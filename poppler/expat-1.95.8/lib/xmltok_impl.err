@@ -1,0 +1,21 @@
+xmltok_impl.c(90): Error! E1009: Expecting ',' or ';' but found 'scanComment'
+xmltok_impl.c(90): Error! E1009: Expecting ',' but found '*'
+xmltok_impl.c(90): Error! E1009: Expecting ',' but found '*'
+xmltok_impl.c(90): Error! E1127: Type required in parameter list
+xmltok_impl.c(94): Error! E1011: Symbol 'ASCII_MINUS' has not been declared
+xmltok_impl.c(96): Error! E1011: Symbol 'XML_TOK_INVALID' has not been declared
+xmltok_impl.c(102): Error! E1011: Symbol 'BT_LEAD2' has not been declared
+xmltok_impl.c(102): Error! E1054: Expression must be constant
+xmltok_impl.c(102): Error! E1011: Symbol 'XML_TOK_PARTIAL_CHAR' has not been declared
+xmltok_impl.c(102): Error! E1011: Symbol 'XML_TOK_INVALID' has not been declared
+xmltok_impl.c(102): Error! E1011: Symbol 'BT_LEAD3' has not been declared
+xmltok_impl.c(102): Error! E1054: Expression must be constant
+xmltok_impl.c(102): Error! E1011: Symbol 'XML_TOK_INVALID' has not been declared
+xmltok_impl.c(102): Error! E1011: Symbol 'BT_LEAD4' has not been declared
+xmltok_impl.c(102): Error! E1054: Expression must be constant
+xmltok_impl.c(102): Error! E1011: Symbol 'XML_TOK_INVALID' has not been declared
+xmltok_impl.c(102): Error! E1011: Symbol 'BT_NONXML' has not been declared
+xmltok_impl.c(102): Error! E1054: Expression must be constant
+xmltok_impl.c(102): Error! E1011: Symbol 'BT_MALFORM' has not been declared
+xmltok_impl.c(102): Error! E1054: Expression must be constant
+xmltok_impl.c(102): Error! E1147: Too many errors: compilation aborted

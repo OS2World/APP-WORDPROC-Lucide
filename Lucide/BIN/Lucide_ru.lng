@@ -1,0 +1,15 @@
+#
+# Main menu
+#
+
+MENU_FILE=~Файл
+MENU_OPEN=Открыть...\tCtrl+O
+MENU_SAVE_AS=Сохранить как...
+
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=Lucide - просмотр документов
+MSGS_NO_SUIT_PLUG=Не могу найти подходящий плагин для просмотра этого документа!
+MSGS_FILE_LOAD_ERROR=Ошибка загрузки файла!

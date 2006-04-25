@@ -1,0 +1,38 @@
+#ifndef ludjvu_idl
+#define ludjvu_idl
+
+/*
+ *
+ *  LuDjvuDocument
+ *
+ */
+
+#include <ludoc.idl>
+
+
+interface LuDjvuDocument : LuDocument
+{
+
+#ifdef __SOMIDL__
+
+    implementation 
+    {
+	    void *data;
+
+        loadFile: override;
+        isScalable: override;
+        getPageCount: override;
+        getPageSize: override;
+        renderPageToPixbuf: override;
+        getThumbnailSize: override;
+        getThumbnail: override;
+
+        somDefaultInit: override, init;
+        somDestruct: override;
+    };
+
+#endif // __SOMIDL__
+
+};
+
+#endif // ludjvu_idl

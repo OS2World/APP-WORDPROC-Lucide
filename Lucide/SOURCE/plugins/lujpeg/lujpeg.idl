@@ -1,0 +1,38 @@
+#ifndef lujpeg_idl
+#define lujpeg_idl
+
+/*
+ *
+ *  LuJpegDocument
+ *
+ *  Lucide plugin for viewing JPEGs.
+ *  Uses IJG JPEG LIBRARY.
+ *
+ */
+
+#include <ludoc.idl>
+
+
+interface LuJpegDocument : LuDocument
+{
+
+#ifdef __SOMIDL__
+
+    implementation 
+    {
+
+	    void *data;
+    	
+        loadFile: override;
+        getPageCount: override;
+        getPageSize: override;
+        renderPageToPixbuf: override;
+        somDefaultInit: override, init;
+        somDestruct: override;
+    };
+    
+#endif // __SOMIDL__
+
+};
+
+#endif // lujpeg_idl

@@ -1,0 +1,60 @@
+#ifndef lupoppler_idl
+#define lupoppler_idl
+
+/*
+ *
+ *  LuPopplerDocument
+ *
+ *  Lucide plugin for viewing/navigating PDFs.
+ *  Uses poppler library.
+ *
+ */
+
+#include <ludoc.idl>
+
+
+interface LuPopplerDocument : LuDocument
+{
+
+#ifdef __SOMIDL__
+
+    implementation 
+    {
+
+	    void *data;
+    	
+        loadFile: override;
+        isScalable: override;
+        isRotable: override;
+        getPageCount: override;
+        getPageSize: override;
+        renderPageToPixbuf: override;
+        isAsynchRenderingSupported: override;
+        renderPageToPixbufAsynch: override;
+        getSelectionRectangles: override;
+        isHaveText: override;
+        getText: override;
+        isHaveLinks: override;
+        getLinkMapping: override;
+        isSaveable: override;
+        saveAs: override;
+        isPSExportable: override;
+        exportToPS: override;
+        isHaveFontInfo: override;
+        getFontInfo: override;
+        isHaveIndex: override;
+        getIndex: override;
+        getDocumentInfo: override;
+        getThumbnailSize: override;
+        getThumbnail: override;
+        searchText: override;
+        
+        somDefaultInit: override, init;
+        somDestruct: override;
+    };
+    
+#endif // __SOMIDL__
+
+};
+
+#endif // lupoppler_idl

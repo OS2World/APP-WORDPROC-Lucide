@@ -1,0 +1,47 @@
+#ifndef lupixbuf_idl
+#define lupixbuf_idl
+
+/*
+ *
+ *  LuPixbuf - pixel buffer class, contains pixel data
+ *             in format suitable for use with GpiDrawBits()
+ *
+ */
+
+#include <somobj.idl>
+
+
+interface LuPixbuf : SOMObject
+{
+    void LuPixbufInit( inout somInitCtrl ctrl, in long w, in long h );
+    long getWidth();
+    long getHeight();
+    long getRowSize();
+    long getDataLen();
+    void *getDataPtr();
+    void putAt( in LuPixbuf p, in long x, in long y );
+
+
+#ifdef __SOMIDL__
+
+    implementation 
+    {
+    	releaseorder: LuPixbufInit, getWidth, getHeight, getRowSize,
+				      getDataLen, getDataPtr, putAt;
+    
+        long width;
+        long height;
+        short bpp;
+        long dlen;
+        long rowsize;
+        void *data;
+        
+        LuPixbufInit: init;
+        somDestruct: override;
+    };
+    
+#endif // __SOMIDL__
+
+};
+
+#endif // lupixbuf_idl

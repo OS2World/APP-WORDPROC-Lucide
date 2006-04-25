@@ -1,0 +1,1 @@
+wcl386 -zq -zp=4 -bm -ox -I.. -Ipoppler -ID:\Projects\poppler\fontconfig-2.3.2-os2 -DOS2 test1.cpp poppler.lib ft2lib.lib

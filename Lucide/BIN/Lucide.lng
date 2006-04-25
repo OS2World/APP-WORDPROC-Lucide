@@ -1,0 +1,116 @@
+#
+# Lucide language file, EN
+#
+
+#
+# Main menu
+#
+MENU_FILE=~File
+MENU_OPEN=Open...\tCtrl+O
+MENU_SAVE_AS=Save As...
+MENU_EXPORT_TO_PS=Export to PostScript...
+MENU_PAGE_SETUP=Page setup...
+MENU_PRINT=Print...
+MENU_DOCUMENT_INFO=Document info...
+MENU_FONTS_INFO=Fonts info...
+MENU_PLUGINS_LIST=Plugins list...
+MENU_EXIT=Exit\tCtrl+X
+MENU_EDIT=~Edit
+MENU_COPY=Copy\tCtrl+Insert
+MENU_SELECT_ALL=Select all
+MENU_FIND=Find...\tCtrl+F
+MENU_FINDAGAIN=Find again\tCtrl+G
+MENU_DOCUMENT=~Document
+MENU_FIRST_PAGE=First page
+MENU_PREV_PAGE=Previous page\t-
+MENU_NEXT_PAGE=Next page\t+
+MENU_LAST_PAGE=Last page
+MENU_GO_TO_PAGE=Go to page...
+MENU_VIEW=~View
+MENU_FIT_WINDOW=Fit in window
+MENU_ACTUAL_SIZE=Actual size
+MENU_FIT_WIDTH=Fit width
+MENU_ROTATE_CW=Rotate 90ø CW
+MENU_ROTATE_CCW=Rotate 90ø CCW
+MENU_SHOW_NAV_PANE=Show navigation pane
+MENU_SINGLE_PAGE=Single page
+MENU_CONTINUOUS=Continuous
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=Open document...
+TBHINT_PRINT=Print...
+TBHINT_SHOW_NAV_PANE=Show/hide navigation pane
+TBHINT_FIRST_PAGE=First page
+TBHINT_PREV_PAGE=Previous page
+TBHINT_NEXT_PAGE=Next page
+TBHINT_LAST_PAGE=Last page
+TBHINT_ACTUAL_SIZE=Actual size
+TBHINT_FIT_WINDOW=Fit in window
+TBHINT_FIT_WIDTH=Fit width
+TBHINT_FIND=Find...
+# toolbar's page number
+TB_PAGENUM=of %d
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=Lucide - Document Viewer
+MSGS_NO_SUIT_PLUG=Can't find suitable plugin for specified document!
+MSGS_FILE_LOAD_ERROR=File load error!
+
+#
+# "Plugins list" dialog
+#
+PLUGLIST_PLUGINS_LIST=Plugins list
+PLUGLIST_CLOSE=Close
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Plugin name
+PLUGLIST_SUPP_EXTS=Supported extensions
+PLUGLIST_PLUGIN_DESC=Plugin description
+
+#
+# "Font info" dialog
+#
+FONTINFO_FONTINFO=Font info
+FONTINFO_CLOSE=Close
+FONTINFO_ENUMERATING=Enumerating fonts, please wait...
+# List columns titles
+FONTINFO_NAME=Name
+FONTINFO_TYPE=Type
+FONTINFO_EMBEDDED=Embedded?
+
+#
+# "Document info" dialog
+#
+DOCINFO_DOCUMENT_INFO=Document info
+DOCINFO_CLOSE=Close
+# Document info keys
+DOCINFO_TITLE=Title:
+DOCINFO_FORMAT=Format:
+DOCINFO_AUTHOR=Author:
+DOCINFO_SUBJECT=Subject:
+DOCINFO_KEYWORDS=Keywords:
+DOCINFO_CREATOR=Creator:
+DOCINFO_PRODUCER=Producer:
+DOCINFO_CREATION_DATE=Created:
+DOCINFO_MOD_DATE=Modified:
+
+#
+# "Find" dialog
+#
+FIND_FIND=Find
+FIND_FIND_WHAT=~Find what:
+FIND_MATCH_CASE=~Match case
+FIND_OK=~OK
+FIND_CANCEL=~Cancel
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=Searching page %d of %d...
+FIND_NOT_FOUND=Not found!
+
+#
+# "Progress" dialog
+#
+PDLG_PROGRESS=Progress
+PDLG_CANCEL=~Cancel
