@@ -1,0 +1,314 @@
+/* config/config.h.in.  Generated from configure.ac by autoheader.  */
+
+
+#ifndef CONFIG_H
+#define CONFIG_H
+/* config.h: begin */
+
+
+/* directory "bindir" */
+#undef DIR_BINDIR
+
+/* directory "datadir" */
+#undef DIR_DATADIR
+
+/* directory "exec_prefix" */
+#undef DIR_EXEC_PREFIX
+
+/* directory "libdir" */
+#undef DIR_LIBDIR
+
+/* directory "mandir" */
+#undef DIR_MANDIR
+
+/* directory "prefix" */
+#undef DIR_PREFIX
+
+/* version string */
+#undef DJVULIBRE_VERSION
+
+/* define if bool is a built-in type */
+#undef HAVE_BOOL
+
+/* Define if cothreads are available. */
+#undef HAVE_COTHREAD
+
+/* Define if libgcc contains the cothread patch. */
+#undef HAVE_COTHREAD_PATCH
+
+/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
+   */
+#define HAVE_DIRENT_H 1
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* define if the compiler supports exceptions */
+#undef HAVE_EXCEPTIONS
+
+/* Define to 1 if you have the `fork' function. */
+#undef HAVE_FORK
+
+/* Define to 1 if you have the `gethostname' function. */
+#undef HAVE_GETHOSTNAME
+
+/* Define to 1 if you have the `getpagesize' function. */
+#undef HAVE_GETPAGESIZE
+
+/* Define to 1 if you have the `getpwuid' function. */
+#undef HAVE_GETPWUID
+
+/* Define to 1 if you have the `iconv' function. */
+#undef HAVE_ICONV
+
+/* Define to 1 if you have the <iconv.h> header file. */
+#undef HAVE_ICONV_H
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `iswspace' function. */
+#undef HAVE_ISWSPACE
+
+/* Define if you have the IJG JPEG library. */
+#undef HAVE_JPEG
+
+/* Define to 1 if you have the `iconv' library (-liconv). */
+#undef HAVE_LIBICONV
+
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
+
+/* Define to 1 if the system has the type `long long int'. */
+#undef HAVE_LONG_LONG_INT
+
+/* Define to 1 if the system has the type `mbstate_t'. */
+#undef HAVE_MBSTATE_T
+
+/* define if the compiler supports member templates */
+#define HAVE_MEMBER_TEMPLATES 1
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have a working `mmap' system call. */
+#undef HAVE_MMAP
+
+/* define if the compiler implements namespaces */
+#define HAVE_NAMESPACES 1
+
+/* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
+#undef HAVE_NDIR_H
+
+/* Define if pthreads are available */
+#undef HAVE_PTHREAD
+
+/* Define to 1 if you have the `putc_unlocked' function. */
+#undef HAVE_PUTC_UNLOCKED
+
+/* Define to Qt version if available */
+#undef HAVE_QT
+
+/* define if the compiler comes with standard includes */
+#undef HAVE_STDINCLUDES
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#define HAVE_STDLIB_H 1
+
+/* Define to 1 if you have the `strerror' function. */
+#define HAVE_STRERROR 1
+
+/* Define to 1 if you have the `strftime' function. */
+#undef HAVE_STRFTIME
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
+   */
+#define HAVE_SYS_DIR_H 1
+
+/* Define to 1 if you have the <sys/ipc.h> header file. */
+#undef HAVE_SYS_IPC_H
+
+/* Define to 1 if you have the <sys/mman.h> header file. */
+#define HAVE_SYS_MMAN_H 1
+
+/* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_SYS_NDIR_H
+
+/* Define to 1 if you have the <sys/shm.h> header file. */
+#undef HAVE_SYS_SHM_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
+#undef HAVE_SYS_WAIT_H
+
+/* Define if you have libtiff. */
+#undef HAVE_TIFF
+
+/* define if the compiler recognizes typename */
+#define HAVE_TYPENAME 1
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the `vfork' function. */
+#undef HAVE_VFORK
+
+/* Define to 1 if you have the <vfork.h> header file. */
+#undef HAVE_VFORK_H
+
+/* Define to 1 if you have the `vsnprintf' function. */
+#undef HAVE_VSNPRINTF
+
+/* Define to 1 if you have the <wchar.h> header file. */
+#define HAVE_WCHAR_H 1
+
+/* Define to 1 if the system has the type `wchar_t'. */
+#define HAVE_WCHAR_T 1
+
+/* Define to 1 if you have the `wcrtomb' function. */
+#define HAVE_WCRTOMB 1
+
+/* Define to 1 if you have the <wctype.h> header file. */
+#define HAVE_WCTYPE_H 1
+
+/* Define to 1 if `fork' works. */
+#undef HAVE_WORKING_FORK
+
+/* Define to 1 if `vfork' works. */
+#undef HAVE_WORKING_VFORK
+
+/* Define to 1 if you have the <X11/extensions/Xext.h> header file. */
+#undef HAVE_X11_EXTENSIONS_XEXT_H
+
+/* Define to use g++ pragmas interface/implementation */
+#undef NEED_GNUG_PRAGMAS
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#define TIME_WITH_SYS_TIME 1
+
+/* Define to 1 if the X Window System is missing or not being used. */
+#undef X_DISPLAY_MISSING
+
+/* Define to `int' if <sys/types.h> does not define. */
+#undef pid_t
+
+/* Define as `fork' if `vfork' does not work. */
+#undef vfork
+
+
+/* - Miscellaneous */
+#define AUTOCONF 1
+#undef UNIX
+#define OS2 1
+
+/* - BOOL */
+#if !defined(HAVE_BOOL) && !defined(bool)
+#define bool  char
+#define true  1
+#define false 0
+#endif
+
+/* - WCHAR etc.*/
+#if ! defined(HAVE_WCHAR_T)
+#define HAS_WCHAR 0
+#define HAS_WCTYPE 0
+#define HAS_MBSTATE 0
+#else
+#define HAS_WCHAR 1
+#if defined(HAVE_WCTYPE_H) && defined(HAVE_ISWSPACE)
+#define HAS_WCTYPE 1
+#endif
+#if defined(HAVE_MBSTATE_T) && defined(HAVE_WCRTOMB)
+#define HAS_MBSTATE 1
+#endif
+#endif
+#if defined(HAVE_ICONV_H) && defined(HAVE_ICONV)
+#define HAS_ICONV 1
+#else
+#define HAS_ICONV 0
+#endif
+
+/* - I18N MESSAGES HELL */
+#define HAS_CTRL_C_IN_ERR_MSG 1
+
+/* - CONTAINERS */
+#ifndef HAVE_MEMBER_TEMPLATES
+#define GCONTAINER_NO_MEMBER_TEMPLATES
+#endif
+#ifndef HAVE_TYPENAME
+#define GCONTAINER_NO_TYPENAME
+#endif
+
+/* - COTHREAD */
+#ifdef HAVE_COTHREAD
+#ifndef HAVE_COTHREAD_PATCH
+#define NO_LIBGCC_HOOKS
+#endif
+#endif
+
+/* - JPEG */
+#ifdef HAVE_JPEG
+#define NEED_JPEG_DECODER
+#endif
+
+/* - MMAP */
+#if defined(HAVE_MMAP) && defined(HAVE_SYS_MMAN_H)
+#define HAS_MEMMAP 1
+#else
+#define HAS_MEMMAP 0
+#endif
+
+/* - QT */
+#ifdef HAVE_QT
+#if HAVE_QT < 200
+#define QT1
+#elif HAVE_QT < 300
+#define QT2
+#else
+#define QT3
+#endif
+#endif
+
+/* - X STUFF */
+#ifdef HAVE_SYS_IPC_H
+#ifdef HAVE_SYS_SHM_H
+#define USE_XSHM 1
+#endif
+#endif
+
+/* config.h: end */
+#endif
+
