@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DjVuImage.h,v 1.9 2005/04/27 16:34:13 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H

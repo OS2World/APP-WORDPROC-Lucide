@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: Template.h,v 1.8 2003/11/07 22:08:22 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 //T// This is a template for the header files in the
 //T// DjVu reference library. It describes the general

@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: GMapAreas.cpp,v 1.9 2004/05/05 15:12:42 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

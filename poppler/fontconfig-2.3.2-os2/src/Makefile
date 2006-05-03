@@ -1,6 +1,6 @@
 CC=wcl386
 
-CFLAGS=-zq -zp=4 -bm -ox -I.. -ID:\Projects\poppler\expat-1.95.8\lib -ID:\Projects\poppler\freetype-2.1.10\include -DOS2
+CFLAGS=-zq -zp=4 -bm -ox -I.. -I..\..\expat-1.95.8\lib -I..\..\freetype-2.1.10\include -DOS2
 
 LIBS=fontconfig.lib
 

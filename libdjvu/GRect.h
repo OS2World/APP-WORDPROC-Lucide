@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GRect.h,v 1.9 2003/11/07 22:08:21 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: GRect.h,v 1.11 2006/02/21 16:10:29 docbill Exp $
+// $Name:  $
 
 #ifndef _GRECT_H_
 #define _GRECT_H_
@@ -75,7 +75,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.9 2003/11/07 22:08:21 leonb Exp $# */
+    #$Id: GRect.h,v 1.11 2006/02/21 16:10:29 docbill Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -87,6 +87,13 @@ namespace DJVU {
 #endif
 #endif
 
+
+/* Flag to indicate that this djvulibre version
+   gets rid of all the crap about orientation bits.
+   All rotation code has been fixed and consistently
+   implements counter-clockwise rotations. */
+
+#define GRECT_WITHOUT_ORIENTATION_BITS 1
 
 
 /** @name Point Coordinates vs. Pixel Coordinates
@@ -132,65 +139,6 @@ namespace DJVU {
 class GRect 
 {
 public:
-  /** #OrientationBits# defines 3 mutually exclusive
-     bits to indicate the image orientation.
-
-     There are four possible rotation values for an image
-     which are 0 degrees, 90 degrees, 180 degrees, and 270 degrees.
-     In addition the image can be mirrored backwards in any of these
-     orientations, giving a possible of 8 orientations.  To sanely deal
-     with these orientations, we have defined 3 mutually exclusive
-     bits.  These are BOTTOM_UP, MIRROR, and ROTATE90_CW.
-  */
-  enum OrientationBits
-  {
-    BOTTOM_UP=0x1,  /* Upside down */
-    MIRROR=0x2,     /* Written backwards. (right to left) */
-    ROTATE90_CW=0x4 /* rotated 90 degrees */
-  };
-
-  /**  #Orientations# defines all 8 possible orientations, using
-   the three \Ref{OrientationBits}.
-   \begin{itemize}
-   \item {\em TDLRNR} for Top Down, Left to Right, No Rotation.
-   \item {\em BULRNR} for Bottom Up, Left to Right, No Rotation.
-   \item {\em TDRLNR} for Top Down, Right to Left, No Rotation.
-   \item {\em BURLNR} for Bottom Up, Right to Left, No Rotation.
-   \item {\em TDLRCW} for Top Down, Left to Right, 90 degree CW rotation.
-   \item {\em BULRCW} for Bottom Up, Left to Right, 90 degree CW rotation.
-   \item {\em TDRLCW} for Top Down, Right to Left, 90 degree CW rotation.
-   \item {\em BURLCW} for Bottom Up, Right to Left, 90 degree CW rotation.
-   \end{itemize}
-  */
-  enum Orientations
-  {
-    TDLRNR=0,                                     /* normal orientation */
-    BULRNR=BOTTOM_UP,                               /* upside down */
-    TDRLNR=MIRROR,                    /* backwards (right to left) */
-    BURLNR=MIRROR|BOTTOM_UP,                    /* rotate 180 */
-    TDLRCW=ROTATE90_CW,                              /* rotated 90 */
-    BULRCW=ROTATE90_CW|BOTTOM_UP, /* backwards and rotate 180 */
-    TDRLCW=ROTATE90_CW|MIRROR,     /* backwards and rotate 90 */
-    BURLCW=ROTATE90_CW|MIRROR|BOTTOM_UP    /* rotate 270 */
-  };
-
-  static Orientations
-  rotate(const int angle,Orientations orientation)
-  {
-    for(int a=(((angle)%360)+405)%360;a>90;a-=90)
-      orientation=(Orientations)((int)orientation^(int)(orientation&ROTATE90_CW)?BURLCW:TDLRCW);
-    return orientation;
-  }
-
-  static int
-  findangle(const Orientations orientation)
-  {
-    int a=270;
-    while(a&&(rotate(a,BURLNR)!=orientation)&&(rotate(a,TDRLNR)!=orientation))
-      a-=90;
-    return a;
-  }
-
   /** Constructs an empty rectangle */
   GRect();
   /** Constructs a rectangle given its minimal coordinates #xmin# and #ymin#,
@@ -204,7 +152,7 @@ public:
   /** Returns the area of the rectangle. */
   int  area() const;
   /** Returns true if the rectangle is empty. */
-  int  isempty() const;
+  bool  isempty() const;
   /** Returns true if the rectangle contains pixel (#x#,#y#).  A rectangle
       contains all pixels with horizontal pixel coordinates in range #xmin#
       (inclusive) to #xmax# (exclusive) and vertical coordinates #ymin#
@@ -315,7 +263,7 @@ public:
       corners in the canonical rectangle representation.  Variable #rect# is
       overwritten with the new rectangle coordinates. */
   void unmap(GRect &rect);
-private:
+public:
   // GRatio
   struct GRatio {
     GRatio ();
@@ -323,6 +271,7 @@ private:
     int p;
     int q;
   };
+private:
   // Data
   GRect rectFrom;
   GRect rectTo;
@@ -366,7 +315,7 @@ GRect::height() const
   return ymax - ymin;
 }
 
-inline int 
+inline bool 
 GRect::isempty() const
 {
   return (xmin>=xmax || ymin>=ymax);

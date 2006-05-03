@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: ByteStream.h,v 1.11 2003/11/07 22:08:20 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: ByteStream.h,v 1.13 2006/01/31 15:28:30 leonb Exp $
+// $Name:  $
 
 #ifndef _BYTESTREAM_H
 #define _BYTESTREAM_H
@@ -97,7 +97,7 @@
 
 
     @version
-    #$Id: ByteStream.h,v 1.11 2003/11/07 22:08:20 leonb Exp $# */
+    #$Id: ByteStream.h,v 1.13 2006/01/31 15:28:30 leonb Exp $# */
 //@{
 
 
@@ -242,7 +242,7 @@ public:
       and writes it to the specified stream. */
   void formatmessage( const char *fmt, ... );
   /** Looks up the message and writes it to the specified stream. */
-  void ByteStream::writemessage( const char *message );
+  void writemessage( const char *message );
   /** Writes a one-byte integer to a ByteStream. */
   void write8 (unsigned int card8);
   /** Writes a two-bytes integer to a ByteStream.
@@ -334,13 +334,12 @@ public:
       the user at construction time. Calls to function #read# directly
       access this memory area.  The user must therefore make sure that its
       content remain valid long enough.  */
-  static GP<ByteStream> create_static(
-    void const * const buffer, const size_t size);
+  static GP<ByteStream> create_static(void const *buffer, size_t size);
   
   /** Easy access to preallocated stdin/stdout/stderr bytestreams */
-  static GP<ByteStream> get_stdin(char const * const mode=0);
-  static GP<ByteStream> get_stdout(char const * const mode=0);  
-  static GP<ByteStream> get_stderr(char const * const mode=0);
+  static GP<ByteStream> get_stdin(char const * mode=0);
+  static GP<ByteStream> get_stdout(char const * mode=0);  
+  static GP<ByteStream> get_stderr(char const * mode=0);
 
   /** This is the conventional name for EOF exceptions */
   static const char *EndOfFile;

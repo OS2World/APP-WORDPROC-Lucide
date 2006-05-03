@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GThreads.cpp,v 1.15 2004/04/21 14:54:43 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: GThreads.cpp,v 1.17 2006/02/21 17:27:34 leonb Exp $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

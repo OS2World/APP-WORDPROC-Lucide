@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GContainer.cpp,v 1.12 2003/11/07 22:08:21 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: GContainer.cpp,v 1.13 2005/11/12 15:52:25 leonb Exp $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -387,7 +387,6 @@ GListBase::GListBase(const GListBase &ref)
   GListBase::operator= (ref);
 }
 
-#include <stdio.h>
 GListBase::~GListBase()
 {
   G_TRY

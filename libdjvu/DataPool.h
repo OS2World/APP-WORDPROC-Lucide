@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DataPool.h,v 1.10 2003/11/07 22:08:20 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H

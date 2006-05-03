@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: JPEGDecoder.h,v 1.8 2003/11/07 22:08:22 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _JPEGDECODER_H_
 #define _JPEGDECODER_H_

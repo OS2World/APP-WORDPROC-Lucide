@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DjVuMessageLite.h,v 1.9 2003/11/07 22:08:21 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef __DJVU_MESSAGE_LITE_H__
 #define __DJVU_MESSAGE_LITE_H__

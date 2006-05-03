@@ -2,7 +2,7 @@
 
 CC=wcl386
 
-CFLAGS=-zq -zp=4 -bm -sg -ox -xs -xr -I.. -ID:\Projects\poppler\freetype-2.1.10\include -DOS2
+CFLAGS=-zq -zp=4 -bm -sg -ox -xs -xr -I.. -I..\..\freetype-2.1.10\include -DOS2
 
 LIBS=libsplash.lib
 

@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: IFFByteStream.h,v 1.10 2003/11/07 22:08:21 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _IFFBYTESTREAM_H_
 #define _IFFBYTESTREAM_H_

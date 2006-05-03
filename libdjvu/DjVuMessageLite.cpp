@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DjVuMessageLite.cpp,v 1.13 2005/04/27 16:34:13 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GPixmap.cpp,v 1.12 2004/08/06 15:11:29 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: GPixmap.cpp,v 1.13 2005/12/24 12:45:01 leonb Exp $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -1604,7 +1604,8 @@ GPixmap::stencil(const GBitmap *bm,
 GP<GPixmap> GPixmap::rotate(int count)
 {
   GP<GPixmap> newpixmap(this);
-  if((count %= 4))
+  count = count & 3;
+  if(count)
   {
     if( count&0x01)
       newpixmap = new GPixmap(ncolumns, nrows);
@@ -1616,7 +1617,7 @@ GP<GPixmap> GPixmap::rotate(int count)
     GMonitorLock lock(&pixmap_monitor());
     switch(count)
     {
-    case 1: //// rotate 90 counter clockwise
+    case 3: //// rotate 90 counter clockwise
         {
             int lastrow = dpixmap.rows()-1;
 
@@ -1646,7 +1647,7 @@ GP<GPixmap> GPixmap::rotate(int count)
             }
         }
         break;
-    case 3: //// rotate 270 counter clockwise
+    case 1: //// rotate 270 counter clockwise
         {
             int lastcolumn = dpixmap.columns()-1;
 

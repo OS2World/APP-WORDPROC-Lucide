@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: JB2Image.h,v 1.9 2003/11/07 22:08:22 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H

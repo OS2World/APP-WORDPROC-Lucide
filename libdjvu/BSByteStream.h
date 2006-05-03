@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: BSByteStream.h,v 1.8 2003/11/07 22:08:20 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _BSBYTESTREAM_H
 #define _BSBYTESTREAM_H

@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GOS.cpp,v 1.12 2005/04/27 16:34:13 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: GOS.cpp,v 1.13 2005/12/23 15:14:16 leonb Exp $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -130,7 +130,7 @@ namespace DJVU {
 
 #if defined(AUTOCONF) && !defined(HAVE_STRERROR)
 # define NEED_STRERROR
-#elif defined(sun) && !defined(__svr4__)
+#elif defined(sun) && !defined(__svr4__) && !defined(__SVR4)
 # define NEED_STRERROR
 #elif defined(REIMPLEMENT_STRERROR)
 # define NEED_STRERROR

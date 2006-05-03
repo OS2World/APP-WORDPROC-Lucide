@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuFile.h,v 1.9 2003/11/07 22:08:20 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: DjVuFile.h,v 1.10 2005/12/24 12:45:01 leonb Exp $
+// $Name:  $
 
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -102,7 +102,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuFile.h,v 1.9 2003/11/07 22:08:20 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.10 2005/12/24 12:45:01 leonb Exp $#
 */
 
 //@{
@@ -780,17 +780,10 @@ DjVuFile::can_compress(void) const
 inline void
 DjVuFile::set_can_compress(bool m)
 {
-   if(info)
-   {
-     info->compressable=m;
-   }
    if (m)
-   {
      flags=flags | CAN_COMPRESS;
-   } else
-   {
+   else
      flags=flags & ~CAN_COMPRESS;
-   }
 }
 
 inline void

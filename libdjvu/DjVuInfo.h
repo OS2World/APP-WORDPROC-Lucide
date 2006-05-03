@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuInfo.h,v 1.12 2003/11/07 22:08:21 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: DjVuInfo.h,v 1.15 2005/12/24 12:45:01 leonb Exp $
+// $Name:  $
 
 #ifndef _DJVUINFO_H
 #define _DJVUINFO_H
@@ -73,7 +73,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.12 2003/11/07 22:08:21 leonb Exp $# */
+    #$Id: DjVuInfo.h,v 1.15 2005/12/24 12:45:01 leonb Exp $# */
 //@{
 
 
@@ -96,11 +96,10 @@ class ByteStream;
 /** Current DjVu format version.  The value of this macro represents the
     version of the DjVu file format implemented by this release of the DjVu
     Reference Library. */
-#define DJVUVERSION              25
+#define DJVUVERSION              26
 /** DjVu format version. This is the value used in files produced 
     with DjVuLibre. This is smaller than DJVUVERSION because version
-    number inflation causes problems with older software.
- */ 
+    number inflation causes problems with older software. */ 
 #define DJVUVERSION_FOR_OUTPUT   24
 /** This is the version which introduced orientations. */
 #define DJVUVERSION_ORIENTATION  22
@@ -164,14 +163,11 @@ public:
       rendering functions can use this information in order to perform color
       correction for the intended display device. */
   double gamma;
-  /** The following boolian values are stored in the last character of the
-      info structure.  Unused bits are reserved for possible future extensions
-      and backwards compatability. */
-  bool compressable;
-  enum {COMPRESSABLE_FLAG=0x80,RESERVED_FLAGS1=0x7f};
 
-  /** We also store the current image orientation as three bits. */
-  GRect::Orientations orientation;
+  /** Image orientation:
+      0: no rotation      1: 90 degrees counter-clockwise
+      2: 180 degrees      3: 270 degrees counter-clockwise */
+  int orientation;
 
      /// Obtain the flags for the default specifications.
   GUTF8String get_paramtags(void) const;

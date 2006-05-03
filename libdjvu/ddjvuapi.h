@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 //C- */ 
 
-/* $Id: ddjvuapi.h,v 1.34 2005/10/31 16:44:10 leonb Exp $ */
+/* $Id: ddjvuapi.h,v 1.46 2006/01/30 14:28:55 leonb Exp $ */
 
 #ifndef DDJVUAPI_H
 #define DDJVUAPI_H
@@ -99,24 +99,29 @@ extern "C" {
 
    Version   Change
    -----------------------------
-     16    Addition of miniexp.h and related functions:
-              ddjvu_miniexp_release()
-              ddjvu_document_get_outline/pagetext/pageanno()
-              ddjvu_anno_get_XXX()
+     17    Addition of:
+              ddjvu_page_get_initial_rotation(), ddjvu_code_get_version()
+              ddjvu_document_get_filenum(), ddjvu_document_get_fileinfo()
+              ddjvu_document_search_pageno(), ddjvu_document_check_pagedata()
+              ddjvu_rectmapper_t and related functions.
+     16    Addition of:
+              miniexp.h and related functions.
      15    Addition of:
               ddjvu_document_get_pageinfo()
               ddjvu_document_print()
      14    Initial version.
 */
 
-#define DDJVUAPI_VERSION 16
+#define DDJVUAPI_VERSION 17
 
-typedef struct ddjvu_context_s  ddjvu_context_t;
-typedef union  ddjvu_message_s  ddjvu_message_t;
-typedef struct ddjvu_job_s      ddjvu_job_t;
-typedef struct ddjvu_document_s ddjvu_document_t;
-typedef struct ddjvu_page_s     ddjvu_page_t;
-typedef struct ddjvu_format_s   ddjvu_format_t;
+typedef struct ddjvu_context_s    ddjvu_context_t;
+typedef union  ddjvu_message_s    ddjvu_message_t;
+typedef struct ddjvu_job_s        ddjvu_job_t;
+typedef struct ddjvu_document_s   ddjvu_document_t;
+typedef struct ddjvu_page_s       ddjvu_page_t;
+typedef struct ddjvu_format_s     ddjvu_format_t;
+typedef struct ddjvu_rect_s       ddjvu_rect_t;
+typedef struct ddjvu_rectmapper_s ddjvu_rectmapper_t;
 
 
 /* GENERAL CONVENTIONS:
@@ -139,7 +144,7 @@ typedef struct ddjvu_format_s   ddjvu_format_t;
    PREREQUISITES:
    - Please read the djvu man page: <"tools/djvu.1">.
    - Please browse the file format specifications 
-     <"doc/djvu3changes.txt"> and <"doc/djvu2spec.djvu">.
+     <"doc/djvu3changes.txt"> and <"doc/djvu3spec.djvu">.
 */
 
   
@@ -403,8 +408,7 @@ typedef struct ddjvu_message_any_s {
    reported as error messages because they can occur
    asynchronously.  Member <message> is the error message.
    Members <function>, <filename> and <lineno>
-   indicates the place where the error was detected.
-*/
+   indicates the place where the error was detected. */
 
 struct ddjvu_message_error_s {  /* ddjvu_message_t::m_error */
   ddjvu_message_any_t   any;
@@ -465,7 +469,7 @@ ddjvu_document_create(ddjvu_context_t *context,
                       int cache);
 
 
-/* ddjvu_document_create_from_file ---
+/* ddjvu_document_create_by_filename ---
    Creates a document for a DjVu document stored in a file.
    The document will directly access the specified DjVu file 
    or related files without generating <m_newstream> messages. */
@@ -594,7 +598,8 @@ ddjvu_stream_close(ddjvu_document_t *document,
    The <m_docinfo> message indicates that basic information
    about the document has been obtained and decoded.
    Not much can be done before this happens.
- */
+   Call <ddjvu_document_decoding_status> to determine
+   whether the operation was successful. */
 
 struct ddjvu_message_docinfo_s {
   ddjvu_message_any_t  any;
@@ -628,6 +633,67 @@ DDJVUAPI int
 ddjvu_document_get_pagenum(ddjvu_document_t *document);
 
 
+
+/* ------- ADVANCED ------- */
+
+
+/* ddjvu_document_get_filenum --
+   Returns the number of component files.
+   This function might return 1 when called
+   before receiving a <m_docinfo> message */
+   
+DDJVUAPI int
+ddjvu_document_get_filenum(ddjvu_document_t *document);
+
+
+/* ddjvu_document_get_fileinfo --
+   Returns information about component file <fileno>.
+   This function might return <DDJVU_JOB_STARTED> when
+   called before receiving a <m_docinfo> message.
+   String pointers in the returned data structure 
+   might be null. Strings are UTF8 encoded and remain 
+   allocated as long as the ddjvu_document_t object exists.*/
+
+typedef struct ddjvu_fileinfo_s {
+  char  type;                   /* [P]age, [T]humbnails, [I]nclude. */
+  int   pageno;                 /* Zero when not applicable. */
+  int   size;                   /* Zero when unknown. */
+  const char *id;               /* File identifier. */
+  const char *name;             /* Name for indirect documents. */
+  const char *title;            /* Page title. */
+} ddjvu_fileinfo_t;
+
+DDJVUAPI ddjvu_status_t
+ddjvu_document_get_fileinfo(ddjvu_document_t *document, 
+                            int fileno, ddjvu_fileinfo_t *info);
+
+
+/* ddjvu_document_search_pageno ---
+   Searches the page number of the page named <name>. 
+   Argument <name> is an UTF8 encoded string that is
+   matched against the page ids, page names, and page titles.
+   Numerical names are also interpreted as page numbers.
+   This functions returns <-1> when an error occurs,
+   when the page is not found, or when called before
+   receiving a <m_docinfo> message. */
+
+DDJVUAPI int
+ddjvu_document_search_pageno(ddjvu_document_t *document, const char *name);
+
+
+/* ddjvu_document_check_pagedata ---
+   Returns a non zero result if the data for page <pageno>
+   is already in memory. When this is the case, functions 
+   <ddjvu_document_get_pageinfo>, <ddjvu_document_get_pagetext> 
+   and <ddjvu_document_get_pageanno> return the information immediately.
+   This function causes the emission of <m_pageinfo> messages 
+   with zero in the <m_any.page> field.
+*/
+
+DDJVUAPI int 
+ddjvu_document_check_pagedata(ddjvu_document_t *document, int pageno);
+
+
 /* ddjvu_document_get_pageinfo ---
    Attempts to obtain information about page <pageno>
    without decoding the page. If the information is available,
@@ -643,20 +709,19 @@ ddjvu_document_get_pagenum(ddjvu_document_t *document);
      handle_ddjvu_messages(ctx, TRUE);
    if (r>=DDJVU_JOB_FAILED)
      signal_error();
-
-   When the djvu document comes from the network, the above idiom 
-   is very slow because it waits until the data for all page is present. 
 */      
 
 typedef struct ddjvu_pageinfo_s {
-  int width;
-  int height;
-  int dpi;
+  int width;                    /* page width (in pixels) */
+  int height;                   /* page height (in pixels) */
+  int dpi;                      /* page resolution (in dots per inche) */
 } ddjvu_pageinfo_t;
 
 DDJVUAPI ddjvu_status_t
-ddjvu_document_get_pageinfo(ddjvu_document_t *document, int pageno, 
-                            ddjvu_pageinfo_t *info);
+ddjvu_document_get_pageinfo(ddjvu_document_t *document, 
+                            int pageno, ddjvu_pageinfo_t *info);
+
+
 
 
 
@@ -669,12 +734,13 @@ ddjvu_document_get_pageinfo(ddjvu_document_t *document, int pageno,
    Each page of a document can be accessed by creating a
    <ddjvu_page_t> object with this function.  Argument
    <pageno> indicates the page number, starting with page
-   <0> to <pagenum-1>. This function can be called
-   immediately after creating the <ddjvu_document_t> object.
-   It also initiates the data transfer and the decoding threads 
-   for the specified page.  Various messages will document
-   the progress of these operations. Error messages will be
-   generated if the page does not exists. */
+   <0> to <pagenum-1>. This function may return NULL
+   when called before receiving the <m_docinfo> message.
+   Calling this function also initiates the data transfer 
+   and the decoding threads for the specified page.  
+   Various messages will document the progress of these 
+   operations. Error messages will be generated if 
+   the page does not exists. */
 
 DDJVUAPI ddjvu_page_t *
 ddjvu_page_create_by_pageno(ddjvu_document_t *document,
@@ -742,7 +808,7 @@ ddjvu_page_job(ddjvu_page_t *page);
      before any <m_relayout> or <m_redisplay> message,
    - when the page decoding thread terminates.
    You can distinguish both cases using 
-   function ddjvu_page_decoding_done().
+   function ddjvu_page_decoding_status().
    Messages <m_pageinfo> are also generated as a consequence of 
    functions such as <ddjvu_document_get_pageinfo>. 
    The field <m_any.page> of such message is null.
@@ -792,7 +858,7 @@ struct ddjvu_message_chunk_s {     /* ddjvu_message_t::m_chunk */
    zoom factors, and place the image area, scrollbars, toolbars, and other gui
    objects.  When receiving <m_redisplay>, the viewer should invalidate the
    image area so that the gui toolkint calls the repaint event handler. This
-   handler should call ddjvu_page_render() and paint the part og the
+   handler should call ddjvu_page_render() and paint the part of the
    image that needs repainting. */
 
 
@@ -840,6 +906,14 @@ ddjvu_page_get_gamma(ddjvu_page_t *page);
 DDJVUAPI int
 ddjvu_page_get_version(ddjvu_page_t *page);
 
+/* ddjvu_code_get_version ---
+   Returns the version of the djvu file format
+   implemented by this library. More or less graceful 
+   degradation might arise if this is smaller than
+   the number returned by <ddjvu_page_get_version>. */
+
+DDJVUAPI int
+ddjvu_code_get_version(void);
 
 /* ddjvu_page_get_type ---
    Returns the type of the page data.
@@ -855,6 +929,7 @@ typedef enum {
 
 DDJVUAPI ddjvu_page_type_t
 ddjvu_page_get_type(ddjvu_page_t *page);
+
 
 /* ddjvu_page_get_short_description ---
    ddjvu_page_get_long_description ---
@@ -872,11 +947,10 @@ DDJVUAPI char *
 ddjvu_page_get_long_description(ddjvu_page_t *page);
 
 
-/* ddjvu_page_get_rotation ---
-   Returns the rotation angle for the DjVu page.
-   The rotation is automatically taken into account
-   by <ddjvu_page_render>, <ddjvu_page_get_width>
-   and <ddjvu_page_get_height>. */
+/* ddjvu_page_set_rotation ---
+   Changes the counter-clockwise rotation angle for a DjVu page.
+   Calling this function before receiving a <m_pageinfo>
+   message has no good effect. */
 
 typedef enum {
   DDJVU_ROTATE_0   = 0,
@@ -885,36 +959,36 @@ typedef enum {
   DDJVU_ROTATE_270 = 3,
 } ddjvu_page_rotation_t;
 
-DDJVUAPI ddjvu_page_rotation_t
-ddjvu_page_get_rotation(ddjvu_page_t *page);
-
-
-/* ddjvu_page_set_rotation ---
-   Changes the rotation angle for a DjVu page.
-   Calling this function before receiving a <m_pageinfo>
-   message has no effect. */
-
 DDJVUAPI void
 ddjvu_page_set_rotation(ddjvu_page_t *page,
                         ddjvu_page_rotation_t rot);
 
 
+/* ddjvu_page_get_rotation ---
+   Returns the counter-clockwise rotation angle for the DjVu page.
+   The rotation is automatically taken into account
+   by <ddjvu_page_render>, <ddjvu_page_get_width>
+   and <ddjvu_page_get_height>. */
+
+DDJVUAPI ddjvu_page_rotation_t
+ddjvu_page_get_rotation(ddjvu_page_t *page);
+
+
+/* ddjvu_page_get_initial_rotation ---
+   Returns the page rotation specified by the 
+   orientation flags in the DjVu file. 
+   [brain damage warning] This is useful because
+   maparea coordinates in the annotation chunks
+   are expressed relative to the rotated coordinates
+   whereas text coordinates in the hidden text data
+   are expressed relative to the unrotated coordinates. */
+
+DDJVUAPI ddjvu_page_rotation_t
+ddjvu_page_get_initial_rotation(ddjvu_page_t *page);
+
+
 
 /* ------- RENDER ------- */
-
-
-/* ddjvu_rect_t ---
-   This structure specifies the location of a rectangle.
-   Coordinates are usually expressed in pixels relative to 
-   the BOTTOM LEFT CORNER (but see ddjvu_format_set_y_direction).
-   Members <x> and <y> indicate the position of the bottom left 
-   corner of the rectangle Members <w> and <h> indicate the 
-   width and height of the rectangle. */
-
-typedef struct ddjvu_rect_s {
-  int x, y;
-  unsigned int w, h;
-} ddjvu_rect_t;
 
 
 /* ddjvu_render_mode_t ---
@@ -929,6 +1003,19 @@ typedef enum {
   DDJVU_RENDER_FOREGROUND,      /* color foreground layer */
 } ddjvu_render_mode_t;
 
+
+/* ddjvu_rect_t ---
+   This structure specifies the location of a rectangle.
+   Coordinates are usually expressed in pixels relative to 
+   the BOTTOM LEFT CORNER (but see ddjvu_format_set_y_direction).
+   Members <x> and <y> indicate the position of the bottom left 
+   corner of the rectangle Members <w> and <h> indicate the 
+   width and height of the rectangle. */
+
+struct ddjvu_rect_s {
+  int x, y;
+  unsigned int w, h;
+};
 
 
 /* ddjvu_page_render --
@@ -967,6 +1054,64 @@ ddjvu_page_render(ddjvu_page_t *page,
 
 
 /* -------------------------------------------------- */
+/* COORDINATE TRANSFORMS                              */
+/* -------------------------------------------------- */
+
+/* ddjvu_rectmapper_create --
+   Creates a <ddjvu_rectmapper_t> data structure 
+   representing an affine coordinate transformation that
+   maps points from rectangle <input> to rectangle <output>.
+   The transformation maintains the positions relative 
+   to the coordinates of the rectangle corners. */
+
+DDJVUAPI ddjvu_rectmapper_t *
+ddjvu_rectmapper_create(ddjvu_rect_t *input, ddjvu_rect_t *output);
+
+
+/* ddjvu_rectmapper_modify ---
+   Modifies the coordinate transform <mapper> by redefining
+   which corners of the output rectangle match those of the 
+   input rectangle. This function first applies a counter-clockwise 
+   rotation of <rotation> quarter-turns, and then reverses the X 
+   (resp. Y) coordinates when <mirrorx> (resp. <mirrory>) is non zero. */
+
+DDJVUAPI void
+ddjvu_rectmapper_modify(ddjvu_rectmapper_t *mapper,
+                        int rotation, int mirrorx, int mirrory);
+
+
+/* ddjvu_rectmapper_release ---
+   Destroys the <ddjvu_rect_mapper_t> structure
+   returned by <ddjvu_rect_mapper_create>. */
+
+DDJVUAPI void 
+ddjvu_rectmapper_release(ddjvu_rectmapper_t *mapper);
+
+/* ddjvu_map_point, ddjvu_map_rect ---
+   Applies the coordinate transform 
+   to a point or a rectangle */
+
+DDJVUAPI void 
+ddjvu_map_point(ddjvu_rectmapper_t *mapper, int *x, int *y);
+
+DDJVUAPI void 
+ddjvu_map_rect(ddjvu_rectmapper_t *mapper, ddjvu_rect_t *rect);
+
+
+/* ddjvu_unmap_point, ddjvu_unmap_rect ---
+   Applies the inverse coordinate transform 
+   to a point or a rectangle */
+
+DDJVUAPI void 
+ddjvu_unmap_point(ddjvu_rectmapper_t *mapper, int *x, int *y);
+
+DDJVUAPI void 
+ddjvu_unmap_rect(ddjvu_rectmapper_t *mapper, ddjvu_rect_t *rect);
+
+
+
+
+/* -------------------------------------------------- */
 /* DJVU_FORMAT_T                                      */
 /* -------------------------------------------------- */
 
@@ -991,9 +1136,10 @@ typedef enum {
    Argument <style> describes the generic pixel format.
    Argument <args> is an array of <nargs> unsigned ints
    providing additionnal information:
-   - When style is <RGBMASK*>, argument <nargs> must be <3>
-     and array <args> contains three contiguous bit masks for 
-     the red, green, and blue components of each pixel.
+   - When style is <RGBMASK*>, argument <nargs> must be <3> or <4>.
+     The three first entries of array <args> are three contiguous 
+     bit masks for the red, green, and blue components of each pixel.
+     The resulting color is then xored with the optional fourth entry.
    - When style is <PALETTE*>, argument <nargs> must be <216>
      and array <args> contains the 6*6*6 entries of a web
      color cube.
@@ -1103,7 +1249,6 @@ ddjvu_thumbnail_render(ddjvu_document_t *document, int pagenum,
 /* -------------------------------------------------- */
 
 
-
 /* ddjvu_message_t::m_progress ---
    These messages are generated to indicate progress 
    towards the completion of a print or save job. */
@@ -1134,7 +1279,7 @@ ddjvu_document_print(ddjvu_document_t *document, FILE *output,
                      int optc, const char * const * optv);
 
 
-/* NOT YET IMPLEMENTED ---
+/* ddjvu_document_save ---
    Saves the djvu document as a bundled djvu file.
    This function works asynchronously in a separate thread.
    You can use the following idiom for synchronous operation:
@@ -1144,11 +1289,9 @@ ddjvu_document_print(ddjvu_document_t *document, FILE *output,
        handle_ddjvu_messages(context, TRUE);
      
    The bundled djvu data is written to file <output>
-   which must be seekable. Arguments <optc> and <optv> 
-   exactly like command line arguments of a program.
-   The only supported option is "-page=<pagespec>".
-   See the man page for <djvups> for more information
-   about page specifications.
+   which must be seekable. Arguments <optc> and <optv>
+   are intended for enabling future extensions 
+   of this function.
 */
 DDJVUAPI ddjvu_job_t *
 ddjvu_document_save(ddjvu_document_t *document, FILE *output, 
@@ -1156,9 +1299,11 @@ ddjvu_document_save(ddjvu_document_t *document, FILE *output,
 
 
 
+
 /* -------------------------------------------------- */
 /* S-EXPRESSIONS                                      */
 /* -------------------------------------------------- */
+
 
 /* DjVu files can contain ancillary information such as
    document outline, hidden text, hyperlinks, and metadata.

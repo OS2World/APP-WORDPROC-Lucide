@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: ByteStream.cpp,v 1.18 2004/08/06 14:50:05 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: ByteStream.cpp,v 1.20 2005/12/24 12:45:01 leonb Exp $
+// $Name:  $
 
 // From: Leon Bottou, 1/31/2002
 // This file has very little to do with my initial implementation.
@@ -1196,7 +1196,7 @@ ByteStream::create(FILE * const f,char const * const mode,const bool closeme)
 }
 
 GP<ByteStream>
-ByteStream::create_static(const void * const buffer, size_t sz)
+ByteStream::create_static(const void * buffer, size_t sz)
 {
   return new Static(buffer, sz);
 }
@@ -1288,21 +1288,21 @@ ByteStream::Wrapper::~Wrapper() {}
 
 
 GP<ByteStream> 
-ByteStream::get_stdin(char const * const mode)
+ByteStream::get_stdin(char const *mode)
 {
   static GP<ByteStream> gp = ByteStream::create(0,mode,false);
   return gp;
 }
 
 GP<ByteStream> 
-ByteStream::get_stdout(char const * const mode)
+ByteStream::get_stdout(char const *mode)
 {
   static GP<ByteStream> gp = ByteStream::create(1,mode,false);
   return gp;
 }
 
 GP<ByteStream> 
-ByteStream::get_stderr(char const * const mode)
+ByteStream::get_stderr(char const *mode)
 {
   static GP<ByteStream> gp = ByteStream::create(2,mode,false);
   return gp;

@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DjVuDumpHelper.h,v 1.9 2003/11/07 22:08:20 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _DJVUDUMPHELPER_H
 #define _DJVUDUMPHELPER_H

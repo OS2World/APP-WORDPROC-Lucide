@@ -1,7 +1,7 @@
 .autodepend
 
-OBJDIR = D:\Projects\Lucide\OBJS
-EXEDIR = D:\Projects\Lucide\BIN
+OBJDIR = ..\..\OBJS
+EXEDIR = ..\..\BIN
 
 .path.obj = $(OBJDIR)
 .path.res = $(OBJDIR)

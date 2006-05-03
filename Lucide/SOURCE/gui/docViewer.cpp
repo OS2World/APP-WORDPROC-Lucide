@@ -15,13 +15,14 @@
 #include "messages.h"
 
 
-// OpenWatcom 1.4 headers doesn't have GpiDrawBits() declaration
+// OpenWatcom headers doesn't have GpiDrawBits() declaration
 extern "C" {
     LONG APIENTRY GpiDrawBits(HPS hps, PVOID pBits, PBITMAPINFO2 pbmiInfoTable,
                               LONG lCount, PPOINTL aptlPoints, LONG lRop, ULONG flOptions);
 }
 
-typedef LuDocument_LuRectSequence *PLuRectSequence;
+typedef LuDocument_LuRectSequence    *PLuRectSequence;
+typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 
 #define LINE_HEIGHT     16
 
@@ -55,17 +56,17 @@ DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
     spos_x      = 0;
     spos_y      = 0;
     progressDlg = new ProgressDlg( hWndFrame );
+    drawareas   = NULL;
+    drawareaIndex = 0;
     // continuous view
-    continuous  = true;
+    continuous  = false;
     pagesizes   = NULL;
     realVscrollMax = 0;
-    VScrollStep = 0;
-    drawareas   = NULL;
+    VScrollStep = 1;
     // asynch draw
     abortAsynch = false;
     termdraw    = false;
     enableAsynchDraw = false;
-    WinSetRectEmpty( hab, &drawRect );
     DosCreateMutexSem( NULL, &todrawAccess, 0, FALSE );
     DosCreateEventSem( NULL, &haveDraw, 0, FALSE );
     // selection
@@ -109,7 +110,7 @@ DocumentViewer::~DocumentViewer()
 
     if ( doc != NULL ) {
         LuDocument::freeRectangles( ev, selrects );
-        LuDocument::freeLinkMapping( ev, links );
+        freeLinks();
         freeFoundrects();
     }
 
@@ -142,8 +143,10 @@ void DocumentViewer::setDocument( LuDocument *_doc )
     fullheight  = 0;
     delete pagesizes;
     pagesizes   = NULL;
+    freeFoundrects();
     delete foundrects;
     foundrects  = NULL;
+    freeLinks();
 
     if ( doc != NULL )
     {
@@ -158,17 +161,39 @@ void DocumentViewer::setDocument( LuDocument *_doc )
 
         foundrects = new PLuRectSequence[ totalpages ];
         memset( foundrects, 0, sizeof( PLuRectSequence ) * totalpages );
-        enableAsynchDraw = false; //doc->isAsynchRenderingSupported( ev );
+        links = new PLuLinkMapSequence[ totalpages ];
+        memset( links, 0, sizeof( PLuLinkMapSequence ) * totalpages );
+        enableAsynchDraw = doc->isAsynchRenderingSupported( ev );
         drawPage();
     }
 }
 
 void DocumentViewer::freeFoundrects()
 {
-    if ( foundrects != NULL ) {
+    if ( foundrects != NULL )
+    {
         for ( long i = 0; i < totalpages; i++ ) {
-            LuDocument::freeRectangles( ev, foundrects[ i ] );
+            if ( foundrects[ i ] != NULL ) {
+                LuDocument::freeRectangles( ev, foundrects[ i ] );
+                foundrects[ i ] = NULL;
+            }
         }
+    }
+}
+
+void DocumentViewer::freeLinks()
+{
+    if ( links != NULL )
+    {
+        for ( long i = 0; i < totalpages; i++ ) {
+            if ( links[ i ] != NULL ) {
+                LuDocument::freeLinkMapping( ev, links[ i ] );
+                links[ i ] = NULL;
+            }
+        }
+
+        delete links;
+        links = NULL;
     }
 }
 
@@ -176,10 +201,19 @@ void DocumentViewer::freeFoundrects()
 // switch view to specified page
 void DocumentViewer::goToPage( long page )
 {
-    currentpage = page;
-    if ( doc != NULL ) {
+    if ( continuous && ( doc != NULL ) )
+    {
+        double pgpos = pagenumToPos( page ) / VScrollStep;
+        vertScroll( hWndDoc, MPFROM2SHORT( pgpos, SB_SLIDERPOSITION ), NULLHANDLE );
         drawPage();
-        Lucide::checkNavigationMenus();
+    }
+    else
+    {
+        currentpage = page;
+        if ( doc != NULL ) {
+            drawPage();
+            Lucide::checkNavigationMenus();
+        }
     }
 }
 
@@ -258,10 +292,9 @@ void DocumentViewer::searchthread( void *p )
             found = true;
             _this->progressDlg->hide();
             _this->goToPage( i );
-            if ( _this->foundrects[i]->_length > 0 )
-            {
+            if ( _this->foundrects[i]->_length > 0 ) {
                 RECTL r;
-                _this->docPosToWinPos( &(_this->foundrects[i]->_buffer[0]), &r );
+                _this->docPosToWinPos( 0, &(_this->foundrects[i]->_buffer[0]), &r );
                 _this->scrollToPos( _this->hWndDoc, NULLHANDLE, r.xLeft, r.yBottom, false );
             }
             break;
@@ -321,14 +354,20 @@ void DocumentViewer::drawPage()
 {
     if ( continuous )
     {
-
+        adjustSize();
+        WinSendMsg( hWndDoc, WM_SIZE, MPFROM2SHORT( cxClient, cyClient ),
+                    MPFROM2SHORT( cxClient, cyClient ) );
+        WinInvalidateRect( hWndDoc, NULL, FALSE );
     }
     else
     {
         LuDocument::freeRectangles( ev, selrects );
         selrects = NULL;
-        LuDocument::freeLinkMapping( ev, links );
-        links = doc->getLinkMapping( ev, currentpage );
+        if ( links != NULL ) {
+            if ( links[ currentpage ] == NULL ) {
+                links[ currentpage ] = doc->getLinkMapping( ev, currentpage );
+            }
+        }
         Lucide::enableCopy( false );
         adjustSize();
         sVscrollPos = 0;
@@ -360,21 +399,16 @@ MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2, HRGN hrgn )
             break;
         case SB_SLIDERTRACK:
         case SB_SLIDERPOSITION:
-            sVscrollInc = ( SHORT1FROMMP( mp2 ) - sVscrollPos ) *
-                                    ( continuous ? VScrollStep : 1 );
+            sVscrollInc = ( SHORT1FROMMP( mp2 ) - sVscrollPos ) * VScrollStep;
             break;
     }
 
-    if ( continuous ) {
-        sVscrollInc = __max( -sVscrollPos * VScrollStep, __min( sVscrollInc,
-                                  ( sVscrollMax - sVscrollPos ) * VScrollStep ) );
-    } else {
-        sVscrollInc = __max( -sVscrollPos, __min( sVscrollInc, sVscrollMax - sVscrollPos ) );
-    }
+    sVscrollInc = __max( -sVscrollPos * VScrollStep, __min( sVscrollInc,
+                              ( sVscrollMax - sVscrollPos ) * VScrollStep ) );
 
     if ( sVscrollInc != 0 )
     {
-        sVscrollPos += (SHORT)( continuous ? ( sVscrollInc / VScrollStep ) : sVscrollInc );
+        sVscrollPos += (SHORT)( sVscrollInc / VScrollStep );
         WinScrollWindow( hwnd, 0, sVscrollInc, NULL, NULL, hrgn, NULL, SW_INVALIDATERGN );
         WinSendMsg( hWndVscroll, SBM_SETPOS, MPFROMSHORT( sVscrollPos ), MPVOID );
         WinUpdateWindow( hwnd );
@@ -464,6 +498,7 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
     }
     else {
         realVscrollMax = sVscrollMax = (SHORT)__max( 0, height - cyClient );
+        VScrollStep = 1;
     }
     sVscrollPos = __min( sVscrollPos, sVscrollMax );
 
@@ -502,11 +537,12 @@ long _System DocumentViewer::asynchCallbackFnDraw( void *data )
     HPS hps = WinGetPS( d->hWndDoc );
     if ( hps != NULLHANDLE )
     {
-        LONG rclx = d->drawRect.xRight - d->drawRect.xLeft;
-        LONG rcly = d->drawRect.yTop - d->drawRect.yBottom;
+        PRECTL drawRect = &((*d->drawareas)[d->drawareaIndex].drawrect);
+        LONG rclx = drawRect->xRight - drawRect->xLeft;
+        LONG rcly = drawRect->yTop - drawRect->yBottom;
 
-        POINTL aptlPoints[4]={ d->drawRect.xLeft, d->drawRect.yBottom,
-                               d->drawRect.xRight-1, d->drawRect.yTop-1,
+        POINTL aptlPoints[4]={ drawRect->xLeft, drawRect->yBottom,
+                               drawRect->xRight-1, drawRect->yTop-1,
                                0, 0, rclx, rcly };
 
         LONG lRop = ROP_SRCCOPY;
@@ -528,43 +564,53 @@ long _System DocumentViewer::asynchCallbackFnDraw( void *data )
 void DocumentViewer::drawthread( void *p )
 {
     DosSetPriority( PRTYS_THREAD, PRTYC_REGULAR, PRTYD_MINIMUM, 0 );
-    DocumentViewer *d = (DocumentViewer *)p;
+    DocumentViewer *_this = (DocumentViewer *)p;
 
     HAB thab = WinInitialize( 0 );
     HMQ thmq = WinCreateMsgQueue( thab, 0 );
 
     ULONG postCnt;
-    while ( !d->termdraw )
+    while ( !_this->termdraw )
     {
-        DosWaitEventSem( d->haveDraw, SEM_INDEFINITE_WAIT );
-        DosResetEventSem( d->haveDraw, &postCnt );
-        d->abortAsynch = false;
+        DosWaitEventSem( _this->haveDraw, SEM_INDEFINITE_WAIT );
+        DosResetEventSem( _this->haveDraw, &postCnt );
+        _this->abortAsynch = false;
 
-        if ( !WinIsRectEmpty( thab, &d->drawRect) )
+        if ( ( _this->drawareas != NULL ) && ( _this->doc != NULL ) )
         {
-            if ( d->doc != NULL )
+            DosRequestMutexSem( _this->todrawAccess, SEM_INDEFINITE_WAIT );
+
+            for ( int i = 0; i < _this->drawareas->size(); i++ )
             {
-                DosRequestMutexSem( d->todrawAccess, SEM_INDEFINITE_WAIT );
-                LONG rclx = d->drawRect.xRight - d->drawRect.xLeft;
-                LONG rcly = d->drawRect.yTop - d->drawRect.yBottom;
-                d->pixbuf = new LuPixbuf( d->ev, rclx, rcly );
-                d->doc->renderPageToPixbufAsynch( d->ev, d->currentpage,
-                           d->spos_x, d->spos_y, rclx, rcly, d->realzoom, 0, d->pixbuf,
-                           asynchCallbackFnDraw, asynchCallbackFnAbort, p );
-                if ( !d->abortAsynch )
-                {
-                    HPS hps = WinGetPS( d->hWndDoc );
-                    if ( hps != NULLHANDLE ) {
-                        d->drawSelection( hps, &d->drawRect );
-                        d->drawFound( hps, &d->drawRect );
-                        WinReleasePS( hps );
-                    }
-                    WinSetRectEmpty( thab, &d->drawRect );
+                PageDrawArea *pda = &(*_this->drawareas)[ i ];
+
+                LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
+                LONG rcly = pda->drawrect.yTop - pda->drawrect.yBottom;
+                _this->pixbuf = new LuPixbuf( _this->ev, rclx, rcly );
+                _this->doc->renderPageToPixbufAsynch( _this->ev, pda->pagenum,
+                       pda->startpos.x, pda->startpos.y, rclx, rcly, _this->realzoom, 0,
+                       _this->pixbuf, asynchCallbackFnDraw, asynchCallbackFnAbort, p );
+                delete _this->pixbuf;
+                _this->pixbuf = NULL;
+
+                if ( _this->abortAsynch ) {
+                    break;  // TODO: remove completed areas from drawareas
                 }
-                delete d->pixbuf;
-                d->pixbuf = NULL;
-                DosReleaseMutexSem( d->todrawAccess );
             }
+
+            if ( !_this->abortAsynch )
+            {
+                HPS hps = WinGetPS( _this->hWndDoc );
+                if ( hps != NULLHANDLE ) {
+                    //_this->drawSelection( hps, &_this->drawRect );
+                    //_this->drawFound( hps, &_this->drawRect );
+                    WinReleasePS( hps );
+                }
+                delete _this->drawareas;
+                _this->drawareas = NULL;
+            }
+
+            DosReleaseMutexSem( _this->todrawAccess );
         }
     }
 
@@ -598,33 +644,48 @@ void DocumentViewer::wmPaintAsynch( HWND hwnd )
     RECTL rclDraw = { 0, 0, 0, 0 };
     if ( WinIntersectRect( hab, &rclDraw, &rcl, &rclPage ) )
     {
-        if ( isSubrect( &drawRect, &rclDraw ) &&
-             ( sVscrollInc == 0 ) && ( sHscrollInc == 0 ) ) {
-            return;
+        if ( ( drawareas != NULL ) && ( drawareas->size() > 0 ) ) {
+            if ( isSubrect( &((*drawareas)[0].drawrect), &rclDraw ) &&
+                 ( sVscrollInc == 0 ) && ( sHscrollInc == 0 ) ) {
+                return;
+            }
         }
 
         abortAsynch = true;
         DosRequestMutexSem( todrawAccess, SEM_INDEFINITE_WAIT );
-        if ( !WinIsRectEmpty( hab, &drawRect ) )
+
+        if ( drawareas == NULL ) {
+            drawareas = new DrawAreas;
+        }
+        if ( drawareas->size() == 0 ) {
+            PageDrawArea pda;
+            memset( &pda, 0, sizeof( pda ) );
+            pda.pagenum = currentpage;
+            drawareas->push_back( pda );
+        }
+
+        PageDrawArea *ppda = &((*drawareas)[0]);
+
+        if ( !WinIsRectEmpty( hab, &ppda->drawrect ) )
         {
             if ( sVscrollInc > 0 ) {
-                drawRect.yTop    += sVscrollInc;
+                ppda->drawrect.yTop    += sVscrollInc;
             } else if ( sVscrollInc < 0 ) {
-                drawRect.yBottom += sVscrollInc;
+                ppda->drawrect.yBottom += sVscrollInc;
             }
             if ( sHscrollInc > 0 ) {
-                drawRect.xLeft  -= sHscrollInc;
+                ppda->drawrect.xLeft  -= sHscrollInc;
             } else if ( sHscrollInc < 0 ) {
-                drawRect.xRight -= sHscrollInc;
+                ppda->drawrect.xRight -= sHscrollInc;
             }
         }
-        WinUnionRect( hab, &drawRect, &drawRect, &rclDraw );
-        spos_x = sHscrollPos + drawRect.xLeft;
-        spos_y = (cyClient - drawRect.yTop) + sVscrollPos;
+        WinUnionRect( hab, &ppda->drawrect, &ppda->drawrect, &rclDraw );
+        ppda->startpos.x = sHscrollPos + ppda->drawrect.xLeft;
+        ppda->startpos.y = ( cyClient - ppda->drawrect.yTop ) + sVscrollPos;
 
         // workaround ?
-        drawRect.xRight++;
-        drawRect.yTop++;
+        ppda->drawrect.xRight++;
+        ppda->drawrect.yTop++;
 
         DosReleaseMutexSem( todrawAccess );
         DosPostEventSem( haveDraw );
@@ -683,8 +744,10 @@ void DocumentViewer::wmPaint( HWND hwnd )
 
 
 // founds number of page at specified vertical position
-long DocumentViewer::posToPagenum( double yPos, double *pageRest )
+// for continuous view only
+long DocumentViewer::posToPagenum( LONG yPosWin, double *pageRest )
 {
+    double yPos = ( cyClient - yPosWin ) + ( sVscrollPos * VScrollStep );
     double pgend = 0;
     for ( long i = 0; i < totalpages; i++ )
     {
@@ -697,6 +760,17 @@ long DocumentViewer::posToPagenum( double yPos, double *pageRest )
     return 0;
 }
 
+// founds vertical position of specified
+// for continuous view only
+double DocumentViewer::pagenumToPos( long pagenum )
+{
+    double ypos = 0;
+    for ( long i = 0; i < pagenum; i++ ) {
+        ypos += pagesizes[ i ].y;
+    }
+    return ypos * realzoom;
+}
+
 // founds pages and it's areas to draw
 DrawAreas *DocumentViewer::foundDrawAreas( PRECTL r )
 {
@@ -704,12 +778,11 @@ DrawAreas *DocumentViewer::foundDrawAreas( PRECTL r )
     if ( doc != NULL )
     {
         long foundpage = -1;
-        double docPos, pageRest;
+        double pageRest;
         for ( LONG i = r->yTop; i >= r->yBottom; i-- )
         {
             pageRest = 0;
-            docPos = ( cyClient - i ) + ( sVscrollPos * VScrollStep );
-            long pg = posToPagenum( docPos, &pageRest );
+            long pg = posToPagenum( i, &pageRest );
             if ( pg != foundpage )
             {
                 PageDrawArea pda;
@@ -738,7 +811,7 @@ DrawAreas *DocumentViewer::foundDrawAreas( PRECTL r )
 
 // found current page in continuous view mode.
 // it's a page which occupes a most larger area in the window.
-void DocumentViewer::foundCurrentPage()
+void DocumentViewer::determineCurrentPage()
 {
     RECTL rcl = { 0 };
     WinQueryWindowRect( hWndDoc, &rcl );
@@ -776,6 +849,11 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
     for ( int i = 0; i < drawareas->size(); i++ )
     {
         PageDrawArea *pda = &(*drawareas)[ i ];
+
+        // load links for page if not loaded before
+        if ( links[ pda->pagenum ] == NULL ) {
+            links[ pda->pagenum ] = doc->getLinkMapping( ev, pda->pagenum );
+        }
 
         RECTL rclDraw = { __min( pagesizes[ pda->pagenum ].x * realzoom,
                                  pda->drawrect.xLeft ),
@@ -818,7 +896,7 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
     BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
     WinEndPaint( hps );
 
-    foundCurrentPage();
+    determineCurrentPage();
 }
 
 
@@ -832,12 +910,26 @@ void DocumentViewer::winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRec
 }
 
 // converts document position to window position
-void DocumentViewer::docPosToWinPos( LuRectangle *r, PRECTL rcl )
+void DocumentViewer::docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl )
 {
-    rcl->xLeft   = ( r->x1 * realzoom ) - sHscrollPos;
-    rcl->yBottom = cyClient - ( r->y2 * realzoom ) + sVscrollPos;
-    rcl->xRight  = ( r->x2 * realzoom ) - sHscrollPos;
-    rcl->yTop    = cyClient - ( r->y1 * realzoom ) + sVscrollPos;
+    if ( continuous )
+    {
+        double yplus = pagenumToPos( pagenum );
+
+        rcl->xLeft   = ( r->x1 * realzoom ) - sHscrollPos;
+        rcl->yBottom = cyClient - ( ( yplus + r->y2 ) * realzoom ) +
+                            ( sVscrollPos * VScrollStep );
+        rcl->xRight  = ( r->x2 * realzoom ) - sHscrollPos;
+        rcl->yTop    = cyClient - ( ( yplus + r->y1 ) * realzoom ) +
+                            ( sVscrollPos * VScrollStep );
+    }
+    else
+    {
+        rcl->xLeft   = ( r->x1 * realzoom ) - sHscrollPos;
+        rcl->yBottom = cyClient - ( r->y2 * realzoom ) + sVscrollPos;
+        rcl->xRight  = ( r->x2 * realzoom ) - sHscrollPos;
+        rcl->yTop    = cyClient - ( r->y1 * realzoom ) + sVscrollPos;
+    }
 }
 
 // creates region from sequence of rectangles
@@ -850,7 +942,7 @@ HRGN DocumentViewer::rectsToRegion( HPS hps, LuDocument_LuRectSequence *rects, b
         for ( int i = 0; i < rects->_length; i++ )
         {
             if ( useScale ) {
-                docPosToWinPos( &(rects->_buffer[i]), &r );
+                docPosToWinPos( 0, &(rects->_buffer[i]), &r );
             }
             else
             {
@@ -899,7 +991,7 @@ void DocumentViewer::drawFound( HPS hps, PRECTL r )
     GpiDestroyRegion( hps, selectRegion );
 }
 
-// scrolls window during text selection
+// scrolls window to specified pos (optionally with text selection)
 void DocumentViewer::scrollToPos( HWND hwnd, HRGN hrgn, SHORT xpos, SHORT ypos,
                                   bool withSelection )
 {
@@ -980,15 +1072,24 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
     }
     else if ( links != NULL )
     {
-        for ( int i = 0; i < links->_length; i++ )
-        {
-            RECTL r = {0};
-            docPosToWinPos( &(links->_buffer[i].area), &r );
+        long pg = currentpage;
+        if ( continuous ) {
+            double tmp;
+            pg = posToPagenum( ypos, &tmp );
+        }
 
-            POINTL ptl = { xpos, ypos };
-            if ( WinPtInRect( hab, &r, &ptl ) ) {
-                WinSetPointer( HWND_DESKTOP, handptr );
-                return TRUE;
+        if ( links[ pg ] != NULL )
+        {
+            for ( int i = 0; i < links[ pg ]->_length; i++ )
+            {
+                RECTL r = {0};
+                docPosToWinPos( pg, &(links[ pg ]->_buffer[i].area), &r );
+
+                POINTL ptl = { xpos, ypos };
+                if ( WinPtInRect( hab, &r, &ptl ) ) {
+                    WinSetPointer( HWND_DESKTOP, handptr );
+                    return TRUE;
+                }
             }
         }
     }
@@ -999,34 +1100,44 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
 // handles WM_BUTTON1CLICK
 BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
 {
-    if ( links != NULL )
+    if ( links == NULL ) {
+        return FALSE;
+    }
+
+    long pg = currentpage;
+    if ( continuous ) {
+        double tmp;
+        pg = posToPagenum( ypos, &tmp );
+    }
+
+    if ( links[ pg ] != NULL )
     {
-        for ( int i = 0; i < links->_length; i++ )
+        for ( int i = 0; i < links[ pg ]->_length; i++ )
         {
             RECTL r = {0};
-            docPosToWinPos( &(links->_buffer[i].area), &r );
+            docPosToWinPos( pg, &(links[ pg ]->_buffer[i].area), &r );
 
             POINTL ptl = { xpos, ypos };
             if ( WinPtInRect( hab, &r, &ptl ) )
             {
-                if ( links->_buffer[i].link.type == LU_LINK_TYPE_EXTERNAL_URI )
+                if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_EXTERNAL_URI )
                 {
                     WinMessageBox( HWND_DESKTOP, hMainFrame,
-                        links->_buffer[i].link.uri, "URI", 1,
+                        links[ pg ]->_buffer[i].link.uri, "URI", 1,
                         MB_OK | MB_INFORMATION | MB_MOVEABLE );
                 }
-                else if ( links->_buffer[i].link.type == LU_LINK_TYPE_TITLE )
+                else if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_TITLE )
                 {
-                    char *title = links->_buffer[i].link.title;
+                    char *title = links[ pg ]->_buffer[i].link.title;
                     if ( title == NULL ) {
                         title = "???";
                     }
                     WinMessageBox( HWND_DESKTOP, hMainFrame,
                         title, "?", 1, MB_OK | MB_INFORMATION | MB_MOVEABLE );
                 }
-                else if ( links->_buffer[i].link.type == LU_LINK_TYPE_PAGE )
+                else if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_PAGE )
                 {
-                    goToPage( links->_buffer[i].link.page );
+                    goToPage( links[ pg ]->_buffer[i].link.page );
                 }
 
                 return TRUE;

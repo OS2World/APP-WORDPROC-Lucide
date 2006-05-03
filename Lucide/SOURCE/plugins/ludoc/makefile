@@ -1,7 +1,7 @@
 .autodepend
 
-OBJDIR = D:\Projects\Lucide\OBJS
-EXEDIR = D:\Projects\Lucide\BIN
+OBJDIR = ..\..\..\OBJS
+EXEDIR = ..\..\..\BIN
 
 .path.obj = $(OBJDIR)
 .path.res = $(OBJDIR)
@@ -31,16 +31,16 @@ file $(OBJDIR)\luinode.obj
 file $(OBJDIR)\cpconv.obj
 name $(EXEDIR)\ludoc
 lib somtk 
-lib D:\BCOS2\LIB\libconv.lib
+lib libconv
 export LuDocumentNewClass
-export LuDocumentClassData
-export LuDocumentCClassData
+export _LuDocumentClassData
+export _LuDocumentCClassData
 export LuPixbufNewClass
-export LuPixbufClassData
-export LuPixbufCClassData
+export _LuPixbufClassData
+export _LuPixbufCClassData
 export LuIndexNodeNewClass
-export LuIndexNodeClassData
-export LuIndexNodeCClassData
+export _LuIndexNodeClassData
+export _LuIndexNodeCClassData
 export createObject
 export getSupportedExtensions
 export getDescription
@@ -81,6 +81,5 @@ MAKE.CFG: makefile
 -ox
 -xs
 -xr
--ID:\BCOS2\H_UNI
 -DOS2
 | MAKE.CFG >NUL

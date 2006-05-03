@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: GSmartPointer.h,v 1.11 2003/11/07 22:08:21 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_

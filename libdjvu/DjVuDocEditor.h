@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DjVuDocEditor.h,v 1.9 2005/05/25 20:24:52 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H

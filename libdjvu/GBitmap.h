@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: GBitmap.h,v 1.9 2004/04/17 23:56:11 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_

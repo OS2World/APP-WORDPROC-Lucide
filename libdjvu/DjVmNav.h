@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DjVmNav.h,v 1.1 2005/05/25 17:36:53 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _DJVMNAV_H
 #define _DJVMNAV_H

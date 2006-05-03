@@ -14,7 +14,7 @@
 // GNU General Public License for more details.
 // -------------------------------------------------------------------
 */
-/* $Id: miniexp.cpp,v 1.5 2005/09/14 02:46:54 leonb Exp $ */
+/* $Id: miniexp.cpp,v 1.12 2006/02/21 19:27:41 leonb Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -107,7 +107,8 @@ symtable_t::symtable_t()
 
 symtable_t::~symtable_t()
 {
-  for (int i=0; i<nbuckets; i++)
+  int i=0;
+  for (; i<nbuckets; i++)
     while (buckets[i])
       {
         struct sym *r = buckets[i];
@@ -123,7 +124,8 @@ symtable_t::resize(int nb)
 {
   struct sym **b = new sym*[nb];
   memset(b, 0, nb*sizeof(sym*));
-  for (int i=0; i<nbuckets; i++)
+  int i=0;
+  for (; i<nbuckets; i++)
     while (buckets[i])
       {
         struct sym *s = buckets[i];
@@ -362,8 +364,10 @@ gc_run(void)
         clear_marks(b);
       // mark
       minivar_t::mark(gc_mark);
-      for (int i=0; i<recentsize; i++)
-        gc_mark((miniexp_t*)&gc.recent[i]);
+      { // extra nesting for windows
+        for (int i=0; i<recentsize; i++)
+          gc_mark((miniexp_t*)&gc.recent[i]);
+      }
       // sweep
       gc.objs_free = gc.pairs_free = 0;
       gc.objs_freelist = gc.pairs_freelist = 0;
@@ -447,7 +451,8 @@ minilisp_release_gc_lock(miniexp_t x)
 void 
 minilisp_gc(void)
 {
-  for (int i=0; i<recentsize; i++)
+  int i;
+  for (i=0; i<recentsize; i++)
     gc.recent[i] = 0;
   gc_run();
 }
@@ -673,8 +678,8 @@ miniobj_t::isa(miniexp_t) const
   return false;
 }
 
-void
-miniobj_t::mark(minilisp_mark_t action)
+void 
+miniobj_t::mark(minilisp_mark_t*)
 {
 }
 
@@ -788,9 +793,11 @@ print_c_string(const char *s, char *d, bool eightbits)
           char letter = 0;
           static char *tr1 = "\"\\tnrbf";
           static char *tr2 = "\"\\\t\n\r\b\f";
-          for (int i=0; tr2[i]; i++)
-            if (c == tr2[i])
-              letter = tr1[i];
+          { // extra nesting for windows
+            for (int i=0; tr2[i]; i++)
+              if (c == tr2[i])
+                letter = tr1[i];
+          }
           char_out('\\', d, n);
           if (letter)
             char_out(letter, d, n);
@@ -856,7 +863,7 @@ miniexp_substring(const char *s, int n)
 miniexp_t 
 miniexp_concat(miniexp_t p)
 {
-  minivar_t l = p;
+  miniexp_t l = p;
   const char *s;
   int n = 0;
   if (miniexp_length(l) < 0)
@@ -880,9 +887,13 @@ miniexp_concat(miniexp_t p)
 /* INPUT/OUTPUT                                       */
 /* -------------------------------------------------- */
 
-/* --------- OUTPUT */
+extern "C" { 
+  // SunCC needs this to be defined inside extern "C" { ... }
+  // Beware the difference between extern "C" {...} and extern "C".
+  miniexp_t (*minilisp_macrochar_parser[128])(void); 
+}
 
-int minilisp_print_7bits = 1;
+/* --------- OUTPUT */
 
 static FILE *outputfile;
 
@@ -896,6 +907,8 @@ stdio_puts(const char *s)
 }
 
 int (*minilisp_puts)(const char *s) = stdio_puts;
+
+int minilisp_print_7bits = 1;
 
 void 
 minilisp_set_output(FILE *f)
@@ -1132,7 +1145,7 @@ miniexp_pprin(miniexp_t p, int width)
   printer.l = miniexp_reverse(printer.l);
   printer.print(p);
   // check
-  ASSERT(! printer.l);
+  ASSERT(printer.l == 0);
   return p;
 }
 
@@ -1143,6 +1156,60 @@ miniexp_pprint(miniexp_t p, int width)
   minilisp_puts("\n");
   return p;
 }
+
+/* --------- PNAME */
+
+static struct { 
+  char *b; int l; int m; 
+} pname_data;
+
+static int
+pname_puts(const char *s)
+{
+  int x = strlen(s);
+  if (pname_data.l + x >= pname_data.m)
+    {
+      int nm = pname_data.l + x + 256;
+      char *nb = new char[nm+1];
+      memcpy(nb, pname_data.b, pname_data.l);
+      delete [] pname_data.b;
+      pname_data.m = nm;
+      pname_data.b = nb;
+    }
+  strcpy(pname_data.b + pname_data.l, s);
+  pname_data.l += x;
+  return x;
+}
+
+miniexp_t 
+miniexp_pname(miniexp_t p, int width)
+{
+  minivar_t r;
+  int (*saved)(const char*) = minilisp_puts;
+  pname_data.b = 0;
+  pname_data.m = pname_data.l = 0;
+  try
+    {
+      minilisp_puts = pname_puts;
+      if (width > 0)
+        miniexp_pprin(p, width);
+      else
+        miniexp_prin(p);
+      minilisp_puts = saved;
+      r = miniexp_string(pname_data.b);
+      delete [] pname_data.b;
+      pname_data.b = 0;
+    }
+  catch(...)
+    {
+      minilisp_puts = saved;
+      delete [] pname_data.b;
+      pname_data.b = 0;
+    }
+  return r;
+}
+
+
 
 /* --------- INPUT */
 
@@ -1166,6 +1233,7 @@ stdio_ungetc(int c)
 }
 
 int (*minilisp_getc)(void) = stdio_getc;
+
 int (*minilisp_ungetc)(int c) = stdio_ungetc;
 
 void 
@@ -1175,8 +1243,6 @@ minilisp_set_input(FILE *f)
   minilisp_getc = stdio_getc;
   minilisp_ungetc = stdio_ungetc;
 }
-
-miniexp_t (*minilisp_macrochar_parser[128])(void);
 
 static void
 skip_blank(int &c)
@@ -1274,9 +1340,11 @@ read_c_string(int &c)
             }
           static char *tr1 = "tnrbfva";
           static char *tr2 = "\t\n\r\b\f\013\007";
-          for (int i=0; tr1[i]; i++)
-            if (c == tr1[i])
-              c = tr2[i];
+          { // extra nesting for windows
+            for (int i=0; tr1[i]; i++)
+              if (c == tr1[i])
+                c = tr2[i];
+          }
         }
       append(c,s,l,m);
       c = minilisp_getc();
@@ -1378,7 +1446,7 @@ read_miniexp(int &c)
                     break;
                 }
               p = read_miniexp(c);
-              if (p == miniexp_dummy)
+              if ((miniexp_t)p == miniexp_dummy)
                 return miniexp_dummy;
               *where = miniexp_cons(p, miniexp_nil);
               where = &cdr(*where);
@@ -1445,8 +1513,10 @@ minilisp_finish(void)
   ASSERT(!gc.lock);
   // clear minivars
   minivar_t::mark(gc_clear);
-  for (int i=0; i<recentsize; i++)
-    gc.recent[i] = 0;
+  { // extra nesting for windows
+    for (int i=0; i<recentsize; i++)
+      gc.recent[i] = 0;
+  }
   // collect everything
   gc_run();
   // deallocate mblocks

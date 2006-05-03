@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: Arrays.h,v 1.10 2004/05/13 15:16:34 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: Arrays.h,v 1.11 2005/12/28 07:54:50 leonb Exp $
+// $Name:  $
 
 #ifndef _ARRAYS_H_
 #define _ARRAYS_H_
@@ -123,7 +123,7 @@ namespace DJVU {
     @author 
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.10 2004/05/13 15:16:34 leonb Exp $# */
+    #$Id: Arrays.h,v 1.11 2005/12/28 07:54:50 leonb Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -480,9 +480,6 @@ public:
        invocation of this conversion operator. */
    operator const TYPE* () const;
    
-#ifndef __MWERKS__ //MCW can't compile
-   operator const TYPE* ();
-#endif  
    /** Insert new elements into an array. This function inserts
        #howmany# elements at position #n# into the array. The initial value #val#
        is copied into the new elements. All array elements previously located at subscripts
@@ -528,15 +525,6 @@ ArrayBaseT<TYPE>::operator TYPE* ()
    ArrayRep * rep=(ArrayRep *) get();
    return &((TYPE *) rep->data)[-rep->minlo];
 }
-
-#ifndef __MWERKS__ //MCW can't compile
-template <class TYPE> inline
-ArrayBaseT<TYPE>::operator const TYPE* ()
-{
-   const ArrayRep * rep=(const ArrayRep *) get();
-   return &((const TYPE *) rep->data)[-rep->minlo];
-}
-#endif
 
 template <class TYPE> inline
 ArrayBaseT<TYPE>::operator const TYPE* () const

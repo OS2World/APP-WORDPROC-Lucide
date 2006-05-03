@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: MMX.cpp,v 1.10 2004/05/13 16:50:10 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

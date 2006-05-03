@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GContainer.h,v 1.15 2004/05/13 15:16:34 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: GContainer.h,v 1.17 2006/02/21 16:10:29 docbill Exp $
+// $Name:  $
 
 #ifndef _GCONTAINER_H_
 #define _GCONTAINER_H_
@@ -130,7 +130,7 @@ namespace DJVU {
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.15 2004/05/13 15:16:34 leonb Exp $# */
+    #$Id: GContainer.h,v 1.17 2006/02/21 16:10:29 docbill Exp $# */
 //@{
 
 
@@ -393,8 +393,6 @@ public:
       subscript range, you must stop using the pointers returned by prior
       invocation of this conversion operator. */
   operator const TYPE* () const
-    { return ((const TYPE*)data)-minlo; }
-  operator const TYPE* ()  // suppress warning with gcc-2.95
     { return ((const TYPE*)data)-minlo; }
   // -- ALTERATION
   /** Erases the array contents. All elements in the array are destroyed.  
@@ -749,7 +747,7 @@ public:
   GListBase & operator= (const GListBase & gl);
   GPosition firstpos() const { return GPosition(head.next, (void*)this); }
   GPosition lastpos() const { return GPosition(head.prev, (void*)this); }
-  int isempty() const { return nelem==0; };
+  bool isempty() const { return nelem==0; };
   GPosition nth(unsigned int n) const;
   void empty();
 };
@@ -845,7 +843,7 @@ public:
   // -- TEST
   /** Tests whether a list is empty.  
       Returns a non zero value if the list contains no elements. */
-  int isempty() const 
+  bool isempty() const 
     { return this->nelem==0; }
   /** Compares two lists. Returns a non zero value if and only if both lists
       contain the same elements (as tested by #TYPE::operator==(const TYPE&)#
@@ -1158,7 +1156,7 @@ public:
     { return firstpos(); }    
   /** Tests whether the associative map is empty.  
       Returns a non zero value if and only if the map contains zero entries. */
-  int isempty() const
+  bool isempty() const
     { return this->nelems==0; }
   /** Searches an entry for key #key#.  If the map contains an entry whose key
       is equal to #key# according to #KTYPE::operator==(const KTYPE&)#, this
@@ -1305,13 +1303,6 @@ static inline unsigned int
 hash(const unsigned long & x) 
 { 
   return (unsigned int)x;
-}
-
-/** Hashing function (void *). */
-static inline unsigned int 
-hash(void * const & x) 
-{ 
-  return (unsigned long) x; 
 }
 
 /** Hashing function (const void *). */

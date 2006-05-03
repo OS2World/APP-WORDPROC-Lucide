@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DjVuNavDir.h,v 1.8 2003/11/07 22:08:21 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _DJVUNAVDIR_H
 #define _DJVUNAVDIR_H

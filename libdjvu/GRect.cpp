@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GRect.cpp,v 1.10 2003/11/07 22:08:21 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: GRect.cpp,v 1.11 2006/02/21 16:10:29 docbill Exp $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -107,8 +107,8 @@ iswap(int &x, int &y)
 int 
 operator==(const GRect & r1, const GRect & r2)
 {
-  int isempty1 = r1.isempty();
-  int isempty2 = r2.isempty();
+  bool isempty1 = r1.isempty();
+  bool isempty2 = r2.isempty();
   if (isempty1 || isempty2)
     if (isempty1 && isempty2)
       return 1;

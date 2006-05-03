@@ -2,7 +2,6 @@
 #define __DOCVIEWER_H
 
 #include <vector>
-using namespace std;
 
 #include <ludoc.xh>
 
@@ -17,7 +16,7 @@ struct PageDrawArea
     RECTL  drawrect;
 };
 
-typedef vector<PageDrawArea> DrawAreas;
+typedef std::vector<PageDrawArea> DrawAreas;
 
 
 class DocumentViewer
@@ -39,6 +38,7 @@ class DocumentViewer
                              bool _continueSearch );
 
         static void registerClass( HAB hab );
+
         // Internal stuffs
     private:
 
@@ -55,15 +55,17 @@ class DocumentViewer
         BOOL wmClick( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 );
         void winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRectangle *r );
-        void docPosToWinPos( LuRectangle *r, PRECTL rcl );
+        void docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl );
         HRGN rectsToRegion( HPS hps, LuDocument_LuRectSequence *rects, bool useScale );
         void drawSelection( HPS hps, PRECTL r );
         void scrollToPos( HWND hwnd, HRGN hrgn, SHORT xpos, SHORT ypos, bool withSelection );
         void freeFoundrects();
+        void freeLinks();
         void drawFound( HPS hps, PRECTL r );
         DrawAreas *foundDrawAreas( PRECTL r );
-        void foundCurrentPage();
-        long posToPagenum( double yPos, double *pageRest );
+        void determineCurrentPage();
+        long posToPagenum( LONG yPosWin, double *pageRest );
+        double pagenumToPos( long pagenum );
 
         static MRESULT EXPENTRY docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
         static void searchthread( void *p );
@@ -97,16 +99,16 @@ class DocumentViewer
         double width, height, zoom, realzoom, fullwidth, fullheight;
         long totalpages, currentpage;
         ProgressDlg *progressDlg;
+        DrawAreas *drawareas;
+        int drawareaIndex;
 
         // continuous view
         bool continuous;
         LuSize *pagesizes;
         SHORT VScrollStep;
-        DrawAreas *drawareas;
 
         // asynch draw
         bool enableAsynchDraw;
-        RECTL drawRect;
         HMTX todrawAccess;
         HEV  haveDraw;
         bool abortAsynch;
@@ -121,7 +123,7 @@ class DocumentViewer
         LuDocument_LuRectSequence *selrects;
 
         // links
-        LuDocument_LuLinkMapSequence *links;
+        LuDocument_LuLinkMapSequence **links;
         HPOINTER handptr;
 
         // search
@@ -133,3 +135,4 @@ class DocumentViewer
 };
 
 #endif // __DOCVIEWER_H
+

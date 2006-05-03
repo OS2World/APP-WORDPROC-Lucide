@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 //
 // $Id: GString.h,v 1.20 2005/07/22 15:28:07 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _GSTRING_H_
 #define _GSTRING_H_

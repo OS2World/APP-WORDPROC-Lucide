@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuAnno.cpp,v 1.12 2004/04/17 23:56:11 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: DjVuAnno.cpp,v 1.13 2006/01/09 15:28:46 leonb Exp $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -1295,17 +1295,13 @@ DjVuANT::encode_raw(void) const
 
       //*** Zoom
    del_all_items(ZOOM_TAG, parser);
-   if (zoom!=ZOOM_UNSPEC)
+   if (zoom>0 || (zoom>=ZOOM_STRETCH && zoom<=ZOOM_PAGE))
    {
       buffer="(" ZOOM_TAG " ";
-      const int i=1-zoom;
-      if((i>=0)&& (i<zoom_strings_size))
-      {
-        buffer+=zoom_strings[i];
-      }else
-      {
-        buffer+="d"+GUTF8String(zoom);
-      }
+      if (zoom < 0)
+        buffer += zoom_strings[-zoom];
+      else
+        buffer += "d"+GUTF8String(zoom);
       buffer+=")";
       parser.parse(buffer);
    }

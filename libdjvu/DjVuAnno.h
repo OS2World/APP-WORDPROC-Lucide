@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DjVuAnno.h,v 1.8 2003/11/07 22:08:20 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H

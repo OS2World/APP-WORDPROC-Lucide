@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuFile.cpp,v 1.11 2003/11/07 22:08:20 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: DjVuFile.cpp,v 1.12 2005/12/24 12:45:01 leonb Exp $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -884,9 +884,8 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
     if (info->width<0 || info->height<0)
       G_THROW( ERR_MSG("DjVuFile.corrupt_zero") );
     if (info->version >= DJVUVERSION_TOO_NEW)
-      G_THROW( ERR_MSG("DjVuFile.new_version") "\t" STRINGIFY(DJVUVERSION_TOO_NEW) );
-    if(info->compressable)
-      set_can_compress(true);
+      G_THROW( ERR_MSG("DjVuFile.new_version") "\t" 
+               STRINGIFY(DJVUVERSION_TOO_NEW) );
   }
   
   // INCL (inclusion chunk)

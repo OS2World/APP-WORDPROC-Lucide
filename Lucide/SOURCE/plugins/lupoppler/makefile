@@ -1,7 +1,7 @@
 .autodepend
 
-OBJDIR = D:\Projects\Lucide\OBJS
-EXEDIR = D:\Projects\Lucide\BIN
+OBJDIR = ..\..\..\OBJS
+EXEDIR = ..\..\..\BIN
 
 .path.obj = $(OBJDIR)
 .path.res = $(OBJDIR)
@@ -27,13 +27,12 @@ option map=$(OBJDIR)\lupplr
 option statics
 file $(OBJDIR)\lupoppler.obj
 name $(EXEDIR)\lupplr
-lib D:\Projects\poppler\mypoppler\poppler.lib
-lib D:\Projects\poppler\mypoppler\ft2lib.lib
+lib ..\..\..\..\poppler\poppler.lib
 lib ..\ludoc\ludoc
 lib somtk 
 export LuPopplerDocumentNewClass
-export LuPopplerDocumentClassData
-export LuPopplerDocumentCClassData
+export _LuPopplerDocumentClassData
+export _LuPopplerDocumentCClassData
 export createObject
 export getSupportedExtensions
 export getDescription
@@ -55,8 +54,8 @@ MAKE.CFG: makefile
 -xs
 -xr
 -I..\ludoc
--ID:\Projects\poppler\mypoppler
--ID:\Projects\poppler\mypoppler\poppler
--ID:\Projects\poppler\fontconfig-2.3.2-os2
+-I..\..\..\..\poppler\mypoppler
+-I..\..\..\..\poppler\mypoppler\poppler
+-I..\..\..\..\poppler\fontconfig-2.3.2-os2
 -DOS2
 | MAKE.CFG >NUL

@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: debug.cpp,v 1.14 2005/05/27 14:26:00 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

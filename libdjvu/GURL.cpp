@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GURL.cpp,v 1.19 2005/04/27 16:34:13 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: GURL.cpp,v 1.21 2005/12/24 12:45:01 leonb Exp $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -392,7 +392,7 @@ GURL::init(const bool nothrow)
            for(ptr=url_ptr;*ptr&&!is_argument(ptr);ptr++)
            		EMPTY_LOOP;
            arg=ptr;
-           url=url.substr(0,(size_t)ptr-(size_t)url_ptr);
+           url=url.substr(0,(size_t)(ptr-url_ptr));
          }
 
             // Do double conversion
@@ -827,10 +827,11 @@ GURL::clear_cgi_arguments(void)
    cgi_value_arr.empty();
 
       // And clear everything past the '?' sign in the URL
-   for(const char * ptr=url;*ptr;ptr++)
+   const char * ptrurl = url;
+   for(const char *ptr = ptrurl; *ptr; ptr++)
       if (*ptr=='?')
       {
-         url.setat(ptr-url, 0);
+         url.setat(ptr-ptrurl, 0);
          break;
       }
 }

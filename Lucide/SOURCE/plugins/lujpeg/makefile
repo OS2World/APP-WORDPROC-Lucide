@@ -1,7 +1,7 @@
 .autodepend
 
-OBJDIR = D:\Projects\Lucide\OBJS
-EXEDIR = D:\Projects\Lucide\BIN
+OBJDIR = ..\..\..\OBJS
+EXEDIR = ..\..\..\BIN
 
 .path.obj = $(OBJDIR)
 .path.res = $(OBJDIR)
@@ -28,12 +28,12 @@ option map=$(OBJDIR)\lujpeg
 option statics
 file $(OBJDIR)\lujpeg.obj
 name $(EXEDIR)\lujpeg
-lib D:\Projects\libjpeg\libjpeg.lib
+lib ..\..\..\..\libjpeg\libjpeg.lib
 lib ..\ludoc\ludoc
 lib somtk 
 export LuJpegDocumentNewClass
-export LuJpegDocumentClassData
-export LuJpegDocumentCClassData
+export _LuJpegDocumentClassData
+export _LuJpegDocumentCClassData
 export createObject
 export getSupportedExtensions
 export getDescription

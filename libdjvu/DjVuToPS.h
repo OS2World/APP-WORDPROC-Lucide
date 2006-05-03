@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DjVuToPS.h,v 1.14 2004/03/05 16:48:53 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifndef _DJVU_TO_PS_H_
 #define _DJVU_TO_PS_H_

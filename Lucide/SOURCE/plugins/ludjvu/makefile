@@ -1,7 +1,7 @@
 .autodepend
 
-OBJDIR = D:\Projects\Lucide\OBJS
-EXEDIR = D:\Projects\Lucide\BIN
+OBJDIR = ..\..\..\OBJS
+EXEDIR = ..\..\..\BIN
 
 .path.obj = $(OBJDIR)
 .path.res = $(OBJDIR)
@@ -28,12 +28,12 @@ option map=$(OBJDIR)\ludjvu
 option statics
 file $(OBJDIR)\ludjvu.obj
 name $(EXEDIR)\ludjvu
-lib D:\Projects\libdjvu\libdjvu\ddjvuapi.lib
+lib ..\..\..\..\libdjvu\ddjvuapi.lib
 lib ..\ludoc\ludoc
 lib somtk 
 export LuDjvuDocumentNewClass
-export LuDjvuDocumentClassData
-export LuDjvuDocumentCClassData
+export _LuDjvuDocumentClassData
+export _LuDjvuDocumentCClassData
 export createObject
 export getSupportedExtensions
 export getDescription
@@ -56,6 +56,6 @@ MAKE.CFG: makefile
 -xs
 -xr
 -I..\ludoc
--ID:\Projects\libdjvu
+-I..\..\..\..\libdjvu
 -DOS2
 | MAKE.CFG >NUL

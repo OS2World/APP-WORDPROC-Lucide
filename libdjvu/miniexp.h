@@ -14,7 +14,7 @@
 // GNU General Public License for more details.
 // -------------------------------------------------------------------
 */
-/* $Id: miniexp.h,v 1.6 2005/10/29 16:32:21 leonb Exp $ */
+/* $Id: miniexp.h,v 1.12 2006/02/21 19:27:41 leonb Exp $ */
 
 #ifndef MINIEXP_H
 #define MINIEXP_H
@@ -119,13 +119,13 @@ MINILISPAPI miniexp_t miniexp_symbol(const char *name);
 /* miniexp_nil --
    The empty list. */
 
-const miniexp_t miniexp_nil = (miniexp_t)(size_t)0;
+#define miniexp_nil ((miniexp_t)(size_t)0)
 
 /* miniexp_dummy --
    An invalid expression used to represent
    various exceptional conditions. */
 
-const miniexp_t miniexp_dummy = (miniexp_t)(size_t)2;
+#define miniexp_dummy ((miniexp_t)(size_t)2)
 
 /* miniexp_listp --
    Tests if an expression is either a pair or the empty list. */   
@@ -490,6 +490,16 @@ MINILISPAPI miniexp_t miniexp_print(miniexp_t p);
 MINILISPAPI miniexp_t miniexp_pprin(miniexp_t p, int width);
 MINILISPAPI miniexp_t miniexp_pprint(miniexp_t p, int width);
 
+/* miniexp_pname --
+   Returns a string containing the textual representation
+   of a minilisp expression. Set argument <width> to zero
+   to output a single line, or to a positive value to
+   perform pretty line breaks for this intended number of columns.
+   These functions can cause a garbage collection to occur.
+   It works by temporarily redefining <minilisp_puts>. */
+
+MINILISPAPI miniexp_t miniexp_pname(miniexp_t p, int width);
+
 /* minilisp_print_7bits --
    When this flag is set, all non ascii characters 
    in strings are escaped in octal. */
@@ -567,7 +577,8 @@ class miniobj_t {
   /* --- optional stuff --- */
   /* mark: iterates over miniexps contained by this object
      for garbage collecting purposes. */
-  virtual void mark(minilisp_mark_t action);
+  virtual void mark(minilisp_mark_t*);
+
   /* pname: returns a printable name for this object.
      The caller must deallocate the result with delete[]. */
   virtual char *pname() const;

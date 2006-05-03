@@ -52,7 +52,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: ZPCodec.cpp,v 1.10 2004/08/06 14:49:34 leonb Exp $
-// $Name: release_3_5_16 $
+// $Name:  $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

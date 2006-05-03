@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GString.cpp,v 1.22 2005/04/27 16:34:13 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: GString.cpp,v 1.23 2005/12/23 15:14:16 leonb Exp $
+// $Name:  $
 
 // From: Leon Bottou, 1/31/2002
 // This file has very little to do with my initial implementation.
@@ -668,7 +668,7 @@ GBaseString::UTF8ToNative(
 
 /*MBCS*/
 GNativeString
-GBaseString::getUTF82Native( const EscapeMode escape ) const
+GBaseString::getUTF82Native( EscapeMode escape ) const
 { //MBCS cvt
   GNativeString retval;
 

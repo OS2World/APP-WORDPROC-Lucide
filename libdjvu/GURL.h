@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GURL.h,v 1.9 2003/11/07 22:08:21 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: GURL.h,v 1.10 2006/01/31 15:28:30 leonb Exp $
+// $Name:  $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -89,7 +89,7 @@ namespace DJVU {
 // mixture of code for syntactically parsing the urls (which is was)
 // and file status code (only for local file: urls).
 
-    @version #$Id: GURL.h,v 1.9 2003/11/07 22:08:21 leonb Exp $#
+    @version #$Id: GURL.h,v 1.10 2006/01/31 15:28:30 leonb Exp $#
 */
 
 //@{
@@ -278,10 +278,10 @@ public:
       //@}
 
       /// Returns TRUE if #gurl1# and #gurl2# are the same
-   bool	GURL::operator==(const GURL & gurl2) const;
+   bool	operator==(const GURL & gurl2) const;
 
       /// Returns TRUE if #gurl1# and #gurl2# are different
-   bool	GURL::operator!=(const GURL & gurl2) const;
+   bool	operator!=(const GURL & gurl2) const;
 
       /// Assignment operator
    GURL &	operator=(const GURL & url);

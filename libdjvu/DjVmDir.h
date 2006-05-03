@@ -51,8 +51,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVmDir.h,v 1.10 2003/11/07 22:08:20 leonb Exp $
-// $Name: release_3_5_16 $
+// $Id: DjVmDir.h,v 1.11 2005/12/30 15:22:16 leonb Exp $
+// $Name:  $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -111,7 +111,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.10 2003/11/07 22:08:20 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.11 2005/12/30 15:22:16 leonb Exp $# */
 //@{
 
 
@@ -168,8 +168,10 @@ public:
    void decode(const GP<ByteStream> &stream);
       /** Encodes the directory into the specified stream. */
    void encode(const GP<ByteStream> &stream, const bool do_rename=false) const;
-      /** Encodes the directory into the specified stream, explicitely as bundled or indirect. */
-   void encode(const GP<ByteStream> &stream, const bool bundled, const bool do_rename) const;
+      /** Encodes the directory into the specified stream, 
+          explicitely as bundled or indirect. */
+  void encode(const GP<ByteStream> &stream, 
+              const bool bundled, const bool do_rename) const;
       /** Tests if directory defines an {\em indirect} document. */
    bool is_indirect(void) const;
       /** Tests if the directory defines a {\em bundled} document. */
@@ -182,6 +184,8 @@ public:
    GP<File> id_to_file(const GUTF8String &id) const;
       /** Translates file shortcuts to file records. */
    GP<File> title_to_file(const GUTF8String &title) const;
+      /** Access file record by position. */
+   GP<File> pos_to_file(int fileno, int *ppageno=0) const;
       /** Returns position of the file in the directory. */
    int get_file_pos(const File * f) const;
       /** Returns position of the given page in the directory. */
