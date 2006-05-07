@@ -8,6 +8,8 @@ extern int deffontlen;
 
 class LuDocument;
 
+enum ViewMode { SinglePage, Continuous };
+
 class Lucide
 {
 	public:
@@ -20,6 +22,7 @@ class Lucide
 		static void goToPage( long page );
 		static void setZoom( double zoom );
 		static void enableCopy( bool enable );
+        static void setViewMode( ViewMode mode );
 };
 
 #endif // __LUCIDE_H

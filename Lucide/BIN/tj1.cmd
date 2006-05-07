@@ -1,1 +1,1 @@
-lucide D:\Projects\libdjvu\doc\lizard2003-navm.djvu
+lucide D:\Projects\lucide\trunk\Lucide\lizard2003-navm.djvu

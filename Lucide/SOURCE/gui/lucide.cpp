@@ -146,16 +146,16 @@ void Lucide::checkZoomMenus()
 
 void Lucide::checkMenus()
 {
-    // currently only "single page" mode
-    WinSendMsg( hWndMenu, MM_SETITEMATTR,
-                MPFROM2SHORT( CM_SINGLEPAGE, TRUE ),
-                MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
-
     // pre-set "Actual size"
     setZoomChecks( CM_ACTSIZE, 0, 0 );
 
     if ( doc == NULL )
     {
+        // "single page" mode by default
+        WinSendMsg( hWndMenu, MM_SETITEMATTR,
+                    MPFROM2SHORT( CM_SINGLEPAGE, TRUE ),
+                    MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
+
         WinEnableMenuItem( hWndMenu, CM_SAVEAS, FALSE );
         WinEnableMenuItem( hWndMenu, CM_EXPORTTOPS, FALSE );
         WinEnableMenuItem( hWndMenu, CM_PAGESETUP, FALSE );
@@ -211,6 +211,9 @@ void Lucide::checkMenus()
     BOOL haveText = doc->isHaveText( ev );
     WinEnableMenuItem( hWndMenu, CM_FIND, haveText );
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FIND), (MPARAM)haveText );
+
+    WinEnableMenuItem( hWndMenu, CM_SINGLEPAGE, TRUE );
+    WinEnableMenuItem( hWndMenu, CM_CONTINUOUS, TRUE );
 }
 
 void Lucide::goToPage( long page )
@@ -233,6 +236,30 @@ void Lucide::setDocument( LuDocument *_doc )
     docViewer->setDocument( _doc );
     indexWin->setDocument( _doc );
     Lucide::checkMenus();
+}
+
+void Lucide::setViewMode( ViewMode mode )
+{
+    if ( mode == SinglePage )
+    {
+        WinSendMsg( hWndMenu, MM_SETITEMATTR,
+                    MPFROM2SHORT( CM_SINGLEPAGE, TRUE ),
+                    MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
+        WinSendMsg( hWndMenu, MM_SETITEMATTR,
+                    MPFROM2SHORT( CM_CONTINUOUS, TRUE ),
+                    MPFROM2SHORT( MIA_CHECKED, FALSE ) );
+    }
+    else
+    {
+        WinSendMsg( hWndMenu, MM_SETITEMATTR,
+                    MPFROM2SHORT( CM_SINGLEPAGE, TRUE ),
+                    MPFROM2SHORT( MIA_CHECKED, FALSE ) );
+        WinSendMsg( hWndMenu, MM_SETITEMATTR,
+                    MPFROM2SHORT( CM_CONTINUOUS, TRUE ),
+                    MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
+    }
+
+    docViewer->setViewMode( mode );
 }
 
 
@@ -386,6 +413,13 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     Lucide::setZoom( -1 );
                     return (MRESULT)FALSE;
 
+                case CM_SINGLEPAGE:
+                    Lucide::setViewMode( SinglePage );
+                    return (MRESULT)FALSE;
+
+                case CM_CONTINUOUS:
+                    Lucide::setViewMode( Continuous );
+                    return (MRESULT)FALSE;
             }
         }
         break;

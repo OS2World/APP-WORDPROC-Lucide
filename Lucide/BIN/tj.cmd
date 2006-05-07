@@ -1,1 +1,1 @@
-lucide D:\Projects\libdjvu\doc\djvu2spec.djvu
+lucide D:\Projects\lucide\trunk\Lucide\djvu2spec.djvu

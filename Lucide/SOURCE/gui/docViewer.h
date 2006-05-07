@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <ludoc.xh>
+#include "lucide.h"
 
 class ProgressDlg;
 
@@ -18,12 +19,13 @@ struct PageDrawArea
 
 typedef std::vector<PageDrawArea> DrawAreas;
 
-
 class DocumentViewer
 {
     public:
         DocumentViewer( HAB _hab, HWND hWndFrame );
         virtual ~DocumentViewer();
+
+        void setViewMode( ViewMode mode );
 
         HWND getHWND() { return hWndDocFrame; }
 
@@ -51,6 +53,7 @@ class DocumentViewer
         void wmPaint( HWND hwnd );
         void wmPaintCont( HWND hwnd );
         void wmPaintAsynch( HWND hwnd );
+        void wmPaintContAsynch( HWND hwnd );
         BOOL wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmClick( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 );
@@ -106,6 +109,7 @@ class DocumentViewer
         bool continuous;
         LuSize *pagesizes;
         SHORT VScrollStep;
+        RECTL savedRcl;
 
         // asynch draw
         bool enableAsynchDraw;
