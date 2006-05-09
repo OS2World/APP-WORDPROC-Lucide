@@ -309,7 +309,7 @@ void DocumentViewer::searchthread( void *p )
             _this->goToPage( i );
             if ( _this->foundrects[i]->_length > 0 ) {
                 RECTL r;
-                _this->docPosToWinPos( 0, &(_this->foundrects[i]->_buffer[0]), &r );
+                _this->docPosToWinPos( i, &(_this->foundrects[i]->_buffer[0]), &r );
                 _this->scrollToPos( _this->hWndDoc, NULLHANDLE, r.xLeft, r.yBottom, false );
             }
             break;
@@ -619,15 +619,13 @@ void DocumentViewer::drawthread( void *p )
             {
                 HPS hps = WinGetPS( _this->hWndDoc );
                 if ( hps != NULLHANDLE ) {
-                    if ( !_this->continuous )   // TODO: continuous
+                    for ( int i = 0; i < _this->drawareas->size(); i++ )
                     {
-                        for ( int i = 0; i < _this->drawareas->size(); i++ )
-                        {
-                            PageDrawArea *pda = &(*_this->drawareas)[ i ];
+                        PageDrawArea *pda = &(*_this->drawareas)[ i ];
 
-                            _this->drawSelection( hps, &pda->drawrect );
-                            _this->drawFound( hps, &pda->drawrect );
-                        }
+                        // TODO: continuous
+                        //_this->drawSelection( hps, &pda->drawrect );
+                        _this->drawFound( pda->pagenum, hps, &pda->drawrect );
                     }
                     WinReleasePS( hps );
                 }
@@ -814,8 +812,8 @@ void DocumentViewer::wmPaint( HWND hwnd )
         GpiDrawBits( hpsBuffer, pixbuf->getDataPtr( ev ), &pbmi, 4L,
                      aptlPoints, lRop, BBO_IGNORE );
 
-        drawSelection( hpsBuffer, &rclDraw );
-        drawFound( hpsBuffer, &rclDraw );
+        drawSelection( currentpage, hpsBuffer, &rclDraw );
+        drawFound( currentpage, hpsBuffer, &rclDraw );
 
         BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
         delete pixbuf;
@@ -961,7 +959,7 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
 
         // TODO
         //drawSelection( hpsBuffer, &rclDraw );
-        //drawFound( hpsBuffer, &rclDraw );
+        drawFound( pda->pagenum, hpsBuffer, &pda->drawrect );
 
         delete pixbuf;
         pixbuf = NULL;
@@ -985,30 +983,20 @@ void DocumentViewer::winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRec
 }
 
 // converts document position to window position
-void DocumentViewer::docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl )
+void DocumentViewer::docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl, bool useZoom )
 {
-    if ( continuous )
-    {
-        double yplus = pagenumToPos( pagenum );
+    double scale = useZoom ? realzoom : 1.0;
+    double yplus = continuous ? pagenumToPos( pagenum ) : 0;
 
-        rcl->xLeft   = ( r->x1 * realzoom ) - sHscrollPos;
-        rcl->yBottom = cyClient - ( ( yplus + r->y2 ) * realzoom ) +
-                            ( sVscrollPos * VScrollStep );
-        rcl->xRight  = ( r->x2 * realzoom ) - sHscrollPos;
-        rcl->yTop    = cyClient - ( ( yplus + r->y1 ) * realzoom ) +
-                            ( sVscrollPos * VScrollStep );
-    }
-    else
-    {
-        rcl->xLeft   = ( r->x1 * realzoom ) - sHscrollPos;
-        rcl->yBottom = cyClient - ( r->y2 * realzoom ) + sVscrollPos;
-        rcl->xRight  = ( r->x2 * realzoom ) - sHscrollPos;
-        rcl->yTop    = cyClient - ( r->y1 * realzoom ) + sVscrollPos;
-    }
+    rcl->xLeft   = ( r->x1 * scale ) - sHscrollPos;
+    rcl->yBottom = cyClient - ( yplus + ( r->y2 * scale ) ) + ( sVscrollPos * VScrollStep );
+    rcl->xRight  = ( r->x2 * scale ) - sHscrollPos;
+    rcl->yTop    = cyClient - ( yplus + ( r->y1 * scale ) ) + ( sVscrollPos * VScrollStep );
 }
 
 // creates region from sequence of rectangles
-HRGN DocumentViewer::rectsToRegion( HPS hps, LuDocument_LuRectSequence *rects, bool useScale )
+HRGN DocumentViewer::rectsToRegion( long pagenum, HPS hps,
+                                    LuDocument_LuRectSequence *rects, bool useZoom )
 {
     HRGN hrgn = GpiCreateRegion( hps, 0, NULL );
     if ( rects != NULL )
@@ -1016,16 +1004,7 @@ HRGN DocumentViewer::rectsToRegion( HPS hps, LuDocument_LuRectSequence *rects, b
         RECTL r = {0};
         for ( int i = 0; i < rects->_length; i++ )
         {
-            if ( useScale ) {
-                docPosToWinPos( 0, &(rects->_buffer[i]), &r );
-            }
-            else
-            {
-                r.xLeft = rects->_buffer[i].x1 - sHscrollPos;
-                r.yBottom = cyClient - rects->_buffer[i].y2 + sVscrollPos;
-                r.xRight = rects->_buffer[i].x2 - sHscrollPos;
-                r.yTop = cyClient - rects->_buffer[i].y1 + sVscrollPos;
-            }
+            docPosToWinPos( pagenum, &(rects->_buffer[i]), &r, useZoom );
             HRGN tmprgn = GpiCreateRegion( hps, 1, &r );
             GpiCombineRegion( hps, hrgn, hrgn, tmprgn, CRGN_OR );
             GpiDestroyRegion( hps, tmprgn );
@@ -1036,11 +1015,11 @@ HRGN DocumentViewer::rectsToRegion( HPS hps, LuDocument_LuRectSequence *rects, b
 
 // draws selected area in window, using XOR mix
 // drawing area may be restricted by r rectangle
-void DocumentViewer::drawSelection( HPS hps, PRECTL r )
+void DocumentViewer::drawSelection( long pagenum, HPS hps, PRECTL r )
 {
     GpiSetMix( hps, FM_XOR );
     GpiSetColor( hps, CLR_YELLOW );
-    HRGN selectRegion = rectsToRegion( hps, selrects, false );
+    HRGN selectRegion = rectsToRegion( pagenum, hps, selrects, false );
     if ( r != NULL )
     {
         HRGN tmprgn = GpiCreateRegion( hps, 1, r );
@@ -1051,11 +1030,11 @@ void DocumentViewer::drawSelection( HPS hps, PRECTL r )
     GpiDestroyRegion( hps, selectRegion );
 }
 
-void DocumentViewer::drawFound( HPS hps, PRECTL r )
+void DocumentViewer::drawFound( long pagenum, HPS hps, PRECTL r )
 {
     GpiSetMix( hps, FM_XOR );
     GpiSetColor( hps, CLR_CYAN );
-    HRGN selectRegion = rectsToRegion( hps, foundrects[ currentpage ], true );
+    HRGN selectRegion = rectsToRegion( pagenum, hps, foundrects[ pagenum ], true );
     if ( r != NULL )
     {
         HRGN tmprgn = GpiCreateRegion( hps, 1, r );
@@ -1067,7 +1046,7 @@ void DocumentViewer::drawFound( HPS hps, PRECTL r )
 }
 
 // scrolls window to specified pos (optionally with text selection)
-void DocumentViewer::scrollToPos( HWND hwnd, HRGN hrgn, SHORT xpos, SHORT ypos,
+void DocumentViewer::scrollToPos( HWND hwnd, HRGN hrgn, LONG xpos, LONG ypos,
                                   bool withSelection )
 {
     SHORT xinc = 0;
@@ -1079,10 +1058,10 @@ void DocumentViewer::scrollToPos( HWND hwnd, HRGN hrgn, SHORT xpos, SHORT ypos,
         xinc = __min( sHscrollMax - sHscrollPos, xpos - cxClient );
     }
     if ( ( ypos < 0 ) && ( sVscrollPos < sVscrollMax ) ) {
-        yinc = __min( sVscrollMax - sVscrollPos, ypos * -1 );
+        yinc = __min( ( sVscrollMax - sVscrollPos ) * VScrollStep, ypos * -1 );
     }
     else if ( ( ypos > cyClient ) && ( sVscrollPos > 0 ) ) {
-        yinc = __max( sVscrollPos * -1, cyClient - ypos );
+        yinc = __max( ( sVscrollPos * -1 ) * VScrollStep, cyClient - ypos );
     }
 
     if ( xinc != 0 ) {
@@ -1092,7 +1071,8 @@ void DocumentViewer::scrollToPos( HWND hwnd, HRGN hrgn, SHORT xpos, SHORT ypos,
         }
     }
     if ( yinc != 0 ) {
-        vertScroll( hwnd, MPFROM2SHORT( sVscrollPos + yinc, SB_SLIDERPOSITION ), hrgn );
+        vertScroll( hwnd, MPFROM2SHORT( ( ( sVscrollPos * VScrollStep ) + yinc ) / VScrollStep,
+                                        SB_SLIDERPOSITION ), hrgn );
         if ( withSelection ) {
             selectionStart.y += yinc;
         }
@@ -1131,7 +1111,7 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
         GpiSetColor( hps, CLR_YELLOW );
         //GpiSetColor( hps, 100 );
 
-        HRGN clearRegion = rectsToRegion( hps, selrects, false );
+        HRGN clearRegion = rectsToRegion( currentpage, hps, selrects, false );
         LuDocument::freeRectangles( ev, selrects );
         if ( ( selectionStart.x == selectionEnd.x ) &&
              ( selectionStart.y == selectionEnd.y ) ) {
@@ -1140,7 +1120,7 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
         else {
             selrects = doc->getSelectionRectangles( ev, currentpage, realzoom, &selection );
         }
-        HRGN selectRegion = rectsToRegion( hps, selrects, false );
+        HRGN selectRegion = rectsToRegion( currentpage, hps, selrects, false );
         GpiCombineRegion( hps, selectRegion, selectRegion, clearRegion, CRGN_XOR );
         //GpiCombineRegion( hps, selectRegion, selectRegion, scrolledRegion, CRGN_DIFF );
         GpiPaintRegion( hps, selectRegion );

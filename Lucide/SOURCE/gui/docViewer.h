@@ -58,13 +58,13 @@ class DocumentViewer
         BOOL wmClick( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 );
         void winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRectangle *r );
-        void docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl );
-        HRGN rectsToRegion( HPS hps, LuDocument_LuRectSequence *rects, bool useScale );
-        void drawSelection( HPS hps, PRECTL r );
-        void scrollToPos( HWND hwnd, HRGN hrgn, SHORT xpos, SHORT ypos, bool withSelection );
+        void docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl, bool useZoom = true );
+        HRGN rectsToRegion( long pagenum, HPS hps, LuDocument_LuRectSequence *rects, bool useZoom );
+        void drawSelection( long pagenum, HPS hps, PRECTL r );
+        void scrollToPos( HWND hwnd, HRGN hrgn, LONG xpos, LONG ypos, bool withSelection );
         void freeFoundrects();
         void freeLinks();
-        void drawFound( HPS hps, PRECTL r );
+        void drawFound( long pagenum, HPS hps, PRECTL r );
         DrawAreas *foundDrawAreas( PRECTL r );
         void determineCurrentPage();
         long posToPagenum( LONG yPosWin, double *pageRest );
