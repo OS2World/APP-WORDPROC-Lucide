@@ -110,9 +110,9 @@ DocumentViewer::~DocumentViewer()
     DosCloseEventSem( haveDraw );
 
     if ( doc != NULL ) {
-        LuDocument::freeRectangles( ev, selrects );
+        freeRects( selrects );
+        freeRects( foundrects );
         freeLinks();
-        freeFoundrects();
     }
 
     WinDestroyPointer( handptr );
@@ -142,11 +142,18 @@ void DocumentViewer::setDocument( LuDocument *_doc )
     currentpage = 0;
     fullwidth   = 0;
     fullheight  = 0;
+
     delete pagesizes;
     pagesizes   = NULL;
-    freeFoundrects();
+
+    freeRects( foundrects );
     delete foundrects;
     foundrects  = NULL;
+
+    freeRects( selrects );
+    delete selrects;
+    selrects  = NULL;
+
     freeLinks();
 
     if ( doc != NULL )
@@ -160,10 +167,15 @@ void DocumentViewer::setDocument( LuDocument *_doc )
             fullheight += pagesizes[i].y;
         }
 
+        selrects = new PLuRectSequence[ totalpages ];
+        memset( selrects, 0, sizeof( PLuRectSequence ) * totalpages );
+
         foundrects = new PLuRectSequence[ totalpages ];
         memset( foundrects, 0, sizeof( PLuRectSequence ) * totalpages );
+
         links = new PLuLinkMapSequence[ totalpages ];
         memset( links, 0, sizeof( PLuLinkMapSequence ) * totalpages );
+
         enableAsynchDraw = doc->isAsynchRenderingSupported( ev );
         goToPage( 0 );
     }
@@ -183,14 +195,14 @@ void DocumentViewer::setViewMode( ViewMode mode )
     }
 }
 
-void DocumentViewer::freeFoundrects()
+void DocumentViewer::freeRects( LuDocument_LuRectSequence **rects )
 {
-    if ( foundrects != NULL )
+    if ( rects != NULL )
     {
         for ( long i = 0; i < totalpages; i++ ) {
-            if ( foundrects[ i ] != NULL ) {
-                LuDocument::freeRectangles( ev, foundrects[ i ] );
-                foundrects[ i ] = NULL;
+            if ( rects[ i ] != NULL ) {
+                LuDocument::freeRectangles( ev, rects[ i ] );
+                rects[ i ] = NULL;
             }
         }
     }
@@ -257,7 +269,7 @@ void DocumentViewer::searchDocument( const char *_searchString, bool _caseSensit
 {
     abortSearch = false;
     if ( !continueSearch ) {
-        freeFoundrects();
+        freeRects( foundrects );
     }
 
     delete searchString;
@@ -376,13 +388,15 @@ void DocumentViewer::drawPage()
     }
     else
     {
-        LuDocument::freeRectangles( ev, selrects );
-        selrects = NULL;
+        LuDocument::freeRectangles( ev, selrects[ currentpage ] );
+        selrects[ currentpage ] = NULL;
+
         if ( links != NULL ) {
             if ( links[ currentpage ] == NULL ) {
                 links[ currentpage ] = doc->getLinkMapping( ev, currentpage );
             }
         }
+
         Lucide::enableCopy( false );
         adjustSize();
         sVscrollPos = 0;
@@ -623,8 +637,7 @@ void DocumentViewer::drawthread( void *p )
                     {
                         PageDrawArea *pda = &(*_this->drawareas)[ i ];
 
-                        // TODO: continuous
-                        //_this->drawSelection( hps, &pda->drawrect );
+                        _this->drawSelection( pda->pagenum, hps, &pda->drawrect );
                         _this->drawFound( pda->pagenum, hps, &pda->drawrect );
                     }
                     WinReleasePS( hps );
@@ -728,9 +741,9 @@ void DocumentViewer::wmPaintContAsynch( HWND hwnd )
         WinEndPaint( hps );
     }
 
-    /*if ( isSubrect( &savedRcl, &rcl ) && ( sVscrollInc == 0 ) && ( sHscrollInc == 0 ) ) {
+    if ( isSubrect( &savedRcl, &rcl ) && ( sVscrollInc == 0 ) && ( sHscrollInc == 0 ) ) {
         return;
-    } */
+    }
 
     abortAsynch = true;
     DosRequestMutexSem( todrawAccess, SEM_INDEFINITE_WAIT );
@@ -754,7 +767,7 @@ void DocumentViewer::wmPaintContAsynch( HWND hwnd )
     WinCopyRect( hab, &savedRcl, &rcl );
 
     delete drawareas;
-    drawareas = foundDrawAreas( &rcl );
+    drawareas = findDrawAreas( &rcl );
 
     for ( int i = 0; i < drawareas->size(); i++ )
     {
@@ -764,8 +777,6 @@ void DocumentViewer::wmPaintContAsynch( HWND hwnd )
         if ( links[ pda->pagenum ] == NULL ) {
             links[ pda->pagenum ] = doc->getLinkMapping( ev, pda->pagenum );
         }
-
-        pda->startpos.x = sHscrollPos + pda->drawrect.xLeft;
     }
     DosReleaseMutexSem( todrawAccess );
     DosPostEventSem( haveDraw );
@@ -854,7 +865,7 @@ double DocumentViewer::pagenumToPos( long pagenum )
 
 // founds pages and it's areas to draw
 // for continuous view only
-DrawAreas *DocumentViewer::foundDrawAreas( PRECTL r )
+DrawAreas *DocumentViewer::findDrawAreas( PRECTL r )
 {
     DrawAreas *areas = new DrawAreas;
     if ( doc != NULL )
@@ -874,7 +885,7 @@ DrawAreas *DocumentViewer::foundDrawAreas( PRECTL r )
                 pda.drawrect.xRight  = __min( pagesizes[ pg ].x * realzoom, r->xRight );
                 pda.drawrect.yTop    = i;
 
-                pda.startpos.x = 0;
+                pda.startpos.x = sHscrollPos + pda.drawrect.xLeft;
                 pda.startpos.y = ( pagesizes[ pg ].y * realzoom ) - pageRest;
 
                 areas->push_back( pda );
@@ -894,7 +905,7 @@ void DocumentViewer::determineCurrentPage()
 {
     RECTL rcl = { 0 };
     WinQueryWindowRect( hWndDoc, &rcl );
-    DrawAreas *areas = foundDrawAreas( &rcl );
+    DrawAreas *areas = findDrawAreas( &rcl );
     long pg = 0;
     long sz = 0;
     for ( int i = 0; i < areas->size(); i++ )
@@ -923,7 +934,7 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
     GpiErase( hpsBuffer );
 
     delete drawareas;
-    drawareas = foundDrawAreas( &rcl );
+    drawareas = findDrawAreas( &rcl );
 
     for ( int i = 0; i < drawareas->size(); i++ )
     {
@@ -934,7 +945,7 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
             links[ pda->pagenum ] = doc->getLinkMapping( ev, pda->pagenum );
         }
 
-        spos_x = sHscrollPos + pda->drawrect.xLeft;
+        spos_x = pda->startpos.x;
         //spos_y = ( cyClient - pda->drawrect.yTop ) + ( sVscrollPos * VScrollStep );
         spos_y = pda->startpos.y;
         LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
@@ -958,7 +969,7 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
                      aptlPoints, lRop, BBO_IGNORE );
 
         // TODO
-        //drawSelection( hpsBuffer, &rclDraw );
+        drawSelection( pda->pagenum, hpsBuffer, &pda->drawrect );
         drawFound( pda->pagenum, hpsBuffer, &pda->drawrect );
 
         delete pixbuf;
@@ -974,12 +985,23 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
 
 
 // converts window position to document position
+// single page mode only
 void DocumentViewer::winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRectangle *r )
 {
     r->x1 = ( startpoint->x + sHscrollPos ) / realzoom;
     r->y1 = ( ( cyClient - startpoint->y ) + sVscrollPos ) / realzoom;
     r->x2 = ( endpoint->x + sHscrollPos ) / realzoom;
     r->y2 = ( ( cyClient - endpoint->y ) + sVscrollPos ) / realzoom;
+}
+
+// converts window position to document position
+// continuous view mode only
+void DocumentViewer::winPosToDocPos( PageDrawArea *pda, LuRectangle *r )
+{
+    r->x1 = ( sHscrollPos + pda->drawrect.xLeft ) / realzoom;;
+    r->y1 = pda->startpos.y / realzoom;
+    r->x2 = ( ( pda->drawrect.xRight - pda->drawrect.xLeft ) / realzoom ) + r->x1;
+    r->y2 = ( ( pda->drawrect.yTop - pda->drawrect.yBottom ) / realzoom ) + r->y1;
 }
 
 // converts document position to window position
@@ -1019,7 +1041,7 @@ void DocumentViewer::drawSelection( long pagenum, HPS hps, PRECTL r )
 {
     GpiSetMix( hps, FM_XOR );
     GpiSetColor( hps, CLR_YELLOW );
-    HRGN selectRegion = rectsToRegion( pagenum, hps, selrects, false );
+    HRGN selectRegion = rectsToRegion( pagenum, hps, selrects[ pagenum ], false );
     if ( r != NULL )
     {
         HRGN tmprgn = GpiCreateRegion( hps, 1, r );
@@ -1086,49 +1108,81 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
 {
     if ( mousePressed && ( doc != NULL ) )
     {
-        // TODO: continuous
-        if ( continuous ) {
-            return FALSE;
-        }
-
         selectionEnd.x = xpos;
         selectionEnd.y = ypos;
 
-        winPosToDocPos( &selectionStart, &selectionEnd, &selection );
+        if ( continuous )
+        {
+            RECTL selRect = {
+                selectionStart.x < selectionEnd.x ? selectionStart.x : selectionEnd.x,
+                selectionStart.y < selectionEnd.y ? selectionStart.y : selectionEnd.y,
+                selectionStart.x < selectionEnd.x ? selectionEnd.x : selectionStart.x,
+                selectionStart.y < selectionEnd.y ? selectionEnd.y : selectionStart.y
+            };
 
-        HPS hps = WinGetPS( hwnd );
-        HRGN scrolledRegion = NULLHANDLE; //GpiCreateRegion( hps, 0, NULL );
+            DrawAreas *areas = findDrawAreas( &selRect );
 
-        scrollToPos( hwnd, scrolledRegion, xpos, ypos, true );
+            HPS hps = WinGetPS( hwnd );
+            GpiSetMix( hps, FM_XOR );
+            GpiSetColor( hps, CLR_YELLOW );
 
-        // 127/191/255
-        //LONG lclr = ( 127 << 16 ) | ( 191 << 8 ) | 255;
-        //LONG lclr = ( 128 << 16 ) | ( 64 << 8 );
-        //LONG ltabl[ 1 ] = { lclr };
-        //GpiCreateLogColorTable( hps, 0, LCOLF_CONSECRGB, 100, 1, ltabl );
+            for ( int i = 0; i < areas->size(); i++ )
+            {
+                PageDrawArea *pda = &(*areas)[ i ];
 
-        GpiSetMix( hps, FM_XOR );
-        GpiSetColor( hps, CLR_YELLOW );
-        //GpiSetColor( hps, 100 );
+                winPosToDocPos( pda, &selection );
 
-        HRGN clearRegion = rectsToRegion( currentpage, hps, selrects, false );
-        LuDocument::freeRectangles( ev, selrects );
-        if ( ( selectionStart.x == selectionEnd.x ) &&
-             ( selectionStart.y == selectionEnd.y ) ) {
-            selrects = NULL;
+                HRGN clearRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ], false );
+                LuDocument::freeRectangles( ev, selrects[ pda->pagenum ] );
+                selrects[ pda->pagenum ] = doc->getSelectionRectangles( ev, pda->pagenum, realzoom, &selection );
+                HRGN selectRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ], false );
+                GpiCombineRegion( hps, selectRegion, selectRegion, clearRegion, CRGN_XOR );
+                GpiPaintRegion( hps, selectRegion );
+                GpiDestroyRegion( hps, clearRegion );
+                GpiDestroyRegion( hps, selectRegion );
+            }
+
+            WinReleasePS( hps );
+            delete areas;
         }
-        else {
-            selrects = doc->getSelectionRectangles( ev, currentpage, realzoom, &selection );
-        }
-        HRGN selectRegion = rectsToRegion( currentpage, hps, selrects, false );
-        GpiCombineRegion( hps, selectRegion, selectRegion, clearRegion, CRGN_XOR );
-        //GpiCombineRegion( hps, selectRegion, selectRegion, scrolledRegion, CRGN_DIFF );
-        GpiPaintRegion( hps, selectRegion );
-        GpiDestroyRegion( hps, clearRegion );
-        GpiDestroyRegion( hps, selectRegion );
-        //GpiDestroyRegion( hps, scrolledRegion );
+        else
+        {
+            winPosToDocPos( &selectionStart, &selectionEnd, &selection );
 
-        WinReleasePS( hps );
+            HPS hps = WinGetPS( hwnd );
+            HRGN scrolledRegion = NULLHANDLE; //GpiCreateRegion( hps, 0, NULL );
+
+            scrollToPos( hwnd, scrolledRegion, xpos, ypos, true );
+
+            // 127/191/255
+            //LONG lclr = ( 127 << 16 ) | ( 191 << 8 ) | 255;
+            //LONG lclr = ( 128 << 16 ) | ( 64 << 8 );
+            //LONG ltabl[ 1 ] = { lclr };
+            //GpiCreateLogColorTable( hps, 0, LCOLF_CONSECRGB, 100, 1, ltabl );
+
+            GpiSetMix( hps, FM_XOR );
+            GpiSetColor( hps, CLR_YELLOW );
+            //GpiSetColor( hps, 100 );
+
+            HRGN clearRegion = rectsToRegion( currentpage, hps, selrects[ currentpage ], false );
+            LuDocument::freeRectangles( ev, selrects[ currentpage ] );
+            if ( ( selectionStart.x == selectionEnd.x ) &&
+                 ( selectionStart.y == selectionEnd.y ) ) {
+                selrects[ currentpage ] = NULL;
+            }
+            else {
+                selrects[ currentpage ] = doc->getSelectionRectangles( ev, currentpage, realzoom, &selection );
+            }
+            HRGN selectRegion = rectsToRegion( currentpage, hps, selrects[ currentpage ], false );
+            GpiCombineRegion( hps, selectRegion, selectRegion, clearRegion, CRGN_XOR );
+            //GpiCombineRegion( hps, selectRegion, selectRegion, scrolledRegion, CRGN_DIFF );
+            GpiPaintRegion( hps, selectRegion );
+            GpiDestroyRegion( hps, clearRegion );
+            GpiDestroyRegion( hps, selectRegion );
+            //GpiDestroyRegion( hps, scrolledRegion );
+
+            WinReleasePS( hps );
+        }
     }
     else if ( links != NULL )
     {
@@ -1247,6 +1301,40 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
     return FALSE;
 }
 
+// handles WM_BUTTON1DOWN
+void DocumentViewer::wmButton1Down( HWND hwnd, SHORT xpos, SHORT ypos )
+{
+    if ( continuous )
+    {
+        // clear selection
+        RECTL rcl = { 0 };
+        WinQueryWindowRect( hwnd, &rcl );
+        DrawAreas *areas = findDrawAreas( &rcl );
+
+        HPS hps = WinGetPS( hwnd );
+        GpiSetMix( hps, FM_XOR );
+        GpiSetColor( hps, CLR_YELLOW );
+
+        for ( int i = 0; i < areas->size(); i++ )
+        {
+            PageDrawArea *pda = &(*areas)[ i ];
+
+            HRGN clearRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ], false );
+            GpiPaintRegion( hps, clearRegion );
+            GpiDestroyRegion( hps, clearRegion );
+        }
+        WinReleasePS( hps );
+        delete areas;
+
+        freeRects( selrects );
+    }
+
+    WinSetCapture( HWND_DESKTOP, hwnd );
+    mousePressed = true;
+    selectionStart.x = xpos;
+    selectionStart.y = ypos;
+}
+
 
 // static, window procedure
 MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
@@ -1296,19 +1384,14 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
             return (MRESULT)FALSE;
 
         case WM_BUTTON1DOWN:
-            {
-                WinSetCapture( HWND_DESKTOP, hwnd );
-                _this->mousePressed = true;
-                _this->selectionStart.x = SHORT1FROMMP( mp1 );
-                _this->selectionStart.y = SHORT2FROMMP( mp1 );
-            }
+            _this->wmButton1Down( hwnd, SHORT1FROMMP( mp1 ), SHORT2FROMMP( mp1 ) );
             break;
 
         case WM_BUTTON1UP:
             {
                 WinSetCapture( HWND_DESKTOP, NULLHANDLE );
                 _this->mousePressed = false;
-                Lucide::enableCopy( _this->selrects != NULL );
+                // TODO Lucide::enableCopy( _this->selrects != NULL );
             }
             break;
 

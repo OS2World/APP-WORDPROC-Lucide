@@ -54,18 +54,20 @@ class DocumentViewer
         void wmPaintCont( HWND hwnd );
         void wmPaintAsynch( HWND hwnd );
         void wmPaintContAsynch( HWND hwnd );
+        void wmButton1Down( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmClick( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 );
         void winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRectangle *r );
+        void winPosToDocPos( PageDrawArea *pda, LuRectangle *r );
         void docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl, bool useZoom = true );
         HRGN rectsToRegion( long pagenum, HPS hps, LuDocument_LuRectSequence *rects, bool useZoom );
         void drawSelection( long pagenum, HPS hps, PRECTL r );
         void scrollToPos( HWND hwnd, HRGN hrgn, LONG xpos, LONG ypos, bool withSelection );
-        void freeFoundrects();
+        void freeRects( LuDocument_LuRectSequence **rects );
         void freeLinks();
         void drawFound( long pagenum, HPS hps, PRECTL r );
-        DrawAreas *foundDrawAreas( PRECTL r );
+        DrawAreas *findDrawAreas( PRECTL r );
         void determineCurrentPage();
         long posToPagenum( LONG yPosWin, double *pageRest );
         double pagenumToPos( long pagenum );
@@ -124,7 +126,7 @@ class DocumentViewer
         POINTL selectionStart;
         POINTL selectionEnd;
         LuRectangle selection;
-        LuDocument_LuRectSequence *selrects;
+        LuDocument_LuRectSequence **selrects;
 
         // links
         LuDocument_LuLinkMapSequence **links;
