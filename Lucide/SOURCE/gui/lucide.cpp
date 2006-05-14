@@ -24,6 +24,7 @@
 
 const char *appName = "Lucide";
 const char *fwp = "FrameWindowPos";
+const char *lvd = "LastViewedDir";
 
 
 HWND createToolbar( HWND hwnd );
@@ -314,9 +315,19 @@ static void openDocument()
     memset( fd, 0, sizeof( FILEDLG ) );
     fd->cbSize = sizeof( FILEDLG );
     fd->fl = FDS_CENTER | FDS_OPEN_DIALOG;
-    strcpy( fd->szFullFile, pluginMan->getExtsMask().c_str() );
+    PrfQueryProfileString( HINI_USERPROFILE, appName, lvd, "",
+                           fd->szFullFile, sizeof( fd->szFullFile ) );
+    strcat( fd->szFullFile, pluginMan->getExtsMask().c_str() );
     WinFileDlg( HWND_DESKTOP, hWndFrame, fd );
-    if ( fd->lReturn == DID_OK ) {
+    if ( fd->lReturn == DID_OK )
+    {
+        char drv[ _MAX_DRIVE ] = "";
+        char dir[ _MAX_PATH ] = "";
+        char buf[ _MAX_PATH ] = "";
+        _splitpath( fd->szFullFile, drv, dir, NULL, NULL );
+        _makepath( buf, drv, dir, NULL, NULL );
+        PrfWriteProfileString( HINI_USERPROFILE, appName, lvd, buf );
+
         loadDocument( fd->szFullFile );
     }
     delete fd;
