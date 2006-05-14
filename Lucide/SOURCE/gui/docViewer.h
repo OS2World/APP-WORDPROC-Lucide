@@ -55,6 +55,7 @@ class DocumentViewer
         void wmPaintAsynch( HWND hwnd );
         void wmPaintContAsynch( HWND hwnd );
         void wmButton1Down( HWND hwnd, SHORT xpos, SHORT ypos );
+        void wmButton1Up();
         BOOL wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmClick( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 );
@@ -125,7 +126,7 @@ class DocumentViewer
         bool mousePressed;
         POINTL selectionStart;
         POINTL selectionEnd;
-        LuRectangle selection;
+        LuRectangle *selection;
         LuDocument_LuRectSequence **selrects;
 
         // links

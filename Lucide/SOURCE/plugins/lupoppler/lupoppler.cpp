@@ -460,11 +460,13 @@ SOM_Scope string  SOMLINK getText(LuPopplerDocument *somSelf,
     pdf_selection.x2 = selection->x2;
     pdf_selection.y2 = selection->y2;
 
+    DosRequestMutexSem( document->mutex, SEM_INDEFINITE_WAIT );
     sel_text = text_dev->getSelectionText( &pdf_selection );
 
     delete document->text;
     document->text = newstrdup( sel_text->getCString() );
     delete sel_text;
+    DosReleaseMutexSem( document->mutex );
 
     return document->text;
 }
