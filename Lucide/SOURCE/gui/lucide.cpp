@@ -264,7 +264,7 @@ void Lucide::setViewMode( ViewMode mode )
 }
 
 
-static void loadDocument( const char *fn )
+void Lucide::loadDocument( const char *fn )
 {
     char *msg = newstrdupL( MSGS_NO_SUIT_PLUG );
 
@@ -276,15 +276,17 @@ static void loadDocument( const char *fn )
     }
     else
     {
-        doc = pluginMan->createDocumentForExt( ext + 1 );
-        if ( doc == NULL ) {
+        LuDocument *d = pluginMan->createDocumentForExt( ext + 1, false );
+        if ( d == NULL ) {
             WinMessageBox( HWND_DESKTOP, hWndFrame, msg,
                            NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
         }
         else
         {
             char *error = NULL;
-            if ( doc->loadFile( ev, (char *)fn, NULL, &error ) ) {
+            if ( d->loadFile( ev, (char *)fn, NULL, &error ) ) {
+                delete doc;
+                doc = d;
                 Lucide::setDocument( doc );
             }
             else
@@ -301,15 +303,14 @@ static void loadDocument( const char *fn )
                     SOMFree( error );
                 }
 
-                delete doc;
-                doc = NULL;
+                delete d;
             }
         }
     }
     delete msg;
 }
 
-static void openDocument()
+void Lucide::openDocument()
 {
     PFILEDLG fd = new FILEDLG;
     memset( fd, 0, sizeof( FILEDLG ) );
@@ -336,6 +337,7 @@ static void openDocument()
 
 static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
+
     switch ( msg )
     {
 
@@ -344,7 +346,7 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             switch ( SHORT1FROMMP(mp1) )
             {
                 case CM_OPEN:
-                    openDocument();
+                    Lucide::openDocument();
                     return (MRESULT)FALSE;
 
                 case CM_EXIT:
@@ -507,7 +509,7 @@ int main( int argc, char **argv )
     findDlg = new FindDlg( hWndFrame );
     Lucide::checkMenus();
     if ( argc > 1 ) {
-        loadDocument( argv[1] );
+        Lucide::loadDocument( argv[1] );
     }
 
     // Показать окно программы

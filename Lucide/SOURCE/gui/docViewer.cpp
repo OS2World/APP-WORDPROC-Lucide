@@ -11,6 +11,7 @@
 #include "lucide.h"
 #include "docViewer.h"
 #include "progressDlg.h"
+#include "pluginman.h"
 #include "luutils.h"
 #include "lucide_res.h"
 #include "messages.h"
@@ -1377,6 +1378,63 @@ void DocumentViewer::wmButton1Up()
     Lucide::enableCopy( haveSelection );
 }
 
+
+// handles DM_DRAGOVER
+MRESULT DocumentViewer::wmDragOver( PDRAGINFO dragInfo )
+{
+    PDRAGITEM dragItem;
+    USHORT    usOp, usIndicator;
+
+    usOp = 0;
+    usIndicator = DOR_NODROPOP;
+
+    DrgAccessDraginfo( dragInfo );
+
+    if ( dragInfo->usOperation == DO_DEFAULT )
+    {
+        dragItem = DrgQueryDragitemPtr( dragInfo, 0 );
+        if ( DrgQueryDragitemCount( dragInfo ) == 1 )
+        {
+            if ( DrgVerifyRMF( dragItem, "DRM_OS2FILE", NULL ) &&
+                 ( dragItem->hstrContainerName != NULLHANDLE ) &&
+                 ( dragItem->hstrSourceName != NULLHANDLE ) )
+            {
+                char fname[ CCHMAXPATHCOMP ] = "";
+                DrgQueryStrName( dragItem->hstrSourceName, CCHMAXPATHCOMP, fname );
+                char *ext = strrchr( fname, '.' );
+                if ( ext != NULL ) {
+                    if ( pluginMan->createDocumentForExt( ext + 1, true ) != NULL ) {
+                        usIndicator = DOR_DROP;
+                        usOp = DO_UNKNOWN;
+                    }
+                }
+            }
+        }
+    }
+
+    DrgFreeDraginfo( dragInfo );
+    return MRFROM2SHORT( usIndicator, usOp );
+}
+
+
+// handles DM_DROP
+void DocumentViewer::wmDrop( PDRAGINFO dragInfo )
+{
+    PDRAGITEM dragItem;
+
+    DrgAccessDraginfo( dragInfo );
+    dragItem = DrgQueryDragitemPtr( dragInfo, 0 );
+
+    char fname[ CCHMAXPATHCOMP ] = "";
+    char fpath[ CCHMAXPATH ] = "";
+    DrgQueryStrName( dragItem->hstrSourceName, CCHMAXPATHCOMP, fname );
+    DrgQueryStrName( dragItem->hstrContainerName, CCHMAXPATH, fpath );
+    DrgFreeDraginfo( dragInfo );
+
+    strcat( fpath, fname );
+    Lucide::loadDocument( fpath );
+}
+
 // static, window procedure
 MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
@@ -1392,6 +1450,13 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
             _this = (DocumentViewer *)mp1;
             return (MRESULT)FALSE;
         }
+
+        case DM_DRAGOVER:
+            return _this->wmDragOver( (PDRAGINFO)mp1 );
+
+        case DM_DROP:
+            _this->wmDrop( (PDRAGINFO)mp1 );
+            return (MRESULT)FALSE;
 
         case WM_ERASEBACKGROUND:
             return (MRESULT)TRUE;

@@ -49,7 +49,9 @@ class DocumentViewer
 
         MRESULT vertScroll( HWND hwnd, MPARAM mp2, HRGN hrgn );
         MRESULT horizScroll( HWND hwnd, MPARAM mp2, HRGN hrgn );
-        void wmSize( HWND hwnd, MPARAM mp2 );
+        MRESULT wmDragOver( PDRAGINFO dragInfo );
+		void wmDrop( PDRAGINFO dragInfo );
+		void wmSize( HWND hwnd, MPARAM mp2 );
         void wmPaint( HWND hwnd );
         void wmPaintCont( HWND hwnd );
         void wmPaintAsynch( HWND hwnd );

@@ -15,6 +15,8 @@ class Lucide
 	public:
 		static bool dontSwitchPage;
 		
+		static void openDocument();
+		static void loadDocument( const char *fn );
 		static void setDocument( LuDocument *_doc );
 		static void checkNavigationMenus();
 		static void checkZoomMenus();

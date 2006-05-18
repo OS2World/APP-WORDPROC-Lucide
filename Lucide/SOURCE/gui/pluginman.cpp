@@ -86,8 +86,13 @@ void PluginManager::loadPlugin( const char *dllname )
 
 
 // returns NULL if not suitable plugin found
-LuDocument *PluginManager::createDocumentForExt( const char *ext )
+// if checkOnly is true - just check if suitable plugin exist
+LuDocument *PluginManager::createDocumentForExt( const char *ext, bool checkOnly )
 {
+	if ( ext == NULL ) {
+		return NULL;
+	}
+
     LuDocument * APIENTRY (*pCreateObject)();
 
     for ( int i = 0; i < plugins->size(); i++ )
@@ -113,7 +118,13 @@ LuDocument *PluginManager::createDocumentForExt( const char *ext )
             {
                 delete cExt;
                 delete cExts;
-                return pCreateObject();
+
+                if ( checkOnly ) {
+                    return (LuDocument *)TRUE;
+                }
+                else {
+                    return pCreateObject();
+                }
             }
         }
 
@@ -123,6 +134,7 @@ LuDocument *PluginManager::createDocumentForExt( const char *ext )
 
     return NULL;
 }
+
 
 std::string PluginManager::getExtsMask()
 {
