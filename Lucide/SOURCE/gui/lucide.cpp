@@ -22,9 +22,13 @@
 #include "messages.h"
 
 
+#define ID_SPLITTER 1
+
 const char *appName = "Lucide";
-const char *fwp = "FrameWindowPos";
-const char *lvd = "LastViewedDir";
+const char *fwp     = "FrameWindowPos";
+const char *lvd     = "LastViewedDir";
+const char *splpos  = "SplitterPos";
+const char *showind = "ShowIndex";
 
 
 HWND createToolbar( HWND hwnd );
@@ -33,6 +37,7 @@ HAB   hab;
 HWND  hWndFrame;
 HWND  hWndMenu;
 HWND  hToolBar;
+HWND  hVertSplitter;
 
 Environment    *ev        = somGetGlobalEnvironment();
 LuDocument     *doc       = NULL;
@@ -41,7 +46,9 @@ DocumentViewer *docViewer = NULL;
 IndexWindow    *indexWin  = NULL;
 FindDlg        *findDlg   = NULL;
 
-bool Lucide::dontSwitchPage = false;
+bool  Lucide::dontSwitchPage = false;
+SHORT Lucide::splitterPos    = 100;
+bool  Lucide::showIndex      = true;
 
 PFNWP pOldSplProc;
 
@@ -50,7 +57,7 @@ void Lucide::enableCopy( bool enable )
     WinEnableMenuItem( hWndMenu, CM_COPY, enable );
 }
 
-static void setOfPages( long pages )
+void Lucide::setOfPages( long pages )
 {
     char *pgfrm = newstrdupL( TB_PAGENUM );
     char pgnum[ 32 ];
@@ -80,7 +87,7 @@ void Lucide::checkNavigationMenus()
     indexWin->goToPage( NULL, docViewer->getCurrentPage() );
 }
 
-void enableZoomMenus()
+void Lucide::enableZoomMenus()
 {
     BOOL scalable = doc->isScalable( ev );
     WinEnableMenuItem( hWndMenu, CM_FITWINDOW, scalable );
@@ -96,7 +103,7 @@ void enableZoomMenus()
 }
 
 
-void setZoomChecks( SHORT cmd, SHORT cbind, double zoom )
+void Lucide::setZoomChecks( SHORT cmd, SHORT cbind, double zoom )
 {
     if ( cmd != -1 )
     {
@@ -191,8 +198,8 @@ void Lucide::checkMenus()
 
         WinEnableMenuItem( hWndMenu, CM_ROTATE90CW, FALSE );
         WinEnableMenuItem( hWndMenu, CM_ROTATE90CCW, FALSE );
-        WinEnableMenuItem( hWndMenu, CM_NAVPANE, FALSE );
-        WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_NAVPANE), (MPARAM)FALSE );
+        //WinEnableMenuItem( hWndMenu, CM_NAVPANE, FALSE );
+        //WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_NAVPANE), (MPARAM)FALSE );
         WinEnableMenuItem( hWndMenu, CM_SINGLEPAGE, FALSE );
         WinEnableMenuItem( hWndMenu, CM_CONTINUOUS, FALSE );
 
@@ -236,7 +243,7 @@ void Lucide::setDocument( LuDocument *_doc )
 {
     docViewer->setDocument( _doc );
     indexWin->setDocument( _doc );
-    Lucide::checkMenus();
+    checkMenus();
 }
 
 void Lucide::setViewMode( ViewMode mode )
@@ -285,9 +292,10 @@ void Lucide::loadDocument( const char *fn )
         {
             char *error = NULL;
             if ( d->loadFile( ev, (char *)fn, NULL, &error ) ) {
+                docViewer->close();
                 delete doc;
                 doc = d;
-                Lucide::setDocument( doc );
+                setDocument( doc );
             }
             else
             {
@@ -334,12 +342,44 @@ void Lucide::openDocument()
     delete fd;
 }
 
+void Lucide::checkNavpane()
+{
+    if ( Lucide::showIndex )
+    {
+        WinSendMsg( hWndMenu, MM_SETITEMATTR, MPFROM2SHORT( CM_NAVPANE, TRUE ),
+                MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
+        WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( CM_NAVPANE ), (MPARAM)TRUE );
+    }
+    else
+    {
+        WinSendMsg( hWndMenu, MM_SETITEMATTR, MPFROM2SHORT( CM_NAVPANE, TRUE ),
+                MPFROM2SHORT( MIA_CHECKED, FALSE ) );
+        WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( CM_NAVPANE ), (MPARAM)FALSE );
+    }
+}
 
 static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
 
     switch ( msg )
     {
+        case WM_CONTROL:
+        {
+            if ( ( SHORT1FROMMP( mp1 ) == ID_SPLITTER ) &&
+                 ( SHORT2FROMMP( mp1 ) == SBN_POSITIONCHANGED ) )
+            {
+                SHORT pos = SHORT1FROMMP( mp2 );
+                if ( pos > 0 ) {
+                    Lucide::splitterPos = pos;
+                    Lucide::showIndex = true;
+                }
+                else {
+                    Lucide::showIndex = false;
+                }
+                Lucide::checkNavpane();
+            }
+        }
+        break;
 
         case WM_COMMAND:
         {
@@ -433,6 +473,15 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                 case CM_CONTINUOUS:
                     Lucide::setViewMode( Continuous );
                     return (MRESULT)FALSE;
+
+                case CM_NAVPANE:
+                    {
+                        Lucide::showIndex = !Lucide::showIndex;
+                        Lucide::checkNavpane();
+                        WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS,
+                            MPFROMSHORT( Lucide::showIndex ? Lucide::splitterPos : 0 ), MPVOID );
+                    }
+                    return (MRESULT)FALSE;
             }
         }
         break;
@@ -475,10 +524,10 @@ int main( int argc, char **argv )
     WinSetWindowUShort( hWndMenu, QWS_ID, FID_MENU );
 
     // Vertical splitter and his windows - Index and Document view
-    HWND hVertSplitter = WinCreateWindow( hWndFrame, WC_ER_SPLITTER, "",
-                                          WS_VISIBLE | SBS_VSPLIT,
-                                          0, 0, 0, 0, hWndFrame, HWND_TOP,
-                                          0, NULL, NULL );
+    hVertSplitter = WinCreateWindow( hWndFrame, WC_ER_SPLITTER, "",
+                                     WS_VISIBLE | SBS_VSPLIT,
+                                     0, 0, 0, 0, hWndFrame, HWND_TOP,
+                                     ID_SPLITTER, NULL, NULL );
 
     indexWin = new IndexWindow( hab, hWndFrame );
 
@@ -488,7 +537,10 @@ int main( int argc, char **argv )
 
     WinSendMsg( hVertSplitter, SBM_SETWINDOWS,
                 MPFROMHWND( indexWin->getHWND() ), MPFROMHWND( docViewer->getHWND() ) );
-    WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS, MPFROMSHORT( 80 ), MPVOID );
+    Lucide::splitterPos = PrfQueryProfileInt( HINI_USERPROFILE, appName, splpos, Lucide::splitterPos );
+    Lucide::showIndex = PrfQueryProfileInt( HINI_USERPROFILE, appName, showind, Lucide::showIndex );
+    WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS,
+                MPFROMSHORT( Lucide::showIndex ? Lucide::splitterPos : 0 ), MPVOID );
 
     // Horizontal splitter and its windows - Toolbar and Vertical splitter
     // Horizontal splitter is client window
@@ -512,6 +564,8 @@ int main( int argc, char **argv )
         Lucide::loadDocument( argv[1] );
     }
 
+    Lucide::checkNavpane();
+
     // Показать окно программы
     if ( !PMRestoreWindowPos( NULL, appName, fwp, hWndFrame,
                               TRUE, TRUE, FALSE, FALSE, FALSE ) )
@@ -525,7 +579,13 @@ int main( int argc, char **argv )
         WinDispatchMsg( hab, &qmsg );
     }
 
-    if ( WinIsWindow( hab, hWndFrame ) ) {
+    if ( WinIsWindow( hab, hWndFrame ) )
+    {
+        char valbuf[ 3 ] = "";
+        PrfWriteProfileString( HINI_USERPROFILE, appName, splpos,
+                               itoa( Lucide::splitterPos, valbuf, 10 ) );
+        PrfWriteProfileString( HINI_USERPROFILE, appName, showind,
+                               itoa( Lucide::showIndex, valbuf, 10 ) );
         PMStoreWindowPos( NULL, appName, fwp, hWndFrame );
     }
 

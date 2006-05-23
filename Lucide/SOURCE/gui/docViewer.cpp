@@ -140,27 +140,8 @@ void DocumentViewer::registerClass( HAB hab )
 // sets the document for viewing
 void DocumentViewer::setDocument( LuDocument *_doc )
 {
-    doc         = _doc;
-    zoom        = 1;
-    currentpage = 0;
-    fullwidth   = 0;
-    fullheight  = 0;
-
-    delete pagesizes;
-    pagesizes   = NULL;
-
-    delete selection;
-    selection   = NULL;
-
-    freeRects( foundrects );
-    delete foundrects;
-    foundrects  = NULL;
-
-    freeRects( selrects );
-    delete selrects;
-    selrects    = NULL;
-
-    freeLinks();
+    close();
+    doc = _doc;
 
     if ( doc != NULL )
     {
@@ -190,6 +171,41 @@ void DocumentViewer::setDocument( LuDocument *_doc )
     }
 }
 
+
+// closes the document
+void DocumentViewer::close()
+{
+    abortAsynch = true;
+    DosRequestMutexSem( todrawAccess, SEM_INDEFINITE_WAIT );
+
+    delete drawareas;
+    drawareas = NULL;
+
+    delete pagesizes;
+    pagesizes   = NULL;
+
+    delete selection;
+    selection   = NULL;
+
+    freeRects( foundrects );
+    delete foundrects;
+    foundrects  = NULL;
+
+    freeRects( selrects );
+    delete selrects;
+    selrects    = NULL;
+
+    freeLinks();
+
+    doc         = NULL;
+    totalpages  = 0;
+    zoom        = 1;
+    currentpage = 0;
+    fullwidth   = 0;
+    fullheight  = 0;
+
+    DosReleaseMutexSem( todrawAccess );
+}
 
 // sets the view mode
 void DocumentViewer::setViewMode( ViewMode mode )
@@ -622,36 +638,46 @@ void DocumentViewer::drawthread( void *p )
     ULONG postCnt;
     while ( !_this->termdraw )
     {
+somPrintf("1\n");
         DosWaitEventSem( _this->haveDraw, SEM_INDEFINITE_WAIT );
         DosResetEventSem( _this->haveDraw, &postCnt );
         _this->abortAsynch = false;
+somPrintf("2\n");
 
         if ( ( _this->drawareas != NULL ) && ( _this->doc != NULL ) )
         {
+somPrintf("3\n");
             DosRequestMutexSem( _this->todrawAccess, SEM_INDEFINITE_WAIT );
 
             for ( _this->drawareaIndex = 0;
                   _this->drawareaIndex < _this->drawareas->size();
                   _this->drawareaIndex++ )
             {
+somPrintf("4\n");
                 PageDrawArea *pda = &(*_this->drawareas)[ _this->drawareaIndex ];
+somPrintf("4.1\n");
 
                 LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
                 LONG rcly = pda->drawrect.yTop - pda->drawrect.yBottom;
                 _this->pixbuf = new LuPixbuf( _this->ev, rclx, rcly );
+somPrintf("4.2\n");
                 _this->doc->renderPageToPixbufAsynch( _this->ev, pda->pagenum,
                        pda->startpos.x, pda->startpos.y, rclx, rcly, _this->realzoom, 0,
                        _this->pixbuf, asynchCallbackFnDraw, asynchCallbackFnAbort, p );
+somPrintf("4.3\n");
                 delete _this->pixbuf;
                 _this->pixbuf = NULL;
+somPrintf("4.4\n");
 
                 if ( _this->abortAsynch ) {
                     break;  // TODO: remove completed areas from drawareas
                 }
+somPrintf("5\n");
             }
 
             if ( !_this->abortAsynch )
             {
+somPrintf("6\n");
                 HPS hps = WinGetPS( _this->hWndDoc );
                 if ( hps != NULLHANDLE ) {
                     for ( int i = 0; i < _this->drawareas->size(); i++ )
@@ -666,10 +692,12 @@ void DocumentViewer::drawthread( void *p )
                 WinSetRectEmpty( _this->hab, &_this->savedRcl );
                 delete _this->drawareas;
                 _this->drawareas = NULL;
+somPrintf("7\n");
             }
 
             DosReleaseMutexSem( _this->todrawAccess );
         }
+somPrintf("8\n");
     }
 
     WinDestroyMsgQueue( thmq );

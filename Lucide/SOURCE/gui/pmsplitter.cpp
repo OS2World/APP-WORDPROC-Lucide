@@ -143,7 +143,7 @@ static MRESULT EXPENTRY splitterProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM m
         sws->ptrNS = NULLHANDLE;
         WinSetWindowULong( hwnd, sizeof( ULONG ), (ULONG)sws );
     }
-    
+
     switch ( msg )
     {
         case SBM_SETWINDOWS:
@@ -177,7 +177,7 @@ static MRESULT EXPENTRY splitterProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM m
         case WM_WINDOWPOSCHANGED:
         case WM_SHOW:
             setWindSize( hwnd, sws );
-            break;  
+            break;
 
         case WM_PAINT:
             {
@@ -271,6 +271,8 @@ static MRESULT EXPENTRY splitterProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM m
                     return (MRESULT)(FALSE);
                 }
 
+                SHORT oldpos = sws->splitterPos;
+
                 POINTL ptl = { SHORT1FROMMP( mp1 ), SHORT2FROMMP( mp1 ) };
                 TRACKINFO track;
 
@@ -305,8 +307,14 @@ static MRESULT EXPENTRY splitterProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM m
                     } else {
                         sws->splitterPos = track.rclTrack.yBottom;
                     }
-                        
+
                     setWindSize( hwnd, sws );
+
+                    // notify owner
+                    WinSendMsg( WinQueryWindow( hwnd, QW_OWNER ), WM_CONTROL,
+                                MPFROM2SHORT( WinQueryWindowUShort( hwnd, QWS_ID ),
+                                              SBN_POSITIONCHANGED ),
+                                MPFROM2SHORT( sws->splitterPos, oldpos ) );
                 }
             }
             return (MRESULT)(FALSE);
@@ -314,7 +322,7 @@ static MRESULT EXPENTRY splitterProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM m
         case WM_ERASEBACKGROUND:
             return (MRESULT)(FALSE);
     }
-    return WinDefWindowProc( hwnd, msg, mp1, mp2 ); 
+    return WinDefWindowProc( hwnd, msg, mp1, mp2 );
 }
 
 

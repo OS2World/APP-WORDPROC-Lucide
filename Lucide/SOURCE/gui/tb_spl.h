@@ -51,6 +51,9 @@ BOOL InitPMSplitterClass( HAB hab );
 // SHORT size;
 // (BOOL)WinSendMsg( hwnd, SBM_SETFIXEDSIZE, MPFROMSHORT( size ), MPVOID );
 
+// Control notification code, splitter pos changed
+// MP1 - (id, SBN_POSITIONCHANGED)  MP2 - (newpos, oldpos)
+#define SBN_POSITIONCHANGED	1
 
 /*****************************************************/
 /*                   Toolbar                         */

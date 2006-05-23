@@ -30,6 +30,7 @@ class DocumentViewer
         HWND getHWND() { return hWndDocFrame; }
 
         void setDocument( LuDocument *_doc );
+        void close();
         void goToPage( long page );
         long getCurrentPage() { return currentpage; }
         void setZoom( double _zoom );
