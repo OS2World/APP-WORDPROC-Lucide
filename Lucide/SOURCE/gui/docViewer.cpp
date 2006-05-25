@@ -51,6 +51,7 @@ DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
     height      = 0;
     fullwidth   = 0;
     fullheight  = 0;
+    bpp         = 0;
     zoom        = 1.0;
     realzoom    = 1.0;
     ev          = somGetGlobalEnvironment();
@@ -146,6 +147,7 @@ void DocumentViewer::setDocument( LuDocument *_doc )
     if ( doc != NULL )
     {
         totalpages = doc->getPageCount( ev );
+        bpp = doc->getBpp( ev );
 
         pagesizes = new LuSize[ totalpages ];
         for ( long i = 0; i < totalpages; i++ ) {
@@ -599,11 +601,11 @@ long _System DocumentViewer::asynchCallbackFnAbort( void *data )
 // static method, draws area during asynch rendering
 long _System DocumentViewer::asynchCallbackFnDraw( void *data )
 {
-    DocumentViewer *d = (DocumentViewer *)data;
-    HPS hps = WinGetPS( d->hWndDoc );
+    DocumentViewer *_this = (DocumentViewer *)data;
+    HPS hps = WinGetPS( _this->hWndDoc );
     if ( hps != NULLHANDLE )
     {
-        PRECTL drawRect = &((*d->drawareas)[d->drawareaIndex].drawrect);
+        PRECTL drawRect = &((*_this->drawareas)[_this->drawareaIndex].drawrect);
         LONG rclx = drawRect->xRight - drawRect->xLeft;
         LONG rcly = drawRect->yTop - drawRect->yBottom;
 
@@ -617,8 +619,8 @@ long _System DocumentViewer::asynchCallbackFnDraw( void *data )
         pbmi.cx = rclx;
         pbmi.cy = rcly;
         pbmi.cPlanes = 1;
-        pbmi.cBitCount = 24;
-        GpiDrawBits( hps, d->pixbuf->getDataPtr( d->ev ), &pbmi, 4L,
+        pbmi.cBitCount = _this->bpp * 8;
+        GpiDrawBits( hps, _this->pixbuf->getDataPtr( _this->ev ), &pbmi, 4L,
                      aptlPoints, lRop, BBO_IGNORE );
 
         WinReleasePS( hps );
@@ -638,46 +640,36 @@ void DocumentViewer::drawthread( void *p )
     ULONG postCnt;
     while ( !_this->termdraw )
     {
-somPrintf("1\n");
         DosWaitEventSem( _this->haveDraw, SEM_INDEFINITE_WAIT );
         DosResetEventSem( _this->haveDraw, &postCnt );
         _this->abortAsynch = false;
-somPrintf("2\n");
 
         if ( ( _this->drawareas != NULL ) && ( _this->doc != NULL ) )
         {
-somPrintf("3\n");
             DosRequestMutexSem( _this->todrawAccess, SEM_INDEFINITE_WAIT );
 
             for ( _this->drawareaIndex = 0;
                   _this->drawareaIndex < _this->drawareas->size();
                   _this->drawareaIndex++ )
             {
-somPrintf("4\n");
                 PageDrawArea *pda = &(*_this->drawareas)[ _this->drawareaIndex ];
-somPrintf("4.1\n");
 
                 LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
                 LONG rcly = pda->drawrect.yTop - pda->drawrect.yBottom;
-                _this->pixbuf = new LuPixbuf( _this->ev, rclx, rcly );
-somPrintf("4.2\n");
+                _this->pixbuf = new LuPixbuf( _this->ev, rclx, rcly, _this->bpp );
                 _this->doc->renderPageToPixbufAsynch( _this->ev, pda->pagenum,
                        pda->startpos.x, pda->startpos.y, rclx, rcly, _this->realzoom, 0,
                        _this->pixbuf, asynchCallbackFnDraw, asynchCallbackFnAbort, p );
-somPrintf("4.3\n");
                 delete _this->pixbuf;
                 _this->pixbuf = NULL;
-somPrintf("4.4\n");
 
                 if ( _this->abortAsynch ) {
                     break;  // TODO: remove completed areas from drawareas
                 }
-somPrintf("5\n");
             }
 
             if ( !_this->abortAsynch )
             {
-somPrintf("6\n");
                 HPS hps = WinGetPS( _this->hWndDoc );
                 if ( hps != NULLHANDLE ) {
                     for ( int i = 0; i < _this->drawareas->size(); i++ )
@@ -692,12 +684,10 @@ somPrintf("6\n");
                 WinSetRectEmpty( _this->hab, &_this->savedRcl );
                 delete _this->drawareas;
                 _this->drawareas = NULL;
-somPrintf("7\n");
             }
 
             DosReleaseMutexSem( _this->todrawAccess );
         }
-somPrintf("8\n");
     }
 
     WinDestroyMsgQueue( thmq );
@@ -855,7 +845,7 @@ void DocumentViewer::wmPaint( HWND hwnd )
         LONG rclx = rclDraw.xRight - rclDraw.xLeft;
         LONG rcly = rclDraw.yTop - rclDraw.yBottom;
 
-        pixbuf = new LuPixbuf( ev, rclx, rcly );
+        pixbuf = new LuPixbuf( ev, rclx, rcly, bpp );
         POINTL aptlPoints[4]={ rclDraw.xLeft, rclDraw.yBottom,
                                rclDraw.xRight-1, rclDraw.yTop-1,
                                0, 0, rclx, rcly };
@@ -868,7 +858,7 @@ void DocumentViewer::wmPaint( HWND hwnd )
         pbmi.cx = rclx;
         pbmi.cy = rcly;
         pbmi.cPlanes = 1;
-        pbmi.cBitCount = 24;
+        pbmi.cBitCount = bpp * 8;
         GpiDrawBits( hpsBuffer, pixbuf->getDataPtr( ev ), &pbmi, 4L,
                      aptlPoints, lRop, BBO_IGNORE );
 
@@ -1000,7 +990,7 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
         LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
         LONG rcly = pda->drawrect.yTop - pda->drawrect.yBottom;
 
-        pixbuf = new LuPixbuf( ev, rclx, rcly );
+        pixbuf = new LuPixbuf( ev, rclx, rcly, bpp );
         POINTL aptlPoints[4]={ pda->drawrect.xLeft, pda->drawrect.yBottom,
                                pda->drawrect.xRight-1, pda->drawrect.yTop-1,
                                0, 0, rclx, rcly };
@@ -1013,7 +1003,7 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
         pbmi.cx = rclx;
         pbmi.cy = rcly;
         pbmi.cPlanes = 1;
-        pbmi.cBitCount = 24;
+        pbmi.cBitCount = bpp * 8;
         GpiDrawBits( hpsBuffer, pixbuf->getDataPtr( ev ), &pbmi, 4L,
                      aptlPoints, lRop, BBO_IGNORE );
 

@@ -17,7 +17,7 @@
 
 /* Enable multithreading support. */
 #ifndef MULTITHREADING
-#define MULTITHREADED 0
+#define MULTITHREADED 1
 #endif
 
 /* Full path for the system-wide xpdfrc file. */

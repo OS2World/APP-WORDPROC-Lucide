@@ -31,7 +31,7 @@
 #define SOM_Scope static
 #endif
 
-#define LuPixbuf_MaxNoMethods 7
+#define LuPixbuf_MaxNoMethods 8
 
 /*
  * -- Instance Data
@@ -119,6 +119,7 @@ typedef LuPixbufData* (SOMLINK * somTD_LuPixbuf_DataThunk)(void*);
   #define _LuPixbufInit somSelf->LuPixbufInit
   #define _getWidth somSelf->getWidth
   #define _getHeight somSelf->getHeight
+  #define _getBpp somSelf->getBpp
   #define _getRowSize somSelf->getRowSize
   #define _getDataLen somSelf->getDataLen
   #define _getDataPtr somSelf->getDataPtr
@@ -144,7 +145,8 @@ SOMEXTERN struct LuPixbufCClassDataStructure SOMDLINK LuPixbufCClassData = {(som
 SOM_Scope void  SOMLINK LuPixbufInit(LuPixbuf *somSelf, Environment *ev, 
 		somInitCtrl* ctrl, 
 		long w, 
-		long h);
+		long h, 
+		short bpp);
 #ifndef somMN_LuPixbufInit_defined
 #define somMN_LuPixbufInit_defined
 static char *somMN_LuPixbufInit = "LuPixbufInit";
@@ -155,7 +157,10 @@ static somId somId_LuPixbufInit = &somMN_LuPixbufInit;
 static char *somDS_LuPixbufInit = "::LuPixbuf::LuPixbufInit";
 static somId somDI_LuPixbufInit = &somDS_LuPixbufInit;
 #endif  /* somDS_LuPixbufInit_defined */
-#define LuPixbufInit_somApRdDefault
+
+static somMethodInfo LuPixbufInitMethodInfo = {0, 24, 0};
+
+static somApRdInfo LuPixbufInitStubs = {0, 0, &LuPixbufInitMethodInfo};
 
 /*
  * New Method: getWidth
@@ -188,6 +193,25 @@ static char *somDS_getHeight = "::LuPixbuf::getHeight";
 static somId somDI_getHeight = &somDS_getHeight;
 #endif  /* somDS_getHeight_defined */
 #define getHeight_somApRdDefault
+
+/*
+ * New Method: getBpp
+ */
+SOM_Scope short  SOMLINK getBpp(LuPixbuf *somSelf, Environment *ev);
+#ifndef somMN_getBpp_defined
+#define somMN_getBpp_defined
+static char *somMN_getBpp = "getBpp";
+static somId somId_getBpp = &somMN_getBpp;
+#endif  /* somMN_getBpp_defined */
+#ifndef somDS_getBpp_defined
+#define somDS_getBpp_defined
+static char *somDS_getBpp = "::LuPixbuf::getBpp";
+static somId somDI_getBpp = &somDS_getBpp;
+#endif  /* somDS_getBpp_defined */
+
+static somMethodInfo getBppMethodInfo = {12, 8, 0};
+
+static somApRdInfo getBppStubs = {0, 0, &getBppMethodInfo};
 
 /*
  * New Method: getRowSize
@@ -309,6 +333,16 @@ static somStaticMethod_t LuPixbufSM[] = {
 #else
          (somMethodProc *) ((void*) &getHeightStubs) },
 #endif
+    {    &LuPixbufClassData.getBpp,
+         &somId_getBpp,
+         &somDI_getBpp,
+         (somMethodProc *) getBpp,
+         (somMethodProc *)((void*)-1),
+#ifdef getBpp_somApRdDefault
+         0},
+#else
+         (somMethodProc *) ((void*) &getBppStubs) },
+#endif
     {    &LuPixbufClassData.getRowSize,
          &somId_getRowSize,
          &somDI_getRowSize,
@@ -376,7 +410,7 @@ static somId somINITLuPixbuf[] = {
 };
 
 static somStaticClassInfo LuPixbufSCI = {
-    4, 7, 1, 0, 0, 0, /* layout version 4 */ 
+    4, 8, 1, 0, 0, 0, /* layout version 4 */ 
     LuPixbuf_MajorVersion, LuPixbuf_MinorVersion,
     sizeof(LuPixbufData), LuPixbuf_MaxNoMethods, 1,
     &somCN_LuPixbuf,
@@ -399,7 +433,7 @@ static somStaticClassInfo LuPixbufSCI = {
     0, /* no sci development level check */
     0, /* number of SelectInheritedMethods */
     0, /* no SelectInheritedMethods */
-    7, /* number of classdata entries */
+    8, /* number of classdata entries */
     0, /* no list provided currently */
     0, /* number of migrated methods */
     0, /* no migrated method implementations */

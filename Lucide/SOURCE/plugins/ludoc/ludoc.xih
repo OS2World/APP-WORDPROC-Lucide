@@ -31,7 +31,7 @@
 #define SOM_Scope static
 #endif
 
-#define LuDocument_MaxNoMethods 29
+#define LuDocument_MaxNoMethods 30
 
 /*
  * -- Instance Data
@@ -89,6 +89,7 @@ typedef void LuDocumentData;
   #define _somDumpSelf somSelf->somDumpSelf
   #define _somDumpSelfInt somSelf->somDumpSelfInt
   #define _loadFile somSelf->loadFile
+  #define _getBpp somSelf->getBpp
   #define _isScalable somSelf->isScalable
   #define _isRotable somSelf->isRotable
   #define _getPageCount somSelf->getPageCount
@@ -153,6 +154,25 @@ static somId somDI_loadFile = &somDS_loadFile;
 static somMethodInfo loadFileMethodInfo = {10, 20, 0};
 
 static somApRdInfo loadFileStubs = {0, 0, &loadFileMethodInfo};
+
+/*
+ * New Method: getBpp
+ */
+SOM_Scope short  SOMLINK getBpp(LuDocument *somSelf, Environment *ev);
+#ifndef somMN_getBpp_defined
+#define somMN_getBpp_defined
+static char *somMN_getBpp = "getBpp";
+static somId somId_getBpp = &somMN_getBpp;
+#endif  /* somMN_getBpp_defined */
+#ifndef somDS_getBpp_defined
+#define somDS_getBpp_defined
+static char *somDS_getBpp = "::LuDocument::getBpp";
+static somId somDI_getBpp = &somDS_getBpp;
+#endif  /* somDS_getBpp_defined */
+
+static somMethodInfo getBppMethodInfo = {12, 8, 0};
+
+static somApRdInfo getBppStubs = {0, 0, &getBppMethodInfo};
 
 /*
  * New Method: isScalable
@@ -698,6 +718,16 @@ static somStaticMethod_t LuDocumentSM[] = {
 #else
          (somMethodProc *) ((void*) &loadFileStubs) },
 #endif
+    {    &LuDocumentClassData.getBpp,
+         &somId_getBpp,
+         &somDI_getBpp,
+         (somMethodProc *) getBpp,
+         (somMethodProc *)((void*)-1),
+#ifdef getBpp_somApRdDefault
+         0},
+#else
+         (somMethodProc *) ((void*) &getBppStubs) },
+#endif
     {    &LuDocumentClassData.isScalable,
          &somId_isScalable,
          &somDI_isScalable,
@@ -971,7 +1001,7 @@ static somProcMethods_t LuDocumentPM[] = {
     (somMethodProc *) freeDocumentInfo};
 
 static somStaticClassInfo LuDocumentSCI = {
-    4, 25, 1, 0, 4, 0, /* layout version 4 */ 
+    4, 26, 1, 0, 4, 0, /* layout version 4 */ 
     LuDocument_MajorVersion, LuDocument_MinorVersion,
     0, LuDocument_MaxNoMethods, 1,
     &somCN_LuDocument,
@@ -994,7 +1024,7 @@ static somStaticClassInfo LuDocumentSCI = {
     0, /* no sci development level check */
     0, /* number of SelectInheritedMethods */
     0, /* no SelectInheritedMethods */
-    29, /* number of classdata entries */
+    30, /* number of classdata entries */
     0, /* no list provided currently */
     0, /* number of migrated methods */
     0, /* no migrated method implementations */

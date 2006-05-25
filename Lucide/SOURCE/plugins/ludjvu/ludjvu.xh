@@ -71,6 +71,8 @@ typedef boolean   SOMLINK somTP_LuDjvuDocument_loadFile(LuDjvuDocument *somSelf,
 		string password, 
 		string* error);
 typedef somTP_LuDjvuDocument_loadFile *somTD_LuDjvuDocument_loadFile;
+typedef short   SOMLINK somTP_LuDjvuDocument_getBpp(LuDjvuDocument *somSelf, Environment *ev);
+typedef somTP_LuDjvuDocument_getBpp *somTD_LuDjvuDocument_getBpp;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_isScalable(LuDjvuDocument *somSelf, Environment *ev);
 typedef somTP_LuDjvuDocument_isScalable *somTD_LuDjvuDocument_isScalable;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_isRotable(LuDjvuDocument *somSelf, Environment *ev);
@@ -172,7 +174,8 @@ typedef LuPixbuf*   SOMLINK somTP_LuDjvuDocument_getThumbnail(LuDjvuDocument *so
 typedef somTP_LuDjvuDocument_getThumbnail *somTD_LuDjvuDocument_getThumbnail;
 typedef LuDocument_LuRectSequence*   SOMLINK somTP_LuDjvuDocument_searchText(LuDjvuDocument *somSelf, Environment *ev, 
 		long pagenum, 
-		string text);
+		string text, 
+		boolean caseSensitive);
 typedef somTP_LuDjvuDocument_searchText *somTD_LuDjvuDocument_searchText;
 typedef void   SOMLINK somTP_LuDjvuDocument_somDefaultInit(LuDjvuDocument *somSelf, 
 		som3InitCtrl* ctrl);
@@ -368,6 +371,14 @@ boolean   loadFile(Environment *ev,
 {
    return SOM_ResolveD(this,LuDjvuDocument,LuDocument,loadFile)
 	(this, ev,filename,password,error);
+}
+
+
+/* method: getBpp */
+short   getBpp(Environment *ev)
+{
+   return SOM_ResolveD(this,LuDjvuDocument,LuDocument,getBpp)
+	(this, ev);
 }
 
 
@@ -635,10 +646,11 @@ LuPixbuf*   getThumbnail(Environment *ev,
 /* method: searchText */
 LuDocument_LuRectSequence*   searchText(Environment *ev, 
 		long pagenum, 
-		string text)
+		string text, 
+		boolean caseSensitive)
 {
    return SOM_ResolveD(this,LuDjvuDocument,LuDocument,searchText)
-	(this, ev,pagenum,text);
+	(this, ev,pagenum,text,caseSensitive);
 }
 
 

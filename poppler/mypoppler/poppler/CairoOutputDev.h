@@ -52,15 +52,15 @@ public:
 
   // Does this device use beginType3Char/endType3Char?  Otherwise,
   // text in Type 3 fonts will be drawn with drawChar/drawString.
-  virtual GBool interpretType3Chars() { return gTrue; }
+  virtual GBool interpretType3Chars() { return gFalse; }
 
   //----- initialization and control
 
   // Start a page.
-  virtual void startPage(int pageNum, GfxState *state);
+  virtual void startPage(int pageNum, GfxState *state) { }
 
   // End a page.
-  virtual void endPage();
+  virtual void endPage() { }
 
   //----- link borders
   virtual void drawLink(Link *link, Catalog *catalog);
@@ -124,6 +124,14 @@ public:
 				int maskWidth, int maskHeight,
 				GfxImageColorMap *maskColorMap);
 
+  virtual void drawMaskedImage(GfxState *state, Object *ref, Stream *str,
+				int width, int height,
+				GfxImageColorMap *colorMap,
+				Stream *maskStr,
+				int maskWidth, int maskHeight,
+				GBool maskInvert);
+
+
   //----- Type 3 font operators
   virtual void type3D0(GfxState *state, double wx, double wy);
   virtual void type3D1(GfxState *state, double wx, double wy,
@@ -136,7 +144,7 @@ public:
  
   GBool isReverseVideo() { return gFalse; }
   
-  void setSurface (cairo_surface_t *surface);
+  void setCairo (cairo_t *cr);
 
 protected:
   void doPath(GfxState *state, GfxPath *path);

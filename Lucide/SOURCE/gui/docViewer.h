@@ -105,6 +105,7 @@ class DocumentViewer
         HDC hdcBuffer;
         Environment *ev;
         LuPixbuf *pixbuf;
+        short bpp;
         double width, height, zoom, realzoom, fullwidth, fullheight;
         long totalpages, currentpage;
         ProgressDlg *progressDlg;

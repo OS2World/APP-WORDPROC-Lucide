@@ -85,6 +85,11 @@ SOM_Scope boolean  SOMLINK loadFile(LuDjvuDocument *somSelf,
     return TRUE;
 }
 
+SOM_Scope short  SOMLINK getBpp(LuDjvuDocument *somSelf,  Environment *ev)
+{
+    return 3;
+}
+
 SOM_Scope boolean  SOMLINK isScalable(LuDjvuDocument *somSelf,
                                        Environment *ev)
 {
@@ -161,8 +166,9 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
 
     long pixbuf_rowsize = pixbuf->getRowSize( ev );
     long pixbuf_height = pixbuf->getHeight( ev );
+    short bpp = getBpp( somSelf, ev );
 
-    LuPixbuf *pb = new LuPixbuf( ev, prect.w, prect.h );
+    LuPixbuf *pb = new LuPixbuf( ev, prect.w, prect.h, bpp );
     long pb_rowsize = pb->getRowSize( ev );
     char *pbbuf = (char *)pb->getDataPtr( ev );
     ddjvu_page_render( d_page, DDJVU_RENDER_COLOR,
@@ -176,7 +182,7 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
     {
         src = pbbuf + (y * pb_rowsize);
         dst = pixbuf_data + (i * pixbuf_rowsize);
-        memcpy( dst, src, src_width * 3 );
+        memcpy( dst, src, src_width * bpp );
     }
     delete pb;
 }
@@ -217,14 +223,15 @@ SOM_Scope LuPixbuf*  SOMLINK getThumbnail(LuDjvuDocument *somSelf,
         
     int t_width = thumb_width;
     int t_height = thumb_height;
-    LuPixbuf *tmppb = new LuPixbuf( ev, thumb_width, thumb_height );
+    short bpp = getBpp( somSelf, ev );
+    LuPixbuf *tmppb = new LuPixbuf( ev, thumb_width, thumb_height, bpp );
     char *tmppb_data = (char *)tmppb->getDataPtr( ev );
     int tmppb_rowstride = tmppb->getRowSize( ev );
 
     ddjvu_thumbnail_render( d->d_document, pagenum, &t_width, &t_height,
                             d->d_format, tmppb_rowstride, tmppb_data );
 
-    LuPixbuf *pixbuf = new LuPixbuf( ev, thumb_width, thumb_height );
+    LuPixbuf *pixbuf = new LuPixbuf( ev, thumb_width, thumb_height, bpp );
     char *pixbuf_data = (char *)pixbuf->getDataPtr( ev );
     int pixbuf_rowstride = pixbuf->getRowSize( ev );
     char *src, *dst;

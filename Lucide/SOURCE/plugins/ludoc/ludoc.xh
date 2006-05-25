@@ -142,6 +142,7 @@ SOMEXTERN SOMClass * SOMLINK LuDocumentNewClass(
 SOMEXTERN struct LuDocumentClassDataStructure {
 	SOMClass *classObject;
 	somMToken loadFile;
+	somMToken getBpp;
 	somMToken isScalable;
 	somMToken isRotable;
 	somMToken getPageCount;
@@ -188,6 +189,8 @@ typedef boolean   SOMLINK somTP_LuDocument_loadFile(LuDocument *somSelf, Environ
 		string password, 
 		string* error);
 typedef somTP_LuDocument_loadFile *somTD_LuDocument_loadFile;
+typedef short   SOMLINK somTP_LuDocument_getBpp(LuDocument *somSelf, Environment *ev);
+typedef somTP_LuDocument_getBpp *somTD_LuDocument_getBpp;
 typedef boolean   SOMLINK somTP_LuDocument_isScalable(LuDocument *somSelf, Environment *ev);
 typedef somTP_LuDocument_isScalable *somTD_LuDocument_isScalable;
 typedef boolean   SOMLINK somTP_LuDocument_isRotable(LuDocument *somSelf, Environment *ev);
@@ -486,6 +489,14 @@ boolean   loadFile(Environment *ev,
 {
    return SOM_ResolveD(this,LuDocument,LuDocument,loadFile)
 	(this, ev,filename,password,error);
+}
+
+
+/* method: getBpp */
+short   getBpp(Environment *ev)
+{
+   return SOM_ResolveD(this,LuDocument,LuDocument,getBpp)
+	(this, ev);
 }
 
 

@@ -24,6 +24,7 @@ interface LuPopplerDocument : LuDocument
 	    void *data;
     	
         loadFile: override;
+        getBpp: override;
         isScalable: override;
         isRotable: override;
         getPageCount: override;

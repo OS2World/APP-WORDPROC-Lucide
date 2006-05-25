@@ -91,14 +91,14 @@ static void toRoman(int number, GooString *str, GBool uppercase) {
       break;
     default:
       if (i > 5) {
-	str->append(wh[2 * k + 1]);
-	i -= 5;
+       str->append(wh[2 * k + 1]);
+       i -= 5;
       }
       for (j = 0; j < i; j++) {
-	str->append(wh[2 * k + 0]);
+       str->append(wh[2 * k + 0]);
       }
     }
-	
+       
     divisor = divisor / 10;
   }
 }

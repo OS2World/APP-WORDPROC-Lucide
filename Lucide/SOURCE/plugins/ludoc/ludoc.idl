@@ -37,6 +37,12 @@ interface LuDocument : SOMObject
     boolean loadFile( in string filename, in string password,
                       inout string error );
 
+    /**
+     * getBpp
+     *
+     * Return value: Number of bytes per pixel used for draw.
+     **/
+    short getBpp();
 
     /**
      * isScalable
@@ -421,8 +427,8 @@ interface LuDocument : SOMObject
 
     implementation
     {
-        releaseorder: loadFile, isScalable, isRotable, getPageCount,
-                      getPageSize, renderPageToPixbuf, 
+        releaseorder: loadFile, getBpp, isScalable, isRotable, 
+                      getPageCount, getPageSize, renderPageToPixbuf, 
                       isAsynchRenderingSupported, renderPageToPixbufAsynch,
                       isHaveText, getSelectionRectangles, freeRectangles,
                       getText, isHaveLinks, getLinkMapping, freeLinkMapping,

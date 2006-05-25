@@ -46,6 +46,20 @@ extern "C" char * _System getDescription()
     return "NULL plugin, abstract base class for Lucide plugins.";
 }
 
+
+/*
+ * SOM_Scope long  SOMLINK getBpp(LuDocument *somSelf,  Environment *ev)
+ */
+
+/*
+ * The prototype for getBpp was replaced by the following prototype:
+ */
+SOM_Scope short  SOMLINK getBpp(LuDocument *somSelf,  Environment *ev)
+{
+    // Abstract method does nothing
+    return 0;
+}
+
 SOM_Scope boolean  SOMLINK isScalable(LuDocument *somSelf,  Environment *ev)
 {
     return FALSE;

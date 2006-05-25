@@ -12,7 +12,7 @@
 #pragma implementation
 #endif
 
-#include "goo/GooString.h"
+#include "GooString.h"
 #include "PDFDoc.h"
 #include "Decrypt.h"
 #include "Error.h"

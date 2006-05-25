@@ -77,6 +77,7 @@ typedef LuPopplerDocumentData* (SOMLINK * somTD_LuPopplerDocument_DataThunk)(voi
  */
 #ifdef METHOD_MACROS
   #define _loadFile somSelf->loadFile
+  #define _getBpp somSelf->getBpp
   #define _isScalable somSelf->isScalable
   #define _isRotable somSelf->isRotable
   #define _getPageCount somSelf->getPageCount
@@ -136,6 +137,7 @@ typedef LuPopplerDocumentData* (SOMLINK * somTD_LuPopplerDocument_DataThunk)(voi
   #define _somDumpSelf somSelf->somDumpSelf
   #define _somDumpSelfInt somSelf->somDumpSelfInt
   #define _loadFile somSelf->loadFile
+  #define _getBpp somSelf->getBpp
   #define _isScalable somSelf->isScalable
   #define _isRotable somSelf->isRotable
   #define _getPageCount somSelf->getPageCount
@@ -220,6 +222,45 @@ static somMethodProc* LuPopplerDocument_parent_LuDocument_loadFile_resolved;
 #endif
 #define LuPopplerDocument_parents_loadFile(somSelf,ev,filename,password,error) (\
    LuPopplerDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,error))
+
+/*
+ * Overridden method: getBpp
+ */
+SOM_Scope short  SOMLINK getBpp(LuPopplerDocument *somSelf, Environment *ev);
+static char *somMN_LuPopplerDocumentgetBpp = "LuDocument::getBpp";
+static somId somId_LuPopplerDocumentgetBpp = &somMN_LuPopplerDocumentgetBpp;
+#ifdef somId_getBpp
+#undef somId_getBpp
+#else
+#define somId_getBpp somId_LuPopplerDocumentgetBpp
+#endif
+typedef short   SOMLINK somTP_xih_LuPopplerDocument_getBpp(LuPopplerDocument *somSelf, Environment *ev);
+typedef somTP_xih_LuPopplerDocument_getBpp *somTD_xih_LuPopplerDocument_getBpp;
+/* define the parent method call macro */
+static somMethodProc* LuPopplerDocument_parent_LuDocument_getBpp_resolved;
+#define LuPopplerDocument_parent_LuDocument_getBpp(somSelf,ev) \
+  ((( somTD_xih_LuPopplerDocument_getBpp ) \
+      LuPopplerDocument_parent_LuDocument_getBpp_resolved) \
+	(somSelf,ev))
+/* define a variety of (possibly ambiguous) short forms */
+#ifndef SOMGD_pmc_parent_getBpp
+  #ifdef parent_getBpp
+    #define SOMGD_pmc_parent_getBpp
+    #undef parent_getBpp
+  #else
+#define parent_getBpp LuPopplerDocument_parent_LuDocument_getBpp
+  #endif
+#endif
+#ifndef SOMGD_pmc_parent_LuDocument_getBpp
+  #ifdef parent_LuDocument_getBpp
+    #define SOMGD_pmc_parent_LuDocument_getBpp
+    #undef parent_LuDocument_getBpp
+  #else
+    #define parent_LuDocument_getBpp LuPopplerDocument_parent_LuDocument_getBpp
+  #endif
+#endif
+#define LuPopplerDocument_parents_getBpp(somSelf,ev) (\
+   LuPopplerDocument_parent_LuDocument_getBpp(somSelf,ev))
 
 /*
  * Overridden method: isScalable
@@ -1283,6 +1324,8 @@ static somId somId_LuPopplerDocumentsomDestruct = &somMN_LuPopplerDocumentsomDes
 static somOverrideMethod_t LuPopplerDocumentOM[] = {
     {    &somId_LuPopplerDocumentloadFile,
          (somMethodProc *) loadFile  },
+    {    &somId_LuPopplerDocumentgetBpp,
+         (somMethodProc *) getBpp  },
     {    &somId_LuPopplerDocumentisScalable,
          (somMethodProc *) isScalable  },
     {    &somId_LuPopplerDocumentisRotable,
@@ -1349,7 +1392,7 @@ static somId somPCLuPopplerDocument[] = {
 };
 
 static somStaticClassInfo LuPopplerDocumentSCI = {
-    4, 0, 27, 0, 0, 0, /* layout version 4 */ 
+    4, 0, 28, 0, 0, 0, /* layout version 4 */ 
     LuPopplerDocument_MajorVersion, LuPopplerDocument_MinorVersion,
     sizeof(LuPopplerDocumentData), LuPopplerDocument_MaxNoMethods, 1,
     &somCN_LuPopplerDocument,
@@ -1443,6 +1486,8 @@ SOMClass * SOMLINK LuPopplerDocumentNewClass (integer4 somtmajorVersion,
 	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.isRotable);
     LuPopplerDocument_parent_LuDocument_isScalable_resolved = 
 	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.isScalable);
+    LuPopplerDocument_parent_LuDocument_getBpp_resolved = 
+	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.getBpp);
     LuPopplerDocument_parent_LuDocument_loadFile_resolved = 
 	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.loadFile);
     return result;

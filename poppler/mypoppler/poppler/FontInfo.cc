@@ -152,7 +152,7 @@ FontInfo::FontInfo(GfxFont *font, PDFDoc *doc) {
   } else {
     name = NULL;
   }
-  
+
   // font type
   type = (FontInfo::Type)font->getType();
 
@@ -162,6 +162,18 @@ FontInfo::FontInfo(GfxFont *font, PDFDoc *doc) {
   } else {
     emb = font->getEmbeddedFontID(&embRef);
   }
+
+  if (!emb)
+  {
+    DisplayFontParam *dfp = globalParams->getDisplayFont(font);
+    if (dfp)
+    {
+      if (dfp->kind == displayFontT1) file = dfp->t1.fileName->copy();
+      else file = dfp->tt.fileName->copy();
+    }
+    else file = NULL;
+  }
+  else file = NULL;
 
   // look for a ToUnicode map
   hasToUnicode = gFalse;
@@ -185,7 +197,8 @@ FontInfo::FontInfo(GfxFont *font, PDFDoc *doc) {
 }
 
 FontInfo::FontInfo(FontInfo& f) {
-  name = f.name->copy();
+  name = f.name ? f.name->copy() : NULL;
+  file = f.file ? f.file->copy() : NULL;
   type = f.type;
   emb = f.emb;
   subset = f.subset;
@@ -195,4 +208,5 @@ FontInfo::FontInfo(FontInfo& f) {
 
 FontInfo::~FontInfo() {
   delete name;
+  delete file;
 }

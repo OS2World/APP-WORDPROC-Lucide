@@ -52,6 +52,7 @@ SOMEXTERN struct LuPixbufClassDataStructure {
 	somMToken LuPixbufInit;
 	somMToken getWidth;
 	somMToken getHeight;
+	somMToken getBpp;
 	somMToken getRowSize;
 	somMToken getDataLen;
 	somMToken getDataPtr;
@@ -72,12 +73,15 @@ SOMEXTERN {
 typedef void   SOMLINK somTP_LuPixbuf_LuPixbufInit(LuPixbuf *somSelf, Environment *ev, 
 		somInitCtrl* ctrl, 
 		long w, 
-		long h);
+		long h, 
+		short bpp);
 typedef somTP_LuPixbuf_LuPixbufInit *somTD_LuPixbuf_LuPixbufInit;
 typedef long   SOMLINK somTP_LuPixbuf_getWidth(LuPixbuf *somSelf, Environment *ev);
 typedef somTP_LuPixbuf_getWidth *somTD_LuPixbuf_getWidth;
 typedef long   SOMLINK somTP_LuPixbuf_getHeight(LuPixbuf *somSelf, Environment *ev);
 typedef somTP_LuPixbuf_getHeight *somTD_LuPixbuf_getHeight;
+typedef short   SOMLINK somTP_LuPixbuf_getBpp(LuPixbuf *somSelf, Environment *ev);
+typedef somTP_LuPixbuf_getBpp *somTD_LuPixbuf_getBpp;
 typedef long   SOMLINK somTP_LuPixbuf_getRowSize(LuPixbuf *somSelf, Environment *ev);
 typedef somTP_LuPixbuf_getRowSize *somTD_LuPixbuf_getRowSize;
 typedef long   SOMLINK somTP_LuPixbuf_getDataLen(LuPixbuf *somSelf, Environment *ev);
@@ -274,9 +278,9 @@ LuPixbuf(const LuPixbuf* fromObj)
 #pragma info(restore)
 #endif
 
-LuPixbuf(Environment *ev,long w,long h) 
+LuPixbuf(Environment *ev,long w,long h,short bpp) 
 {
-   LuPixbufInit(ev,0,w,h);
+   LuPixbufInit(ev,0,w,h,bpp);
 }
 
 
@@ -284,10 +288,11 @@ LuPixbuf(Environment *ev,long w,long h)
 void   LuPixbufInit(Environment *ev, 
 		somInitCtrl* ctrl, 
 		long w, 
-		long h)
+		long h, 
+		short bpp)
 {
    SOM_ResolveD(this,LuPixbuf,LuPixbuf,LuPixbufInit)
-	(this, ev,ctrl,w,h);
+	(this, ev,ctrl,w,h,bpp);
 }
 
 
@@ -303,6 +308,14 @@ long   getWidth(Environment *ev)
 long   getHeight(Environment *ev)
 {
    return SOM_ResolveD(this,LuPixbuf,LuPixbuf,getHeight)
+	(this, ev);
+}
+
+
+/* method: getBpp */
+short   getBpp(Environment *ev)
+{
+   return SOM_ResolveD(this,LuPixbuf,LuPixbuf,getBpp)
 	(this, ev);
 }
 

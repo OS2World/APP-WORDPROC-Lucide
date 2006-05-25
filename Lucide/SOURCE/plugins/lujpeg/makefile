@@ -56,6 +56,6 @@ MAKE.CFG: makefile
 -xs
 -xr
 -I..\ludoc
--ID:\Projects\libjpeg
+-I..\..\..\..\libjpeg
 -DOS2
 | MAKE.CFG >NUL

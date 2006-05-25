@@ -483,6 +483,7 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict,
   // initialize
   out = outA;
   state = new GfxState(72, 72, box, 0, gFalse);
+  out->updateAll(state);
   fontChanged = gFalse;
   clip = clipNone;
   ignoreUndef = 0;
@@ -2523,6 +2524,8 @@ void Gfx::opSetFont(Object args[], int numArgs) {
 	   args[1].getNum());
     fflush(stdout);
   }
+
+  font->incRefCnt();
   state->setFont(font, args[1].getNum());
   fontChanged = gTrue;
 }

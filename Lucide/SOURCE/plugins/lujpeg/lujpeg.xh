@@ -71,6 +71,8 @@ typedef boolean   SOMLINK somTP_LuJpegDocument_loadFile(LuJpegDocument *somSelf,
 		string password, 
 		string* error);
 typedef somTP_LuJpegDocument_loadFile *somTD_LuJpegDocument_loadFile;
+typedef short   SOMLINK somTP_LuJpegDocument_getBpp(LuJpegDocument *somSelf, Environment *ev);
+typedef somTP_LuJpegDocument_getBpp *somTD_LuJpegDocument_getBpp;
 typedef boolean   SOMLINK somTP_LuJpegDocument_isScalable(LuJpegDocument *somSelf, Environment *ev);
 typedef somTP_LuJpegDocument_isScalable *somTD_LuJpegDocument_isScalable;
 typedef boolean   SOMLINK somTP_LuJpegDocument_isRotable(LuJpegDocument *somSelf, Environment *ev);
@@ -92,6 +94,21 @@ typedef void   SOMLINK somTP_LuJpegDocument_renderPageToPixbuf(LuJpegDocument *s
 		long rotation, 
 		LuPixbuf* pixbuf);
 typedef somTP_LuJpegDocument_renderPageToPixbuf *somTD_LuJpegDocument_renderPageToPixbuf;
+typedef boolean   SOMLINK somTP_LuJpegDocument_isAsynchRenderingSupported(LuJpegDocument *somSelf, Environment *ev);
+typedef somTP_LuJpegDocument_isAsynchRenderingSupported *somTD_LuJpegDocument_isAsynchRenderingSupported;
+typedef void   SOMLINK somTP_LuJpegDocument_renderPageToPixbufAsynch(LuJpegDocument *somSelf, Environment *ev, 
+		long pagenum, 
+		long src_x, 
+		long src_y, 
+		long src_width, 
+		long src_height, 
+		double scale, 
+		long rotation, 
+		LuPixbuf* pixbuf, 
+		LuDocument_asynchCallbackFn fnd, 
+		LuDocument_asynchCallbackFn fna, 
+		somToken fndata);
+typedef somTP_LuJpegDocument_renderPageToPixbufAsynch *somTD_LuJpegDocument_renderPageToPixbufAsynch;
 typedef boolean   SOMLINK somTP_LuJpegDocument_isHaveText(LuJpegDocument *somSelf, Environment *ev);
 typedef somTP_LuJpegDocument_isHaveText *somTD_LuJpegDocument_isHaveText;
 typedef LuDocument_LuRectSequence*   SOMLINK somTP_LuJpegDocument_getSelectionRectangles(LuJpegDocument *somSelf, Environment *ev, 
@@ -157,7 +174,8 @@ typedef LuPixbuf*   SOMLINK somTP_LuJpegDocument_getThumbnail(LuJpegDocument *so
 typedef somTP_LuJpegDocument_getThumbnail *somTD_LuJpegDocument_getThumbnail;
 typedef LuDocument_LuRectSequence*   SOMLINK somTP_LuJpegDocument_searchText(LuJpegDocument *somSelf, Environment *ev, 
 		long pagenum, 
-		string text);
+		string text, 
+		boolean caseSensitive);
 typedef somTP_LuJpegDocument_searchText *somTD_LuJpegDocument_searchText;
 typedef void   SOMLINK somTP_LuJpegDocument_somDefaultInit(LuJpegDocument *somSelf, 
 		som3InitCtrl* ctrl);
@@ -356,6 +374,14 @@ boolean   loadFile(Environment *ev,
 }
 
 
+/* method: getBpp */
+short   getBpp(Environment *ev)
+{
+   return SOM_ResolveD(this,LuJpegDocument,LuDocument,getBpp)
+	(this, ev);
+}
+
+
 /* method: isScalable */
 boolean   isScalable(Environment *ev)
 {
@@ -404,6 +430,33 @@ void   renderPageToPixbuf(Environment *ev,
 {
    SOM_ResolveD(this,LuJpegDocument,LuDocument,renderPageToPixbuf)
 	(this, ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf);
+}
+
+
+/* method: isAsynchRenderingSupported */
+boolean   isAsynchRenderingSupported(Environment *ev)
+{
+   return SOM_ResolveD(this,LuJpegDocument,LuDocument,isAsynchRenderingSupported)
+	(this, ev);
+}
+
+
+/* method: renderPageToPixbufAsynch */
+void   renderPageToPixbufAsynch(Environment *ev, 
+		long pagenum, 
+		long src_x, 
+		long src_y, 
+		long src_width, 
+		long src_height, 
+		double scale, 
+		long rotation, 
+		LuPixbuf* pixbuf, 
+		LuDocument_asynchCallbackFn fnd, 
+		LuDocument_asynchCallbackFn fna, 
+		somToken fndata)
+{
+   SOM_ResolveD(this,LuJpegDocument,LuDocument,renderPageToPixbufAsynch)
+	(this, ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,fnd,fna,fndata);
 }
 
 
@@ -593,10 +646,11 @@ LuPixbuf*   getThumbnail(Environment *ev,
 /* method: searchText */
 LuDocument_LuRectSequence*   searchText(Environment *ev, 
 		long pagenum, 
-		string text)
+		string text, 
+		boolean caseSensitive)
 {
    return SOM_ResolveD(this,LuJpegDocument,LuDocument,searchText)
-	(this, ev,pagenum,text);
+	(this, ev,pagenum,text,caseSensitive);
 }
 
 

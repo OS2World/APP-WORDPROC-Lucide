@@ -77,6 +77,7 @@ typedef LuDjvuDocumentData* (SOMLINK * somTD_LuDjvuDocument_DataThunk)(void*);
  */
 #ifdef METHOD_MACROS
   #define _loadFile somSelf->loadFile
+  #define _getBpp somSelf->getBpp
   #define _isScalable somSelf->isScalable
   #define _isRotable somSelf->isRotable
   #define _getPageCount somSelf->getPageCount
@@ -136,6 +137,7 @@ typedef LuDjvuDocumentData* (SOMLINK * somTD_LuDjvuDocument_DataThunk)(void*);
   #define _somDumpSelf somSelf->somDumpSelf
   #define _somDumpSelfInt somSelf->somDumpSelfInt
   #define _loadFile somSelf->loadFile
+  #define _getBpp somSelf->getBpp
   #define _isScalable somSelf->isScalable
   #define _getPageCount somSelf->getPageCount
   #define _getPageSize somSelf->getPageSize
@@ -202,6 +204,45 @@ static somMethodProc* LuDjvuDocument_parent_LuDocument_loadFile_resolved;
 #endif
 #define LuDjvuDocument_parents_loadFile(somSelf,ev,filename,password,error) (\
    LuDjvuDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,error))
+
+/*
+ * Overridden method: getBpp
+ */
+SOM_Scope short  SOMLINK getBpp(LuDjvuDocument *somSelf, Environment *ev);
+static char *somMN_LuDjvuDocumentgetBpp = "LuDocument::getBpp";
+static somId somId_LuDjvuDocumentgetBpp = &somMN_LuDjvuDocumentgetBpp;
+#ifdef somId_getBpp
+#undef somId_getBpp
+#else
+#define somId_getBpp somId_LuDjvuDocumentgetBpp
+#endif
+typedef short   SOMLINK somTP_xih_LuDjvuDocument_getBpp(LuDjvuDocument *somSelf, Environment *ev);
+typedef somTP_xih_LuDjvuDocument_getBpp *somTD_xih_LuDjvuDocument_getBpp;
+/* define the parent method call macro */
+static somMethodProc* LuDjvuDocument_parent_LuDocument_getBpp_resolved;
+#define LuDjvuDocument_parent_LuDocument_getBpp(somSelf,ev) \
+  ((( somTD_xih_LuDjvuDocument_getBpp ) \
+      LuDjvuDocument_parent_LuDocument_getBpp_resolved) \
+	(somSelf,ev))
+/* define a variety of (possibly ambiguous) short forms */
+#ifndef SOMGD_pmc_parent_getBpp
+  #ifdef parent_getBpp
+    #define SOMGD_pmc_parent_getBpp
+    #undef parent_getBpp
+  #else
+#define parent_getBpp LuDjvuDocument_parent_LuDocument_getBpp
+  #endif
+#endif
+#ifndef SOMGD_pmc_parent_LuDocument_getBpp
+  #ifdef parent_LuDocument_getBpp
+    #define SOMGD_pmc_parent_LuDocument_getBpp
+    #undef parent_LuDocument_getBpp
+  #else
+    #define parent_LuDocument_getBpp LuDjvuDocument_parent_LuDocument_getBpp
+  #endif
+#endif
+#define LuDjvuDocument_parents_getBpp(somSelf,ev) (\
+   LuDjvuDocument_parent_LuDocument_getBpp(somSelf,ev))
 
 /*
  * Overridden method: isScalable
@@ -509,6 +550,8 @@ static somId somId_LuDjvuDocumentsomDestruct = &somMN_LuDjvuDocumentsomDestruct;
 static somOverrideMethod_t LuDjvuDocumentOM[] = {
     {    &somId_LuDjvuDocumentloadFile,
          (somMethodProc *) loadFile  },
+    {    &somId_LuDjvuDocumentgetBpp,
+         (somMethodProc *) getBpp  },
     {    &somId_LuDjvuDocumentisScalable,
          (somMethodProc *) isScalable  },
     {    &somId_LuDjvuDocumentgetPageCount,
@@ -539,7 +582,7 @@ static somId somPCLuDjvuDocument[] = {
 };
 
 static somStaticClassInfo LuDjvuDocumentSCI = {
-    4, 0, 9, 0, 0, 0, /* layout version 4 */ 
+    4, 0, 10, 0, 0, 0, /* layout version 4 */ 
     LuDjvuDocument_MajorVersion, LuDjvuDocument_MinorVersion,
     sizeof(LuDjvuDocumentData), LuDjvuDocument_MaxNoMethods, 1,
     &somCN_LuDjvuDocument,
@@ -597,6 +640,8 @@ SOMClass * SOMLINK LuDjvuDocumentNewClass (integer4 somtmajorVersion,
 	somParentNumResolve(LuDjvuDocumentCClassData.parentMtab, 1, LuDocumentClassData.getPageCount);
     LuDjvuDocument_parent_LuDocument_isScalable_resolved = 
 	somParentNumResolve(LuDjvuDocumentCClassData.parentMtab, 1, LuDocumentClassData.isScalable);
+    LuDjvuDocument_parent_LuDocument_getBpp_resolved = 
+	somParentNumResolve(LuDjvuDocumentCClassData.parentMtab, 1, LuDocumentClassData.getBpp);
     LuDjvuDocument_parent_LuDocument_loadFile_resolved = 
 	somParentNumResolve(LuDjvuDocumentCClassData.parentMtab, 1, LuDocumentClassData.loadFile);
     return result;

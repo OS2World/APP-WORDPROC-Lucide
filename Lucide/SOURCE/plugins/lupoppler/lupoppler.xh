@@ -71,6 +71,8 @@ typedef boolean   SOMLINK somTP_LuPopplerDocument_loadFile(LuPopplerDocument *so
 		string password, 
 		string* error);
 typedef somTP_LuPopplerDocument_loadFile *somTD_LuPopplerDocument_loadFile;
+typedef short   SOMLINK somTP_LuPopplerDocument_getBpp(LuPopplerDocument *somSelf, Environment *ev);
+typedef somTP_LuPopplerDocument_getBpp *somTD_LuPopplerDocument_getBpp;
 typedef boolean   SOMLINK somTP_LuPopplerDocument_isScalable(LuPopplerDocument *somSelf, Environment *ev);
 typedef somTP_LuPopplerDocument_isScalable *somTD_LuPopplerDocument_isScalable;
 typedef boolean   SOMLINK somTP_LuPopplerDocument_isRotable(LuPopplerDocument *somSelf, Environment *ev);
@@ -369,6 +371,14 @@ boolean   loadFile(Environment *ev,
 {
    return SOM_ResolveD(this,LuPopplerDocument,LuDocument,loadFile)
 	(this, ev,filename,password,error);
+}
+
+
+/* method: getBpp */
+short   getBpp(Environment *ev)
+{
+   return SOM_ResolveD(this,LuPopplerDocument,LuDocument,getBpp)
+	(this, ev);
 }
 
 

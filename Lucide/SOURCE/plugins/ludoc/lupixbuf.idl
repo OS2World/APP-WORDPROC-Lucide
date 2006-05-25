@@ -13,9 +13,10 @@
 
 interface LuPixbuf : SOMObject
 {
-    void LuPixbufInit( inout somInitCtrl ctrl, in long w, in long h );
+    void LuPixbufInit( inout somInitCtrl ctrl, in long w, in long h, in short bpp );
     long getWidth();
     long getHeight();
+    short getBpp();
     long getRowSize();
     long getDataLen();
     void *getDataPtr();
@@ -26,7 +27,7 @@ interface LuPixbuf : SOMObject
 
     implementation 
     {
-    	releaseorder: LuPixbufInit, getWidth, getHeight, getRowSize,
+    	releaseorder: LuPixbufInit, getWidth, getHeight, getBpp, getRowSize,
 				      getDataLen, getDataPtr, putAt;
     
         long width;

@@ -154,6 +154,11 @@ static char *somstrdup( const char *s )
 }
 
 
+SOM_Scope short  SOMLINK getBpp(LuPopplerDocument *somSelf,  Environment *ev)
+{
+    return 4;
+}
+
 SOM_Scope boolean  SOMLINK isScalable(LuPopplerDocument *somSelf,
                                        Environment *ev)
 {
@@ -1160,7 +1165,8 @@ SOM_Scope LuPixbuf*  SOMLINK getThumbnail(LuPopplerDocument *somSelf,
         return NULL;
     }
 
-    LuPixbuf *pixbuf = new LuPixbuf( ev, width, height );
+    short bpp = getBpp( somSelf, ev );
+    LuPixbuf *pixbuf = new LuPixbuf( ev, width, height, bpp );
     char *pixbuf_data = (char *)pixbuf->getDataPtr( ev );
     int pixbuf_rowstride = pixbuf->getRowSize( ev );
     char *src, *dst;
@@ -1169,7 +1175,7 @@ SOM_Scope LuPixbuf*  SOMLINK getThumbnail(LuPopplerDocument *somSelf,
     {
         src = data + ( j * rowstride );
         dst = pixbuf_data + (i * pixbuf_rowstride);
-        for ( int k = 0; k < pixbuf_rowstride; k+= 3 )
+        for ( int k = 0; k < pixbuf_rowstride; k += bpp )
         {
             dst[ k ]     = src[ k + 2 ];
             dst[ k + 1 ] = src[ k + 1 ];
@@ -1342,7 +1348,7 @@ SOM_Scope boolean  SOMLINK loadFile(LuPopplerDocument *somSelf,
     white[0] = 255;
     white[1] = 255;
     white[2] = 255;
-    document->output_dev = new SplashOutputDev( splashModeBGR8, 4, gFalse, white );
+    document->output_dev = new SplashOutputDev( splashModeRGB8, 4, gFalse, white );
     document->output_dev->startDoc( document->doc->getXRef() );
 
     long numpages = document->doc->getNumPages();

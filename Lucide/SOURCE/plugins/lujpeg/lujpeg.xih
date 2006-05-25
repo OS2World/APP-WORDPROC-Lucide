@@ -77,11 +77,14 @@ typedef LuJpegDocumentData* (SOMLINK * somTD_LuJpegDocument_DataThunk)(void*);
  */
 #ifdef METHOD_MACROS
   #define _loadFile somSelf->loadFile
+  #define _getBpp somSelf->getBpp
   #define _isScalable somSelf->isScalable
   #define _isRotable somSelf->isRotable
   #define _getPageCount somSelf->getPageCount
   #define _getPageSize somSelf->getPageSize
   #define _renderPageToPixbuf somSelf->renderPageToPixbuf
+  #define _isAsynchRenderingSupported somSelf->isAsynchRenderingSupported
+  #define _renderPageToPixbufAsynch somSelf->renderPageToPixbufAsynch
   #define _isHaveText somSelf->isHaveText
   #define _getSelectionRectangles somSelf->getSelectionRectangles
   #define _freeRectangles somSelf->freeRectangles
@@ -134,6 +137,7 @@ typedef LuJpegDocumentData* (SOMLINK * somTD_LuJpegDocument_DataThunk)(void*);
   #define _somDumpSelf somSelf->somDumpSelf
   #define _somDumpSelfInt somSelf->somDumpSelfInt
   #define _loadFile somSelf->loadFile
+  #define _getBpp somSelf->getBpp
   #define _getPageCount somSelf->getPageCount
   #define _getPageSize somSelf->getPageSize
   #define _renderPageToPixbuf somSelf->renderPageToPixbuf
@@ -197,6 +201,45 @@ static somMethodProc* LuJpegDocument_parent_LuDocument_loadFile_resolved;
 #endif
 #define LuJpegDocument_parents_loadFile(somSelf,ev,filename,password,error) (\
    LuJpegDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,error))
+
+/*
+ * Overridden method: getBpp
+ */
+SOM_Scope short  SOMLINK getBpp(LuJpegDocument *somSelf, Environment *ev);
+static char *somMN_LuJpegDocumentgetBpp = "LuDocument::getBpp";
+static somId somId_LuJpegDocumentgetBpp = &somMN_LuJpegDocumentgetBpp;
+#ifdef somId_getBpp
+#undef somId_getBpp
+#else
+#define somId_getBpp somId_LuJpegDocumentgetBpp
+#endif
+typedef short   SOMLINK somTP_xih_LuJpegDocument_getBpp(LuJpegDocument *somSelf, Environment *ev);
+typedef somTP_xih_LuJpegDocument_getBpp *somTD_xih_LuJpegDocument_getBpp;
+/* define the parent method call macro */
+static somMethodProc* LuJpegDocument_parent_LuDocument_getBpp_resolved;
+#define LuJpegDocument_parent_LuDocument_getBpp(somSelf,ev) \
+  ((( somTD_xih_LuJpegDocument_getBpp ) \
+      LuJpegDocument_parent_LuDocument_getBpp_resolved) \
+	(somSelf,ev))
+/* define a variety of (possibly ambiguous) short forms */
+#ifndef SOMGD_pmc_parent_getBpp
+  #ifdef parent_getBpp
+    #define SOMGD_pmc_parent_getBpp
+    #undef parent_getBpp
+  #else
+#define parent_getBpp LuJpegDocument_parent_LuDocument_getBpp
+  #endif
+#endif
+#ifndef SOMGD_pmc_parent_LuDocument_getBpp
+  #ifdef parent_LuDocument_getBpp
+    #define SOMGD_pmc_parent_LuDocument_getBpp
+    #undef parent_LuDocument_getBpp
+  #else
+    #define parent_LuDocument_getBpp LuJpegDocument_parent_LuDocument_getBpp
+  #endif
+#endif
+#define LuJpegDocument_parents_getBpp(somSelf,ev) (\
+   LuJpegDocument_parent_LuDocument_getBpp(somSelf,ev))
 
 /*
  * Overridden method: getPageCount
@@ -375,6 +418,8 @@ static somId somId_LuJpegDocumentsomDestruct = &somMN_LuJpegDocumentsomDestruct;
 static somOverrideMethod_t LuJpegDocumentOM[] = {
     {    &somId_LuJpegDocumentloadFile,
          (somMethodProc *) loadFile  },
+    {    &somId_LuJpegDocumentgetBpp,
+         (somMethodProc *) getBpp  },
     {    &somId_LuJpegDocumentgetPageCount,
          (somMethodProc *) getPageCount  },
     {    &somId_LuJpegDocumentgetPageSize,
@@ -399,7 +444,7 @@ static somId somPCLuJpegDocument[] = {
 };
 
 static somStaticClassInfo LuJpegDocumentSCI = {
-    4, 0, 6, 0, 0, 0, /* layout version 4 */ 
+    4, 0, 7, 0, 0, 0, /* layout version 4 */ 
     LuJpegDocument_MajorVersion, LuJpegDocument_MinorVersion,
     sizeof(LuJpegDocumentData), LuJpegDocument_MaxNoMethods, 1,
     &somCN_LuJpegDocument,
@@ -451,6 +496,8 @@ SOMClass * SOMLINK LuJpegDocumentNewClass (integer4 somtmajorVersion,
 	somParentNumResolve(LuJpegDocumentCClassData.parentMtab, 1, LuDocumentClassData.getPageSize);
     LuJpegDocument_parent_LuDocument_getPageCount_resolved = 
 	somParentNumResolve(LuJpegDocumentCClassData.parentMtab, 1, LuDocumentClassData.getPageCount);
+    LuJpegDocument_parent_LuDocument_getBpp_resolved = 
+	somParentNumResolve(LuJpegDocumentCClassData.parentMtab, 1, LuDocumentClassData.getBpp);
     LuJpegDocument_parent_LuDocument_loadFile_resolved = 
 	somParentNumResolve(LuJpegDocumentCClassData.parentMtab, 1, LuDocumentClassData.loadFile);
     return result;
