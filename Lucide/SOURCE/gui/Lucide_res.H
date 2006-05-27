@@ -23,19 +23,20 @@
 #define CM_EXPORTTOPS	103
 #define CM_PAGESETUP	104
 #define CM_PRINT		105
-#define CM_DOCINFO		106
-#define CM_FONTSINFO	107
-#define CM_PLUGINSLIST	108
-#define CM_EXIT			109
+#define CM_PLUGINSLIST	106
+#define CM_EXIT			107
+
 #define CM_COPY			201
 #define CM_SELECTALL	202
 #define CM_FIND			203
 #define CM_FINDAGAIN	204
+
 #define CM_FIRSTPAGE	301
 #define CM_PREVPAGE		302
 #define CM_NEXTPAGE		303
 #define CM_LASTPAGE		304
 #define CM_GOTOPAGE		305
+
 #define CM_FITWINDOW	401
 #define CM_ACTSIZE		402
 #define CM_FITWIDTH		403
@@ -44,6 +45,10 @@
 #define CM_NAVPANE		406
 #define CM_SINGLEPAGE	407
 #define CM_CONTINUOUS	408
+#define CM_DOCINFO		409
+#define CM_FONTSINFO	410
+
+#define CM_PRODINFO		601
 
 #define TBID_PAGENUM	1
 #define TBID_OFPAGES	2

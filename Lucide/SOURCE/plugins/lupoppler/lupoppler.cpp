@@ -221,13 +221,13 @@ static void copy_page_to_pixbuf( Environment *ev, SplashBitmap *bitmap, LuPixbuf
     splash_height = bitmap->getHeight();
     splash_rowstride = bitmap->getRowSize();
 
-    //printf( "splash_width: %d   splash_height: %d   splash_rowstride: %d\n",
+    //somPrintf( "splash_width: %d   splash_height: %d   splash_rowstride: %d\n",
     //            splash_width, splash_height, splash_rowstride );
 
     pixbuf_data = (char *)pixbuf->getDataPtr( ev );
     pixbuf_width = pixbuf->getWidth( ev );
     pixbuf_height = pixbuf->getHeight( ev );
-    pixbuf_rowstride = pixbuf->getRowSize(ev );
+    pixbuf_rowstride = pixbuf->getRowSize( ev );
 
     width = __min( splash_width, pixbuf_width );
     height = __min( splash_height, pixbuf_height );
@@ -262,6 +262,7 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuPopplerDocument *somSelf,
     }
 
     DosRequestMutexSem( document->mutex, SEM_INDEFINITE_WAIT );
+
     page->displaySlice( document->output_dev,
                 72.0 * scale, 72.0 * scale,
                 rotation,
@@ -271,6 +272,7 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuPopplerDocument *somSelf,
                 src_width, src_height,
                 NULL, /* links */
                 document->doc->getCatalog() );
+
     DosReleaseMutexSem( document->mutex );
 
     copy_page_to_pixbuf( ev, document->output_dev->getBitmap(), pixbuf );
@@ -346,6 +348,10 @@ SOM_Scope void  SOMLINK renderPageToPixbufAsynch(LuPopplerDocument *somSelf,
     DosQuerySysInfo( QSV_MS_COUNT, QSV_MS_COUNT, &acd.tmr, sizeof( long ) );
 
     DosRequestMutexSem( document->mutex, SEM_INDEFINITE_WAIT );
+
+    //somPrintf( "src_x: %d, src_y: %d, src_width: %d, src_height: %d\n",
+    //           src_x, src_y, src_width, src_height );
+
     page->displaySlice( document->output_dev,
                 72.0 * scale, 72.0 * scale,
                 rotation,

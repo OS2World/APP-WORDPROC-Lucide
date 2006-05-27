@@ -454,10 +454,10 @@ MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2, HRGN hrgn )
     switch ( SHORT2FROMMP( mp2 ) )
     {
         case SB_LINEUP:
-            sVscrollInc = -LINE_HEIGHT;
+            sVscrollInc = -(__max( LINE_HEIGHT, VScrollStep ));
             break ;
         case SB_LINEDOWN:
-            sVscrollInc = LINE_HEIGHT;
+            sVscrollInc = __max( LINE_HEIGHT, VScrollStep );
             break;
         case SB_PAGEUP:
             sVscrollInc = __min( -1, -( cyClient - LINE_HEIGHT ) );

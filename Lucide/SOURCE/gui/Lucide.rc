@@ -1,19 +1,19 @@
 #include "Lucide_res.H"
 #include <os2.h>
 
-BITMAP IDB_OPEN			"bitmaps\\open.bmp"
-BITMAP IDB_PRINT		"bitmaps\\print.bmp"
-BITMAP IDB_NAVPANE		"bitmaps\\navpanel.bmp"
-BITMAP IDB_FIRSTPAGE	"bitmaps\\firstpage.bmp"
-BITMAP IDB_PREVPAGE		"bitmaps\\prevpage.bmp"
-BITMAP IDB_NEXTPAGE		"bitmaps\\nextpage.bmp"
-BITMAP IDB_LASTPAGE		"bitmaps\\lastpage.bmp"
-BITMAP IDB_100PERC		"bitmaps\\100perc.bmp"
-BITMAP IDB_FITPAGE		"bitmaps\\fitpage.bmp"
-BITMAP IDB_FITWIDTH		"bitmaps\\fitwidth.bmp"
-BITMAP IDB_FIND			"bitmaps\\find.bmp"
+BITMAP IDB_OPEN         "bitmaps\\open.bmp"
+BITMAP IDB_PRINT        "bitmaps\\print.bmp"
+BITMAP IDB_NAVPANE      "bitmaps\\navpanel.bmp"
+BITMAP IDB_FIRSTPAGE    "bitmaps\\firstpage.bmp"
+BITMAP IDB_PREVPAGE     "bitmaps\\prevpage.bmp"
+BITMAP IDB_NEXTPAGE     "bitmaps\\nextpage.bmp"
+BITMAP IDB_LASTPAGE     "bitmaps\\lastpage.bmp"
+BITMAP IDB_100PERC      "bitmaps\\100perc.bmp"
+BITMAP IDB_FITPAGE      "bitmaps\\fitpage.bmp"
+BITMAP IDB_FITWIDTH     "bitmaps\\fitwidth.bmp"
+BITMAP IDB_FIND         "bitmaps\\find.bmp"
 
-POINTER IDP_HAND		"bitmaps\\hand.ptr"
+POINTER IDP_HAND        "bitmaps\\hand.ptr"
 
 MENU IDM_MAINMENU
 BEGIN
@@ -59,20 +59,19 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "MENU_SINGLE_PAGE", CM_SINGLEPAGE
         MENUITEM "MENU_CONTINUOUS", CM_CONTINUOUS
-         MENUITEM SEPARATOR
+        MENUITEM SEPARATOR
         MENUITEM "MENU_DOCUMENT_INFO", CM_DOCINFO
         MENUITEM "MENU_FONTS_INFO", CM_FONTSINFO
     END
 
-     SUBMENU "MENU_WINDOW", 500
+    SUBMENU "MENU_WINDOW", 500
     BEGIN
         MENUITEM "MENU_SHOW_NAV_PANE", CM_NAVPANE
-
     END
-     SUBMENU "MENU_HELP", 600
-    BEGIN
-        MENUITEM "MENU_PRODUCT_INFORMATION", CM_NAVPANE
 
+    SUBMENU "MENU_HELP", 600
+    BEGIN
+        MENUITEM "MENU_PRODUCT_INFORMATION", CM_PRODINFO
     END
 END
 
@@ -94,3 +93,4 @@ BEGIN
 END
 
 rcinclude dialogs.rc
+

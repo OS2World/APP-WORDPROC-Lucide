@@ -283,6 +283,13 @@ void Lucide::loadDocument( const char *fn )
     }
     else
     {
+        // test if extension supported and then close previous opened document
+        if ( pluginMan->createDocumentForExt( ext + 1, true ) != NULL ) {
+            docViewer->close();
+            delete doc;
+            doc = NULL;
+        }
+
         LuDocument *d = pluginMan->createDocumentForExt( ext + 1, false );
         if ( d == NULL ) {
             WinMessageBox( HWND_DESKTOP, hWndFrame, msg,
@@ -292,8 +299,6 @@ void Lucide::loadDocument( const char *fn )
         {
             char *error = NULL;
             if ( d->loadFile( ev, (char *)fn, NULL, &error ) ) {
-                docViewer->close();
-                delete doc;
                 doc = d;
                 setDocument( doc );
             }
