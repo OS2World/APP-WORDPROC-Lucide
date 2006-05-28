@@ -117,3 +117,10 @@ FIND_NOT_FOUND=Not found!
 #
 PDLG_PROGRESS=Progress
 PDLG_CANCEL=~Cancel
+
+#
+# About dialog
+#
+AD_ABOUT=About
+AD_COPYRIGHTS=Copyrights here.
+AD_OK=OK

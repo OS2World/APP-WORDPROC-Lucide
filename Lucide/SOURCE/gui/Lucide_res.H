@@ -1,6 +1,8 @@
 #ifndef __LUCIDE_RES_H
 #define __LUCIDE_RES_H
 
+#define IDI_MAIN_ICON 1
+
 #define IDP_HAND  10
 
 #define IDB_OPEN		20
@@ -72,5 +74,9 @@
 #define IDC_PTEXT			10
 #define IDC_PBAR			11
 
+#define IDD_ABOUT			1005
+#define IDT_LUCIDEVERSION	10
+#define IDC_COPYRIGHTS		11
+#define IDC_NETLABSURL		12
 
 #endif // __LUCIDE_RES_H

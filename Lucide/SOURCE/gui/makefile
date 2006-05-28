@@ -1,5 +1,14 @@
 .autodepend
 
+TEST=0
+VERSION=Beta 1
+
+!if $(TEST)==1
+	BMODE=os2v2
+!else
+	BMODE=os2v2_pm
+!endif
+
 OBJDIR = ..\..\OBJS
 EXEDIR = ..\..\BIN
 
@@ -25,12 +34,13 @@ all: make.cfg Lucide.exe
 OBJS = Lucide.obj luutils.obj clipbrd.obj pmsplitter.obj pmtoolbar.obj \
        toolbar.obj pluginman.obj pluginViewDlg.obj docViewer.obj \
        linklab.obj wwbtn.obj intern.obj messages.obj indexWindow.obj \
-       fontsInfoDlg.obj docInfoDlg.obj findDlg.obj progressDlg.obj
+       fontsInfoDlg.obj docInfoDlg.obj findDlg.obj progressDlg.obj \
+       aboutDlg.obj
 
 Lucide.exe: $(OBJS) Lucide.res
   copy &&|
 option quiet
-system os2v2
+system $(BMODE)
 option map=$(OBJDIR)\lucide
 option statics
 file $(OBJDIR)\Lucide.obj
@@ -45,6 +55,7 @@ file $(OBJDIR)\fontsInfoDlg.obj
 file $(OBJDIR)\docInfoDlg.obj
 file $(OBJDIR)\findDlg.obj
 file $(OBJDIR)\progressDlg.obj
+file $(OBJDIR)\aboutDlg.obj
 file $(OBJDIR)\docViewer.obj
 file $(OBJDIR)\indexWindow.obj
 file $(OBJDIR)\linklab.obj
@@ -66,7 +77,7 @@ Lucide.res: Lucide.rc dialogs.rc
 
 Lucide.cpp: ..\plugins\ludoc\ludoc.xh
 
-Lucide.obj:         Lucide.cpp
+Lucide.obj:         Lucide.cpp         makefile
 luutils.obj:        luutils.cpp
 clipbrd.obj:        clipbrd.cpp
 pmsplitter.obj:     pmsplitter.cpp
@@ -78,6 +89,7 @@ fontsInfoDlg.obj:   fontsInfoDlg.cpp
 docInfoDlg.obj:     docInfoDlg.cpp
 findDlg.obj:        findDlg.cpp
 progressDlg.obj:    progressDlg.cpp
+aboutDlg.obj:       aboutDlg.cpp
 docViewer.obj:      docViewer.cpp
 indexWindow.obj:    indexWindow.cpp
 intern.obj:         intern.cpp
@@ -93,6 +105,10 @@ MAKE.CFG: makefile
 -bm
 -xs
 -sg
+-DVERSION="$(VERSION)"  
+!if $(TEST)==1
+-D__TEST__
+!endif
 -I..\plugins\ludoc
 -DOS2
 | MAKE.CFG >NUL

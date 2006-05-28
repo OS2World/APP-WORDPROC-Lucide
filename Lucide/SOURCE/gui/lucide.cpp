@@ -25,14 +25,16 @@
 
 #define ID_SPLITTER 1
 
-const char *appName = "Lucide";
-const char *fwp     = "FrameWindowPos";
-const char *lvd     = "LastViewedDir";
-const char *splpos  = "SplitterPos";
-const char *showind = "ShowIndex";
+const char *appName    = "Lucide";
+const char *appVersion = VERSION;
+const char *fwp        = "FrameWindowPos";
+const char *lvd        = "LastViewedDir";
+const char *splpos     = "SplitterPos";
+const char *showind    = "ShowIndex";
 
 
 HWND createToolbar( HWND hwnd );
+void AboutBox( HWND hWndFrame );
 
 HAB   hab;
 HWND  hWndFrame;
@@ -542,6 +544,11 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                             MPFROMSHORT( Lucide::showIndex ? Lucide::splitterPos : 0 ), MPVOID );
                     }
                     return (MRESULT)FALSE;
+
+                case CM_PRODINFO:
+                    AboutBox( hWndFrame );
+                    return (MRESULT)FALSE;
+
             }
         }
         break;
@@ -555,10 +562,12 @@ int deffontlen = sizeof( deffont );
 
 int main( int argc, char **argv )
 {
+#ifdef __TEST__
     PPIB pib;
     PTIB tib;
     DosGetInfoBlocks(&tib, &pib);
     pib->pib_ultype = 3;
+#endif
 
     HMQ   hmq;
     QMSG  qmsg;

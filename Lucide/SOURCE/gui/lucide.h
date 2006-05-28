@@ -2,6 +2,7 @@
 #define __LUCIDE_H
 
 extern const char *appName;
+extern const char *appVersion;
 extern HAB hab;
 extern char deffont[];
 extern int deffontlen;

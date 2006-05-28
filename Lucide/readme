@@ -1,0 +1,26 @@
+Lucide readme.
+
+Lucide is a plugin-based document viewer.
+
+Included plugins:
+
+   Supported file type         Supported features
+  ---------------------------------------------------------------------
+         PDF                   Scaling, Navigation, Text selection,
+                               Searching, Asynchronous rendering
+                               
+         DJVU                  Scaling
+         
+         JPG                   -
+  ---------------------------------------------------------------------
+
+!!! DJVU plugin require LIBC: 
+    ftp://ftp.netlabs.org/pub/gcc/libc-0.6.1-csd1.zip
+
+Current limitations:
+ 
+ - Printing not implemented
+ - Some menuitems doesn't work
+ - Lucide crashes on copying large block of text to clipboard
+ 
+-- 
