@@ -7,15 +7,23 @@ extern char deffont[];
 extern int deffontlen;
 
 class LuDocument;
+class ProgressDlg;
 
 enum ViewMode { SinglePage, Continuous };
 
 class Lucide
 {
     private:
+    
+		static ProgressDlg *loadProgressDlg;
+		static char docName[ CCHMAXPATH ];
+		static bool docLoaded;
+		static char *loadError;
+    
         static void setOfPages( long pages );
         static void enableZoomMenus();
         static void setZoomChecks( SHORT cmd, SHORT cbind, double zoom );
+        static void loadthread( void *p );
 
     public:
         static bool dontSwitchPage;

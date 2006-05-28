@@ -4,7 +4,7 @@
 
 #include <string>
 #include <stdio.h>
-//#include <stdlib.h>
+#include <process.h>
 
 #include <ludoc.xh>
 
@@ -14,6 +14,7 @@
 #include "fontsInfoDlg.h"
 #include "docInfoDlg.h"
 #include "findDlg.h"
+#include "progressDlg.h"
 #include "docViewer.h"
 #include "indexWindow.h"
 #include "luutils.h"
@@ -45,6 +46,7 @@ PluginManager  *pluginMan = NULL;
 DocumentViewer *docViewer = NULL;
 IndexWindow    *indexWin  = NULL;
 FindDlg        *findDlg   = NULL;
+char           *title     = NULL;
 
 bool  Lucide::dontSwitchPage = false;
 SHORT Lucide::splitterPos    = 100;
@@ -271,6 +273,25 @@ void Lucide::setViewMode( ViewMode mode )
 }
 
 
+// static data for asynch loading document
+ProgressDlg *Lucide::loadProgressDlg       = NULL;
+char         Lucide::docName[ CCHMAXPATH ] = "";
+bool         Lucide::docLoaded             = false;;
+char        *Lucide::loadError             = NULL;
+
+void Lucide::loadthread( void *p )
+{
+    HAB thab = WinInitialize( 0 );
+    HMQ thmq = WinCreateMsgQueue( thab, 0 );
+
+    docLoaded = doc->loadFile( ev, docName, NULL, &loadError );
+    loadProgressDlg->hide();
+
+    WinDestroyMsgQueue( thmq );
+    WinTerminate( thab );
+    _endthread();
+}
+
 void Lucide::loadDocument( const char *fn )
 {
     char *msg = newstrdupL( MSGS_NO_SUIT_PLUG );
@@ -284,41 +305,75 @@ void Lucide::loadDocument( const char *fn )
     else
     {
         // test if extension supported and then close previous opened document
-        if ( pluginMan->createDocumentForExt( ext + 1, true ) != NULL ) {
-            docViewer->close();
-            delete doc;
-            doc = NULL;
-        }
-
-        LuDocument *d = pluginMan->createDocumentForExt( ext + 1, false );
-        if ( d == NULL ) {
+        if ( pluginMan->createDocumentForExt( ext + 1, true ) == NULL )
+        {
             WinMessageBox( HWND_DESKTOP, hWndFrame, msg,
                            NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
         }
         else
         {
-            char *error = NULL;
-            if ( d->loadFile( ev, (char *)fn, NULL, &error ) ) {
-                doc = d;
-                setDocument( doc );
+            docViewer->close();
+            delete doc;
+            doc = NULL;
+            WinSetWindowText( hWndFrame, title );
+
+            doc = pluginMan->createDocumentForExt( ext + 1, false );
+            if ( doc == NULL ) {
+                WinMessageBox( HWND_DESKTOP, hWndFrame, msg,
+                               NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
             }
             else
             {
-                if ( error == NULL ) {
-                    char *m = newstrdupL( MSGS_FILE_LOAD_ERROR );
-                    WinMessageBox( HWND_DESKTOP, hWndFrame, m,
-                                   NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
-                    delete m;
-                }
-                else {
-                    WinMessageBox( HWND_DESKTOP, hWndFrame, error,
-                                   NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
-                    SOMFree( error );
-                }
+                strcpy( docName, fn );
+                docLoaded = false;;
+                loadError = NULL;
 
-                delete d;
+#if 0
+                loadProgressDlg = new ProgressDlg( hWndFrame );
+                loadProgressDlg->setText( "Loading document, please wait..." );
+                loadProgressDlg->show( loadthread, NULL ); // doc will be loaded
+                delete loadProgressDlg;
+#else
+                docLoaded = doc->loadFile( ev, docName, NULL, &loadError );
+#endif
+
+                if ( docLoaded )
+                {
+                    char *t = new char[ 2048 ];
+                    char _fn[ _MAX_NAME ];
+                    char _ex[ _MAX_EXT ];
+                    _splitpath( fn, NULL, NULL, _fn, _ex );
+                    strcpy( t, _fn );
+                    strcat( t, _ex );
+                    strcat( t, " - " );
+                    strcat( t, title );
+                    WinSetWindowText( hWndFrame, t );
+                    delete t;
+                    setDocument( doc );
+                }
+                else
+                {
+                    if ( loadError == NULL )
+                    {
+                        char *m = newstrdupL( MSGS_FILE_LOAD_ERROR );
+                        WinMessageBox( HWND_DESKTOP, hWndFrame, m,
+                                       NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
+                        delete m;
+                    }
+                    else
+                    {
+                        WinMessageBox( HWND_DESKTOP, hWndFrame, loadError,
+                                       NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
+                        SOMFree( loadError );
+                    }
+
+                    delete doc;
+                    doc = NULL;
+                }
             }
+
         }
+
     }
     delete msg;
 }
@@ -519,10 +574,9 @@ int main( int argc, char **argv )
 
     ULONG ulFrameFlags = FCF_TITLEBAR | FCF_SIZEBORDER | FCF_SYSMENU |
                          FCF_MINMAX | FCF_TASKLIST | FCF_NOBYTEALIGN;
-    char *title = newstrdupL( MSGS_MAIN_WIN_TITLE );
+    title = newstrdupL( MSGS_MAIN_WIN_TITLE );
     hWndFrame = WinCreateStdWindow( HWND_DESKTOP, 0, &ulFrameFlags, NULL, title,
                                     WS_SYNCPAINT|WS_VISIBLE, NULLHANDLE, 100, NULL );
-    delete title;
     WinSetAccelTable( hab, WinLoadAccelTable( hab, NULLHANDLE, IDA_MAINACCEL ), hWndFrame );
     hWndMenu = WinLoadMenu( hWndFrame, NULLHANDLE, IDM_MAINMENU );
     localizeMenu( hWndMenu );
@@ -565,19 +619,19 @@ int main( int argc, char **argv )
 
     findDlg = new FindDlg( hWndFrame );
     Lucide::checkMenus();
+
+    // Показать окно программы
+    if ( !PMRestoreWindowPos( NULL, appName, fwp, hWndFrame,
+                              TRUE, TRUE, FALSE, FALSE, FALSE ) ) {
+        WinSetWindowPos( hWndFrame, HWND_TOP, 100, 100, 630, 400,
+                         SWP_SIZE | SWP_MOVE | SWP_SHOW | SWP_ACTIVATE );
+    }
+
     if ( argc > 1 ) {
         Lucide::loadDocument( argv[1] );
     }
 
     Lucide::checkNavpane();
-
-    // Показать окно программы
-    if ( !PMRestoreWindowPos( NULL, appName, fwp, hWndFrame,
-                              TRUE, TRUE, FALSE, FALSE, FALSE ) )
-    {
-        WinSetWindowPos( hWndFrame, HWND_TOP, 100, 100, 630, 400,
-                         SWP_SIZE | SWP_MOVE | SWP_SHOW | SWP_ACTIVATE );
-    }
 
     // Messsage loop
     while ( WinGetMsg( hab, &qmsg, 0, 0, 0 ) ) {
@@ -606,6 +660,7 @@ int main( int argc, char **argv )
     delete pluginMan;
 
     delete findDlg;
+    delete title;
 
     return 0;
 }

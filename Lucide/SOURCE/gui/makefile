@@ -92,6 +92,7 @@ MAKE.CFG: makefile
 -zp=4
 -bm
 -xs
+-sg
 -I..\plugins\ludoc
 -DOS2
 | MAKE.CFG >NUL

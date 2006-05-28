@@ -1,7 +1,7 @@
 CC=wcl386
 
-CFLAGS=-zq -zp=4 -bm -ox -xs -xr -I.. -DOS2
-CFLAGS_C=-zq -zp=4 -bm -ox -I.. -DOS2
+CFLAGS=-zq -zp=4 -bm -ox -xs -xr -sg -I.. -DOS2
+CFLAGS_C=-zq -zp=4 -bm -ox -sg -I.. -DOS2
 
 LIBS=libgoo.lib
 

@@ -1,6 +1,6 @@
 CC=wcl386
 
-CFLAGS=-zq -zp=4 -bm -ox -I.. -DOS2
+CFLAGS=-zq -zp=4 -bm -ox -sg -I.. -DOS2
 
 LIBS=libfofi.lib
 

@@ -53,6 +53,7 @@ MAKE.CFG: makefile
 -ox
 -xs
 -xr
+-sg
 -I..\ludoc
 -I..\..\..\..\poppler\mypoppler
 -I..\..\..\..\poppler\mypoppler\poppler
