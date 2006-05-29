@@ -2,7 +2,7 @@
 
 CC=wcl386
 
-CFLAGS=-zq -zp=4 -bm -sg -ox -xs -xr -I.. -I..\goo -I..\..\freetype-2.1.10\include -I..\..\fontconfig-2.3.2-os2 -DOS2 -DUSE_ANNOTS_VIEW
+CFLAGS=-zq -zp=4 -bm -sg -ox -xs -xr -I.. -I..\goo -I..\..\..\libjpeg -I..\..\freetype-2.1.10\include -I..\..\fontconfig-2.3.2-os2 -DOS2 -DUSE_ANNOTS_VIEW
 
 LIBS=libpoppler.lib
 
@@ -16,7 +16,7 @@ OBJS3 = Outline.obj OutputDev.obj Page.obj Parser.obj PDFDoc.obj \
         PDFDocEncoding.obj ProfileData.obj PSTokenizer.obj Stream.obj \
         UnicodeMap.obj UnicodeTypeTable.obj XRef.obj PSOutputDev.obj
 OBJS4 = TextOutputDev.obj PageLabelInfo.obj SecurityHandler.obj \
-        XpdfPluginAPI.obj UGooString.obj
+        XpdfPluginAPI.obj UGooString.obj DCTStream.obj
 
 all: $(LIBS)
 

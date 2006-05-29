@@ -28,6 +28,7 @@ option statics
 file $(OBJDIR)\lupoppler.obj
 name $(EXEDIR)\lupplr
 lib ..\..\..\..\poppler\poppler.lib
+lib ..\..\..\..\libjpeg\libjpeg.lib
 lib ..\ludoc\ludoc
 lib somtk 
 export LuPopplerDocumentNewClass

@@ -344,7 +344,7 @@ SOM_Scope void  SOMLINK renderPageToPixbufAsynch(LuPopplerDocument *somSelf,
     acd.fnd       = (_asynchCallbackFn)fnd;
     acd.fna       = (_asynchCallbackFn)fna;
     acd.forceDraw = false;
-    acd.delay     = 100;
+    acd.delay     = 200;
     DosQuerySysInfo( QSV_MS_COUNT, QSV_MS_COUNT, &acd.tmr, sizeof( long ) );
 
     DosRequestMutexSem( document->mutex, SEM_INDEFINITE_WAIT );

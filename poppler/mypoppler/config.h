@@ -4,7 +4,8 @@
 #define A4_PAPER 1
 
 /* Use libjpeg instead of builtin jpeg decoder. */
-#undef ENABLE_LIBJPEG 
+#define ENABLE_LIBJPEG  1
+//#undef ENABLE_LIBJPEG
 
 /* Use zlib instead of builtin zlib decoder. */
 #undef ENABLE_ZLIB
