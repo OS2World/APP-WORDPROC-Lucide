@@ -1,1 +1,1 @@
-lucide D:\Projects\lucide\trunk\Lucide\djvu2spec.djvu
+start /f lucide D:\Projects\lucide\trunk\Lucide\djvu2spec.djvu

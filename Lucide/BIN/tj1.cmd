@@ -1,1 +1,1 @@
-lucide D:\Projects\lucide\trunk\Lucide\lizard2003-navm.djvu
+start /f lucide D:\Projects\lucide\trunk\Lucide\lizard2003-navm.djvu

@@ -278,6 +278,7 @@ void DocumentViewer::goToPage( long page )
 void DocumentViewer::setZoom( double _zoom )
 {
     zoom = _zoom;
+
     if ( doc != NULL ) {
         drawPage();
     }
@@ -420,7 +421,6 @@ void DocumentViewer::drawPage()
 {
     if ( continuous )
     {
-        adjustSize();
         WinSendMsg( hWndDoc, WM_SIZE, MPFROM2SHORT( cxClient, cyClient ),
                     MPFROM2SHORT( cxClient, cyClient ) );
         WinInvalidateRect( hWndDoc, NULL, FALSE );
@@ -437,8 +437,6 @@ void DocumentViewer::drawPage()
         }
 
         Lucide::enableCopy( false );
-        adjustSize();
-        sVscrollPos = 0;
         WinSendMsg( hWndDoc, WM_SIZE, MPFROM2SHORT( cxClient, cyClient ),
                     MPFROM2SHORT( cxClient, cyClient ) );
         WinInvalidateRect( hWndDoc, NULL, FALSE );
@@ -531,6 +529,8 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
     cxClient = SHORT1FROMMP( mp2 );
     cyClient = SHORT2FROMMP( mp2 );
 
+    double relativeScrollPos = (double)sVscrollPos / (double)sVscrollMax;
+
     adjustSize();
 
     if ( ( hpsBuffer != NULLHANDLE ) && ( hdcBuffer != NULLHANDLE ) ) {
@@ -581,6 +581,9 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
                     MPFROM2SHORT( cyClient, height ), MPVOID );
     }
     WinEnableWindow( hWndVscroll, (BOOL)( sVscrollMax != 0 ) );
+
+    SHORT realScrollPos = (SHORT)(sVscrollMax * relativeScrollPos);
+    vertScroll( hWndDoc, MPFROM2SHORT( realScrollPos, SB_SLIDERPOSITION ), NULLHANDLE );
 }
 
 // returns true if subrect inside rect
