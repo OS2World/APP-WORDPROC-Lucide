@@ -526,6 +526,10 @@ MRESULT DocumentViewer::horizScroll( HWND hwnd, MPARAM mp2, HRGN hrgn )
 // creates appropriate hps buffer, sets scrollbars limits
 void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
 {
+    if ( !WinIsWindowShowing( hwnd ) ) {
+        return;
+    }
+
     cxClient = SHORT1FROMMP( mp2 );
     cyClient = SHORT2FROMMP( mp2 );
 
