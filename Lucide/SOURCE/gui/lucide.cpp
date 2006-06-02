@@ -36,11 +36,14 @@ const char *showind    = "ShowIndex";
 HWND createToolbar( HWND hwnd );
 void AboutBox( HWND hWndFrame );
 
-HAB   hab;
-HWND  hWndFrame;
-HWND  hWndMenu;
-HWND  hToolBar;
-HWND  hVertSplitter;
+HAB   hab            = NULLHANDLE;
+HWND  hWndFrame      = NULLHANDLE;
+HWND  hWndMenu       = NULLHANDLE;
+HWND  hToolBar       = NULLHANDLE;
+HWND  hVertSplitter  = NULLHANDLE;
+HWND  hFrameSysmenu  = NULLHANDLE;
+HWND  hFrameTitlebar = NULLHANDLE;
+HWND  hFrameMinMax   = NULLHANDLE;
 
 Environment    *ev        = somGetGlobalEnvironment();
 LuDocument     *doc       = NULL;
@@ -50,9 +53,13 @@ IndexWindow    *indexWin  = NULL;
 FindDlg        *findDlg   = NULL;
 char           *title     = NULL;
 
+
 bool  Lucide::dontSwitchPage = false;
 SHORT Lucide::splitterPos    = 100;
 bool  Lucide::showIndex      = true;
+bool  Lucide::isFullscreen   = false;
+LuWindowPos Lucide::winPos   = {0};
+
 
 PFNWP pOldSplProc;
 
@@ -420,9 +427,66 @@ void Lucide::checkNavpane()
     }
 }
 
+
+void Lucide::toggleFullscreen()
+{
+    ULONG ulFrameStyle = WinQueryWindowULong( hWndFrame, QWL_STYLE );
+
+    if ( isFullscreen )
+    {
+        WinSetParent( hFrameSysmenu,  hWndFrame, FALSE );
+        WinSetParent( hFrameTitlebar, hWndFrame, FALSE );
+        WinSetParent( hFrameMinMax,   hWndFrame, FALSE );
+        ulFrameStyle |= FS_SIZEBORDER;
+    }
+    else
+    {
+        WinQueryWindowPos( hWndFrame, &winPos.Swp );
+        winPos.XRestore  = WinQueryWindowUShort( hWndFrame, QWS_XRESTORE );
+        winPos.YRestore  = WinQueryWindowUShort( hWndFrame, QWS_YRESTORE );
+        winPos.CXRestore = WinQueryWindowUShort( hWndFrame, QWS_CXRESTORE );
+        winPos.CYRestore = WinQueryWindowUShort( hWndFrame, QWS_CYRESTORE );
+        winPos.XMinimize = WinQueryWindowUShort( hWndFrame, QWS_XMINIMIZE );
+        winPos.YMinimize = WinQueryWindowUShort( hWndFrame, QWS_YMINIMIZE );
+
+        WinSetParent( hFrameSysmenu,  HWND_OBJECT, FALSE );
+        WinSetParent( hFrameTitlebar, HWND_OBJECT, FALSE );
+        WinSetParent( hFrameMinMax,   HWND_OBJECT, FALSE );
+        ulFrameStyle &= ~FS_SIZEBORDER;
+    }
+
+    WinSetWindowULong( hWndFrame, QWL_STYLE, ulFrameStyle );
+    WinSendMsg( hWndFrame, WM_UPDATEFRAME,
+                MPFROMLONG( FCF_TITLEBAR | FCF_SIZEBORDER | FCF_SYSMENU | FCF_MINMAX ),
+                MPVOID );
+
+    if ( isFullscreen )
+    {
+        WinSetWindowUShort( hWndFrame, QWS_XRESTORE,  winPos.XRestore );
+        WinSetWindowUShort( hWndFrame, QWS_YRESTORE,  winPos.YRestore );
+        WinSetWindowUShort( hWndFrame, QWS_CXRESTORE, winPos.CXRestore );
+        WinSetWindowUShort( hWndFrame, QWS_CYRESTORE, winPos.CYRestore );
+        WinSetWindowUShort( hWndFrame, QWS_XMINIMIZE, winPos.XMinimize );
+        WinSetWindowUShort( hWndFrame, QWS_YMINIMIZE, winPos.YMinimize );
+        ULONG swpopt = SWP_MOVE | SWP_SIZE | SWP_SHOW;
+        WinSetWindowPos( hWndFrame, NULLHANDLE,
+                         winPos.Swp.x, winPos.Swp.y, winPos.Swp.cx, winPos.Swp.cy,
+                         swpopt );
+    }
+    else
+    {
+        WinSetWindowPos( hWndFrame, HWND_TOP, 0, 0,
+                         WinQuerySysValue( HWND_DESKTOP, SV_CXFULLSCREEN ) - 1,
+                         WinQuerySysValue( HWND_DESKTOP, SV_CYFULLSCREEN ) +
+                            WinQuerySysValue( HWND_DESKTOP, SV_CYTITLEBAR ),
+                         SWP_SIZE | SWP_MOVE | SWP_ZORDER );
+    }
+
+    isFullscreen = !isFullscreen;
+}
+
 static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
-
     switch ( msg )
     {
         case WM_CONTROL:
@@ -545,6 +609,10 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     }
                     return (MRESULT)FALSE;
 
+                case CM_FULLSCREEN:
+                    Lucide::toggleFullscreen();
+                    return (MRESULT)FALSE;
+
                 case CM_PRODINFO:
                     AboutBox( hWndFrame );
                     return (MRESULT)FALSE;
@@ -586,6 +654,9 @@ int main( int argc, char **argv )
     title = newstrdupL( MSGS_MAIN_WIN_TITLE );
     hWndFrame = WinCreateStdWindow( HWND_DESKTOP, 0, &ulFrameFlags, NULL, title,
                                     WS_SYNCPAINT|WS_VISIBLE, NULLHANDLE, 100, NULL );
+    hFrameSysmenu  = WinWindowFromID( hWndFrame, FID_SYSMENU );
+    hFrameTitlebar = WinWindowFromID( hWndFrame, FID_TITLEBAR );
+    hFrameMinMax   = WinWindowFromID( hWndFrame, FID_MINMAX );
     WinSetAccelTable( hab, WinLoadAccelTable( hab, NULLHANDLE, IDA_MAINACCEL ), hWndFrame );
     hWndMenu = WinLoadMenu( hWndFrame, NULLHANDLE, IDM_MAINMENU );
     localizeMenu( hWndMenu );

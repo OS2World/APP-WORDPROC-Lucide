@@ -12,6 +12,17 @@ class ProgressDlg;
 
 enum ViewMode { SinglePage, Continuous };
 
+struct LuWindowPos
+{
+    SWP    Swp;
+    USHORT XRestore;
+    USHORT YRestore;
+    USHORT CXRestore;
+    USHORT CYRestore;
+    USHORT XMinimize;
+    USHORT YMinimize;
+};
+
 class Lucide
 {
     private:
@@ -20,6 +31,8 @@ class Lucide
 		static char docName[ CCHMAXPATH ];
 		static bool docLoaded;
 		static char *loadError;
+		static bool isFullscreen;
+		static LuWindowPos winPos;
     
         static void setOfPages( long pages );
         static void enableZoomMenus();
@@ -42,6 +55,7 @@ class Lucide
         static void setZoom( double zoom );
         static void enableCopy( bool enable );
         static void setViewMode( ViewMode mode );
+        static void toggleFullscreen();
 };
 
 #endif // __LUCIDE_H

@@ -36,6 +36,7 @@ MENU_SHOW_NAV_PANE=Show navigation pane
 MENU_SINGLE_PAGE=Single page
 MENU_CONTINUOUS=Continuous
 MENU_WINDOW=~Window
+MENU_FULLSCREEN=Fullscreen\tF11
 MENU_HELP=~Help
 MENU_PRODUCT_INFORMATION=Product Information
 

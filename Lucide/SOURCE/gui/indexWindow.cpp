@@ -30,7 +30,8 @@ IndexWindow::IndexWindow( HAB _hab, HWND hWndFrame )
     WinSetWindowULong( hWndPanel, QWL_USER, (ULONG)this );
     pOldPanelProc = WinSubclassWindow( hWndPanel, panelProc );
 
-    hWndBar = WinCreateWindow( hWndFrame, WC_STATIC, "index/thumbs switch will be here",
+    // index/thumbs switch will be here
+    hWndBar = WinCreateWindow( hWndFrame, WC_STATIC, NULL,
                                WS_VISIBLE | SS_TEXT | DT_LEFT | DT_VCENTER,
                                0, 0, 0, 0, hWndPanel, HWND_TOP, ID_BAR, NULL, NULL );
     WinSetPresParam( hWndBar, PP_FONTNAMESIZE, deffontlen, deffont );
@@ -44,7 +45,7 @@ IndexWindow::IndexWindow( HAB _hab, HWND hWndFrame )
 
     WinSendMsg( hWndPanel, SBM_SETWINDOWS,
                 MPFROMHWND( hWndIndex ), MPFROMHWND( hWndBar ) );
-    WinSendMsg( hWndPanel, SBM_SETFIXEDSIZE, MPFROMSHORT( 30 ), MPVOID );
+    WinSendMsg( hWndPanel, SBM_SETFIXEDSIZE, MPFROMSHORT( 0 ), MPVOID );
 }
 
 // IndexWindow destructor
