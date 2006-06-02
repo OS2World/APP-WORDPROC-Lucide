@@ -1,7 +1,8 @@
 /*
+ *  PM Splitter implementation.
+ *  by Eugene Romanenko
  *
- *  Copyrights? Public domain, nah!
- *
+ *  This code is in the public domain and has no copyright.
  */
 
 #define INCL_WIN

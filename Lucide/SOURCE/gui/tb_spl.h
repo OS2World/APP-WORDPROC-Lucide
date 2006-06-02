@@ -1,6 +1,13 @@
 #ifndef __TB_SPL_H
 #define __TB_SPL_H
 
+/*
+ *  PM Splitter and Toolbar interface.
+ *  by Eugene Romanenko
+ *
+ *  This code is in the public domain and has no copyright.
+ */
+
 // Toolbar and splitter definitions
 
 /*****************************************************/

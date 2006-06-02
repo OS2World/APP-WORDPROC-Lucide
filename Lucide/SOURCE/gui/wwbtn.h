@@ -2,9 +2,10 @@
 #define __WWBTN_H
 
 /*
+ *  wwbtn interface.
+ *  by Eugene Romanenko
  *
- *  Copyrights? Public domain, nah!
- *
+ *  This code is in the public domain and has no copyright.
  */
 
 

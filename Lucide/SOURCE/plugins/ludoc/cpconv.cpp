@@ -1,3 +1,37 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: CDDL 1.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the COMMON DEVELOPMENT AND
+ * DISTRIBUTION LICENSE (CDDL) Version 1.0 (the "License"); you may not use
+ * this file except in compliance with the License. You may obtain a copy of
+ * the License at http://www.sun.com/cddl/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Initial Developer of the Original Code is
+ * Eugene Romanenko, netlabs.org.
+ * Portions created by the Initial Developer are Copyright (C) 2006
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the LGPL are applicable instead of those
+ * above. If you wish to allow use of your version of this file only under the
+ * terms of the LGPL, and not to allow others to use your version of this file
+ * under the terms of the CDDL, indicate your decision by deleting the
+ * provisions above and replace them with the notice and other provisions
+ * required by the LGPL. If you do not delete the provisions above, a recipient
+ * may use your version of this file under the terms of any one of the CDDL
+ * or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
+
 #include <os2.h>
 
 #include <string.h>
@@ -141,61 +175,30 @@ int cpconv::conv( const char **in, size_t *in_left, char **out, size_t *out_left
     UniChar  *orig_ucs;
     size_t    retval = 0;
 
-  /* The caller wish to initate the conversion state and/or write initial
-     shift prefix (or something like that) to the output buffer. */
-  if (!in || !*in)
-    {
-      if (!out || !*out || !out_left || !*out_left)
-        /* do nothing since we don't have any shift state in the iconv_t. */
+    if (!in || !*in) {
         return 0;
-
-      /** @todo We don't have any shift state I or so, so what to do now?
-       *        Let's do nothing till we have anyone complaining about his DBCS
-       *        stuff not working 100%, and accept patches for that guy.
-       *        Perhaps try call UniUconvFromUcs(conv->to, and some empty input buffer or so...
-       */
-      return 0;
     }
 
-  sl =  *in_left;
-  ucs = (UniChar *) alloca (sl * sizeof (UniChar));
-  orig_ucs = ucs;
+    sl =  *in_left;
+    ucs = (UniChar *) alloca(sl * sizeof(UniChar));
+    orig_ucs = ucs;
 
-  rc = UniUconvToUcs (objtoucs, (void **)in, in_left, &ucs, &sl, &retval);
-  if (rc)
-    goto error;
-  sl = ucs - orig_ucs;
-  ucs = orig_ucs;
-  /* UniUconvFromUcs will stop at first null byte (huh? indeed?)
-     while we want ALL the bytes converted.  */
-#if 1
-  rc = UniUconvFromUcs (objfromucs, &ucs, &sl, (void **)out, out_left, &nonid);
-  if (rc)
-    goto error;
-  retval += nonid;
-#else
-  while (sl)
-    {
-      size_t usl = 0;
-      while (sl && (ucs[usl] != 0))
-        usl++, sl--;
-      rc = UniUconvFromUcs (objfromucs, &ucs, &usl, (void **)out, out_left, &nonid);
-      if (rc)
+    rc = UniUconvToUcs(objtoucs, (void **)in, in_left, &ucs, &sl, &retval);
+    if (rc) {
         goto error;
-      retval += nonid;
-      if (sl && *out_left)
-        {
-          *(*out)++ = 0;
-          (*out_left)--;
-          ucs++; sl--;
-        }
     }
-#endif
-  return 0;
+    sl = ucs - orig_ucs;
+    ucs = orig_ucs;
+    rc = UniUconvFromUcs(objfromucs, &ucs, &sl, (void **)out, out_left, &nonid);
+    if (rc) {
+        goto error;
+    }
+    retval += nonid;
+    return 0;
 
 error:
     err = 1;
-  return -1;
+    return -1;
 }
 
 extern "C" LONG APIENTRY cnvUniToUTF8( const char **in, unsigned *in_left,
@@ -244,7 +247,7 @@ static void convSpchars( UniChar *uni )
         }
         *uni++;
     }
-//printf( "\n" );    
+//printf( "\n" );
 }
 
 
@@ -306,20 +309,20 @@ extern "C" LONG APIENTRY cnvSysToUCS2( const char **in, unsigned *in_left,
 // test
 /*void main()
 {
-	const char *testutf8 = "test UTF-8  Тест! Проверка!";
-	char buf[ 100 ];
-	memset( buf, 0, sizeof( buf ) );
-	char *bufsav = buf;
-	char *buf1 = buf;
-	unsigned in_len = strlen( testutf8 );
-	unsigned out_len = sizeof( buf );
-	
-	cnvUTF8ToUCS4( &testutf8, &in_len, &buf1, &out_len );
-	
-	for ( int i = 0; i<100; i++ )
-	{
-		printf( ":%d:", (int)bufsav[i] );
-	}
-	printf( "\n" );
+    const char *testutf8 = "test UTF-8  Тест! Проверка!";
+    char buf[ 100 ];
+    memset( buf, 0, sizeof( buf ) );
+    char *bufsav = buf;
+    char *buf1 = buf;
+    unsigned in_len = strlen( testutf8 );
+    unsigned out_len = sizeof( buf );
+    
+    cnvUTF8ToUCS4( &testutf8, &in_len, &buf1, &out_len );
+    
+    for ( int i = 0; i<100; i++ )
+    {
+        printf( ":%d:", (int)bufsav[i] );
+    }
+    printf( "\n" );
 }
 */

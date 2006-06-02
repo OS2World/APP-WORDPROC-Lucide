@@ -1,7 +1,9 @@
 /*
+ *  Transfer a labels and buttons into multi-line with word-wrap.
+ *  Useful for internationalization.
+ *  by Eugene Romanenko
  *
- *  Copyrights? Public domain, nah!
- *
+ *  This code is in the public domain and has no copyright.
  */
 
 #define INCL_WIN
