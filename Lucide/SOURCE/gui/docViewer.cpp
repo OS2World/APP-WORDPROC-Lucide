@@ -293,7 +293,7 @@ void DocumentViewer::goToPage( long page )
     {
         double pgpos = pagenumToPos( page ) / VScrollStep;
         vertScroll( hWndDoc, MPFROM2SHORT( pgpos, SB_SLIDERPOSITION ), NULLHANDLE );
-        drawPage();
+        //drawPage();
     }
     else
     {
@@ -1495,6 +1495,7 @@ void DocumentViewer::wmDrop( PDRAGINFO dragInfo )
     Lucide::loadDocument( fpath );
 }
 
+static int zzz = 0;
 // static, window procedure
 MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
