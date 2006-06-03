@@ -140,6 +140,7 @@ cpconv::~cpconv()
     }
 }
 
+// convert one char
 int cpconv::conv( int chfrom )
 {
     int rc = ULS_SUCCESS;
@@ -180,25 +181,28 @@ int cpconv::conv( const char **in, size_t *in_left, char **out, size_t *out_left
     }
 
     sl =  *in_left;
-    ucs = (UniChar *) alloca(sl * sizeof(UniChar));
+    ucs = new UniChar[ sl ];
     orig_ucs = ucs;
 
-    rc = UniUconvToUcs(objtoucs, (void **)in, in_left, &ucs, &sl, &retval);
-    if (rc) {
-        goto error;
+    rc = UniUconvToUcs( objtoucs, (void **)in, in_left, &ucs, &sl, &retval );
+    if ( rc != 0 ) {
+        delete ucs;
+        err = 1;
+        return -1;
     }
+
     sl = ucs - orig_ucs;
     ucs = orig_ucs;
-    rc = UniUconvFromUcs(objfromucs, &ucs, &sl, (void **)out, out_left, &nonid);
-    if (rc) {
-        goto error;
+    rc = UniUconvFromUcs( objfromucs, &ucs, &sl, (void **)out, out_left, &nonid );
+    delete ucs;
+
+    if ( rc != 0 ) {
+        err = 1;
+        return -1;
     }
+
     retval += nonid;
     return 0;
-
-error:
-    err = 1;
-    return -1;
 }
 
 extern "C" LONG APIENTRY cnvUniToUTF8( const char **in, unsigned *in_left,
@@ -223,11 +227,11 @@ extern "C" LONG APIENTRY cnvUTF8ToUni( const char **in, unsigned *in_left,
 }
 
 
+// Converts special non-ascii chars to suitable ascii chars
 static void convSpchars( UniChar *uni )
 {
     while ( *uni )
     {
-//printf( ":%x:", *uni );
         switch ( *uni )
         {
             case 0x2018:
@@ -247,7 +251,6 @@ static void convSpchars( UniChar *uni )
         }
         *uni++;
     }
-//printf( "\n" );
 }
 
 
@@ -316,9 +319,9 @@ extern "C" LONG APIENTRY cnvSysToUCS2( const char **in, unsigned *in_left,
     char *buf1 = buf;
     unsigned in_len = strlen( testutf8 );
     unsigned out_len = sizeof( buf );
-    
+
     cnvUTF8ToUCS4( &testutf8, &in_len, &buf1, &out_len );
-    
+
     for ( int i = 0; i<100; i++ )
     {
         printf( ":%d:", (int)bufsav[i] );

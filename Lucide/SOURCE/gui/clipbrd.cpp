@@ -38,6 +38,7 @@
 
 #include <string.h>
 #include <malloc.h>
+#include <stdio.h>
 #include "cpconv.h"
 
 
@@ -73,15 +74,12 @@ void textToClipbrd( HAB hab, const char *text )
         void *memuni = NULL;
 
         // place to clipboard as unicode
-        if ( DosAllocSharedMem( &memuni, NULL, olen ,
-                                PAG_WRITE | PAG_COMMIT | OBJ_GIVEABLE ) == 0 )
+        if ( DosAllocSharedMem( &memuni, NULL, olen, fALLOCSHR ) == 0 )
         {
             memset( memuni, 0, olen );
             void *tmem = memuni;
 
-            //cpconv c( 1208, 1200 );
             tsav = text;
-            //c.conv( &text, &len, (char **)&memuni, &olen );
             cnvUTF8ToUni( &text, &len, (char **)&memuni, &olen );
             text = tsav;
 
@@ -94,15 +92,12 @@ void textToClipbrd( HAB hab, const char *text )
         void *memcp = NULL;
 
         // place to clipboard as current codepage
-        if ( DosAllocSharedMem( &memcp, NULL, olen ,
-                                PAG_WRITE | PAG_COMMIT | OBJ_GIVEABLE ) == 0 )
+        if ( DosAllocSharedMem( &memcp, NULL, olen, fALLOCSHR ) == 0 )
         {
             memset( memcp, 0, olen );
             void *tmem = memcp;
 
-            //cpconv c( 1208 );
             tsav = text;
-            //c.conv( &text, &len, (char **)&memcp, &olen );
             cnvUTF8ToSys( &text, &len, (char **)&memcp, &olen );
 			text = tsav;
 
