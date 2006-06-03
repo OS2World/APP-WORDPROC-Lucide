@@ -17,6 +17,8 @@ OBJS3 = Outline.obj OutputDev.obj Page.obj Parser.obj PDFDoc.obj \
         UnicodeMap.obj UnicodeTypeTable.obj XRef.obj PSOutputDev.obj
 OBJS4 = TextOutputDev.obj PageLabelInfo.obj SecurityHandler.obj \
         XpdfPluginAPI.obj UGooString.obj DCTStream.obj
+        
+# DCTStream.obj
 
 all: $(LIBS)
 

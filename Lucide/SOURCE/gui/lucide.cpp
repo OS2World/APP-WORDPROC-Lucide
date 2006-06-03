@@ -21,12 +21,12 @@
  * Alternatively, the contents of this file may be used under the terms of
  * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
  * in which case the provisions of the LGPL are applicable instead of those
- * above. If you wish to allow use of your version of this file only under the 
+ * above. If you wish to allow use of your version of this file only under the
  * terms of the LGPL, and not to allow others to use your version of this file
  * under the terms of the CDDL, indicate your decision by deleting the
  * provisions above and replace them with the notice and other provisions
  * required by the LGPL. If you do not delete the provisions above, a recipient
- * may use your version of this file under the terms of any one of the CDDL 
+ * may use your version of this file under the terms of any one of the CDDL
  * or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
@@ -243,8 +243,6 @@ void Lucide::checkMenus()
 
         WinEnableMenuItem( hWndMenu, CM_ROTATE90CW, FALSE );
         WinEnableMenuItem( hWndMenu, CM_ROTATE90CCW, FALSE );
-        //WinEnableMenuItem( hWndMenu, CM_NAVPANE, FALSE );
-        //WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_NAVPANE), (MPARAM)FALSE );
         WinEnableMenuItem( hWndMenu, CM_SINGLEPAGE, FALSE );
         WinEnableMenuItem( hWndMenu, CM_CONTINUOUS, FALSE );
 
@@ -264,6 +262,7 @@ void Lucide::checkMenus()
     BOOL haveText = doc->isHaveText( ev );
     WinEnableMenuItem( hWndMenu, CM_FIND, haveText );
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FIND), (MPARAM)haveText );
+    WinEnableMenuItem( hWndMenu, CM_SELECTALL, haveText );
 
     WinEnableMenuItem( hWndMenu, CM_SINGLEPAGE, TRUE );
     WinEnableMenuItem( hWndMenu, CM_CONTINUOUS, TRUE );
@@ -579,6 +578,10 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
                 case CM_COPY:
                     docViewer->copyToClipbrd();
+                    return (MRESULT)FALSE;
+
+                case CM_SELECTALL:
+                    docViewer->selectAll();
                     return (MRESULT)FALSE;
 
                 case CM_FIND:

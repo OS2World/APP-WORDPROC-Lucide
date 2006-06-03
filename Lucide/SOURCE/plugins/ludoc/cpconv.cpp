@@ -32,6 +32,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 
+#define INCL_DOS
 #include <os2.h>
 
 #include <string.h>
@@ -181,12 +182,16 @@ int cpconv::conv( const char **in, size_t *in_left, char **out, size_t *out_left
     }
 
     sl =  *in_left;
-    ucs = new UniChar[ sl ];
+    //ucs = new UniChar[ sl ];
+    // have crashes in libc memmanager due to frequent alloc/free
+    // use system malloc routines as workaround
+    DosAllocMem( (PPVOID)&ucs, sl * sizeof( UniChar ), fALLOC );
     orig_ucs = ucs;
 
     rc = UniUconvToUcs( objtoucs, (void **)in, in_left, &ucs, &sl, &retval );
     if ( rc != 0 ) {
-        delete ucs;
+        //delete ucs;
+        DosFreeMem( ucs );
         err = 1;
         return -1;
     }
@@ -194,7 +199,8 @@ int cpconv::conv( const char **in, size_t *in_left, char **out, size_t *out_left
     sl = ucs - orig_ucs;
     ucs = orig_ucs;
     rc = UniUconvFromUcs( objfromucs, &ucs, &sl, (void **)out, out_left, &nonid );
-    delete ucs;
+    //delete ucs;
+    DosFreeMem( ucs );
 
     if ( rc != 0 ) {
         err = 1;

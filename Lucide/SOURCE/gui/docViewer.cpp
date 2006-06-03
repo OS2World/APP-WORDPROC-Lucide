@@ -21,12 +21,12 @@
  * Alternatively, the contents of this file may be used under the terms of
  * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
  * in which case the provisions of the LGPL are applicable instead of those
- * above. If you wish to allow use of your version of this file only under the 
+ * above. If you wish to allow use of your version of this file only under the
  * terms of the LGPL, and not to allow others to use your version of this file
  * under the terms of the CDDL, indicate your decision by deleting the
  * provisions above and replace them with the notice and other provisions
  * required by the LGPL. If you do not delete the provisions above, a recipient
- * may use your version of this file under the terms of any one of the CDDL 
+ * may use your version of this file under the terms of any one of the CDDL
  * or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
@@ -338,6 +338,35 @@ void DocumentViewer::copyToClipbrd()
     }
 }
 
+// select all text (continuous view) or current page (single page view)
+void DocumentViewer::selectAll()
+{
+    if ( continuous )
+    {
+        for ( long i = 0; i < totalpages; i++ )
+        {
+            selection[ i ].x1 = 0;
+            selection[ i ].y1 = 0;
+            selection[ i ].x2 = pagesizes[ i ].x;
+            selection[ i ].y2 = pagesizes[ i ].y;
+            LuDocument::freeRectangles( ev, selrects[ i ] );
+            selrects[ i ] = doc->getSelectionRectangles( ev, i, realzoom, &(selection[i]) );
+        }
+    }
+    else
+    {
+        selection[ currentpage ].x1 = 0;
+        selection[ currentpage ].y1 = 0;
+        selection[ currentpage ].x2 = pagesizes[ currentpage ].x;
+        selection[ currentpage ].y2 = pagesizes[ currentpage ].y;
+        LuDocument::freeRectangles( ev, selrects[ currentpage ] );
+        selrects[ currentpage ] = doc->getSelectionRectangles( ev, currentpage, realzoom, &(selection[currentpage]) );
+    }
+
+    Lucide::enableCopy( true );
+    WinInvalidateRect( hWndDoc, NULL, FALSE );
+}
+
 // perform search in document
 void DocumentViewer::searchDocument( const char *_searchString, bool _caseSensitive,
                                      bool _continueSearch )
@@ -454,13 +483,7 @@ void DocumentViewer::adjustSize()
 // page redraw
 void DocumentViewer::drawPage()
 {
-    if ( continuous )
-    {
-        WinSendMsg( hWndDoc, WM_SIZE, MPFROM2SHORT( cxClient, cyClient ),
-                    MPFROM2SHORT( cxClient, cyClient ) );
-        WinInvalidateRect( hWndDoc, NULL, FALSE );
-    }
-    else
+    if ( !continuous )
     {
         LuDocument::freeRectangles( ev, selrects[ currentpage ] );
         selrects[ currentpage ] = NULL;
@@ -472,10 +495,10 @@ void DocumentViewer::drawPage()
         }
 
         Lucide::enableCopy( false );
-        WinSendMsg( hWndDoc, WM_SIZE, MPFROM2SHORT( cxClient, cyClient ),
-                    MPFROM2SHORT( cxClient, cyClient ) );
-        WinInvalidateRect( hWndDoc, NULL, FALSE );
     }
+    WinSendMsg( hWndDoc, WM_SIZE, MPFROM2SHORT( cxClient, cyClient ),
+                MPFROM2SHORT( cxClient, cyClient ) );
+    WinInvalidateRect( hWndDoc, NULL, FALSE );
 }
 
 

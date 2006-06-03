@@ -70,6 +70,7 @@ class DocumentViewer
         void setZoom( double _zoom );
         double getZoom() { return zoom; }
         double getRealZoom() { return realzoom; }
+        void selectAll();
         void copyToClipbrd();
         void searchDocument( const char *_searchString, bool _caseSensitive,
                              bool _continueSearch );
