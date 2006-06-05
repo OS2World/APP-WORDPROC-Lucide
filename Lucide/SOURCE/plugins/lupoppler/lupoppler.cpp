@@ -178,7 +178,7 @@ static char *somstrdup( const char *s )
 
 SOM_Scope short  SOMLINK getBpp(LuPopplerDocument *somSelf,  Environment *ev)
 {
-    return 4;
+    return 3;
 }
 
 SOM_Scope boolean  SOMLINK isScalable(LuPopplerDocument *somSelf,
@@ -1376,7 +1376,7 @@ SOM_Scope boolean  SOMLINK loadFile(LuPopplerDocument *somSelf,
     white[0] = 255;
     white[1] = 255;
     white[2] = 255;
-    document->output_dev = new SplashOutputDev( splashModeRGB8, 4, gFalse, white );
+    document->output_dev = new SplashOutputDev( splashModeBGR8, 4, gFalse, white );
     document->output_dev->startDoc( document->doc->getXRef() );
 
     long numpages = document->doc->getNumPages();
