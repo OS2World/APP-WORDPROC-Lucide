@@ -1,23 +1,60 @@
-Lucide is a plugin-based document viewer.
+:: About Lucide ::
 
-Included plugins:
+Lucide is a plugin-based document viewer with support for various file formats.
+
+It provides a SOM based plugin architecture which allows 3rd party programmers
+to easily add more plugins.
+
+
+:: Plugins ::
 
    Supported file type         Supported features
   ---------------------------------------------------------------------
          PDF                   Scaling, Navigation, Text selection,
                                Searching, Asynchronous rendering
-                               
+
          DJVU                  Scaling
-         
+
          JPG                   -
   ---------------------------------------------------------------------
 
-!!! DJVU plugin require LIBC: 
+The DJVU plugin requires Innotek LIBC:
+
     ftp://ftp.netlabs.org/pub/gcc/libc-0.6.1-csd1.zip
 
-Current limitations:
- 
- - Printing not implemented
- - Some menuitems doesn't work
- 
--- 
+
+:: Limitations & Bugs ::
+
+ - Printing is not yet implemented
+ - Some menuitems do not work
+
+To see a full list of features and enhancements consult the Lucide TRAC at:
+
+  http://svn.netlabs.org/lucide/
+
+If you encounter any bugs register them in the TRAC as well, see:
+
+  http://svn.netlabs.org/lucide/newticket
+
+Please make sure you select the correct version and component for your ticket.
+
+
+:: License ::
+
+Lucide is released for use with eComStation only. You are not allowed to upload
+it to Hobbes or any other server and make it publicly available.
+
+The plugins are released under CDDL/LGPL or GPL, depeding on the plugin. See
+http://svn.netlabs.org/lucide/ for more information and source code.
+
+
+:: Links ::
+
+http://www.netlabs.org
+http://www.ecomstation.com
+
+
+:: Copyright ::
+
+(c) by Eugene Romanenko, netlabs.org
+    in co-operation with Serenity Systems International
