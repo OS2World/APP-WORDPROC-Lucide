@@ -41,8 +41,9 @@ Please make sure you select the correct version and component for your ticket.
 
 :: License ::
 
-Lucide is released for use with eComStation only. You are not allowed to upload
-it to Hobbes or any other server and make it publicly available.
+Lucide is licensed for use with eComStation only. You are not allowed to
+distribute the product by uploading it to public Internet servers or by any
+other means make it publicly available.
 
 The plugins are released under CDDL/LGPL or GPL, depending on the plugin. See
 http://svn.netlabs.org/lucide/ for more information and source code.
