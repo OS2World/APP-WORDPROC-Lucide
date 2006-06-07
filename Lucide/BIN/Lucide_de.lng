@@ -1,0 +1,121 @@
+#
+# Lucide language file, DE
+#
+
+#
+# HauptmenÅ
+#
+MENU_FILE=~Datei
+MENU_OPEN=ôffnen...\tCtrl+O
+MENU_SAVE_AS=Sichern als...
+MENU_EXPORT_TO_PS=Als PostScript exportieren...
+MENU_PAGE_SETUP=Seite einrichten...
+MENU_PRINT=Drucken...
+MENU_DOCUMENT_INFO=Dokumenteninfo...
+MENU_FONTS_INFO=Fontsinfo...
+MENU_PLUGINS_LIST=Pluginsliste...
+MENU_EXIT=Beenden\tCtrl+X
+MENU_EDIT=~Bearbeiten
+MENU_COPY=Kopieren\tCtrl+Insert
+MENU_SELECT_ALL=Alles markieren
+MENU_FIND=Suchen...\tCtrl+F
+MENU_FINDAGAIN=Weitersuchen\tCtrl+G
+MENU_DOCUMENT=~Dokument
+MENU_FIRST_PAGE=Seite eins
+MENU_PREV_PAGE=Vorherige Seite\t-
+MENU_NEXT_PAGE=NÑchste Seite\t+
+MENU_LAST_PAGE=Letzte Seite
+MENU_GO_TO_PAGE=Gehe zu Seite...
+MENU_VIEW=~Ansicht
+MENU_FIT_WINDOW=An Fenster anpassen
+MENU_ACTUAL_SIZE=Grî·e aktualisieren
+MENU_FIT_WIDTH=Breite anpassen
+MENU_ROTATE_CW=Rotiere 90¯ im Uz
+MENU_ROTATE_CCW=Rotiere 90¯ gegen Uz
+MENU_SHOW_NAV_PANE=Navigationszeile anzeigen
+MENU_SINGLE_PAGE=Einzelseite
+MENU_CONTINUOUS=Fortlaufend
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=ôffne Dokument...
+TBHINT_PRINT=Drucken...
+TBHINT_SHOW_NAV_PANE=Zeige/Verstecke Navigationszeile
+TBHINT_FIRST_PAGE=Erste Seite
+TBHINT_PREV_PAGE=Vorherige Seite
+TBHINT_NEXT_PAGE=NÑchste Seite
+TBHINT_LAST_PAGE=Letzte Seite
+TBHINT_ACTUAL_SIZE=Aktuelle Grî·e
+TBHINT_FIT_WINDOW=An Fenster anpassen
+TBHINT_FIT_WIDTH=Breite anpassen
+TBHINT_FIND=Suche...
+
+# toolbar's Seitennummer
+TB_PAGENUM=von %d
+
+#
+# Lucide Nachrichten ;)
+#
+MSGS_MAIN_WIN_TITLE=Lucide - Dokumenten Betrachter
+MSGS_NO_SUIT_PLUG=Kann kein passendes Plugin fÅr das angegebene Dokument finden!
+MSGS_FILE_LOAD_ERROR=Dateifehler beim laden!
+
+#
+# "Pluginliste" dialog
+#
+PLUGLIST_PLUGINS_LIST=Pluginsliste
+PLUGLIST_CLOSE=Schlie·en
+
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Pluginname
+PLUGLIST_SUPP_EXTS=UnterstÅtzte Erweiterungen
+PLUGLIST_PLUGIN_DESC=Pluginbeschreibung
+
+#
+# "Fontinfo" dialog
+#
+FONTINFO_FONTINFO=Fontinfo
+FONTINFO_CLOSE=Schlie·en
+FONTINFO_ENUMERATING=Auflistung der Fonts, bitte warten...
+
+# List columns titles
+FONTINFO_NAME=Name
+FONTINFO_TYPE=Type
+FONTINFO_EMBEDDED=Eingebettet?
+
+#
+# "Documenteninfo" dialog
+#
+DOCINFO_DOCUMENT_INFO=Dokumenteninfo
+DOCINFO_CLOSE=Schlie·en
+
+# Document info keys
+DOCINFO_TITLE=Titel:
+DOCINFO_FORMAT=Format:
+DOCINFO_AUTHOR=Autor:
+DOCINFO_SUBJECT=Subject:
+DOCINFO_KEYWORDS=SchlÅsselwîrter:
+DOCINFO_CREATOR=Hersteller:
+DOCINFO_PRODUCER=Produzent:
+DOCINFO_CREATION_DATE=Erstellt am:
+DOCINFO_MOD_DATE=Modifiziert:
+
+#
+# "Suchen" dialog
+#
+FIND_FIND=Suche
+FIND_FIND_WHAT=~Suche was:
+FIND_MATCH_CASE=~Match case
+FIND_OK=~OK
+FIND_CANCEL=~Abbruch
+
+# andere 'Suchen'-bezogene Nachrichten
+FIND_SEARCH_PAGE_OF=Suche Seite %d von %d...
+FIND_NOT_FOUND=Nicht gefunden!
+
+#
+# "Fortschritt" dialog
+#
+PDLG_PROGRESS=Fortschritt
+PDLG_CANCEL=~Abbruch
