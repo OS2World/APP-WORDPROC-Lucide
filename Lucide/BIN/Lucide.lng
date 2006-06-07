@@ -123,5 +123,5 @@ PDLG_CANCEL=~Cancel
 # About dialog
 #
 AD_ABOUT=About
-AD_COPYRIGHTS=Copyrights here.
+AD_COPYRIGHTS=(c) by Eugene Romanenko, netlabs.org in co-operation with Serenity Systems International
 AD_OK=OK
