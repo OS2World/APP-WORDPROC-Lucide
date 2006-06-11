@@ -217,7 +217,7 @@ SOM_Scope boolean  SOMLINK getThumbnailSize(LuDjvuDocument *somSelf,
                                             short* width, short* height)
 {
     LuDjvuDocumentData *somThis = LuDjvuDocumentGetData(somSelf);
-    
+
     double page_ratio;
     double p_width = 0, p_height = 0;
     getPageSize( somSelf, ev, pagenum, &p_width, &p_height );
@@ -241,9 +241,9 @@ SOM_Scope LuPixbuf*  SOMLINK getThumbnail(LuDjvuDocument *somSelf,
 
     while ( ddjvu_thumbnail_status( d->d_document, pagenum, 1 ) < DDJVU_JOB_OK ) {
             ddjvu_message_wait( d->d_context );
-            ddjvu_message_pop( d->d_context );  
+            ddjvu_message_pop( d->d_context );
     }
-        
+
     int t_width = thumb_width;
     int t_height = thumb_height;
     short bpp = getBpp( somSelf, ev );

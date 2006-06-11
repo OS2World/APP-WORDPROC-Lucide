@@ -35,6 +35,11 @@
 #include "messages.h"
 
 
+// Some menu item, which used not only in menu
+const char *MENU_SINGLE_PAGE = "MENU_SINGLE_PAGE";
+const char *MENU_CONTINUOUS  = "MENU_CONTINUOUS";
+
+
 // Toolbar hints
 const char *TBHINT_OPEN          = "TBHINT_OPEN";
 const char *TBHINT_PRINT         = "TBHINT_PRINT";
@@ -52,9 +57,10 @@ const char *TB_PAGENUM           = "TB_PAGENUM";
 
 
 // Lucide messages
-const char *MSGS_MAIN_WIN_TITLE  = "MSGS_MAIN_WIN_TITLE";
-const char *MSGS_NO_SUIT_PLUG    = "MSGS_NO_SUIT_PLUG";
-const char *MSGS_FILE_LOAD_ERROR = "MSGS_FILE_LOAD_ERROR";
+const char *MSGS_MAIN_WIN_TITLE   = "MSGS_MAIN_WIN_TITLE";
+const char *MSGS_NO_SUIT_PLUG     = "MSGS_NO_SUIT_PLUG";
+const char *MSGS_FILE_LOAD_ERROR  = "MSGS_FILE_LOAD_ERROR";
+const char *MSGS_LOADING_DOCUMENT = "MSGS_LOADING_DOCUMENT";
 
 // Plugins List columns titles
 const char *PLUGLIST_PLUGIN_NAME = "PLUGLIST_PLUGIN_NAME";

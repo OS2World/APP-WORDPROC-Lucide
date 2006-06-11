@@ -66,6 +66,7 @@
 #define CM_SELECTALL	202
 #define CM_FIND			203
 #define CM_FINDAGAIN	204
+#define CM_SETTINGS		205
 
 #define CM_FIRSTPAGE	301
 #define CM_PREVPAGE		302
@@ -114,5 +115,9 @@
 #define IDT_LUCIDEVERSION	10
 #define IDC_COPYRIGHTS		11
 #define IDC_NETLABSURL		12
+
+#define IDD_SETTINGS		1006
+#define IDC_DEFPGLAYOUT		10
+#define IDC_DEFZOOM			11
 
 #endif // __LUCIDE_RES_H

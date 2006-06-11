@@ -21,12 +21,12 @@
  * Alternatively, the contents of this file may be used under the terms of
  * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
  * in which case the provisions of the LGPL are applicable instead of those
- * above. If you wish to allow use of your version of this file only under the 
+ * above. If you wish to allow use of your version of this file only under the
  * terms of the LGPL, and not to allow others to use your version of this file
  * under the terms of the CDDL, indicate your decision by deleting the
  * provisions above and replace them with the notice and other provisions
  * required by the LGPL. If you do not delete the provisions above, a recipient
- * may use your version of this file under the terms of any one of the CDDL 
+ * may use your version of this file under the terms of any one of the CDDL
  * or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
@@ -37,6 +37,7 @@
 #include <os2.h>
 
 #include <process.h>
+#include <stdio.h>
 
 #include "luutils.h"
 #include "progressDlg.h"
@@ -118,6 +119,7 @@ MRESULT EXPENTRY ProgressDlg::progressDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
 
             _this->hDialog = hwnd;
             WinSetDlgItemText( hwnd, IDC_PTEXT, _this->text );
+            WinEnableControl( hwnd, DID_CANCEL, _this->fn != NULL );
 
             _this->startPos = 0;
             HWND hBar = WinWindowFromID( hwnd, IDC_PBAR );
@@ -138,7 +140,7 @@ MRESULT EXPENTRY ProgressDlg::progressDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
             WinSetWindowULong( hBar, QWL_USER, (ULONG)_this );
             _this->pOldBarProc = WinSubclassWindow( hBar, progressBarProc );
             WinStartTimer( hBarHab, hBar, TID_PAINT, 1 );
-
+            
             _beginthread( _this->threadFn, NULL, 65536, _this->threadData );
 
             return (MRESULT)FALSE;
@@ -164,7 +166,9 @@ MRESULT EXPENTRY ProgressDlg::progressDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
 
                 case DID_CANCEL:
                     WinEnableControl( hwnd, DID_CANCEL, FALSE );
-                    _this->fn( _this->data );
+                    if ( _this->fn != NULL ) {
+                        _this->fn( _this->data );
+                    }
                     return (MRESULT)FALSE;
             };
             return (MRESULT)FALSE;

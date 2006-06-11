@@ -59,7 +59,7 @@ class DocumentViewer
         DocumentViewer( HAB _hab, HWND hWndFrame );
         virtual ~DocumentViewer();
 
-        void setViewMode( ViewMode mode );
+        void setPageLayout( PgLayout layout );
 
         HWND getHWND() { return hWndDocFrame; }
 
@@ -146,6 +146,7 @@ class DocumentViewer
         ProgressDlg *progressDlg;
         DrawAreas *drawareas;
         int drawareaIndex;
+        bool closed;
 
         // continuous view
         bool continuous;

@@ -19,7 +19,7 @@ EXEDIR = ..\..\..\BIN
 all: make.cfg lupplr.dll
    DEL MAKE.CFG
     
-lupplr.dll: lupoppler.obj ..\ludoc\ludoc.lib
+lupplr.dll: lupoppler.obj ..\ludoc\ludoc.lib ..\..\..\..\poppler\poppler.lib
   copy &&|
 option quiet
 system os2v2 dll initinstance terminstance

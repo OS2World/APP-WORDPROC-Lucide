@@ -1,7 +1,7 @@
 .autodepend
 
 TEST=0
-VERSION=Beta 1
+VERSION=Beta 1.1
 
 !if $(TEST)==1
 	BMODE=os2v2
@@ -35,7 +35,7 @@ OBJS = Lucide.obj luutils.obj clipbrd.obj pmsplitter.obj pmtoolbar.obj \
        toolbar.obj pluginman.obj pluginViewDlg.obj docViewer.obj \
        linklab.obj wwbtn.obj intern.obj messages.obj indexWindow.obj \
        fontsInfoDlg.obj docInfoDlg.obj findDlg.obj progressDlg.obj \
-       aboutDlg.obj
+       aboutDlg.obj settingsDlg.obj lusettings.obj
 
 Lucide.exe: $(OBJS) Lucide.res
   copy &&|
@@ -56,6 +56,8 @@ file $(OBJDIR)\docInfoDlg.obj
 file $(OBJDIR)\findDlg.obj
 file $(OBJDIR)\progressDlg.obj
 file $(OBJDIR)\aboutDlg.obj
+file $(OBJDIR)\settingsDlg.obj
+file $(OBJDIR)\lusettings.obj
 file $(OBJDIR)\docViewer.obj
 file $(OBJDIR)\indexWindow.obj
 file $(OBJDIR)\linklab.obj
@@ -90,6 +92,8 @@ docInfoDlg.obj:     docInfoDlg.cpp
 findDlg.obj:        findDlg.cpp
 progressDlg.obj:    progressDlg.cpp
 aboutDlg.obj:       aboutDlg.cpp
+settingsDlg.obj:    settingsDlg.cpp
+lusettings.obj:     lusettings.cpp
 docViewer.obj:      docViewer.cpp
 indexWindow.obj:    indexWindow.cpp
 intern.obj:         intern.cpp

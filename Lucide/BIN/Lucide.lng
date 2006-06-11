@@ -20,6 +20,7 @@ MENU_COPY=Copy\tCtrl+Insert
 MENU_SELECT_ALL=Select all\tCtrl+/
 MENU_FIND=Find...\tCtrl+F
 MENU_FINDAGAIN=Find again\tCtrl+G
+MENU_SETTINGS=Settings
 MENU_DOCUMENT=~Document
 MENU_FIRST_PAGE=First page
 MENU_PREV_PAGE=Previous page\t-
@@ -63,6 +64,7 @@ TB_PAGENUM=of %d
 MSGS_MAIN_WIN_TITLE=Lucide - Document Viewer
 MSGS_NO_SUIT_PLUG=Can't find suitable plugin for specified document!
 MSGS_FILE_LOAD_ERROR=File load error!
+MSGS_LOADING_DOCUMENT=Loading document, please wait...
 
 #
 # "Plugins list" dialog
@@ -125,3 +127,12 @@ PDLG_CANCEL=~Cancel
 AD_ABOUT=About
 AD_COPYRIGHTS=(c) by Eugene Romanenko, netlabs.org in co-operation with Serenity Systems International
 AD_OK=OK
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Settings
+SD_DEFAULT_PAGE_LAYOUT=Default Page Layout:
+SD_DEFAULT_ZOOM=Default Zoom:
+SD_OK=~OK
+SD_CANCEL=~Cancel

@@ -312,7 +312,7 @@ struct asynchCallbackData
 {
     Environment      *ev;
     LuPixbuf         *pixbuf;
-    SplashBitmap     *bitmap;
+    SplashOutputDev  *out;
     void             *fndata;
     _asynchCallbackFn fnd;
     _asynchCallbackFn fna;
@@ -327,8 +327,13 @@ static GBool abortCheckCbk( void *data )
     asynchCallbackData *cd = (asynchCallbackData *)data;
     DosQuerySysInfo( QSV_MS_COUNT, QSV_MS_COUNT, &now, sizeof( long ) );
     long dist = ( now - cd->tmr );
-    if ( ( dist > cd->delay ) || cd->forceDraw ) {
-        copy_page_to_pixbuf( cd->ev, cd->bitmap, cd->pixbuf );
+    if ( ( dist > cd->delay ) || cd->forceDraw ) 
+    {
+    	// Note: we use out->getBitmap() on each iteration instead
+    	//       of remembering pointer to bitmap before call
+    	//       page->displaySlice() because OutputDev may change
+    	//       bitmap during page->displaySlice() processing.
+        copy_page_to_pixbuf( cd->ev, cd->out->getBitmap(), cd->pixbuf );
         cd->fnd( cd->fndata );
         cd->tmr = now;
         cd->delay += 100;
@@ -361,7 +366,7 @@ SOM_Scope void  SOMLINK renderPageToPixbufAsynch(LuPopplerDocument *somSelf,
     asynchCallbackData acd;
     acd.ev        = ev;
     acd.pixbuf    = pixbuf;
-    acd.bitmap    = document->output_dev->getBitmap();
+    acd.out       = document->output_dev;
     acd.fndata    = fndata;
     acd.fnd       = (_asynchCallbackFn)fnd;
     acd.fna       = (_asynchCallbackFn)fna;

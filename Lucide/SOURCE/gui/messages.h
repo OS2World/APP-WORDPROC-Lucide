@@ -36,6 +36,10 @@
 #define __MESSAGES_H
 
 
+// Some menu item, which used not only in menu
+extern const char *MENU_SINGLE_PAGE;
+extern const char *MENU_CONTINUOUS;
+
 // Toolbar hints
 extern const char *TBHINT_OPEN;
 extern const char *TBHINT_PRINT;
@@ -55,6 +59,7 @@ extern const char *TB_PAGENUM;
 extern const char *MSGS_MAIN_WIN_TITLE;
 extern const char *MSGS_NO_SUIT_PLUG;
 extern const char *MSGS_FILE_LOAD_ERROR;
+extern const char *MSGS_LOADING_DOCUMENT;
 
 // Plugins List columns titles
 extern const char *PLUGLIST_PLUGIN_NAME;

@@ -65,6 +65,8 @@ BOOL PMRestoreWindowPos( PCSZ pIniName, PCSZ pAppName, PCSZ pKeyName,
 SHORT getStringPixSize( HPS hps, PCSZ str );
 void textToClipbrd( HAB hab, const char *text );
 void centerWindow( HWND parent, HWND hwnd );
+void setZoomValues( HWND lbox );
+double convZoom( SHORT v );
 #endif
 
 

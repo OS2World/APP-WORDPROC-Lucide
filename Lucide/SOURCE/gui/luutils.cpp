@@ -44,6 +44,7 @@
 #include <string>
 
 #include "luutils.h"
+#include "messages.h"
 
 bool initCountryInfo();
 
@@ -440,3 +441,48 @@ std::string time2string( unsigned long time )
     return s;
 }
 
+void setZoomValues( HWND lbox )
+{
+    std::string actsizetext = getLocalizedString( TBHINT_ACTUAL_SIZE );
+    WinSetWindowText( lbox, actsizetext.c_str() );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END),
+                MPFROMP( actsizetext.c_str() ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END),
+                MPFROMP( getLocalizedString( TBHINT_FIT_WINDOW ).c_str() ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END),
+                MPFROMP( getLocalizedString( TBHINT_FIT_WIDTH ).c_str() ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "12.5%" ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "25%" ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "50%" ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "100%" ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "125%" ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "150%" ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "200%" ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "300%" ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "400%" ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "800%" ) );
+    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "1600%" ) );
+}
+
+double convZoom( SHORT v )
+{
+	double z = -3;
+    switch ( v )
+    {
+        case 0:   z = 1;      break;
+        case 1:   z = -2;     break;
+        case 2:   z = -1;     break;
+        case 3:   z = 0.125;  break;
+        case 4:   z = 0.25;   break;
+        case 5:   z = 0.5;    break;
+        case 6:   z = 1;      break;
+        case 7:   z = 1.25;   break;
+        case 8:   z = 1.5;    break;
+        case 9:   z = 2;      break;
+        case 10:  z = 3;      break;
+        case 11:  z = 4;      break;
+        case 12:  z = 8;      break;
+        case 13:  z = 16;     break;
+    }
+    return z;
+}

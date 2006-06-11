@@ -49,8 +49,10 @@
 #include "docInfoDlg.h"
 #include "findDlg.h"
 #include "progressDlg.h"
+#include "settingsDlg.h"
 #include "docViewer.h"
 #include "indexWindow.h"
+#include "lusettings.h"
 #include "luutils.h"
 #include "tb_spl.h"
 #include "Lucide_res.h"
@@ -66,6 +68,9 @@ const char *lvd        = "LastViewedDir";
 const char *splpos     = "SplitterPos";
 const char *showind    = "ShowIndex";
 
+ULONG APIENTRY GPFHandler( PEXCEPTIONREPORTRECORD pxcptrec,
+                           PEXCEPTIONREGISTRATIONRECORD prr,
+                           PCONTEXTRECORD pcr, PVOID pv );
 
 HWND createToolbar( HWND hwnd );
 void AboutBox( HWND hWndFrame );
@@ -85,6 +90,7 @@ PluginManager  *pluginMan = NULL;
 DocumentViewer *docViewer = NULL;
 IndexWindow    *indexWin  = NULL;
 FindDlg        *findDlg   = NULL;
+LuSettings     *settings  = NULL;
 char           *title     = NULL;
 
 
@@ -290,9 +296,9 @@ void Lucide::setDocument( LuDocument *_doc )
     checkMenus();
 }
 
-void Lucide::setViewMode( ViewMode mode )
+void Lucide::setPageLayout( PgLayout layout )
 {
-    if ( mode == SinglePage )
+    if ( layout == SinglePage )
     {
         WinSendMsg( hWndMenu, MM_SETITEMATTR,
                     MPFROM2SHORT( CM_SINGLEPAGE, TRUE ),
@@ -311,7 +317,7 @@ void Lucide::setViewMode( ViewMode mode )
                     MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
     }
 
-    docViewer->setViewMode( mode );
+    docViewer->setPageLayout( layout );
 }
 
 
@@ -370,25 +376,21 @@ void Lucide::loadDocument( const char *fn )
                 docLoaded = false;;
                 loadError = NULL;
 
-#if 0
+                // Load document asynchronously
                 loadProgressDlg = new ProgressDlg( hWndFrame );
-                loadProgressDlg->setText( "Loading document, please wait..." );
+                char *ldmsg = newstrdupL( MSGS_LOADING_DOCUMENT );
+                loadProgressDlg->setText( ldmsg );
+                delete ldmsg;
                 loadProgressDlg->show( loadthread, NULL ); // doc will be loaded
                 delete loadProgressDlg;
-#else
-                docLoaded = doc->loadFile( ev, docName, NULL, &loadError );
-#endif
 
                 if ( docLoaded )
                 {
                     char *t = new char[ 2048 ];
-                    char _fn[ _MAX_NAME ];
+                    char _fn[ _MAX_FNAME ];
                     char _ex[ _MAX_EXT ];
                     _splitpath( fn, NULL, NULL, _fn, _ex );
-                    strcpy( t, _fn );
-                    strcat( t, _ex );
-                    strcat( t, " - " );
-                    strcat( t, title );
+                    snprintf( t, 2048, "%s%s - %s", _fn, _ex, title );
                     WinSetWindowText( hWndFrame, t );
                     delete t;
                     setDocument( doc );
@@ -601,6 +603,13 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                                                findDlg->isCaseSensitive(), true );
                     return (MRESULT)FALSE;
 
+                case CM_SETTINGS:
+                {
+                    SettingsDlg *d = new SettingsDlg( hWndFrame, settings );
+                    d->doDialog();
+                    return (MRESULT)FALSE;
+                }
+
                 case CM_FIRSTPAGE:
                     Lucide::goToPage( 0 );
                     return (MRESULT)FALSE;
@@ -630,11 +639,11 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     return (MRESULT)FALSE;
 
                 case CM_SINGLEPAGE:
-                    Lucide::setViewMode( SinglePage );
+                    Lucide::setPageLayout( SinglePage );
                     return (MRESULT)FALSE;
 
                 case CM_CONTINUOUS:
-                    Lucide::setViewMode( Continuous );
+                    Lucide::setPageLayout( Continuous );
                     return (MRESULT)FALSE;
 
                 case CM_NAVPANE:
@@ -680,6 +689,9 @@ int main( int argc, char **argv )
     hmq = WinCreateMsgQueue( hab, 0 );
 
     loadLang();
+
+    settings = new LuSettings;
+    settings->load();
 
     pluginMan = new PluginManager;
 
@@ -736,6 +748,8 @@ int main( int argc, char **argv )
 
     findDlg = new FindDlg( hWndFrame );
     Lucide::checkMenus();
+    Lucide::setPageLayout( settings->layout );
+    Lucide::setZoom( settings->zoom );
 
     // Показать окно программы
     if ( !PMRestoreWindowPos( NULL, appName, fwp, hWndFrame,
@@ -766,8 +780,6 @@ int main( int argc, char **argv )
     }
 
     WinDestroyWindow( hWndFrame );
-    WinDestroyMsgQueue( hmq );
-    WinTerminate( hab );
 
     delete docViewer;
     delete indexWin;
@@ -778,7 +790,10 @@ int main( int argc, char **argv )
 
     delete findDlg;
     delete title;
+    delete settings;
 
+    WinDestroyMsgQueue( hmq );
+    WinTerminate( hab );
     return 0;
 }
 

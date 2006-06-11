@@ -128,7 +128,7 @@ struct LuFontInfo
 struct LuDocumentInfo
 {
 	char *title;
-	char *format; /* eg, "pdf-1.5" */
+	char *format;
 	char *author;
 	char *subject;
 	char *keywords;

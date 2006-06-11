@@ -57,6 +57,11 @@ extern "C" {
                               LONG lCount, PPOINTL aptlPoints, LONG lRop, ULONG flOptions);
 }
 
+ULONG APIENTRY GPFHandler( PEXCEPTIONREPORTRECORD pxcptrec,
+                           PEXCEPTIONREGISTRATIONRECORD prr,
+                           PCONTEXTRECORD pcr, PVOID pv );
+
+
 typedef LuDocument_LuRectSequence    *PLuRectSequence;
 typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 
@@ -95,6 +100,7 @@ DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
     progressDlg = new ProgressDlg( hWndFrame );
     drawareas   = NULL;
     drawareaIndex = 0;
+    closed        = true;
     // continuous view
     continuous  = false;
     pagesizes   = NULL;
@@ -180,8 +186,13 @@ void DocumentViewer::setDocument( LuDocument *_doc )
 
     if ( doc != NULL )
     {
+        closed = false;
+
         totalpages = doc->getPageCount( ev );
         bpp = doc->getBpp( ev );
+        if ( !doc->isScalable( ev ) ) {
+            zoom = 1;
+        }
 
         pagesizes = new LuSize[ totalpages ];
         for ( long i = 0; i < totalpages; i++ ) {
@@ -204,6 +215,10 @@ void DocumentViewer::setDocument( LuDocument *_doc )
 
         enableAsynchDraw = doc->isAsynchRenderingSupported( ev );
         goToPage( 0 );
+
+        if ( continuous ) {
+            drawPage();
+        }
     }
 }
 
@@ -211,6 +226,11 @@ void DocumentViewer::setDocument( LuDocument *_doc )
 // closes the document
 void DocumentViewer::close()
 {
+    if ( closed ) {
+        return;
+    }
+
+    closed = true;
     abortAsynch = true;
     DosRequestMutexSem( todrawAccess, SEM_INDEFINITE_WAIT );
 
@@ -235,7 +255,6 @@ void DocumentViewer::close()
 
     doc         = NULL;
     totalpages  = 0;
-    zoom        = 1;
     currentpage = 0;
     fullwidth   = 0;
     fullheight  = 0;
@@ -243,10 +262,10 @@ void DocumentViewer::close()
     DosReleaseMutexSem( todrawAccess );
 }
 
-// sets the view mode
-void DocumentViewer::setViewMode( ViewMode mode )
+// sets the page layout
+void DocumentViewer::setPageLayout( PgLayout layout )
 {
-    continuous = ( mode == Continuous );
+    continuous = ( layout == Continuous );
     if ( doc != NULL ) {
         long pg = currentpage;
         drawPage();
@@ -293,7 +312,6 @@ void DocumentViewer::goToPage( long page )
     {
         double pgpos = pagenumToPos( page ) / VScrollStep;
         vertScroll( hWndDoc, MPFROM2SHORT( pgpos, SB_SLIDERPOSITION ), NULLHANDLE );
-        //drawPage();
     }
     else
     {
@@ -754,7 +772,6 @@ void DocumentViewer::drawthread( void *p )
             DosReleaseMutexSem( _this->todrawAccess );
         }
     }
-
     WinDestroyMsgQueue( thmq );
     WinTerminate( thab );
     _endthread();
@@ -766,70 +783,70 @@ void DocumentViewer::wmPaintAsynch( HWND hwnd )
 {
     RECTL rcl;
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
-    if ( hps != NULLHANDLE )
-    {
-        RECTL rclWin = { 0 };
-        WinQueryWindowRect( hwnd, &rclWin );
-        if ( WinEqualRect( hab, &rcl, &rclWin ) ) {
-            GpiErase( hps );
-        }
-        WinEndPaint( hps );
+    RECTL rclWin = { 0 };
+    WinQueryWindowRect( hwnd, &rclWin );
+    if ( WinEqualRect( hab, &rcl, &rclWin ) ) {
+        GpiErase( hps );
     }
+    WinEndPaint( hps );
 
-    RECTL rclPage = { 0, 0, width, height };
-    if ( height < cyClient )
+    if ( doc != NULL )
     {
-        rclPage.yBottom = cyClient - height;
-        rclPage.yTop = cyClient;
-    }
-    RECTL rclDraw = { 0 };
-    if ( WinIntersectRect( hab, &rclDraw, &rcl, &rclPage ) )
-    {
-        if ( ( drawareas != NULL ) && ( drawareas->size() > 0 ) ) {
-            if ( isSubrect( &((*drawareas)[0].drawrect), &rclDraw ) &&
-                 ( sVscrollInc == 0 ) && ( sHscrollInc == 0 ) ) {
-                return;
-            }
-        }
-
-        abortAsynch = true;
-        DosRequestMutexSem( todrawAccess, SEM_INDEFINITE_WAIT );
-
-        if ( drawareas == NULL ) {
-            drawareas = new DrawAreas;
-        }
-        if ( drawareas->size() == 0 ) {
-            PageDrawArea pda;
-            memset( &pda, 0, sizeof( pda ) );
-            pda.pagenum = currentpage;
-            drawareas->push_back( pda );
-        }
-
-        PageDrawArea *ppda = &((*drawareas)[0]);
-
-        if ( !WinIsRectEmpty( hab, &ppda->drawrect ) )
+        RECTL rclPage = { 0, 0, width, height };
+        if ( height < cyClient )
         {
-            if ( sVscrollInc > 0 ) {
-                ppda->drawrect.yTop    += sVscrollInc;
-            } else if ( sVscrollInc < 0 ) {
-                ppda->drawrect.yBottom += sVscrollInc;
-            }
-            if ( sHscrollInc > 0 ) {
-                ppda->drawrect.xLeft  -= sHscrollInc;
-            } else if ( sHscrollInc < 0 ) {
-                ppda->drawrect.xRight -= sHscrollInc;
-            }
+            rclPage.yBottom = cyClient - height;
+            rclPage.yTop = cyClient;
         }
-        WinUnionRect( hab, &ppda->drawrect, &ppda->drawrect, &rclDraw );
-        ppda->startpos.x = sHscrollPos + ppda->drawrect.xLeft;
-        ppda->startpos.y = ( cyClient - ppda->drawrect.yTop ) + sVscrollPos;
+        RECTL rclDraw = { 0 };
+        if ( WinIntersectRect( hab, &rclDraw, &rcl, &rclPage ) )
+        {
+            if ( ( drawareas != NULL ) && ( drawareas->size() > 0 ) ) {
+                if ( isSubrect( &((*drawareas)[0].drawrect), &rclDraw ) &&
+                     ( sVscrollInc == 0 ) && ( sHscrollInc == 0 ) ) {
+                    return;
+                }
+            }
 
-        // workaround ?
-        ppda->drawrect.xRight++;
-        ppda->drawrect.yTop++;
+            abortAsynch = true;
+            DosRequestMutexSem( todrawAccess, SEM_INDEFINITE_WAIT );
 
-        DosReleaseMutexSem( todrawAccess );
-        DosPostEventSem( haveDraw );
+            if ( drawareas == NULL ) {
+                drawareas = new DrawAreas;
+            }
+            if ( drawareas->size() == 0 ) {
+                PageDrawArea pda;
+                memset( &pda, 0, sizeof( pda ) );
+                pda.pagenum = currentpage;
+                drawareas->push_back( pda );
+            }
+
+            PageDrawArea *ppda = &((*drawareas)[0]);
+
+            if ( !WinIsRectEmpty( hab, &ppda->drawrect ) )
+            {
+                if ( sVscrollInc > 0 ) {
+                    ppda->drawrect.yTop    += sVscrollInc;
+                } else if ( sVscrollInc < 0 ) {
+                    ppda->drawrect.yBottom += sVscrollInc;
+                }
+                if ( sHscrollInc > 0 ) {
+                    ppda->drawrect.xLeft  -= sHscrollInc;
+                } else if ( sHscrollInc < 0 ) {
+                    ppda->drawrect.xRight -= sHscrollInc;
+                }
+            }
+            WinUnionRect( hab, &ppda->drawrect, &ppda->drawrect, &rclDraw );
+            ppda->startpos.x = sHscrollPos + ppda->drawrect.xLeft;
+            ppda->startpos.y = ( cyClient - ppda->drawrect.yTop ) + sVscrollPos;
+
+            // workaround ?
+            ppda->drawrect.xRight++;
+            ppda->drawrect.yTop++;
+
+            DosReleaseMutexSem( todrawAccess );
+            DosPostEventSem( haveDraw );
+        }
     }
 }
 
@@ -839,53 +856,54 @@ void DocumentViewer::wmPaintContAsynch( HWND hwnd )
 {
     RECTL rcl, rclWin, rclDraw = { 0 };
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
-    if ( hps != NULLHANDLE ) {
-        GpiErase( hpsBuffer );
-        BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
-        WinEndPaint( hps );
-    }
+    GpiErase( hpsBuffer );
+    BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
+    WinEndPaint( hps );
 
-    if ( isSubrect( &savedRcl, &rcl ) && ( sVscrollInc == 0 ) && ( sHscrollInc == 0 ) ) {
-        return;
-    }
-
-    abortAsynch = true;
-    DosRequestMutexSem( todrawAccess, SEM_INDEFINITE_WAIT );
-
-    WinQueryWindowRect( hwnd, &rclWin );
-    WinUnionRect( hab, &rcl, &rcl, &savedRcl );
-
-    if ( sVscrollInc > 0 ) {
-        rcl.yTop    += sVscrollInc;
-    } else if ( sVscrollInc < 0 ) {
-        rcl.yBottom += sVscrollInc;
-    }
-    if ( sHscrollInc > 0 ) {
-        rcl.xLeft  -= sHscrollInc;
-    } else if ( sHscrollInc < 0 ) {
-        rcl.xRight -= sHscrollInc;
-    }
-
-    WinIntersectRect( hab, &rclDraw, &rcl, &rclWin );
-    WinCopyRect( hab, &rcl, &rclDraw );
-    WinCopyRect( hab, &savedRcl, &rcl );
-
-    delete drawareas;
-    drawareas = findDrawAreas( &rcl );
-
-    for ( int i = 0; i < drawareas->size(); i++ )
+    if ( doc != NULL )
     {
-        PageDrawArea *pda = &(*drawareas)[ i ];
-
-        // load links for page if not loaded before
-        if ( links[ pda->pagenum ] == NULL ) {
-            links[ pda->pagenum ] = doc->getLinkMapping( ev, pda->pagenum );
+        if ( isSubrect( &savedRcl, &rcl ) && ( sVscrollInc == 0 ) && ( sHscrollInc == 0 ) ) {
+            return;
         }
-    }
-    DosReleaseMutexSem( todrawAccess );
-    DosPostEventSem( haveDraw );
 
-    determineCurrentPage();
+        abortAsynch = true;
+        DosRequestMutexSem( todrawAccess, SEM_INDEFINITE_WAIT );
+
+        WinQueryWindowRect( hwnd, &rclWin );
+        WinUnionRect( hab, &rcl, &rcl, &savedRcl );
+
+        if ( sVscrollInc > 0 ) {
+            rcl.yTop    += sVscrollInc;
+        } else if ( sVscrollInc < 0 ) {
+            rcl.yBottom += sVscrollInc;
+        }
+        if ( sHscrollInc > 0 ) {
+            rcl.xLeft  -= sHscrollInc;
+        } else if ( sHscrollInc < 0 ) {
+            rcl.xRight -= sHscrollInc;
+        }
+
+        WinIntersectRect( hab, &rclDraw, &rcl, &rclWin );
+        WinCopyRect( hab, &rcl, &rclDraw );
+        WinCopyRect( hab, &savedRcl, &rcl );
+
+        delete drawareas;
+        drawareas = findDrawAreas( &rcl );
+
+        for ( int i = 0; i < drawareas->size(); i++ )
+        {
+            PageDrawArea *pda = &(*drawareas)[ i ];
+
+            // load links for page if not loaded before
+            if ( links[ pda->pagenum ] == NULL ) {
+                links[ pda->pagenum ] = doc->getLinkMapping( ev, pda->pagenum );
+            }
+        }
+        DosReleaseMutexSem( todrawAccess );
+        DosPostEventSem( haveDraw );
+
+        determineCurrentPage();
+    }
 }
 
 
@@ -896,45 +914,50 @@ void DocumentViewer::wmPaint( HWND hwnd )
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
     GpiErase( hpsBuffer );
 
-    RECTL rclPage = { 0, 0, width, height };
-    if ( height < cyClient )
+    if ( doc != NULL )
     {
-        rclPage.yBottom = cyClient - height;
-        rclPage.yTop = cyClient;
+        RECTL rclPage = { 0, 0, width, height };
+        if ( height < cyClient )
+        {
+            rclPage.yBottom = cyClient - height;
+            rclPage.yTop = cyClient;
+        }
+        RECTL rclDraw = { 0 };
+        if ( WinIntersectRect( hab, &rclDraw, &rcl, &rclPage ) )
+        {
+            spos_x = sHscrollPos + rclDraw.xLeft;
+            spos_y = (cyClient - rclDraw.yTop) + sVscrollPos;
+            LONG rclx = rclDraw.xRight - rclDraw.xLeft;
+            LONG rcly = rclDraw.yTop - rclDraw.yBottom;
+
+            pixbuf = new LuPixbuf( ev, rclx, rcly, bpp );
+            POINTL aptlPoints[4]={ rclDraw.xLeft, rclDraw.yBottom,
+                                   rclDraw.xRight-1, rclDraw.yTop-1,
+                                   0, 0, rclx, rcly };
+
+            doc->renderPageToPixbuf( ev, currentpage, spos_x, spos_y,
+                                     rclx, rcly, realzoom, 0, pixbuf );
+            LONG lRop = ROP_SRCCOPY;
+            BITMAPINFO2 pbmi;
+            pbmi.cbFix = 16L;
+            pbmi.cx = rclx;
+            pbmi.cy = rcly;
+            pbmi.cPlanes = 1;
+            pbmi.cBitCount = bpp * 8;
+            GpiDrawBits( hpsBuffer, pixbuf->getDataPtr( ev ), &pbmi, 4L,
+                         aptlPoints, lRop, BBO_IGNORE );
+
+            drawSelection( currentpage, hpsBuffer, &rclDraw );
+            drawFound( currentpage, hpsBuffer, &rclDraw );
+
+            BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
+            delete pixbuf;
+            pixbuf = NULL;
+        }
     }
-    RECTL rclDraw = { 0 };
-    if ( WinIntersectRect( hab, &rclDraw, &rcl, &rclPage ) )
-    {
-        spos_x = sHscrollPos + rclDraw.xLeft;
-        spos_y = (cyClient - rclDraw.yTop) + sVscrollPos;
-        LONG rclx = rclDraw.xRight - rclDraw.xLeft;
-        LONG rcly = rclDraw.yTop - rclDraw.yBottom;
-
-        pixbuf = new LuPixbuf( ev, rclx, rcly, bpp );
-        POINTL aptlPoints[4]={ rclDraw.xLeft, rclDraw.yBottom,
-                               rclDraw.xRight-1, rclDraw.yTop-1,
-                               0, 0, rclx, rcly };
-
-        doc->renderPageToPixbuf( ev, currentpage, spos_x, spos_y,
-                                 rclx, rcly, realzoom, 0, pixbuf );
-        LONG lRop = ROP_SRCCOPY;
-        BITMAPINFO2 pbmi;
-        pbmi.cbFix = 16L;
-        pbmi.cx = rclx;
-        pbmi.cy = rcly;
-        pbmi.cPlanes = 1;
-        pbmi.cBitCount = bpp * 8;
-        GpiDrawBits( hpsBuffer, pixbuf->getDataPtr( ev ), &pbmi, 4L,
-                     aptlPoints, lRop, BBO_IGNORE );
-
-        drawSelection( currentpage, hpsBuffer, &rclDraw );
-        drawFound( currentpage, hpsBuffer, &rclDraw );
-
+    else {
         BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
-        delete pixbuf;
-        pixbuf = NULL;
     }
-
     WinEndPaint( hps );
 }
 
@@ -1037,53 +1060,58 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
     GpiErase( hpsBuffer );
 
-    delete drawareas;
-    drawareas = findDrawAreas( &rcl );
-
-    for ( int i = 0; i < drawareas->size(); i++ )
+    if ( doc != NULL )
     {
-        PageDrawArea *pda = &(*drawareas)[ i ];
+        delete drawareas;
+        drawareas = findDrawAreas( &rcl );
 
-        // load links for page if not loaded before
-        if ( links[ pda->pagenum ] == NULL ) {
-            links[ pda->pagenum ] = doc->getLinkMapping( ev, pda->pagenum );
+        for ( int i = 0; i < drawareas->size(); i++ )
+        {
+            PageDrawArea *pda = &(*drawareas)[ i ];
+
+            // load links for page if not loaded before
+            if ( links[ pda->pagenum ] == NULL ) {
+                links[ pda->pagenum ] = doc->getLinkMapping( ev, pda->pagenum );
+            }
+
+            spos_x = pda->startpos.x;
+            //spos_y = ( cyClient - pda->drawrect.yTop ) + ( sVscrollPos * VScrollStep );
+            spos_y = pda->startpos.y;
+            LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
+            LONG rcly = pda->drawrect.yTop - pda->drawrect.yBottom;
+
+            pixbuf = new LuPixbuf( ev, rclx, rcly, bpp );
+            POINTL aptlPoints[4]={ pda->drawrect.xLeft, pda->drawrect.yBottom,
+                                   pda->drawrect.xRight-1, pda->drawrect.yTop-1,
+                                   0, 0, rclx, rcly };
+
+            doc->renderPageToPixbuf( ev, pda->pagenum, spos_x, spos_y,
+                                     rclx, rcly, realzoom, 0, pixbuf );
+            LONG lRop = ROP_SRCCOPY;
+            BITMAPINFO2 pbmi;
+            pbmi.cbFix = 16L;
+            pbmi.cx = rclx;
+            pbmi.cy = rcly;
+            pbmi.cPlanes = 1;
+            pbmi.cBitCount = bpp * 8;
+            GpiDrawBits( hpsBuffer, pixbuf->getDataPtr( ev ), &pbmi, 4L,
+                         aptlPoints, lRop, BBO_IGNORE );
+
+            drawSelection( pda->pagenum, hpsBuffer, &pda->drawrect );
+            drawFound( pda->pagenum, hpsBuffer, &pda->drawrect );
+
+            delete pixbuf;
+            pixbuf = NULL;
         }
-
-        spos_x = pda->startpos.x;
-        //spos_y = ( cyClient - pda->drawrect.yTop ) + ( sVscrollPos * VScrollStep );
-        spos_y = pda->startpos.y;
-        LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
-        LONG rcly = pda->drawrect.yTop - pda->drawrect.yBottom;
-
-        pixbuf = new LuPixbuf( ev, rclx, rcly, bpp );
-        POINTL aptlPoints[4]={ pda->drawrect.xLeft, pda->drawrect.yBottom,
-                               pda->drawrect.xRight-1, pda->drawrect.yTop-1,
-                               0, 0, rclx, rcly };
-
-        doc->renderPageToPixbuf( ev, pda->pagenum, spos_x, spos_y,
-                                 rclx, rcly, realzoom, 0, pixbuf );
-        LONG lRop = ROP_SRCCOPY;
-        BITMAPINFO2 pbmi;
-        pbmi.cbFix = 16L;
-        pbmi.cx = rclx;
-        pbmi.cy = rcly;
-        pbmi.cPlanes = 1;
-        pbmi.cBitCount = bpp * 8;
-        GpiDrawBits( hpsBuffer, pixbuf->getDataPtr( ev ), &pbmi, 4L,
-                     aptlPoints, lRop, BBO_IGNORE );
-
-        drawSelection( pda->pagenum, hpsBuffer, &pda->drawrect );
-        drawFound( pda->pagenum, hpsBuffer, &pda->drawrect );
-
-        delete pixbuf;
-        pixbuf = NULL;
+        delete drawareas;
+        drawareas = NULL;
     }
-    delete drawareas;
-    drawareas = NULL;
     BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
     WinEndPaint( hps );
 
-    determineCurrentPage();
+    if ( doc != NULL ) {
+        determineCurrentPage();
+    }
 }
 
 
