@@ -57,11 +57,6 @@ extern "C" {
                               LONG lCount, PPOINTL aptlPoints, LONG lRop, ULONG flOptions);
 }
 
-ULONG APIENTRY GPFHandler( PEXCEPTIONREPORTRECORD pxcptrec,
-                           PEXCEPTIONREGISTRATIONRECORD prr,
-                           PCONTEXTRECORD pcr, PVOID pv );
-
-
 typedef LuDocument_LuRectSequence    *PLuRectSequence;
 typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 

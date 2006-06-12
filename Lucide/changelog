@@ -1,0 +1,13 @@
+Beta-1.1:
+  - Poppler (pdf rendering) library updated to version 0.5.3.
+  - Added settings dialog, where you can define default page layout
+    and zoom level (closed ticket #23).
+  - Added asynchronous opening of documents.
+  - Custom zoom level can be specified in zoom combo on toolbar.
+  - Fixed crash on opening file with long filename (closed
+    tickets #19, #21).
+  - Fixed crash and redraw problem when opening a new file (closed
+    ticket #24).
+
+Beta-1:
+  Initial public release.

@@ -68,10 +68,6 @@ const char *lvd        = "LastViewedDir";
 const char *splpos     = "SplitterPos";
 const char *showind    = "ShowIndex";
 
-ULONG APIENTRY GPFHandler( PEXCEPTIONREPORTRECORD pxcptrec,
-                           PEXCEPTIONREGISTRATIONRECORD prr,
-                           PCONTEXTRECORD pcr, PVOID pv );
-
 HWND createToolbar( HWND hwnd );
 void AboutBox( HWND hWndFrame );
 
