@@ -1,0 +1,127 @@
+#
+# Lucide language file, SV
+#
+
+#
+# Main menu
+#
+MENU_FILE=~Arkiv
+MENU_OPEN=™ppna...\tCtrl+O
+MENU_SAVE_AS=Spara som...
+MENU_EXPORT_TO_PS=Exportera till PostScript...
+MENU_PAGE_SETUP=Sida inst„llningar...
+MENU_PRINT=Skriv ut...
+MENU_DOCUMENT_INFO=Dokumentinfo...
+MENU_FONTS_INFO=Fonter info...
+MENU_PLUGINS_LIST=Pluginlista...
+MENU_EXIT=Avsluta\tCtrl+X
+MENU_EDIT=~Redigera
+MENU_COPY=Kopiera\tCtrl+Insert
+MENU_SELECT_ALL=V„lj allt\tCtrl+/
+MENU_FIND=Finn...\tCtrl+F
+MENU_FINDAGAIN=Finn igen\tCtrl+G
+MENU_DOCUMENT=~Dokument
+MENU_FIRST_PAGE=F”rsta sidan
+MENU_PREV_PAGE=F”reg†ende sida\t-
+MENU_NEXT_PAGE=N„sta sida\t+
+MENU_LAST_PAGE=Sista sidan
+MENU_GO_TO_PAGE=G† till sidan...
+MENU_VIEW=~Visa
+MENU_FIT_WINDOW=Passa f”nster
+MENU_ACTUAL_SIZE=Verklig storlek
+MENU_FIT_WIDTH=Passa bredd
+MENU_ROTATE_CW=Rotera 90ø CW
+MENU_ROTATE_CCW=Rotera 90ø CCW
+MENU_SHOW_NAV_PANE=Visa navigationspanel
+MENU_SINGLE_PAGE=Enstaka sida
+MENU_CONTINUOUS=Kontinuerlig
+MENU_WINDOW=~F”nster
+MENU_FULLSCREEN=Fullsk„rm\tF11
+MENU_HELP=~Hj„lp
+MENU_PRODUCT_INFORMATION=Produktinformation
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=™ppna dokument...
+TBHINT_PRINT=Skriv ut...
+TBHINT_SHOW_NAV_PANE=Visa/d”lj navigationspanel
+TBHINT_FIRST_PAGE=F”rsta sidan
+TBHINT_PREV_PAGE=F”reg†ende sida
+TBHINT_NEXT_PAGE=N„sta sida
+TBHINT_LAST_PAGE=Sista sidan
+TBHINT_ACTUAL_SIZE=Verklig storlek
+TBHINT_FIT_WINDOW=Passa f”nster
+TBHINT_FIT_WIDTH=Passa bredd
+TBHINT_FIND=Finn...
+# toolbar's page number
+TB_PAGENUM=av %d
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=Lucide - Dokumentvisare
+MSGS_NO_SUIT_PLUG=Kan inte hitta n†gon l„mplig plugin f”r specificerat dokument!
+MSGS_FILE_LOAD_ERROR=Filladdningsfel!
+
+#
+# "Plugins list" dialog
+#
+PLUGLIST_PLUGINS_LIST=Pluginlista
+PLUGLIST_CLOSE=St„ng
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Plugin namn
+PLUGLIST_SUPP_EXTS=Typer som st”d
+PLUGLIST_PLUGIN_DESC=Plugin beskrivning
+
+#
+# "Font info" dialog
+#
+FONTINFO_FONTINFO=Fontinfo
+FONTINFO_CLOSE=St„ng
+FONTINFO_ENUMERATING=R„knar upp fonter, var v„nlig v„nta...
+# List columns titles
+FONTINFO_NAME=Namn
+FONTINFO_TYPE=Typ
+FONTINFO_EMBEDDED=Inb„ddad?
+
+#
+# "Document info" dialog
+#
+DOCINFO_DOCUMENT_INFO=Dokumentinfo
+DOCINFO_CLOSE=St„ng
+# Document info keys
+DOCINFO_TITLE=Titel:
+DOCINFO_FORMAT=Format:
+DOCINFO_AUTHOR=F”rfattare:
+DOCINFO_SUBJECT=Subjekt:
+DOCINFO_KEYWORDS=Nyckelord:
+DOCINFO_CREATOR=Skapare:
+DOCINFO_PRODUCER=Producent:
+DOCINFO_CREATION_DATE=Skapad:
+DOCINFO_MOD_DATE=Modifierad:
+
+#
+# "Find" dialog
+#
+FIND_FIND=Finn
+FIND_FIND_WHAT=~Finn vad:
+FIND_MATCH_CASE=~Matcha stor/liten bokstav
+FIND_OK=~OK
+FIND_CANCEL=~Avbryt
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=S”ker sidan %d av %d...
+FIND_NOT_FOUND=Hittades inte!
+
+#
+# "Progress" dialog
+#
+PDLG_PROGRESS=Progress
+PDLG_CANCEL=~Avbryt
+
+#
+# About dialog
+#
+AD_ABOUT=Om
+AD_COPYRIGHTS=(c) 2006 f”r Eugene Romanenko, netlabs.org i samarbete med Serenity Systems International
+AD_OK=OK
