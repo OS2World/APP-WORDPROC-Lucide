@@ -604,7 +604,8 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
     cxClient = SHORT1FROMMP( mp2 );
     cyClient = SHORT2FROMMP( mp2 );
 
-    double relativeScrollPos = (double)sVscrollPos / (double)sVscrollMax;
+    double relativeScrollPos = ( sVscrollMax == 0 ) ? 0 :
+                                    (double)sVscrollPos / (double)sVscrollMax;
 
     adjustSize();
 

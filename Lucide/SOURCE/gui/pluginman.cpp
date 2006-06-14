@@ -21,12 +21,12 @@
  * Alternatively, the contents of this file may be used under the terms of
  * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
  * in which case the provisions of the LGPL are applicable instead of those
- * above. If you wish to allow use of your version of this file only under the 
+ * above. If you wish to allow use of your version of this file only under the
  * terms of the LGPL, and not to allow others to use your version of this file
  * under the terms of the CDDL, indicate your decision by deleting the
  * provisions above and replace them with the notice and other provisions
  * required by the LGPL. If you do not delete the provisions above, a recipient
- * may use your version of this file under the terms of any one of the CDDL 
+ * may use your version of this file under the terms of any one of the CDDL
  * or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
@@ -47,11 +47,13 @@ PluginManager::PluginManager()
 
     // Find exe path
     char buffer[ _MAX_PATH ];
+    char path[ _MAX_PATH ];
     char drive[ _MAX_DRIVE ];
     char dir[ _MAX_DIR ];
     _splitpath( __argv[0], drive, dir, NULL, NULL );
-    _makepath( buffer, drive, dir, NULL, NULL );
-    strcat( buffer, "\\LU*.DLL" );
+    _makepath( path, drive, dir, NULL, NULL );
+    strcpy( buffer, path );
+    strcat( buffer, "LU*.DLL" );
 
     // enum plugins, except for LUDOC.DLL, which is 'null' plugin
     struct find_t ffblk;
@@ -59,7 +61,7 @@ PluginManager::PluginManager()
     while ( done == 0 )
     {
         if ( stricmp( ffblk.name, "LUDOC.DLL" ) != 0 ) {
-            loadPlugin( ffblk.name );
+            loadPlugin( path, ffblk.name );
         }
         done = _dos_findnext( &ffblk );
     }
@@ -78,12 +80,15 @@ PluginManager::~PluginManager()
     delete plugins;
 }
 
-void PluginManager::loadPlugin( const char *dllname )
+void PluginManager::loadPlugin( const char *path, const char *dllname )
 {
     // Function pointer variables
     LuDocument * APIENTRY (*pCreateObject)();
     char * APIENTRY (*pGetSupportedExtensions)();
     char * APIENTRY (*pGetDescription)();
+
+    std::string fulldllname = path;
+    fulldllname += dllname;
 
     // cut DLL name at last point
     char *lpoint = strrchr( dllname, '.' );
@@ -94,7 +99,7 @@ void PluginManager::loadPlugin( const char *dllname )
     bool res = false;
     do
     {
-        if ( DosLoadModule( NULL, 0, dllname, &h ) != 0 )
+        if ( DosLoadModule( NULL, 0, fulldllname.c_str(), &h ) != 0 )
             break;
         if ( DosQueryProcAddr( h, 0, "createObject", (PFN *)&pCreateObject ) != 0 )
             break;
@@ -123,9 +128,9 @@ void PluginManager::loadPlugin( const char *dllname )
 // if checkOnly is true - just check if suitable plugin exist
 LuDocument *PluginManager::createDocumentForExt( const char *ext, bool checkOnly )
 {
-	if ( ext == NULL ) {
-		return NULL;
-	}
+    if ( ext == NULL ) {
+        return NULL;
+    }
 
     LuDocument * APIENTRY (*pCreateObject)();
 

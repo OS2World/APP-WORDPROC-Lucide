@@ -55,7 +55,7 @@ class PluginManager
 {
     private:
         PluginInfoList *plugins;
-        void loadPlugin( const char *dllname );
+        void loadPlugin( const char *path, const char *dllname );
     public:
         PluginManager();
         ~PluginManager();

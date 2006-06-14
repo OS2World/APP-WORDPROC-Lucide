@@ -72,7 +72,7 @@ extern "C" LuDocument * _System createObject()
 
 extern "C" char * _System getSupportedExtensions()
 {
-    return "DJVU";
+    return "DJVU;DJV";
 }
 
 extern "C" char * _System getDescription()
