@@ -70,6 +70,8 @@ class DocumentViewer
         void setZoom( double _zoom );
         double getZoom() { return zoom; }
         double getRealZoom() { return realzoom; }
+        void setRotation( long _rotation );
+        long getRotation() { return rotation; }
         void selectAll();
         void copyToClipbrd();
         void searchDocument( const char *_searchString, bool _caseSensitive,
@@ -82,6 +84,7 @@ class DocumentViewer
 
         void drawPage();
         void adjustSize();
+		void countPagesizes();
 
         MRESULT vertScroll( HWND hwnd, MPARAM mp2, HRGN hrgn );
         MRESULT horizScroll( HWND hwnd, MPARAM mp2, HRGN hrgn );
@@ -142,6 +145,7 @@ class DocumentViewer
         LuPixbuf *pixbuf;
         short bpp;
         double width, height, zoom, realzoom, fullwidth, fullheight;
+        long rotation;
         long totalpages, currentpage;
         ProgressDlg *progressDlg;
         DrawAreas *drawareas;

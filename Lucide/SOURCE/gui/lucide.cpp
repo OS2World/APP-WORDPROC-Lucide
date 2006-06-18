@@ -642,6 +642,14 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     Lucide::setPageLayout( Continuous );
                     return (MRESULT)FALSE;
 
+                case CM_ROTATE90CW:
+                    docViewer->setRotation( docViewer->getRotation() + 90 );
+                    return (MRESULT)FALSE;
+
+                case CM_ROTATE90CCW:
+                    docViewer->setRotation( docViewer->getRotation() - 90 );
+                    return (MRESULT)FALSE;
+
                 case CM_NAVPANE:
                     {
                         Lucide::showIndex = !Lucide::showIndex;

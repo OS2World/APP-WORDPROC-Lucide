@@ -88,6 +88,7 @@ DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
     bpp         = 0;
     zoom        = 1.0;
     realzoom    = 1.0;
+    rotation    = 0;
     ev          = somGetGlobalEnvironment();
     pixbuf      = NULL;
     spos_x      = 0;
@@ -190,11 +191,7 @@ void DocumentViewer::setDocument( LuDocument *_doc )
         }
 
         pagesizes = new LuSize[ totalpages ];
-        for ( long i = 0; i < totalpages; i++ ) {
-            doc->getPageSize( ev, i, &pagesizes[i].x, &pagesizes[i].y );
-            fullwidth = __max( fullwidth, pagesizes[i].x );
-            fullheight += pagesizes[i].y;
-        }
+        countPagesizes();
 
         selrects = new PLuRectSequence[ totalpages ];
         memset( selrects, 0, sizeof( PLuRectSequence ) * totalpages );
@@ -217,6 +214,20 @@ void DocumentViewer::setDocument( LuDocument *_doc )
     }
 }
 
+void DocumentViewer::countPagesizes()
+{
+    for ( long i = 0; i < totalpages; i++ )
+    {
+        doc->getPageSize( ev, i, &pagesizes[i].x, &pagesizes[i].y );
+        if ( ( rotation == 90 ) || ( rotation == 270 ) ) {
+            double tmp = pagesizes[i].x;
+            pagesizes[i].x = pagesizes[i].y;
+            pagesizes[i].y = tmp;
+        }
+        fullwidth = __max( fullwidth, pagesizes[i].x );
+        fullheight += pagesizes[i].y;
+    }
+}
 
 // closes the document
 void DocumentViewer::close()
@@ -325,10 +336,41 @@ void DocumentViewer::goToPage( long page )
 //         -2 - fit page
 void DocumentViewer::setZoom( double _zoom )
 {
-    zoom = _zoom;
 
     if ( doc != NULL ) {
-        drawPage();
+        if ( doc->isScalable( ev ) ) {
+            zoom = _zoom;
+            drawPage();
+        }
+    }
+    else {
+        zoom = _zoom;
+    }
+}
+
+// Sets the rotation
+// rotation may be 0, 90, 180 or 270 degrees
+// -90 will be changed to 270, 360 to 0
+void DocumentViewer::setRotation( long _rotation )
+{
+    if ( _rotation == -90 ) {
+        _rotation = 270;
+    }
+    if ( _rotation == 360 ) {
+        _rotation = 0;
+    }
+
+    if ( doc != NULL )
+    {
+        if ( doc->isRotable( ev ) )
+        {
+            rotation = _rotation;
+            countPagesizes();
+            drawPage();
+        }
+    }
+    else {
+        rotation = _rotation;
     }
 }
 
@@ -468,7 +510,8 @@ void DocumentViewer::adjustSize()
 {
     if ( doc != NULL )
     {
-        doc->getPageSize( ev, currentpage, &width, &height );
+        width  = pagesizes[ currentpage ].x;
+        height = pagesizes[ currentpage ].y;
 
         fullwidth = 0;
         fullheight = 0;
@@ -737,8 +780,9 @@ void DocumentViewer::drawthread( void *p )
                 LONG rcly = pda->drawrect.yTop - pda->drawrect.yBottom;
                 _this->pixbuf = new LuPixbuf( _this->ev, rclx, rcly, _this->bpp );
                 _this->doc->renderPageToPixbufAsynch( _this->ev, pda->pagenum,
-                       pda->startpos.x, pda->startpos.y, rclx, rcly, _this->realzoom, 0,
-                       _this->pixbuf, asynchCallbackFnDraw, asynchCallbackFnAbort, p );
+                       pda->startpos.x, pda->startpos.y, rclx, rcly, _this->realzoom,
+                       _this->rotation, _this->pixbuf,
+                       asynchCallbackFnDraw, asynchCallbackFnAbort, p );
                 delete _this->pixbuf;
                 _this->pixbuf = NULL;
 
@@ -932,7 +976,7 @@ void DocumentViewer::wmPaint( HWND hwnd )
                                    0, 0, rclx, rcly };
 
             doc->renderPageToPixbuf( ev, currentpage, spos_x, spos_y,
-                                     rclx, rcly, realzoom, 0, pixbuf );
+                                     rclx, rcly, realzoom, rotation, pixbuf );
             LONG lRop = ROP_SRCCOPY;
             BITMAPINFO2 pbmi;
             pbmi.cbFix = 16L;
@@ -1082,7 +1126,7 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
                                    0, 0, rclx, rcly };
 
             doc->renderPageToPixbuf( ev, pda->pagenum, spos_x, spos_y,
-                                     rclx, rcly, realzoom, 0, pixbuf );
+                                     rclx, rcly, realzoom, rotation, pixbuf );
             LONG lRop = ROP_SRCCOPY;
             BITMAPINFO2 pbmi;
             pbmi.cbFix = 16L;
@@ -1119,6 +1163,21 @@ void DocumentViewer::winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRec
     r->y1 = ( ( cyClient - startpoint->y ) + sVscrollPos ) / realzoom;
     r->x2 = ( endpoint->x + sHscrollPos ) / realzoom;
     r->y2 = ( ( cyClient - endpoint->y ) + sVscrollPos ) / realzoom;
+
+    /*double tmp_x1 = r->x1;
+    double tmp_y1 = r->y1;
+    double tmp_x2 = r->x2;
+    double tmp_y2 = r->y2;
+
+    somPrintf( "1: x1: %f, y1: %f, x2: %f, y2: %f, height: %f\n", r->x1, r->y1, r->x2, r->y2, height );
+    if ( rotation == 90 ) {
+        r->x1 = height - tmp_y1;
+        r->y1 = tmp_x1;
+        r->x2 = height - tmp_y2;
+        r->y2 = tmp_x2;
+    }
+    somPrintf( "2: x1: %f, y1: %f, x2: %f, y2: %f, height: %f\n", r->x1, r->y1, r->x2, r->y2, height );
+    */
 }
 
 // converts window position to document position
@@ -1137,10 +1196,37 @@ void DocumentViewer::docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl, b
     double scale = useZoom ? realzoom : 1.0;
     double yplus = continuous ? pagenumToPos( pagenum ) : 0;
 
-    rcl->xLeft   = ( r->x1 * scale ) - sHscrollPos;
-    rcl->yBottom = cyClient - ( yplus + ( r->y2 * scale ) ) + ( sVscrollPos * VScrollStep );
-    rcl->xRight  = ( r->x2 * scale ) - sHscrollPos;
-    rcl->yTop    = cyClient - ( yplus + ( r->y1 * scale ) ) + ( sVscrollPos * VScrollStep );
+    double tmp_x1 = r->x1;
+    double tmp_y1 = r->y1;
+    double tmp_x2 = r->x2;
+    double tmp_y2 = r->y2;
+
+    if ( rotation == 90 )
+    {
+        tmp_x1 = ( width / scale ) - r->y2;
+        tmp_y1 = r->x1;
+        tmp_x2 = ( width / scale ) - r->y1;
+        tmp_y2 = r->x2;
+    }
+    else if ( rotation == 180 )
+    {
+        tmp_x1 = ( width / scale ) - r->x2;
+        tmp_y1 = ( height / scale ) - r->y2;
+        tmp_x2 = ( width / scale ) - r->x1;
+        tmp_y2 = ( height / scale ) - r->y1;
+    }
+    else if ( rotation == 270 )
+    {
+        tmp_x1 = r->y1;
+        tmp_y1 = ( height / scale ) - r->x2;
+        tmp_x2 = r->y2;
+        tmp_y2 = ( height / scale ) - r->x1;
+    }
+
+    rcl->xLeft   = ( tmp_x1 * scale ) - sHscrollPos;
+    rcl->yBottom = cyClient - ( yplus + ( tmp_y2 * scale ) ) + ( sVscrollPos * VScrollStep );
+    rcl->xRight  = ( tmp_x2 * scale ) - sHscrollPos;
+    rcl->yTop    = cyClient - ( yplus + ( tmp_y1 * scale ) ) + ( sVscrollPos * VScrollStep );
 }
 
 // creates region from sequence of rectangles
