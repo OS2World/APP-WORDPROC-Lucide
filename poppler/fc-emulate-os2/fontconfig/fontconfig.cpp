@@ -151,6 +151,10 @@ static void loadDir( string path )
 
 #define FLIST_SIZE  (1024*64)
 
+//
+// TODO: save fonts information in cache file to avoid rescan
+//       if no fonts added
+//
 FcBool FcInit()
 {
     if ( fontmap != NULL ) {
@@ -208,6 +212,11 @@ FcBool FcInit()
 }
 
 
+//
+// Assume fonts "Times New Roman", "Helvetica" and "Courier" always
+// present on any system (see GPI Guide and Reference, section 
+// "Fonts" -> "About Fonts" -> "PM-Supplied Fonts").
+// 
 #define DEFAULT_SERIF_FONT          "times new roman"
 #define DEFAULT_SANSSERIF_FONT      "helvetica"
 #define DEFAULT_MONOSPACED_FONT     "courier"
