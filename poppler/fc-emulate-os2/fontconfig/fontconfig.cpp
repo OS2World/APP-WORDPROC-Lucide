@@ -1,0 +1,332 @@
+/*
+ * Copyright (c) 2006, Eugene Romanenko, netlabs.org
+ *
+ *----------------------------------------------------------------------
+ * This file is part of poppler plugin for Lucide (lupoppler).
+ *
+ *  lupoppler is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  lupoppler is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with gtk-gnutella; if not, write to the Free Software
+ *  Foundation, Inc.:
+ *      59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *----------------------------------------------------------------------
+ */
+
+// This file is fontconfig replacement which emulates functions
+// used by poppler.
+ 
+#define INCL_DOS
+#define INCL_WIN
+#include <os2.h>
+
+#include <map>
+#include <string>
+using namespace std;
+
+#include <stdio.h>
+#include <dos.h>
+#include <string.h>
+
+#include "fontconfig.h"
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+
+static map<string,string> *fontmap = NULL;
+
+
+struct _FcPattern
+{
+    char *family;
+    int slant;
+    int weight;
+    int width;
+    int spacing;
+    char *lang;
+
+    char *filename;
+};
+
+static char *newstrdup( const char *s )
+{
+    if ( s == NULL ) {
+        return NULL;
+    }
+    char *temp = new char[ strlen( s ) + 1 ];
+    strcpy( temp, s );
+    return temp;
+}
+
+
+FcConfig *FcConfigGetCurrent()
+{
+    return NULL;
+}
+
+FcBool FcConfigSubstitute( FcConfig *config, FcPattern *p, FcMatchKind kind )
+{
+    return FcTrue;
+}
+
+
+void FcDefaultSubstitute( FcPattern *pattern )
+{
+}
+
+void FcFontSetDestroy( FcFontSet *s )
+{
+    for ( int i = 0; i < s->nfont; i++ ) {
+        FcPatternDestroy( s->fonts[i] );
+    }
+    delete s->fonts;
+    delete s;
+}
+
+
+FT_Library ftlib;
+
+
+static void ftLoad( char *fn )
+{
+    int l = strlen( fn );
+    if ( l < 5 ) {
+        return;
+    }
+
+    if ( stricmp( fn + ( l - 4 ), ".OFM" ) == 0 ) {
+        fn[ l - 3 ] = 'P';
+        fn[ l - 1 ] = 'B';
+    }
+
+    FT_Face ftface;
+    if ( FT_New_Face( ftlib, fn, 0, &ftface ) ) {
+        return;
+    }
+
+    string key = ftface->family_name;
+    if ( stricmp( ftface->style_name, "regular" ) != 0 ) {
+        key += ' ';
+        key += ftface->style_name;
+    }
+
+    char *tmpkey = newstrdup( key.c_str() );
+    strlwr( tmpkey );
+    key = tmpkey;
+    delete tmpkey;
+
+    (*fontmap)[ key ] = fn;
+    //printf( "%s: %s\n", fn, key.c_str() );
+
+    FT_Done_Face( ftface );
+}
+
+
+static void loadDir( string path )
+{
+    string pathnam = path + "\\*";
+
+    struct find_t ffblk;
+    unsigned done = _dos_findfirst( pathnam.c_str(), _A_RDONLY | _A_NORMAL, &ffblk );
+    while ( done == 0 )
+    {
+        string fname = path + '\\' + ffblk.name;
+        char *fn = newstrdup( fname.c_str() );
+        ftLoad( fn );
+        delete fn;
+        done = _dos_findnext( &ffblk );
+    }
+    _dos_findclose( &ffblk );
+}
+
+
+#define FLIST_SIZE  (1024*64)
+
+FcBool FcInit()
+{
+    if ( fontmap != NULL ) {
+        return FcTrue;
+    }
+
+    if ( FT_Init_FreeType( &ftlib ) ) {
+        return FcFalse;
+    }
+
+    fontmap = new map<string,string>;
+
+    // enum installed fonts
+    ULONG uldrv = 0;
+    DosQuerySysInfo( QSV_BOOT_DRIVE, QSV_BOOT_DRIVE, &uldrv, sizeof( ULONG ) );
+    char drv = (char)( uldrv + '@' );
+
+    const char *pmfonts = "PM_Fonts";
+    char *fnames = new char[ FLIST_SIZE ];
+    memset( fnames, 0, FLIST_SIZE );
+    PrfQueryProfileString( HINI_USER, pmfonts, NULL, NULL, fnames, FLIST_SIZE );
+
+    char *fn1 = new char[ CCHMAXPATH ];
+    char *fn2 = new char[ CCHMAXPATH ];
+    int noffset = 0;
+    while ( fnames[ noffset ] != 0 )
+    {
+
+        const char *fname = fnames + noffset;
+
+        PrfQueryProfileString( HINI_USER, pmfonts, fname, "", fn1, CCHMAXPATH );
+
+        if ( fn1[ 0 ] == '\\' ) {
+            fn2[ 0 ] = drv;
+            fn2[ 1 ] = ':';
+            fn2[ 2 ] = 0;
+            strcat( fn2, fn1 );
+        }
+        else {
+            strcpy( fn2, fn1 );
+        }
+
+        ftLoad( fn2 );
+
+        noffset += ( strlen( fname ) + 1 );
+    }
+    delete fn1;
+    delete fn2;
+    delete fnames;
+
+    // TODO: load some fonts dir?
+    //loadDir( "C:\\Programs\\AcrobatReader\\Adobe\\Acrobat 4.0\\Resource\\Font" );
+
+    return FcTrue;
+}
+
+
+#define DEFAULT_SERIF_FONT          "times new roman"
+#define DEFAULT_SANSSERIF_FONT      "helvetica"
+#define DEFAULT_MONOSPACED_FONT     "courier"
+
+static string buildFontKey( FcPattern *p, bool useDefaultFonts )
+{
+    string key = p->family;
+
+    if ( useDefaultFonts )
+    {
+        if ( p->spacing == FC_MONO ) {
+            key = DEFAULT_MONOSPACED_FONT;
+        }
+        else
+        {
+            if ( ( strstr( p->family, "swiss" ) != NULL ) ||
+                 ( strstr( p->family, "sans" ) != NULL ) )
+            {
+                key = DEFAULT_SANSSERIF_FONT;
+            }
+            else {
+                key = DEFAULT_SERIF_FONT;
+            }
+        }
+    }
+
+    if ( p->weight > FC_WEIGHT_NORMAL ) {
+        key += ' ';
+        key += "bold";
+    }
+
+    if ( p->slant != FC_SLANT_ROMAN ) {
+        key += ' ';
+        key += "italic";
+    }
+
+    return key;
+}
+
+FcFontSet *FcFontSort( FcConfig *config, FcPattern *p, FcBool trim,
+                       FcCharSet **csp, FcResult *result )
+{
+    FcPattern *pat = new FcPattern;
+    pat->family   = newstrdup( p->family );
+    pat->slant    = p->slant;
+    pat->weight   = p->weight;
+    pat->width    = p->width;
+    pat->spacing  = p->spacing;
+    pat->lang     = newstrdup( p->lang );
+    pat->filename = NULL;
+
+    string key = buildFontKey( pat, false );
+
+    if ( fontmap->find( key ) == fontmap->end() ) {
+        key = buildFontKey( pat, true );
+        pat->filename = newstrdup( (*fontmap)[ key ].c_str() );
+    }
+    else {
+        pat->filename = newstrdup( (*fontmap)[ key ].c_str() );
+    }
+
+    printf( "MATCHED STYLE: %s, FILENAME: %s\n", key.c_str(), pat->filename );
+
+    FcFontSet *fs = new FcFontSet;
+    fs->nfont = 1;
+    fs->sfont = 1;
+    fs->fonts = new FcPattern *[ 1 ];
+    fs->fonts[ 0 ] = pat;
+
+    return fs;
+}
+
+void FcFontSetSortDestroy( FcFontSet *fs )
+{
+}
+
+void FcPatternDestroy( FcPattern *p )
+{
+    delete p->family;
+    delete p->lang;
+    delete p->filename;
+}
+
+FcResult FcPatternGetInteger( const FcPattern *p, const char *object, int n, int *i )
+{
+    return FcResultMatch;
+}
+
+FcResult FcPatternGetString( const FcPattern *p, const char *object, int n, FcChar8 **s )
+{
+    if ( strcmp( object, FC_FILE ) == 0 )
+    {
+        *s = p->filename;
+        return FcResultMatch;
+    }
+    return FcResultNoMatch;
+}
+
+FcPattern *FcPatternBuild( void *,
+                    const char *fcFamily, FcType tFamily, const char *family,
+                    const char *fcSlant, FcType tSlant, int slant,
+                    const char *fcWeight, FcType tWeight, int weight,
+                    const char *fcWidth, FcType tWidth, int width,
+                    const char *fcSpacing, FcType tSpacing, int spacing,
+                    const char *fcLang, FcType tLang, const char *lang, void * )
+{
+    printf( "FAMILY: %s, SLANT: %d, WEIGHT: %d, WIDTH: %d, SPACING: %d, LANG: %s\n",
+            family, slant, weight, width, spacing, lang );
+
+    FcPattern *p = new FcPattern;
+    p->family   = newstrdup( family );
+    strlwr( p->family );
+    p->slant    = slant;
+    p->weight   = weight;
+    p->width    = width;
+    p->spacing  = spacing;
+    p->lang     = newstrdup( lang );
+    p->filename = NULL;
+
+    return p;
+}
+

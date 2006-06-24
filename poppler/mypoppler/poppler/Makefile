@@ -2,7 +2,8 @@
 
 CC=wcl386
 
-CFLAGS=-zq -zp=4 -bm -sg -ox -xs -xr -I.. -I..\goo -I..\..\..\libjpeg -I..\..\fontconfig-2.3.2-os2 -DOS2 -DUSE_ANNOTS_VIEW
+#CFLAGS=-zq -zp=4 -bm -sg -ox -xs -xr -I.. -I..\goo -I..\..\..\libjpeg -I..\..\fontconfig-2.3.2-os2 -DOS2 -DUSE_ANNOTS_VIEW
+CFLAGS=-zq -zp=4 -bm -sg -ox -xs -xr -I.. -I..\goo -I..\..\..\libjpeg -I..\..\fc-emulate-os2 -DOS2 -DUSE_ANNOTS_VIEW
 
 LIBS=libpoppler.lib
 
