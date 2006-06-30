@@ -584,7 +584,6 @@ static somMethodProc* LuPopplerDocument_parent_LuDocument_renderPageToPixbufAsyn
  */
 SOM_Scope LuDocument_LuRectSequence*  SOMLINK getSelectionRectangles(LuPopplerDocument *somSelf, Environment *ev,
 		long pagenum,
-		double scale,
 		LuRectangle* selection);
 static char *somMN_LuPopplerDocumentgetSelectionRectangles = "LuDocument::getSelectionRectangles";
 static somId somId_LuPopplerDocumentgetSelectionRectangles = &somMN_LuPopplerDocumentgetSelectionRectangles;
@@ -595,15 +594,14 @@ static somId somId_LuPopplerDocumentgetSelectionRectangles = &somMN_LuPopplerDoc
 #endif
 typedef LuDocument_LuRectSequence*   SOMLINK somTP_xih_LuPopplerDocument_getSelectionRectangles(LuPopplerDocument *somSelf, Environment *ev, 
 		long pagenum, 
-		double scale, 
 		LuRectangle* selection);
 typedef somTP_xih_LuPopplerDocument_getSelectionRectangles *somTD_xih_LuPopplerDocument_getSelectionRectangles;
 /* define the parent method call macro */
 static somMethodProc* LuPopplerDocument_parent_LuDocument_getSelectionRectangles_resolved;
-#define LuPopplerDocument_parent_LuDocument_getSelectionRectangles(somSelf,ev,pagenum,scale,selection) \
+#define LuPopplerDocument_parent_LuDocument_getSelectionRectangles(somSelf,ev,pagenum,selection) \
   ((( somTD_xih_LuPopplerDocument_getSelectionRectangles ) \
       LuPopplerDocument_parent_LuDocument_getSelectionRectangles_resolved) \
-	(somSelf,ev,pagenum,scale,selection))
+	(somSelf,ev,pagenum,selection))
 /* define a variety of (possibly ambiguous) short forms */
 #ifndef SOMGD_pmc_parent_getSelectionRectangles
   #ifdef parent_getSelectionRectangles
@@ -621,8 +619,8 @@ static somMethodProc* LuPopplerDocument_parent_LuDocument_getSelectionRectangles
     #define parent_LuDocument_getSelectionRectangles LuPopplerDocument_parent_LuDocument_getSelectionRectangles
   #endif
 #endif
-#define LuPopplerDocument_parents_getSelectionRectangles(somSelf,ev,pagenum,scale,selection) (\
-   LuPopplerDocument_parent_LuDocument_getSelectionRectangles(somSelf,ev,pagenum,scale,selection))
+#define LuPopplerDocument_parents_getSelectionRectangles(somSelf,ev,pagenum,selection) (\
+   LuPopplerDocument_parent_LuDocument_getSelectionRectangles(somSelf,ev,pagenum,selection))
 
 /*
  * Overridden method: isHaveText

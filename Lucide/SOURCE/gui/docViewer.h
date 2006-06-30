@@ -102,8 +102,9 @@ class DocumentViewer
         BOOL wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 );
         void winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRectangle *r );
         void winPosToDocPos( PageDrawArea *pda, LuRectangle *r );
-        void docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl, bool useZoom = true );
-        HRGN rectsToRegion( long pagenum, HPS hps, LuDocument_LuRectSequence *rects, bool useZoom );
+        void docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl );
+        void rotateRectangle( long pagenum, LuRectangle *r );
+        HRGN rectsToRegion( long pagenum, HPS hps, LuDocument_LuRectSequence *rects );
         void drawSelection( long pagenum, HPS hps, PRECTL r );
         void scrollToPos( HWND hwnd, HRGN hrgn, LONG xpos, LONG ypos, bool withSelection );
         void freeRects( LuDocument_LuRectSequence **rects );

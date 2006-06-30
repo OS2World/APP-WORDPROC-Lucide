@@ -166,7 +166,6 @@ SOM_Scope boolean  SOMLINK isHaveText(LuDocument *somSelf,
 SOM_Scope LuDocument_LuRectSequence*  SOMLINK getSelectionRectangles(LuDocument *somSelf,
                                                                     Environment *ev,
                                                                    long pagenum,
-                                                                   double scale,
                                                                    LuRectangle* selection)
 {
     // Abstract method does nothing

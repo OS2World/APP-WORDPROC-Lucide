@@ -356,7 +356,6 @@ static somApRdInfo isHaveTextStubs = {0, 0, &isHaveTextMethodInfo};
  */
 SOM_Scope LuDocument_LuRectSequence*  SOMLINK getSelectionRectangles(LuDocument *somSelf, Environment *ev, 
 		long pagenum, 
-		double scale, 
 		LuRectangle* selection);
 #ifndef somMN_getSelectionRectangles_defined
 #define somMN_getSelectionRectangles_defined
@@ -368,13 +367,7 @@ static somId somId_getSelectionRectangles = &somMN_getSelectionRectangles;
 static char *somDS_getSelectionRectangles = "::LuDocument::getSelectionRectangles";
 static somId somDI_getSelectionRectangles = &somDS_getSelectionRectangles;
 #endif  /* somDS_getSelectionRectangles_defined */
-
-static somFloatMap getSelectionRectanglesFloatMap = {
-14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
-
-static somMethodInfo getSelectionRectanglesMethodInfo = {1, 24, &getSelectionRectanglesFloatMap};
-
-static somApRdInfo getSelectionRectanglesStubs = {0, 0, &getSelectionRectanglesMethodInfo};
+#define getSelectionRectangles_somApRdDefault
 
 /*
  * New Direct call procedure: freeRectangles

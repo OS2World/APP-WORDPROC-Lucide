@@ -149,7 +149,6 @@ interface LuDocument : SOMObject
     /**
      * getSelectionRectangles
      * pagenum: page number
-     * scale: scale specified as pixels per point
      * selection: start and end point of selection as a rectangle
      *
      * Returns a sequence of rectangles containing the area that would
@@ -163,7 +162,7 @@ interface LuDocument : SOMObject
      * Note: SOMMalloc() must be used for all memory allocations.
      **/
     LuRectSequence *getSelectionRectangles( in long pagenum,
-                               in double scale, in LuRectangle selection );
+                                            in LuRectangle selection );
 
 
     /**

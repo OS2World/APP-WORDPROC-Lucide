@@ -113,7 +113,6 @@ typedef boolean   SOMLINK somTP_LuPopplerDocument_isHaveText(LuPopplerDocument *
 typedef somTP_LuPopplerDocument_isHaveText *somTD_LuPopplerDocument_isHaveText;
 typedef LuDocument_LuRectSequence*   SOMLINK somTP_LuPopplerDocument_getSelectionRectangles(LuPopplerDocument *somSelf, Environment *ev, 
 		long pagenum, 
-		double scale, 
 		LuRectangle* selection);
 typedef somTP_LuPopplerDocument_getSelectionRectangles *somTD_LuPopplerDocument_getSelectionRectangles;
 typedef void   SOMLINK somTP_LuPopplerDocument_freeRectangles(Environment *ev, 
@@ -471,11 +470,10 @@ boolean   isHaveText(Environment *ev)
 /* method: getSelectionRectangles */
 LuDocument_LuRectSequence*   getSelectionRectangles(Environment *ev, 
 		long pagenum, 
-		double scale, 
 		LuRectangle* selection)
 {
    return SOM_ResolveD(this,LuPopplerDocument,LuDocument,getSelectionRectangles)
-	(this, ev,pagenum,scale,selection);
+	(this, ev,pagenum,selection);
 }
 
 

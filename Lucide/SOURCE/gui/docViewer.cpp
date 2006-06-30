@@ -405,7 +405,7 @@ void DocumentViewer::selectAll()
             selection[ i ].x2 = pagesizes[ i ].x;
             selection[ i ].y2 = pagesizes[ i ].y;
             LuDocument::freeRectangles( ev, selrects[ i ] );
-            selrects[ i ] = doc->getSelectionRectangles( ev, i, realzoom, &(selection[i]) );
+            selrects[ i ] = doc->getSelectionRectangles( ev, i, &(selection[i]) );
         }
     }
     else
@@ -415,7 +415,7 @@ void DocumentViewer::selectAll()
         selection[ currentpage ].x2 = pagesizes[ currentpage ].x;
         selection[ currentpage ].y2 = pagesizes[ currentpage ].y;
         LuDocument::freeRectangles( ev, selrects[ currentpage ] );
-        selrects[ currentpage ] = doc->getSelectionRectangles( ev, currentpage, realzoom, &(selection[currentpage]) );
+        selrects[ currentpage ] = doc->getSelectionRectangles( ev, currentpage, &(selection[currentpage]) );
     }
 
     Lucide::enableCopy( true );
@@ -1155,6 +1155,51 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
 }
 
 
+// Rotates document rectangle
+void DocumentViewer::rotateRectangle( long pagenum, LuRectangle *r )
+{
+    double tmp_x1 = r->x1;
+    double tmp_y1 = r->y1;
+    double tmp_x2 = r->x2;
+    double tmp_y2 = r->y2;
+
+    double w = pagesizes[ pagenum ].x;
+    double h = pagesizes[ pagenum ].y;
+
+    if ( rotation == 90 ) {
+        r->x1 = tmp_y1;
+        r->y1 = w - tmp_x1;
+        r->x2 = tmp_y2;
+        r->y2 = w - tmp_x2;
+    }
+    else if ( rotation == 180 )
+    {
+        r->x1 = w - tmp_x2;
+        r->y1 = h - tmp_y2;
+        r->x2 = w - tmp_x1;
+        r->y2 = h - tmp_y1;
+    }
+    else if ( rotation == 270 )
+    {
+        r->x1 = h - tmp_y1;
+        r->y1 = tmp_x1;
+        r->x2 = h - tmp_y2;
+        r->y2 = tmp_x2;
+    }
+
+    if ( r->x1 > r->x2 ) {
+        double tmp = r->x1;
+        r->x1 = r->x2;
+        r->x2 = tmp;
+    }
+
+    if ( r->y1 > r->y2 ) {
+        double tmp = r->y1;
+        r->y1 = r->y2;
+        r->y2 = tmp;
+    }
+}
+
 // converts window position to document position
 // single page mode only
 void DocumentViewer::winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRectangle *r )
@@ -1164,20 +1209,7 @@ void DocumentViewer::winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRec
     r->x2 = ( endpoint->x + sHscrollPos ) / realzoom;
     r->y2 = ( ( cyClient - endpoint->y ) + sVscrollPos ) / realzoom;
 
-    /*double tmp_x1 = r->x1;
-    double tmp_y1 = r->y1;
-    double tmp_x2 = r->x2;
-    double tmp_y2 = r->y2;
-
-    somPrintf( "1: x1: %f, y1: %f, x2: %f, y2: %f, height: %f\n", r->x1, r->y1, r->x2, r->y2, height );
-    if ( rotation == 90 ) {
-        r->x1 = height - tmp_y1;
-        r->y1 = tmp_x1;
-        r->x2 = height - tmp_y2;
-        r->y2 = tmp_x2;
-    }
-    somPrintf( "2: x1: %f, y1: %f, x2: %f, y2: %f, height: %f\n", r->x1, r->y1, r->x2, r->y2, height );
-    */
+    rotateRectangle( currentpage, r );
 }
 
 // converts window position to document position
@@ -1188,13 +1220,16 @@ void DocumentViewer::winPosToDocPos( PageDrawArea *pda, LuRectangle *r )
     r->y1 = pda->startpos.y / realzoom;
     r->x2 = ( ( pda->drawrect.xRight - pda->drawrect.xLeft ) / realzoom ) + r->x1;
     r->y2 = ( ( pda->drawrect.yTop - pda->drawrect.yBottom ) / realzoom ) + r->y1;
+
+    rotateRectangle( pda->pagenum, r );
 }
 
 // converts document position to window position
-void DocumentViewer::docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl, bool useZoom )
+void DocumentViewer::docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl )
 {
-    double scale = useZoom ? realzoom : 1.0;
     double yplus = continuous ? pagenumToPos( pagenum ) : 0;
+    double w = pagesizes[ pagenum ].x;
+    double h = pagesizes[ pagenum ].y;
 
     double tmp_x1 = r->x1;
     double tmp_y1 = r->y1;
@@ -1203,35 +1238,34 @@ void DocumentViewer::docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl, b
 
     if ( rotation == 90 )
     {
-        tmp_x1 = ( width / scale ) - r->y2;
+        tmp_x1 = w - r->y2;
         tmp_y1 = r->x1;
-        tmp_x2 = ( width / scale ) - r->y1;
+        tmp_x2 = w - r->y1;
         tmp_y2 = r->x2;
     }
     else if ( rotation == 180 )
     {
-        tmp_x1 = ( width / scale ) - r->x2;
-        tmp_y1 = ( height / scale ) - r->y2;
-        tmp_x2 = ( width / scale ) - r->x1;
-        tmp_y2 = ( height / scale ) - r->y1;
+        tmp_x1 = w - r->x2;
+        tmp_y1 = h - r->y2;
+        tmp_x2 = w - r->x1;
+        tmp_y2 = h - r->y1;
     }
     else if ( rotation == 270 )
     {
         tmp_x1 = r->y1;
-        tmp_y1 = ( height / scale ) - r->x2;
+        tmp_y1 = h - r->x2;
         tmp_x2 = r->y2;
-        tmp_y2 = ( height / scale ) - r->x1;
+        tmp_y2 = h - r->x1;
     }
 
-    rcl->xLeft   = ( tmp_x1 * scale ) - sHscrollPos;
-    rcl->yBottom = cyClient - ( yplus + ( tmp_y2 * scale ) ) + ( sVscrollPos * VScrollStep );
-    rcl->xRight  = ( tmp_x2 * scale ) - sHscrollPos;
-    rcl->yTop    = cyClient - ( yplus + ( tmp_y1 * scale ) ) + ( sVscrollPos * VScrollStep );
+    rcl->xLeft   = ( tmp_x1 * realzoom ) - sHscrollPos;
+    rcl->yBottom = cyClient - ( yplus + ( tmp_y2 * realzoom ) ) + ( sVscrollPos * VScrollStep );
+    rcl->xRight  = ( tmp_x2 * realzoom ) - sHscrollPos;
+    rcl->yTop    = cyClient - ( yplus + ( tmp_y1 * realzoom ) ) + ( sVscrollPos * VScrollStep );
 }
 
 // creates region from sequence of rectangles
-HRGN DocumentViewer::rectsToRegion( long pagenum, HPS hps,
-                                    LuDocument_LuRectSequence *rects, bool useZoom )
+HRGN DocumentViewer::rectsToRegion( long pagenum, HPS hps, LuDocument_LuRectSequence *rects )
 {
     HRGN hrgn = GpiCreateRegion( hps, 0, NULL );
     if ( rects != NULL )
@@ -1239,7 +1273,7 @@ HRGN DocumentViewer::rectsToRegion( long pagenum, HPS hps,
         RECTL r = {0};
         for ( int i = 0; i < rects->_length; i++ )
         {
-            docPosToWinPos( pagenum, &(rects->_buffer[i]), &r, useZoom );
+            docPosToWinPos( pagenum, &(rects->_buffer[i]), &r );
             HRGN tmprgn = GpiCreateRegion( hps, 1, &r );
             GpiCombineRegion( hps, hrgn, hrgn, tmprgn, CRGN_OR );
             GpiDestroyRegion( hps, tmprgn );
@@ -1254,7 +1288,7 @@ void DocumentViewer::drawSelection( long pagenum, HPS hps, PRECTL r )
 {
     GpiSetMix( hps, FM_XOR );
     GpiSetColor( hps, CLR_YELLOW );
-    HRGN selectRegion = rectsToRegion( pagenum, hps, selrects[ pagenum ], false );
+    HRGN selectRegion = rectsToRegion( pagenum, hps, selrects[ pagenum ] );
     if ( r != NULL )
     {
         HRGN tmprgn = GpiCreateRegion( hps, 1, r );
@@ -1269,7 +1303,7 @@ void DocumentViewer::drawFound( long pagenum, HPS hps, PRECTL r )
 {
     GpiSetMix( hps, FM_XOR );
     GpiSetColor( hps, CLR_CYAN );
-    HRGN selectRegion = rectsToRegion( pagenum, hps, foundrects[ pagenum ], true );
+    HRGN selectRegion = rectsToRegion( pagenum, hps, foundrects[ pagenum ] );
     if ( r != NULL )
     {
         HRGN tmprgn = GpiCreateRegion( hps, 1, r );
@@ -1348,10 +1382,10 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
 
                 winPosToDocPos( pda, &(selection[pda->pagenum]) );
 
-                HRGN clearRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ], false );
+                HRGN clearRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ] );
                 LuDocument::freeRectangles( ev, selrects[ pda->pagenum ] );
-                selrects[ pda->pagenum ] = doc->getSelectionRectangles( ev, pda->pagenum, realzoom, &(selection[pda->pagenum]) );
-                HRGN selectRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ], false );
+                selrects[ pda->pagenum ] = doc->getSelectionRectangles( ev, pda->pagenum, &(selection[pda->pagenum]) );
+                HRGN selectRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ] );
                 GpiCombineRegion( hps, selectRegion, selectRegion, clearRegion, CRGN_XOR );
                 GpiPaintRegion( hps, selectRegion );
                 GpiDestroyRegion( hps, clearRegion );
@@ -1380,7 +1414,7 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
             GpiSetColor( hps, CLR_YELLOW );
             //GpiSetColor( hps, 100 );
 
-            HRGN clearRegion = rectsToRegion( currentpage, hps, selrects[ currentpage ], false );
+            HRGN clearRegion = rectsToRegion( currentpage, hps, selrects[ currentpage ] );
             LuDocument::freeRectangles( ev, selrects[ currentpage ] );
             if ( ( selectionStart.x == selectionEnd.x ) &&
                  ( selectionStart.y == selectionEnd.y ) ) {
@@ -1388,9 +1422,9 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
                 memset( &(selection[ currentpage ]), 0, sizeof( LuRectangle ) );
             }
             else {
-                selrects[ currentpage ] = doc->getSelectionRectangles( ev, currentpage, realzoom, &(selection[currentpage]) );
+                selrects[ currentpage ] = doc->getSelectionRectangles( ev, currentpage, &(selection[currentpage]) );
             }
-            HRGN selectRegion = rectsToRegion( currentpage, hps, selrects[ currentpage ], false );
+            HRGN selectRegion = rectsToRegion( currentpage, hps, selrects[ currentpage ] );
             GpiCombineRegion( hps, selectRegion, selectRegion, clearRegion, CRGN_XOR );
             //GpiCombineRegion( hps, selectRegion, selectRegion, scrolledRegion, CRGN_DIFF );
             GpiPaintRegion( hps, selectRegion );
@@ -1536,7 +1570,7 @@ void DocumentViewer::wmButton1Down( HWND hwnd, SHORT xpos, SHORT ypos )
         {
             PageDrawArea *pda = &(*areas)[ i ];
 
-            HRGN clearRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ], false );
+            HRGN clearRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ] );
             GpiPaintRegion( hps, clearRegion );
             GpiDestroyRegion( hps, clearRegion );
         }

@@ -424,7 +424,6 @@ static TextOutputDev *get_text_output_dev( PopplerPage *page,
 SOM_Scope LuDocument_LuRectSequence*  SOMLINK getSelectionRectangles(LuPopplerDocument *somSelf,
                                                                     Environment *ev,
                                                                    long pagenum,
-                                                                   double scale,
                                                                    LuRectangle* selection)
 {
     LuDocument_LuRectSequence *rectangles = NULL;
@@ -441,7 +440,7 @@ SOM_Scope LuDocument_LuRectSequence*  SOMLINK getSelectionRectangles(LuPopplerDo
     poppler_selection.x2 = selection->x2;
     poppler_selection.y2 = selection->y2;
 
-    GooList *list = text_dev->getSelectionRegion( &poppler_selection, scale );
+    GooList *list = text_dev->getSelectionRegion( &poppler_selection, 1.0 );
     int len = list->getLength();
 
     if ( len > 0 )

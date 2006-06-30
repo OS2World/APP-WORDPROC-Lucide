@@ -420,13 +420,15 @@ void Lucide::loadDocument( const char *fn )
 
 void Lucide::openDocument()
 {
+	char dirbuf[ CCHMAXPATH ];
     PFILEDLG fd = new FILEDLG;
     memset( fd, 0, sizeof( FILEDLG ) );
     fd->cbSize = sizeof( FILEDLG );
     fd->fl = FDS_CENTER | FDS_OPEN_DIALOG;
     PrfQueryProfileString( HINI_USERPROFILE, appName, lvd, "",
-                           fd->szFullFile, sizeof( fd->szFullFile ) );
-    strcat( fd->szFullFile, pluginMan->getExtsMask().c_str() );
+                           dirbuf, sizeof( dirbuf ) );
+    snprintf( fd->szFullFile, sizeof( fd->szFullFile ),
+              "%s%s", dirbuf, pluginMan->getExtsMask().c_str() );
     WinFileDlg( HWND_DESKTOP, hWndFrame, fd );
     if ( fd->lReturn == DID_OK )
     {
