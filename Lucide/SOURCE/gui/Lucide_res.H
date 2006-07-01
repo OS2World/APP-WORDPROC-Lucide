@@ -35,9 +35,10 @@
 #ifndef __LUCIDE_RES_H
 #define __LUCIDE_RES_H
 
-#define IDI_MAIN_ICON 1
+#define IDI_MAIN_ICON	1
+#define IDB_LOGO		2
 
-#define IDP_HAND  10
+#define IDP_HAND		10
 
 #define IDB_OPEN		20
 #define IDB_PRINT		21
@@ -116,6 +117,7 @@
 #define IDT_LUCIDEVERSION	10
 #define IDC_COPYRIGHTS		11
 #define IDC_NETLABSURL		12
+#define IDC_LOGO			13
 
 #define IDD_SETTINGS		1006
 #define IDC_DEFPGLAYOUT		10

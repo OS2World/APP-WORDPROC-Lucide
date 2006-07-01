@@ -707,10 +707,10 @@ int main( int argc, char **argv )
     InitPMToolbarClass( hab );
 
     ULONG ulFrameFlags = FCF_TITLEBAR | FCF_SIZEBORDER | FCF_SYSMENU |
-                         FCF_MINMAX | FCF_TASKLIST | FCF_NOBYTEALIGN;
+                         FCF_MINMAX | FCF_TASKLIST | FCF_NOBYTEALIGN | FCF_ICON;
     title = newstrdupL( MSGS_MAIN_WIN_TITLE );
     hWndFrame = WinCreateStdWindow( HWND_DESKTOP, 0, &ulFrameFlags, NULL, title,
-                                    WS_SYNCPAINT|WS_VISIBLE, NULLHANDLE, 100, NULL );
+                                    WS_SYNCPAINT|WS_VISIBLE, NULLHANDLE, IDI_MAIN_ICON, NULL );
     hFrameSysmenu  = WinWindowFromID( hWndFrame, FID_SYSMENU );
     hFrameTitlebar = WinWindowFromID( hWndFrame, FID_TITLEBAR );
     hFrameMinMax   = WinWindowFromID( hWndFrame, FID_MINMAX );

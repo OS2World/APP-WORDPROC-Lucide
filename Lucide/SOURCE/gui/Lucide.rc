@@ -1,6 +1,9 @@
 #include "Lucide_res.H"
 #include <os2.h>
 
+ICON IDI_MAIN_ICON      "bitmaps\\lucide.ico"
+BITMAP IDB_LOGO         "bitmaps\\lucidelogo.bmp"
+
 BITMAP IDB_OPEN         "bitmaps\\open.bmp"
 BITMAP IDB_PRINT        "bitmaps\\print.bmp"
 BITMAP IDB_NAVPANE      "bitmaps\\navpanel.bmp"
