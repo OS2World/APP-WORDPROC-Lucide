@@ -116,6 +116,7 @@ class DocumentViewer
         double pagenumToPos( long pagenum );
 
         static MRESULT EXPENTRY docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
+        static MRESULT EXPENTRY docFrameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
         static void searchthread( void *p );
         static void searchabort( void *p );
         static void drawthread( void *p );
@@ -127,6 +128,7 @@ class DocumentViewer
         HWND hMainFrame;
         HWND hWndDocFrame;
         HWND hWndDoc;
+        PFNWP oldFrameProc;
         HWND hWndHscroll;
         HWND hWndVscroll;
         SHORT sHscrollMax;
