@@ -323,8 +323,12 @@ void DocumentViewer::goToPage( long page )
 {
     if ( continuous && ( doc != NULL ) )
     {
+        bool needRedraw = ( page == currentpage );
         double pgpos = pagenumToPos( page ) / VScrollStep;
         vertScroll( hWndDoc, MPFROM2SHORT( pgpos, SB_SLIDERPOSITION ), NULLHANDLE );
+        if ( needRedraw ) {
+            drawPage();
+        }
     }
     else
     {
@@ -1360,8 +1364,15 @@ void DocumentViewer::scrollToPos( HWND hwnd, HRGN hrgn, LONG xpos, LONG ypos,
             selectionStart.x -= xinc;
         }
     }
-    yinc = ( ( yinc / VScrollStep ) * VScrollStep );
-    if ( yinc != 0 ) {
+
+    if ( yinc != 0 )
+    {
+        SHORT remainder = yinc % VScrollStep;
+        if ( remainder != 0 ) {
+            SHORT add = VScrollStep - remainder;
+            yinc += ( ( yinc > 0 ) ? add : -add );
+        }
+
         vertScroll( hwnd, MPFROM2SHORT( ( ( sVscrollPos * VScrollStep ) + yinc ) / VScrollStep,
                                         SB_SLIDERPOSITION ), hrgn );
         if ( withSelection ) {
