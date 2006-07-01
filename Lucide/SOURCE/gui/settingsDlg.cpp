@@ -61,6 +61,22 @@ void SettingsDlg::doDialog()
     delete this;
 }
 
+static void setZoomCombo( HWND combo, SHORT cbind, double zoom )
+{
+    if ( cbind != -1 )
+    {
+        char buf[ 255 ] = "";
+        WinSendMsg( combo, LM_QUERYITEMTEXT,
+                    MPFROM2SHORT( cbind, sizeof( buf ) ), MPFROMP( buf ) );
+        WinSetWindowText( combo, buf );
+    }
+
+    if ( zoom != 0 )
+    {
+        std::string z = str( zoom * 100.0 ) + "%";
+        WinSetWindowText( combo, z.c_str() );
+    }
+}
 
 MRESULT EXPENTRY SettingsDlg::settingsDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
@@ -84,15 +100,33 @@ MRESULT EXPENTRY SettingsDlg::settingsDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
             centerWindow( _this->hFrame, hwnd );
 
             // init
+
+            // layout
             HWND hLayout = WinWindowFromID( hwnd, IDC_DEFPGLAYOUT );
             std::string spage = getLocalizedString( MENU_SINGLE_PAGE );
-            WinSetWindowText( hLayout, spage.c_str() );
+            std::string cont = getLocalizedString( MENU_CONTINUOUS );
             WinSendMsg( hLayout, LM_INSERTITEM, MPFROMSHORT(LIT_END),
                         MPFROMP( spage.c_str() ) );
             WinSendMsg( hLayout, LM_INSERTITEM, MPFROMSHORT(LIT_END),
-                        MPFROMP( getLocalizedString( MENU_CONTINUOUS ).c_str() ) );
+                        MPFROMP( cont.c_str() ) );
+            if ( _this->settings->layout == SinglePage ) {
+                WinSetWindowText( hLayout, spage.c_str() );
+            } else if ( _this->settings->layout = Continuous ) {
+                WinSetWindowText( hLayout, cont.c_str() );
+            }
 
-            setZoomValues( WinWindowFromID( hwnd, IDC_DEFZOOM ) );
+            // zoom
+            HWND zoomCombo = WinWindowFromID( hwnd, IDC_DEFZOOM );
+            setZoomValues( zoomCombo );
+            if ( _this->settings->zoom == -2 ) {
+                setZoomCombo( zoomCombo, 1, 0 );
+            } else if ( _this->settings->zoom == -1 ) {
+                setZoomCombo( zoomCombo, 2, 0 );
+            } else if ( _this->settings->zoom == 1 ) {
+                setZoomCombo( zoomCombo, 0, 0 );
+            } else {
+                setZoomCombo( zoomCombo, -1, _this->settings->zoom );
+            }
 
             return (MRESULT)FALSE;
         }
