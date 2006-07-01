@@ -85,6 +85,8 @@ typedef LuDjvuDocumentData* (SOMLINK * somTD_LuDjvuDocument_DataThunk)(void*);
   #define _renderPageToPixbuf somSelf->renderPageToPixbuf
   #define _isAsynchRenderingSupported somSelf->isAsynchRenderingSupported
   #define _renderPageToPixbufAsynch somSelf->renderPageToPixbufAsynch
+  #define _isRenderIntoPS somSelf->isRenderIntoPS
+  #define _renderPageToPS somSelf->renderPageToPS
   #define _isHaveText somSelf->isHaveText
   #define _getSelectionRectangles somSelf->getSelectionRectangles
   #define _freeRectangles somSelf->freeRectangles
@@ -94,8 +96,8 @@ typedef LuDjvuDocumentData* (SOMLINK * somTD_LuDjvuDocument_DataThunk)(void*);
   #define _freeLinkMapping somSelf->freeLinkMapping
   #define _isSaveable somSelf->isSaveable
   #define _saveAs somSelf->saveAs
-  #define _isPSExportable somSelf->isPSExportable
-  #define _exportToPS somSelf->exportToPS
+  #define _isPostScriptExportable somSelf->isPostScriptExportable
+  #define _exportToPostScript somSelf->exportToPostScript
   #define _isHaveFontInfo somSelf->isHaveFontInfo
   #define _getFontInfo somSelf->getFontInfo
   #define _freeFontInfo somSelf->freeFontInfo

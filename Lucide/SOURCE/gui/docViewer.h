@@ -152,6 +152,7 @@ class DocumentViewer
         DrawAreas *drawareas;
         int drawareaIndex;
         bool closed;
+        bool drawPS;
 
         // continuous view
         bool continuous;

@@ -109,11 +109,23 @@ typedef void   SOMLINK somTP_LuJpegDocument_renderPageToPixbufAsynch(LuJpegDocum
 		LuDocument_asynchCallbackFn fna, 
 		somToken fndata);
 typedef somTP_LuJpegDocument_renderPageToPixbufAsynch *somTD_LuJpegDocument_renderPageToPixbufAsynch;
+typedef boolean   SOMLINK somTP_LuJpegDocument_isRenderIntoPS(LuJpegDocument *somSelf, Environment *ev);
+typedef somTP_LuJpegDocument_isRenderIntoPS *somTD_LuJpegDocument_isRenderIntoPS;
+typedef void   SOMLINK somTP_LuJpegDocument_renderPageToPS(LuJpegDocument *somSelf, Environment *ev, 
+		long pagenum, 
+		long src_x, 
+		long src_y, 
+		long src_width, 
+		long src_height, 
+		double scale, 
+		long rotation, 
+		unsigned long hps, 
+		somMToken rect);
+typedef somTP_LuJpegDocument_renderPageToPS *somTD_LuJpegDocument_renderPageToPS;
 typedef boolean   SOMLINK somTP_LuJpegDocument_isHaveText(LuJpegDocument *somSelf, Environment *ev);
 typedef somTP_LuJpegDocument_isHaveText *somTD_LuJpegDocument_isHaveText;
 typedef LuDocument_LuRectSequence*   SOMLINK somTP_LuJpegDocument_getSelectionRectangles(LuJpegDocument *somSelf, Environment *ev, 
 		long pagenum, 
-		double scale, 
 		LuRectangle* selection);
 typedef somTP_LuJpegDocument_getSelectionRectangles *somTD_LuJpegDocument_getSelectionRectangles;
 typedef void   SOMLINK somTP_LuJpegDocument_freeRectangles(Environment *ev, 
@@ -136,16 +148,16 @@ typedef somTP_LuJpegDocument_isSaveable *somTD_LuJpegDocument_isSaveable;
 typedef boolean   SOMLINK somTP_LuJpegDocument_saveAs(LuJpegDocument *somSelf, Environment *ev, 
 		string filename);
 typedef somTP_LuJpegDocument_saveAs *somTD_LuJpegDocument_saveAs;
-typedef boolean   SOMLINK somTP_LuJpegDocument_isPSExportable(LuJpegDocument *somSelf, Environment *ev);
-typedef somTP_LuJpegDocument_isPSExportable *somTD_LuJpegDocument_isPSExportable;
-typedef void   SOMLINK somTP_LuJpegDocument_exportToPS(LuJpegDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_LuJpegDocument_isPostScriptExportable(LuJpegDocument *somSelf, Environment *ev);
+typedef somTP_LuJpegDocument_isPostScriptExportable *somTD_LuJpegDocument_isPostScriptExportable;
+typedef void   SOMLINK somTP_LuJpegDocument_exportToPostScript(LuJpegDocument *somSelf, Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
 		double width, 
 		double height, 
 		boolean duplex);
-typedef somTP_LuJpegDocument_exportToPS *somTD_LuJpegDocument_exportToPS;
+typedef somTP_LuJpegDocument_exportToPostScript *somTD_LuJpegDocument_exportToPostScript;
 typedef boolean   SOMLINK somTP_LuJpegDocument_isHaveFontInfo(LuJpegDocument *somSelf, Environment *ev);
 typedef somTP_LuJpegDocument_isHaveFontInfo *somTD_LuJpegDocument_isHaveFontInfo;
 typedef LuDocument_LuFontInfoSequence*   SOMLINK somTP_LuJpegDocument_getFontInfo(LuJpegDocument *somSelf, Environment *ev);
@@ -460,6 +472,31 @@ void   renderPageToPixbufAsynch(Environment *ev,
 }
 
 
+/* method: isRenderIntoPS */
+boolean   isRenderIntoPS(Environment *ev)
+{
+   return SOM_ResolveD(this,LuJpegDocument,LuDocument,isRenderIntoPS)
+	(this, ev);
+}
+
+
+/* method: renderPageToPS */
+void   renderPageToPS(Environment *ev, 
+		long pagenum, 
+		long src_x, 
+		long src_y, 
+		long src_width, 
+		long src_height, 
+		double scale, 
+		long rotation, 
+		unsigned long hps, 
+		somMToken rect)
+{
+   SOM_ResolveD(this,LuJpegDocument,LuDocument,renderPageToPS)
+	(this, ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,hps,rect);
+}
+
+
 /* method: isHaveText */
 boolean   isHaveText(Environment *ev)
 {
@@ -471,11 +508,10 @@ boolean   isHaveText(Environment *ev)
 /* method: getSelectionRectangles */
 LuDocument_LuRectSequence*   getSelectionRectangles(Environment *ev, 
 		long pagenum, 
-		double scale, 
 		LuRectangle* selection)
 {
    return SOM_ResolveD(this,LuJpegDocument,LuDocument,getSelectionRectangles)
-	(this, ev,pagenum,scale,selection);
+	(this, ev,pagenum,selection);
 }
 
 
@@ -541,16 +577,16 @@ boolean   saveAs(Environment *ev,
 }
 
 
-/* method: isPSExportable */
-boolean   isPSExportable(Environment *ev)
+/* method: isPostScriptExportable */
+boolean   isPostScriptExportable(Environment *ev)
 {
-   return SOM_ResolveD(this,LuJpegDocument,LuDocument,isPSExportable)
+   return SOM_ResolveD(this,LuJpegDocument,LuDocument,isPostScriptExportable)
 	(this, ev);
 }
 
 
-/* method: exportToPS */
-void   exportToPS(Environment *ev, 
+/* method: exportToPostScript */
+void   exportToPostScript(Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
@@ -558,7 +594,7 @@ void   exportToPS(Environment *ev,
 		double height, 
 		boolean duplex)
 {
-   SOM_ResolveD(this,LuJpegDocument,LuDocument,exportToPS)
+   SOM_ResolveD(this,LuJpegDocument,LuDocument,exportToPostScript)
 	(this, ev,filename,first_page,last_page,width,height,duplex);
 }
 

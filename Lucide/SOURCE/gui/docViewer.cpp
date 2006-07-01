@@ -103,6 +103,7 @@ DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
     realVscrollMax = 0;
     VScrollStep = 1;
     WinSetRectEmpty( hab, &savedRcl );
+    drawPS = false;
     // asynch draw
     abortAsynch = false;
     termdraw    = false;
@@ -135,7 +136,7 @@ DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
     hWndHscroll = WinWindowFromID( hWndDocFrame, FID_HORZSCROLL );
     hWndVscroll = WinWindowFromID( hWndDocFrame, FID_VERTSCROLL );
 
-    drawThreadId = _beginthread( drawthread, NULL, 65536, this );
+    drawThreadId = _beginthread( drawthread, NULL, 262144, this );
 }
 
 // DocumentViewer destructor
@@ -205,7 +206,13 @@ void DocumentViewer::setDocument( LuDocument *_doc )
         selection = new LuRectangle[ totalpages ];
         memset( selection, 0, sizeof( LuRectangle ) * totalpages );
 
-        enableAsynchDraw = doc->isAsynchRenderingSupported( ev );
+        drawPS = doc->isRenderIntoPS( ev );
+        if ( drawPS ) {
+            enableAsynchDraw = false;
+        }
+        else {
+            enableAsynchDraw = doc->isAsynchRenderingSupported( ev );
+        }
         goToPage( 0 );
 
         if ( continuous ) {
@@ -970,29 +977,37 @@ void DocumentViewer::wmPaint( HWND hwnd )
             LONG rclx = rclDraw.xRight - rclDraw.xLeft;
             LONG rcly = rclDraw.yTop - rclDraw.yBottom;
 
-            pixbuf = new LuPixbuf( ev, rclx, rcly, bpp );
-            POINTL aptlPoints[4]={ rclDraw.xLeft, rclDraw.yBottom,
-                                   rclDraw.xRight-1, rclDraw.yTop-1,
-                                   0, 0, rclx, rcly };
+            if ( drawPS )
+            {
+                doc->renderPageToPS( ev, currentpage, spos_x, spos_y, rclx, rcly,
+                                     realzoom, rotation, hpsBuffer, &rclDraw );
+            }
+            else
+            {
+                pixbuf = new LuPixbuf( ev, rclx, rcly, bpp );
+                POINTL aptlPoints[4]={ rclDraw.xLeft, rclDraw.yBottom,
+                                       rclDraw.xRight-1, rclDraw.yTop-1,
+                                       0, 0, rclx, rcly };
 
-            doc->renderPageToPixbuf( ev, currentpage, spos_x, spos_y,
-                                     rclx, rcly, realzoom, rotation, pixbuf );
-            LONG lRop = ROP_SRCCOPY;
-            BITMAPINFO2 pbmi;
-            pbmi.cbFix = 16L;
-            pbmi.cx = rclx;
-            pbmi.cy = rcly;
-            pbmi.cPlanes = 1;
-            pbmi.cBitCount = bpp * 8;
-            GpiDrawBits( hpsBuffer, pixbuf->getDataPtr( ev ), &pbmi, 4L,
-                         aptlPoints, lRop, BBO_IGNORE );
+                doc->renderPageToPixbuf( ev, currentpage, spos_x, spos_y,
+                                         rclx, rcly, realzoom, rotation, pixbuf );
+                LONG lRop = ROP_SRCCOPY;
+                BITMAPINFO2 pbmi;
+                pbmi.cbFix = 16L;
+                pbmi.cx = rclx;
+                pbmi.cy = rcly;
+                pbmi.cPlanes = 1;
+                pbmi.cBitCount = bpp * 8;
+                GpiDrawBits( hpsBuffer, pixbuf->getDataPtr( ev ), &pbmi, 4L,
+                             aptlPoints, lRop, BBO_IGNORE );
+                delete pixbuf;
+                pixbuf = NULL;
+            }
 
             drawSelection( currentpage, hpsBuffer, &rclDraw );
             drawFound( currentpage, hpsBuffer, &rclDraw );
 
             BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
-            delete pixbuf;
-            pixbuf = NULL;
         }
     }
     else {
@@ -1120,28 +1135,34 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
             LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
             LONG rcly = pda->drawrect.yTop - pda->drawrect.yBottom;
 
-            pixbuf = new LuPixbuf( ev, rclx, rcly, bpp );
-            POINTL aptlPoints[4]={ pda->drawrect.xLeft, pda->drawrect.yBottom,
-                                   pda->drawrect.xRight-1, pda->drawrect.yTop-1,
-                                   0, 0, rclx, rcly };
-
-            doc->renderPageToPixbuf( ev, pda->pagenum, spos_x, spos_y,
-                                     rclx, rcly, realzoom, rotation, pixbuf );
-            LONG lRop = ROP_SRCCOPY;
-            BITMAPINFO2 pbmi;
-            pbmi.cbFix = 16L;
-            pbmi.cx = rclx;
-            pbmi.cy = rcly;
-            pbmi.cPlanes = 1;
-            pbmi.cBitCount = bpp * 8;
-            GpiDrawBits( hpsBuffer, pixbuf->getDataPtr( ev ), &pbmi, 4L,
-                         aptlPoints, lRop, BBO_IGNORE );
+            if ( drawPS )
+            {
+                doc->renderPageToPS( ev, pda->pagenum, spos_x, spos_y, rclx, rcly,
+                                     realzoom, rotation, hpsBuffer, &(pda->drawrect) );
+            }
+            else
+            {
+                pixbuf = new LuPixbuf( ev, rclx, rcly, bpp );
+                POINTL aptlPoints[4]={ pda->drawrect.xLeft, pda->drawrect.yBottom,
+                                       pda->drawrect.xRight-1, pda->drawrect.yTop-1,
+                                       0, 0, rclx, rcly };
+                doc->renderPageToPixbuf( ev, pda->pagenum, spos_x, spos_y,
+                                         rclx, rcly, realzoom, rotation, pixbuf );
+                LONG lRop = ROP_SRCCOPY;
+                BITMAPINFO2 pbmi;
+                pbmi.cbFix = 16L;
+                pbmi.cx = rclx;
+                pbmi.cy = rcly;
+                pbmi.cPlanes = 1;
+                pbmi.cBitCount = bpp * 8;
+                GpiDrawBits( hpsBuffer, pixbuf->getDataPtr( ev ), &pbmi, 4L,
+                             aptlPoints, lRop, BBO_IGNORE );
+                delete pixbuf;
+                pixbuf = NULL;
+            }
 
             drawSelection( pda->pagenum, hpsBuffer, &pda->drawrect );
             drawFound( pda->pagenum, hpsBuffer, &pda->drawrect );
-
-            delete pixbuf;
-            pixbuf = NULL;
         }
         delete drawareas;
         drawareas = NULL;

@@ -31,7 +31,7 @@
 #define SOM_Scope static
 #endif
 
-#define LuDocument_MaxNoMethods 30
+#define LuDocument_MaxNoMethods 32
 
 /*
  * -- Instance Data
@@ -97,6 +97,8 @@ typedef void LuDocumentData;
   #define _renderPageToPixbuf somSelf->renderPageToPixbuf
   #define _isAsynchRenderingSupported somSelf->isAsynchRenderingSupported
   #define _renderPageToPixbufAsynch somSelf->renderPageToPixbufAsynch
+  #define _isRenderIntoPS somSelf->isRenderIntoPS
+  #define _renderPageToPS somSelf->renderPageToPS
   #define _isHaveText somSelf->isHaveText
   #define _getSelectionRectangles somSelf->getSelectionRectangles
   #define _freeRectangles somSelf->freeRectangles
@@ -106,8 +108,8 @@ typedef void LuDocumentData;
   #define _freeLinkMapping somSelf->freeLinkMapping
   #define _isSaveable somSelf->isSaveable
   #define _saveAs somSelf->saveAs
-  #define _isPSExportable somSelf->isPSExportable
-  #define _exportToPS somSelf->exportToPS
+  #define _isPostScriptExportable somSelf->isPostScriptExportable
+  #define _exportToPostScript somSelf->exportToPostScript
   #define _isHaveFontInfo somSelf->isHaveFontInfo
   #define _getFontInfo somSelf->getFontInfo
   #define _freeFontInfo somSelf->freeFontInfo
@@ -333,6 +335,56 @@ static somMethodInfo renderPageToPixbufAsynchMethodInfo = {1, 56, &renderPageToP
 static somApRdInfo renderPageToPixbufAsynchStubs = {0, 0, &renderPageToPixbufAsynchMethodInfo};
 
 /*
+ * New Method: isRenderIntoPS
+ */
+SOM_Scope boolean  SOMLINK isRenderIntoPS(LuDocument *somSelf, Environment *ev);
+#ifndef somMN_isRenderIntoPS_defined
+#define somMN_isRenderIntoPS_defined
+static char *somMN_isRenderIntoPS = "isRenderIntoPS";
+static somId somId_isRenderIntoPS = &somMN_isRenderIntoPS;
+#endif  /* somMN_isRenderIntoPS_defined */
+#ifndef somDS_isRenderIntoPS_defined
+#define somDS_isRenderIntoPS_defined
+static char *somDS_isRenderIntoPS = "::LuDocument::isRenderIntoPS";
+static somId somDI_isRenderIntoPS = &somDS_isRenderIntoPS;
+#endif  /* somDS_isRenderIntoPS_defined */
+
+static somMethodInfo isRenderIntoPSMethodInfo = {10, 8, 0};
+
+static somApRdInfo isRenderIntoPSStubs = {0, 0, &isRenderIntoPSMethodInfo};
+
+/*
+ * New Method: renderPageToPS
+ */
+SOM_Scope void  SOMLINK renderPageToPS(LuDocument *somSelf, Environment *ev, 
+		long pagenum, 
+		long src_x, 
+		long src_y, 
+		long src_width, 
+		long src_height, 
+		double scale, 
+		long rotation, 
+		unsigned long hps, 
+		somMToken rect);
+#ifndef somMN_renderPageToPS_defined
+#define somMN_renderPageToPS_defined
+static char *somMN_renderPageToPS = "renderPageToPS";
+static somId somId_renderPageToPS = &somMN_renderPageToPS;
+#endif  /* somMN_renderPageToPS_defined */
+#ifndef somDS_renderPageToPS_defined
+#define somDS_renderPageToPS_defined
+static char *somDS_renderPageToPS = "::LuDocument::renderPageToPS";
+static somId somDI_renderPageToPS = &somDS_renderPageToPS;
+#endif  /* somDS_renderPageToPS_defined */
+
+static somFloatMap renderPageToPSFloatMap = {
+30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
+
+static somMethodInfo renderPageToPSMethodInfo = {1, 48, &renderPageToPSFloatMap};
+
+static somApRdInfo renderPageToPSStubs = {0, 0, &renderPageToPSMethodInfo};
+
+/*
  * New Method: isHaveText
  */
 SOM_Scope boolean  SOMLINK isHaveText(LuDocument *somSelf, Environment *ev);
@@ -475,51 +527,51 @@ static somMethodInfo saveAsMethodInfo = {10, 12, 0};
 static somApRdInfo saveAsStubs = {0, 0, &saveAsMethodInfo};
 
 /*
- * New Method: isPSExportable
+ * New Method: isPostScriptExportable
  */
-SOM_Scope boolean  SOMLINK isPSExportable(LuDocument *somSelf, Environment *ev);
-#ifndef somMN_isPSExportable_defined
-#define somMN_isPSExportable_defined
-static char *somMN_isPSExportable = "isPSExportable";
-static somId somId_isPSExportable = &somMN_isPSExportable;
-#endif  /* somMN_isPSExportable_defined */
-#ifndef somDS_isPSExportable_defined
-#define somDS_isPSExportable_defined
-static char *somDS_isPSExportable = "::LuDocument::isPSExportable";
-static somId somDI_isPSExportable = &somDS_isPSExportable;
-#endif  /* somDS_isPSExportable_defined */
+SOM_Scope boolean  SOMLINK isPostScriptExportable(LuDocument *somSelf, Environment *ev);
+#ifndef somMN_isPostScriptExportable_defined
+#define somMN_isPostScriptExportable_defined
+static char *somMN_isPostScriptExportable = "isPostScriptExportable";
+static somId somId_isPostScriptExportable = &somMN_isPostScriptExportable;
+#endif  /* somMN_isPostScriptExportable_defined */
+#ifndef somDS_isPostScriptExportable_defined
+#define somDS_isPostScriptExportable_defined
+static char *somDS_isPostScriptExportable = "::LuDocument::isPostScriptExportable";
+static somId somDI_isPostScriptExportable = &somDS_isPostScriptExportable;
+#endif  /* somDS_isPostScriptExportable_defined */
 
-static somMethodInfo isPSExportableMethodInfo = {10, 8, 0};
+static somMethodInfo isPostScriptExportableMethodInfo = {10, 8, 0};
 
-static somApRdInfo isPSExportableStubs = {0, 0, &isPSExportableMethodInfo};
+static somApRdInfo isPostScriptExportableStubs = {0, 0, &isPostScriptExportableMethodInfo};
 
 /*
- * New Method: exportToPS
+ * New Method: exportToPostScript
  */
-SOM_Scope void  SOMLINK exportToPS(LuDocument *somSelf, Environment *ev, 
+SOM_Scope void  SOMLINK exportToPostScript(LuDocument *somSelf, Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
 		double width, 
 		double height, 
 		boolean duplex);
-#ifndef somMN_exportToPS_defined
-#define somMN_exportToPS_defined
-static char *somMN_exportToPS = "exportToPS";
-static somId somId_exportToPS = &somMN_exportToPS;
-#endif  /* somMN_exportToPS_defined */
-#ifndef somDS_exportToPS_defined
-#define somDS_exportToPS_defined
-static char *somDS_exportToPS = "::LuDocument::exportToPS";
-static somId somDI_exportToPS = &somDS_exportToPS;
-#endif  /* somDS_exportToPS_defined */
+#ifndef somMN_exportToPostScript_defined
+#define somMN_exportToPostScript_defined
+static char *somMN_exportToPostScript = "exportToPostScript";
+static somId somId_exportToPostScript = &somMN_exportToPostScript;
+#endif  /* somMN_exportToPostScript_defined */
+#ifndef somDS_exportToPostScript_defined
+#define somDS_exportToPostScript_defined
+static char *somDS_exportToPostScript = "::LuDocument::exportToPostScript";
+static somId somDI_exportToPostScript = &somDS_exportToPostScript;
+#endif  /* somDS_exportToPostScript_defined */
 
-static somFloatMap exportToPSFloatMap = {
+static somFloatMap exportToPostScriptFloatMap = {
 20, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
 
-static somMethodInfo exportToPSMethodInfo = {1, 40, &exportToPSFloatMap};
+static somMethodInfo exportToPostScriptMethodInfo = {1, 40, &exportToPostScriptFloatMap};
 
-static somApRdInfo exportToPSStubs = {0, 0, &exportToPSMethodInfo};
+static somApRdInfo exportToPostScriptStubs = {0, 0, &exportToPostScriptMethodInfo};
 
 /*
  * New Method: isHaveFontInfo
@@ -791,6 +843,26 @@ static somStaticMethod_t LuDocumentSM[] = {
 #else
          (somMethodProc *) ((void*) &renderPageToPixbufAsynchStubs) },
 #endif
+    {    &LuDocumentClassData.isRenderIntoPS,
+         &somId_isRenderIntoPS,
+         &somDI_isRenderIntoPS,
+         (somMethodProc *) isRenderIntoPS,
+         (somMethodProc *)((void*)-1),
+#ifdef isRenderIntoPS_somApRdDefault
+         0},
+#else
+         (somMethodProc *) ((void*) &isRenderIntoPSStubs) },
+#endif
+    {    &LuDocumentClassData.renderPageToPS,
+         &somId_renderPageToPS,
+         &somDI_renderPageToPS,
+         (somMethodProc *) renderPageToPS,
+         (somMethodProc *)((void*)-1),
+#ifdef renderPageToPS_somApRdDefault
+         0},
+#else
+         (somMethodProc *) ((void*) &renderPageToPSStubs) },
+#endif
     {    &LuDocumentClassData.isHaveText,
          &somId_isHaveText,
          &somDI_isHaveText,
@@ -861,25 +933,25 @@ static somStaticMethod_t LuDocumentSM[] = {
 #else
          (somMethodProc *) ((void*) &saveAsStubs) },
 #endif
-    {    &LuDocumentClassData.isPSExportable,
-         &somId_isPSExportable,
-         &somDI_isPSExportable,
-         (somMethodProc *) isPSExportable,
+    {    &LuDocumentClassData.isPostScriptExportable,
+         &somId_isPostScriptExportable,
+         &somDI_isPostScriptExportable,
+         (somMethodProc *) isPostScriptExportable,
          (somMethodProc *)((void*)-1),
-#ifdef isPSExportable_somApRdDefault
+#ifdef isPostScriptExportable_somApRdDefault
          0},
 #else
-         (somMethodProc *) ((void*) &isPSExportableStubs) },
+         (somMethodProc *) ((void*) &isPostScriptExportableStubs) },
 #endif
-    {    &LuDocumentClassData.exportToPS,
-         &somId_exportToPS,
-         &somDI_exportToPS,
-         (somMethodProc *) exportToPS,
+    {    &LuDocumentClassData.exportToPostScript,
+         &somId_exportToPostScript,
+         &somDI_exportToPostScript,
+         (somMethodProc *) exportToPostScript,
          (somMethodProc *)((void*)-1),
-#ifdef exportToPS_somApRdDefault
+#ifdef exportToPostScript_somApRdDefault
          0},
 #else
-         (somMethodProc *) ((void*) &exportToPSStubs) },
+         (somMethodProc *) ((void*) &exportToPostScriptStubs) },
 #endif
     {    &LuDocumentClassData.isHaveFontInfo,
          &somId_isHaveFontInfo,
@@ -994,7 +1066,7 @@ static somProcMethods_t LuDocumentPM[] = {
     (somMethodProc *) freeDocumentInfo};
 
 static somStaticClassInfo LuDocumentSCI = {
-    4, 26, 1, 0, 4, 0, /* layout version 4 */ 
+    4, 28, 1, 0, 4, 0, /* layout version 4 */ 
     LuDocument_MajorVersion, LuDocument_MinorVersion,
     0, LuDocument_MaxNoMethods, 1,
     &somCN_LuDocument,
@@ -1017,7 +1089,7 @@ static somStaticClassInfo LuDocumentSCI = {
     0, /* no sci development level check */
     0, /* number of SelectInheritedMethods */
     0, /* no SelectInheritedMethods */
-    30, /* number of classdata entries */
+    32, /* number of classdata entries */
     0, /* no list provided currently */
     0, /* number of migrated methods */
     0, /* no migrated method implementations */

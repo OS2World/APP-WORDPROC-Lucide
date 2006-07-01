@@ -109,11 +109,23 @@ typedef void   SOMLINK somTP_LuDjvuDocument_renderPageToPixbufAsynch(LuDjvuDocum
 		LuDocument_asynchCallbackFn fna, 
 		somToken fndata);
 typedef somTP_LuDjvuDocument_renderPageToPixbufAsynch *somTD_LuDjvuDocument_renderPageToPixbufAsynch;
+typedef boolean   SOMLINK somTP_LuDjvuDocument_isRenderIntoPS(LuDjvuDocument *somSelf, Environment *ev);
+typedef somTP_LuDjvuDocument_isRenderIntoPS *somTD_LuDjvuDocument_isRenderIntoPS;
+typedef void   SOMLINK somTP_LuDjvuDocument_renderPageToPS(LuDjvuDocument *somSelf, Environment *ev, 
+		long pagenum, 
+		long src_x, 
+		long src_y, 
+		long src_width, 
+		long src_height, 
+		double scale, 
+		long rotation, 
+		unsigned long hps, 
+		somMToken rect);
+typedef somTP_LuDjvuDocument_renderPageToPS *somTD_LuDjvuDocument_renderPageToPS;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_isHaveText(LuDjvuDocument *somSelf, Environment *ev);
 typedef somTP_LuDjvuDocument_isHaveText *somTD_LuDjvuDocument_isHaveText;
 typedef LuDocument_LuRectSequence*   SOMLINK somTP_LuDjvuDocument_getSelectionRectangles(LuDjvuDocument *somSelf, Environment *ev, 
 		long pagenum, 
-		double scale, 
 		LuRectangle* selection);
 typedef somTP_LuDjvuDocument_getSelectionRectangles *somTD_LuDjvuDocument_getSelectionRectangles;
 typedef void   SOMLINK somTP_LuDjvuDocument_freeRectangles(Environment *ev, 
@@ -136,16 +148,16 @@ typedef somTP_LuDjvuDocument_isSaveable *somTD_LuDjvuDocument_isSaveable;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_saveAs(LuDjvuDocument *somSelf, Environment *ev, 
 		string filename);
 typedef somTP_LuDjvuDocument_saveAs *somTD_LuDjvuDocument_saveAs;
-typedef boolean   SOMLINK somTP_LuDjvuDocument_isPSExportable(LuDjvuDocument *somSelf, Environment *ev);
-typedef somTP_LuDjvuDocument_isPSExportable *somTD_LuDjvuDocument_isPSExportable;
-typedef void   SOMLINK somTP_LuDjvuDocument_exportToPS(LuDjvuDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_LuDjvuDocument_isPostScriptExportable(LuDjvuDocument *somSelf, Environment *ev);
+typedef somTP_LuDjvuDocument_isPostScriptExportable *somTD_LuDjvuDocument_isPostScriptExportable;
+typedef void   SOMLINK somTP_LuDjvuDocument_exportToPostScript(LuDjvuDocument *somSelf, Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
 		double width, 
 		double height, 
 		boolean duplex);
-typedef somTP_LuDjvuDocument_exportToPS *somTD_LuDjvuDocument_exportToPS;
+typedef somTP_LuDjvuDocument_exportToPostScript *somTD_LuDjvuDocument_exportToPostScript;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_isHaveFontInfo(LuDjvuDocument *somSelf, Environment *ev);
 typedef somTP_LuDjvuDocument_isHaveFontInfo *somTD_LuDjvuDocument_isHaveFontInfo;
 typedef LuDocument_LuFontInfoSequence*   SOMLINK somTP_LuDjvuDocument_getFontInfo(LuDjvuDocument *somSelf, Environment *ev);
@@ -460,6 +472,31 @@ void   renderPageToPixbufAsynch(Environment *ev,
 }
 
 
+/* method: isRenderIntoPS */
+boolean   isRenderIntoPS(Environment *ev)
+{
+   return SOM_ResolveD(this,LuDjvuDocument,LuDocument,isRenderIntoPS)
+	(this, ev);
+}
+
+
+/* method: renderPageToPS */
+void   renderPageToPS(Environment *ev, 
+		long pagenum, 
+		long src_x, 
+		long src_y, 
+		long src_width, 
+		long src_height, 
+		double scale, 
+		long rotation, 
+		unsigned long hps, 
+		somMToken rect)
+{
+   SOM_ResolveD(this,LuDjvuDocument,LuDocument,renderPageToPS)
+	(this, ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,hps,rect);
+}
+
+
 /* method: isHaveText */
 boolean   isHaveText(Environment *ev)
 {
@@ -471,11 +508,10 @@ boolean   isHaveText(Environment *ev)
 /* method: getSelectionRectangles */
 LuDocument_LuRectSequence*   getSelectionRectangles(Environment *ev, 
 		long pagenum, 
-		double scale, 
 		LuRectangle* selection)
 {
    return SOM_ResolveD(this,LuDjvuDocument,LuDocument,getSelectionRectangles)
-	(this, ev,pagenum,scale,selection);
+	(this, ev,pagenum,selection);
 }
 
 
@@ -541,16 +577,16 @@ boolean   saveAs(Environment *ev,
 }
 
 
-/* method: isPSExportable */
-boolean   isPSExportable(Environment *ev)
+/* method: isPostScriptExportable */
+boolean   isPostScriptExportable(Environment *ev)
 {
-   return SOM_ResolveD(this,LuDjvuDocument,LuDocument,isPSExportable)
+   return SOM_ResolveD(this,LuDjvuDocument,LuDocument,isPostScriptExportable)
 	(this, ev);
 }
 
 
-/* method: exportToPS */
-void   exportToPS(Environment *ev, 
+/* method: exportToPostScript */
+void   exportToPostScript(Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
@@ -558,7 +594,7 @@ void   exportToPS(Environment *ev,
 		double height, 
 		boolean duplex)
 {
-   SOM_ResolveD(this,LuDjvuDocument,LuDocument,exportToPS)
+   SOM_ResolveD(this,LuDjvuDocument,LuDocument,exportToPostScript)
 	(this, ev,filename,first_page,last_page,width,height,duplex);
 }
 

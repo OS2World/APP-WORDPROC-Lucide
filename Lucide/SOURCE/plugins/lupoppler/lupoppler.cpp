@@ -675,14 +675,14 @@ SOM_Scope boolean  SOMLINK saveAs(LuPopplerDocument *somSelf,
 }
 
 
-SOM_Scope boolean  SOMLINK isPSExportable(LuPopplerDocument *somSelf,
+SOM_Scope boolean  SOMLINK isPostScriptExportable(LuPopplerDocument *somSelf,
                                            Environment *ev)
 {
     return TRUE;
 }
 
 
-SOM_Scope void  SOMLINK exportToPS(LuPopplerDocument *somSelf,
+SOM_Scope void  SOMLINK exportToPostScript(LuPopplerDocument *somSelf,
                                     Environment *ev, string filename,
                                    long first_page, long last_page,
                                    double width, double height,

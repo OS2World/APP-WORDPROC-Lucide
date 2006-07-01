@@ -150,6 +150,8 @@ SOMEXTERN struct LuDocumentClassDataStructure {
 	somMToken renderPageToPixbuf;
 	somMToken isAsynchRenderingSupported;
 	somMToken renderPageToPixbufAsynch;
+	somMToken isRenderIntoPS;
+	somMToken renderPageToPS;
 	somMToken isHaveText;
 	somMToken getSelectionRectangles;
 	somMethodProc *freeRectangles;
@@ -159,8 +161,8 @@ SOMEXTERN struct LuDocumentClassDataStructure {
 	somMethodProc *freeLinkMapping;
 	somMToken isSaveable;
 	somMToken saveAs;
-	somMToken isPSExportable;
-	somMToken exportToPS;
+	somMToken isPostScriptExportable;
+	somMToken exportToPostScript;
 	somMToken isHaveFontInfo;
 	somMToken getFontInfo;
 	somMethodProc *freeFontInfo;
@@ -227,6 +229,19 @@ typedef void   SOMLINK somTP_LuDocument_renderPageToPixbufAsynch(LuDocument *som
 		LuDocument_asynchCallbackFn fna, 
 		somToken fndata);
 typedef somTP_LuDocument_renderPageToPixbufAsynch *somTD_LuDocument_renderPageToPixbufAsynch;
+typedef boolean   SOMLINK somTP_LuDocument_isRenderIntoPS(LuDocument *somSelf, Environment *ev);
+typedef somTP_LuDocument_isRenderIntoPS *somTD_LuDocument_isRenderIntoPS;
+typedef void   SOMLINK somTP_LuDocument_renderPageToPS(LuDocument *somSelf, Environment *ev, 
+		long pagenum, 
+		long src_x, 
+		long src_y, 
+		long src_width, 
+		long src_height, 
+		double scale, 
+		long rotation, 
+		unsigned long hps, 
+		somMToken rect);
+typedef somTP_LuDocument_renderPageToPS *somTD_LuDocument_renderPageToPS;
 typedef boolean   SOMLINK somTP_LuDocument_isHaveText(LuDocument *somSelf, Environment *ev);
 typedef somTP_LuDocument_isHaveText *somTD_LuDocument_isHaveText;
 typedef LuDocument_LuRectSequence*   SOMLINK somTP_LuDocument_getSelectionRectangles(LuDocument *somSelf, Environment *ev, 
@@ -253,16 +268,16 @@ typedef somTP_LuDocument_isSaveable *somTD_LuDocument_isSaveable;
 typedef boolean   SOMLINK somTP_LuDocument_saveAs(LuDocument *somSelf, Environment *ev, 
 		string filename);
 typedef somTP_LuDocument_saveAs *somTD_LuDocument_saveAs;
-typedef boolean   SOMLINK somTP_LuDocument_isPSExportable(LuDocument *somSelf, Environment *ev);
-typedef somTP_LuDocument_isPSExportable *somTD_LuDocument_isPSExportable;
-typedef void   SOMLINK somTP_LuDocument_exportToPS(LuDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_LuDocument_isPostScriptExportable(LuDocument *somSelf, Environment *ev);
+typedef somTP_LuDocument_isPostScriptExportable *somTD_LuDocument_isPostScriptExportable;
+typedef void   SOMLINK somTP_LuDocument_exportToPostScript(LuDocument *somSelf, Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
 		double width, 
 		double height, 
 		boolean duplex);
-typedef somTP_LuDocument_exportToPS *somTD_LuDocument_exportToPS;
+typedef somTP_LuDocument_exportToPostScript *somTD_LuDocument_exportToPostScript;
 typedef boolean   SOMLINK somTP_LuDocument_isHaveFontInfo(LuDocument *somSelf, Environment *ev);
 typedef somTP_LuDocument_isHaveFontInfo *somTD_LuDocument_isHaveFontInfo;
 typedef LuDocument_LuFontInfoSequence*   SOMLINK somTP_LuDocument_getFontInfo(LuDocument *somSelf, Environment *ev);
@@ -577,6 +592,31 @@ void   renderPageToPixbufAsynch(Environment *ev,
 }
 
 
+/* method: isRenderIntoPS */
+boolean   isRenderIntoPS(Environment *ev)
+{
+   return SOM_ResolveD(this,LuDocument,LuDocument,isRenderIntoPS)
+	(this, ev);
+}
+
+
+/* method: renderPageToPS */
+void   renderPageToPS(Environment *ev, 
+		long pagenum, 
+		long src_x, 
+		long src_y, 
+		long src_width, 
+		long src_height, 
+		double scale, 
+		long rotation, 
+		unsigned long hps, 
+		somMToken rect)
+{
+   SOM_ResolveD(this,LuDocument,LuDocument,renderPageToPS)
+	(this, ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,hps,rect);
+}
+
+
 /* method: isHaveText */
 boolean   isHaveText(Environment *ev)
 {
@@ -657,16 +697,16 @@ boolean   saveAs(Environment *ev,
 }
 
 
-/* method: isPSExportable */
-boolean   isPSExportable(Environment *ev)
+/* method: isPostScriptExportable */
+boolean   isPostScriptExportable(Environment *ev)
 {
-   return SOM_ResolveD(this,LuDocument,LuDocument,isPSExportable)
+   return SOM_ResolveD(this,LuDocument,LuDocument,isPostScriptExportable)
 	(this, ev);
 }
 
 
-/* method: exportToPS */
-void   exportToPS(Environment *ev, 
+/* method: exportToPostScript */
+void   exportToPostScript(Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
@@ -674,7 +714,7 @@ void   exportToPS(Environment *ev,
 		double height, 
 		boolean duplex)
 {
-   SOM_ResolveD(this,LuDocument,LuDocument,exportToPS)
+   SOM_ResolveD(this,LuDocument,LuDocument,exportToPostScript)
 	(this, ev,filename,first_page,last_page,width,height,duplex);
 }
 

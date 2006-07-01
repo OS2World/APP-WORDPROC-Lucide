@@ -39,8 +39,8 @@ interface LuPopplerDocument : LuDocument
         getLinkMapping: override;
         isSaveable: override;
         saveAs: override;
-        isPSExportable: override;
-        exportToPS: override;
+        isPostScriptExportable: override;
+        exportToPostScript: override;
         isHaveFontInfo: override;
         getFontInfo: override;
         isHaveIndex: override;

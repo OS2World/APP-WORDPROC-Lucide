@@ -135,6 +135,41 @@ interface LuDocument : SOMObject
 
 
     /**
+     * isRenderIntoPS
+     *
+     * See renderPageToPS()
+     *
+     * Return value: TRUE if document will render directly into
+     *               presentation space.
+     **/
+    boolean isRenderIntoPS();
+    
+    
+    /**
+     * renderPageToPS
+     * pagenum: the page to render from
+     * src_x: x coordinate of upper left corner
+     * src_y: y coordinate of upper left corner
+     * src_width: width of rectangle to render
+     * src_height: height of rectangle to render
+     * scale: scale specified as pixels per point
+     *        (if isScalable() is FALSE, scale ignored and assumed 1.0)
+     * rotation: rotate the document by the specified degree
+     *        (if isRotable() is FALSE, rotation ignored and assumed 0)
+     * hps: handle of presentation space to render into
+     * rect: pointer to RECTL structure, defines render area on HPS
+     *
+     * First scale the document to match the specified pixels per point,
+     * then render the rectangle given by the upper left corner at
+     * (src_x, src_y) and src_width and src_height.
+     **/
+    void renderPageToPS( in long pagenum, in long src_x, in long src_y,
+                   in long src_width, in long src_height,
+                   in double scale, in long rotation, 
+                   in unsigned long hps, in somMToken rect );
+
+
+    /**
      * isHaveText
      *
      * See getSelectionRectangles(), searchText()
@@ -250,16 +285,16 @@ interface LuDocument : SOMObject
 
 
     /**
-     * isPSExportable
+     * isPostScriptExportable
      *
      * Return value: TRUE if document can be exported to
      *               PostScript, FALSE otherwise.
      **/
-    boolean isPSExportable();
+    boolean isPostScriptExportable();
 
 
     /**
-     * exportToPS
+     * exportToPostScript
      * filename: the path of the output filename
      * first_page: the first page to print
      * last_page: the last page to print
@@ -273,7 +308,8 @@ interface LuDocument : SOMObject
      *
      * Create a new postscript file and render document to.
      **/
-    void exportToPS( in string filename, in long first_page, in long last_page,
+    void exportToPostScript( in string filename, 
+                     in long first_page, in long last_page,
                      in double width, in double height, in boolean duplex );
 
 
@@ -429,9 +465,11 @@ interface LuDocument : SOMObject
         releaseorder: loadFile, getBpp, isScalable, isRotable, 
                       getPageCount, getPageSize, renderPageToPixbuf, 
                       isAsynchRenderingSupported, renderPageToPixbufAsynch,
+                      isRenderIntoPS, renderPageToPS,
                       isHaveText, getSelectionRectangles, freeRectangles,
                       getText, isHaveLinks, getLinkMapping, freeLinkMapping,
-                      isSaveable, saveAs, isPSExportable, exportToPS,
+                      isSaveable, saveAs, 
+                      isPostScriptExportable, exportToPostScript,
                       isHaveFontInfo, getFontInfo, freeFontInfo,
                       isHaveIndex, getIndex, getDocumentInfo,
                       freeDocumentInfo, getThumbnailSize, getThumbnail,

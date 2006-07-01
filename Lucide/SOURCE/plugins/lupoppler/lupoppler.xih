@@ -85,6 +85,8 @@ typedef LuPopplerDocumentData* (SOMLINK * somTD_LuPopplerDocument_DataThunk)(voi
   #define _renderPageToPixbuf somSelf->renderPageToPixbuf
   #define _isAsynchRenderingSupported somSelf->isAsynchRenderingSupported
   #define _renderPageToPixbufAsynch somSelf->renderPageToPixbufAsynch
+  #define _isRenderIntoPS somSelf->isRenderIntoPS
+  #define _renderPageToPS somSelf->renderPageToPS
   #define _isHaveText somSelf->isHaveText
   #define _getSelectionRectangles somSelf->getSelectionRectangles
   #define _freeRectangles somSelf->freeRectangles
@@ -94,8 +96,8 @@ typedef LuPopplerDocumentData* (SOMLINK * somTD_LuPopplerDocument_DataThunk)(voi
   #define _freeLinkMapping somSelf->freeLinkMapping
   #define _isSaveable somSelf->isSaveable
   #define _saveAs somSelf->saveAs
-  #define _isPSExportable somSelf->isPSExportable
-  #define _exportToPS somSelf->exportToPS
+  #define _isPostScriptExportable somSelf->isPostScriptExportable
+  #define _exportToPostScript somSelf->exportToPostScript
   #define _isHaveFontInfo somSelf->isHaveFontInfo
   #define _getFontInfo somSelf->getFontInfo
   #define _freeFontInfo somSelf->freeFontInfo
@@ -152,8 +154,8 @@ typedef LuPopplerDocumentData* (SOMLINK * somTD_LuPopplerDocument_DataThunk)(voi
   #define _getLinkMapping somSelf->getLinkMapping
   #define _isSaveable somSelf->isSaveable
   #define _saveAs somSelf->saveAs
-  #define _isPSExportable somSelf->isPSExportable
-  #define _exportToPS somSelf->exportToPS
+  #define _isPostScriptExportable somSelf->isPostScriptExportable
+  #define _exportToPostScript somSelf->exportToPostScript
   #define _isHaveFontInfo somSelf->isHaveFontInfo
   #define _getFontInfo somSelf->getFontInfo
   #define _isHaveIndex somSelf->isHaveIndex
@@ -865,94 +867,94 @@ static somMethodProc* LuPopplerDocument_parent_LuDocument_saveAs_resolved;
    LuPopplerDocument_parent_LuDocument_saveAs(somSelf,ev,filename))
 
 /*
- * Overridden method: isPSExportable
+ * Overridden method: isPostScriptExportable
  */
-SOM_Scope boolean  SOMLINK isPSExportable(LuPopplerDocument *somSelf, Environment *ev);
-static char *somMN_LuPopplerDocumentisPSExportable = "LuDocument::isPSExportable";
-static somId somId_LuPopplerDocumentisPSExportable = &somMN_LuPopplerDocumentisPSExportable;
-#ifdef somId_isPSExportable
-#undef somId_isPSExportable
+SOM_Scope boolean  SOMLINK isPostScriptExportable(LuPopplerDocument *somSelf, Environment *ev);
+static char *somMN_LuPopplerDocumentisPostScriptExportable = "LuDocument::isPostScriptExportable";
+static somId somId_LuPopplerDocumentisPostScriptExportable = &somMN_LuPopplerDocumentisPostScriptExportable;
+#ifdef somId_isPostScriptExportable
+#undef somId_isPostScriptExportable
 #else
-#define somId_isPSExportable somId_LuPopplerDocumentisPSExportable
+#define somId_isPostScriptExportable somId_LuPopplerDocumentisPostScriptExportable
 #endif
-typedef boolean   SOMLINK somTP_xih_LuPopplerDocument_isPSExportable(LuPopplerDocument *somSelf, Environment *ev);
-typedef somTP_xih_LuPopplerDocument_isPSExportable *somTD_xih_LuPopplerDocument_isPSExportable;
+typedef boolean   SOMLINK somTP_xih_LuPopplerDocument_isPostScriptExportable(LuPopplerDocument *somSelf, Environment *ev);
+typedef somTP_xih_LuPopplerDocument_isPostScriptExportable *somTD_xih_LuPopplerDocument_isPostScriptExportable;
 /* define the parent method call macro */
-static somMethodProc* LuPopplerDocument_parent_LuDocument_isPSExportable_resolved;
-#define LuPopplerDocument_parent_LuDocument_isPSExportable(somSelf,ev) \
-  ((( somTD_xih_LuPopplerDocument_isPSExportable ) \
-      LuPopplerDocument_parent_LuDocument_isPSExportable_resolved) \
+static somMethodProc* LuPopplerDocument_parent_LuDocument_isPostScriptExportable_resolved;
+#define LuPopplerDocument_parent_LuDocument_isPostScriptExportable(somSelf,ev) \
+  ((( somTD_xih_LuPopplerDocument_isPostScriptExportable ) \
+      LuPopplerDocument_parent_LuDocument_isPostScriptExportable_resolved) \
 	(somSelf,ev))
 /* define a variety of (possibly ambiguous) short forms */
-#ifndef SOMGD_pmc_parent_isPSExportable
-  #ifdef parent_isPSExportable
-    #define SOMGD_pmc_parent_isPSExportable
-    #undef parent_isPSExportable
+#ifndef SOMGD_pmc_parent_isPostScriptExportable
+  #ifdef parent_isPostScriptExportable
+    #define SOMGD_pmc_parent_isPostScriptExportable
+    #undef parent_isPostScriptExportable
   #else
-#define parent_isPSExportable LuPopplerDocument_parent_LuDocument_isPSExportable
+#define parent_isPostScriptExportable LuPopplerDocument_parent_LuDocument_isPostScriptExportable
   #endif
 #endif
-#ifndef SOMGD_pmc_parent_LuDocument_isPSExportable
-  #ifdef parent_LuDocument_isPSExportable
-    #define SOMGD_pmc_parent_LuDocument_isPSExportable
-    #undef parent_LuDocument_isPSExportable
+#ifndef SOMGD_pmc_parent_LuDocument_isPostScriptExportable
+  #ifdef parent_LuDocument_isPostScriptExportable
+    #define SOMGD_pmc_parent_LuDocument_isPostScriptExportable
+    #undef parent_LuDocument_isPostScriptExportable
   #else
-    #define parent_LuDocument_isPSExportable LuPopplerDocument_parent_LuDocument_isPSExportable
+    #define parent_LuDocument_isPostScriptExportable LuPopplerDocument_parent_LuDocument_isPostScriptExportable
   #endif
 #endif
-#define LuPopplerDocument_parents_isPSExportable(somSelf,ev) (\
-   LuPopplerDocument_parent_LuDocument_isPSExportable(somSelf,ev))
+#define LuPopplerDocument_parents_isPostScriptExportable(somSelf,ev) (\
+   LuPopplerDocument_parent_LuDocument_isPostScriptExportable(somSelf,ev))
 
 /*
- * Overridden method: exportToPS
+ * Overridden method: exportToPostScript
  */
-SOM_Scope void  SOMLINK exportToPS(LuPopplerDocument *somSelf, Environment *ev,
+SOM_Scope void  SOMLINK exportToPostScript(LuPopplerDocument *somSelf, Environment *ev,
 		string filename,
 		long first_page,
 		long last_page,
 		double width,
 		double height,
 		boolean duplex);
-static char *somMN_LuPopplerDocumentexportToPS = "LuDocument::exportToPS";
-static somId somId_LuPopplerDocumentexportToPS = &somMN_LuPopplerDocumentexportToPS;
-#ifdef somId_exportToPS
-#undef somId_exportToPS
+static char *somMN_LuPopplerDocumentexportToPostScript = "LuDocument::exportToPostScript";
+static somId somId_LuPopplerDocumentexportToPostScript = &somMN_LuPopplerDocumentexportToPostScript;
+#ifdef somId_exportToPostScript
+#undef somId_exportToPostScript
 #else
-#define somId_exportToPS somId_LuPopplerDocumentexportToPS
+#define somId_exportToPostScript somId_LuPopplerDocumentexportToPostScript
 #endif
-typedef void   SOMLINK somTP_xih_LuPopplerDocument_exportToPS(LuPopplerDocument *somSelf, Environment *ev, 
+typedef void   SOMLINK somTP_xih_LuPopplerDocument_exportToPostScript(LuPopplerDocument *somSelf, Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
 		double width, 
 		double height, 
 		boolean duplex);
-typedef somTP_xih_LuPopplerDocument_exportToPS *somTD_xih_LuPopplerDocument_exportToPS;
+typedef somTP_xih_LuPopplerDocument_exportToPostScript *somTD_xih_LuPopplerDocument_exportToPostScript;
 /* define the parent method call macro */
-static somMethodProc* LuPopplerDocument_parent_LuDocument_exportToPS_resolved;
-#define LuPopplerDocument_parent_LuDocument_exportToPS(somSelf,ev,filename,first_page,last_page,width,height,duplex) \
-  ((( somTD_xih_LuPopplerDocument_exportToPS ) \
-      LuPopplerDocument_parent_LuDocument_exportToPS_resolved) \
+static somMethodProc* LuPopplerDocument_parent_LuDocument_exportToPostScript_resolved;
+#define LuPopplerDocument_parent_LuDocument_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex) \
+  ((( somTD_xih_LuPopplerDocument_exportToPostScript ) \
+      LuPopplerDocument_parent_LuDocument_exportToPostScript_resolved) \
 	(somSelf,ev,filename,first_page,last_page,width,height,duplex))
 /* define a variety of (possibly ambiguous) short forms */
-#ifndef SOMGD_pmc_parent_exportToPS
-  #ifdef parent_exportToPS
-    #define SOMGD_pmc_parent_exportToPS
-    #undef parent_exportToPS
+#ifndef SOMGD_pmc_parent_exportToPostScript
+  #ifdef parent_exportToPostScript
+    #define SOMGD_pmc_parent_exportToPostScript
+    #undef parent_exportToPostScript
   #else
-#define parent_exportToPS LuPopplerDocument_parent_LuDocument_exportToPS
+#define parent_exportToPostScript LuPopplerDocument_parent_LuDocument_exportToPostScript
   #endif
 #endif
-#ifndef SOMGD_pmc_parent_LuDocument_exportToPS
-  #ifdef parent_LuDocument_exportToPS
-    #define SOMGD_pmc_parent_LuDocument_exportToPS
-    #undef parent_LuDocument_exportToPS
+#ifndef SOMGD_pmc_parent_LuDocument_exportToPostScript
+  #ifdef parent_LuDocument_exportToPostScript
+    #define SOMGD_pmc_parent_LuDocument_exportToPostScript
+    #undef parent_LuDocument_exportToPostScript
   #else
-    #define parent_LuDocument_exportToPS LuPopplerDocument_parent_LuDocument_exportToPS
+    #define parent_LuDocument_exportToPostScript LuPopplerDocument_parent_LuDocument_exportToPostScript
   #endif
 #endif
-#define LuPopplerDocument_parents_exportToPS(somSelf,ev,filename,first_page,last_page,width,height,duplex) (\
-   LuPopplerDocument_parent_LuDocument_exportToPS(somSelf,ev,filename,first_page,last_page,width,height,duplex))
+#define LuPopplerDocument_parents_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex) (\
+   LuPopplerDocument_parent_LuDocument_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex))
 
 /*
  * Overridden method: isHaveFontInfo
@@ -1352,10 +1354,10 @@ static somOverrideMethod_t LuPopplerDocumentOM[] = {
          (somMethodProc *) isSaveable  },
     {    &somId_LuPopplerDocumentsaveAs,
          (somMethodProc *) saveAs  },
-    {    &somId_LuPopplerDocumentisPSExportable,
-         (somMethodProc *) isPSExportable  },
-    {    &somId_LuPopplerDocumentexportToPS,
-         (somMethodProc *) exportToPS  },
+    {    &somId_LuPopplerDocumentisPostScriptExportable,
+         (somMethodProc *) isPostScriptExportable  },
+    {    &somId_LuPopplerDocumentexportToPostScript,
+         (somMethodProc *) exportToPostScript  },
     {    &somId_LuPopplerDocumentisHaveFontInfo,
          (somMethodProc *) isHaveFontInfo  },
     {    &somId_LuPopplerDocumentgetFontInfo,
@@ -1452,10 +1454,10 @@ SOMClass * SOMLINK LuPopplerDocumentNewClass (integer4 somtmajorVersion,
 	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.getFontInfo);
     LuPopplerDocument_parent_LuDocument_isHaveFontInfo_resolved = 
 	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.isHaveFontInfo);
-    LuPopplerDocument_parent_LuDocument_exportToPS_resolved = 
-	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.exportToPS);
-    LuPopplerDocument_parent_LuDocument_isPSExportable_resolved = 
-	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.isPSExportable);
+    LuPopplerDocument_parent_LuDocument_exportToPostScript_resolved = 
+	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.exportToPostScript);
+    LuPopplerDocument_parent_LuDocument_isPostScriptExportable_resolved = 
+	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.isPostScriptExportable);
     LuPopplerDocument_parent_LuDocument_saveAs_resolved = 
 	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.saveAs);
     LuPopplerDocument_parent_LuDocument_isSaveable_resolved = 

@@ -67,6 +67,10 @@ file $(OBJDIR)\messages.obj
 name $(EXEDIR)\Lucide
 lib ..\plugins\ludoc\ludoc
 lib somtk
+import _LuDocumentClassData ludoc.LuDocumentClassData
+import _LuPixbufClassData ludoc.LuPixbufClassData 
+import _LuIndexNodeClassData ludoc.LuIndexNodeClassData
+
 | tmpmake.lnk >NUL
     wlink @tmpmake.lnk
     RC -n $(OBJDIR)\Lucide.RES $(EXEDIR)\Lucide.exe >NUL

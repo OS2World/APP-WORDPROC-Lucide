@@ -31,9 +31,13 @@ lib ..\..\..\..\poppler\poppler.lib
 lib ..\..\..\..\libjpeg\libjpeg.lib
 lib ..\ludoc\ludoc
 lib somtk 
+import _LuPixbufClassData ludoc.LuPixbufClassData
+import _LuIndexNodeClassData ludoc.LuIndexNodeClassData
+import _LuDocumentClassData ludoc.LuDocumentClassData
+import _LuDocumentCClassData ludoc.LuDocumentCClassData
 export LuPopplerDocumentNewClass
-export _LuPopplerDocumentClassData
-export _LuPopplerDocumentCClassData
+export LuPopplerDocumentClassData=_LuPopplerDocumentClassData
+export LuPopplerDocumentCClassData=_LuPopplerDocumentCClassData
 export createObject
 export getSupportedExtensions
 export getDescription

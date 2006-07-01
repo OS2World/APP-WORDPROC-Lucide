@@ -141,7 +141,7 @@ MRESULT EXPENTRY ProgressDlg::progressDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
             _this->pOldBarProc = WinSubclassWindow( hBar, progressBarProc );
             WinStartTimer( hBarHab, hBar, TID_PAINT, 1 );
             
-            _beginthread( _this->threadFn, NULL, 65536, _this->threadData );
+            _beginthread( _this->threadFn, NULL, 262144, _this->threadData );
 
             return (MRESULT)FALSE;
         }
