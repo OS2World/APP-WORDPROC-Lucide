@@ -52,6 +52,7 @@ extern const char *TBHINT_ACTUAL_SIZE;
 extern const char *TBHINT_FIT_WINDOW;
 extern const char *TBHINT_FIT_WIDTH;
 extern const char *TBHINT_FIND;
+extern const char *TBHINT_FINDAGAIN;
 // toolbar's page number
 extern const char *TB_PAGENUM;
 

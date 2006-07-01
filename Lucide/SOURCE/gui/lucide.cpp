@@ -224,6 +224,7 @@ void Lucide::checkMenus()
         WinEnableMenuItem( hWndMenu, CM_FIND, FALSE );
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FIND), (MPARAM)FALSE );
         WinEnableMenuItem( hWndMenu, CM_FINDAGAIN, FALSE );
+        WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FINDAGAIN), (MPARAM)FALSE );
 
         WinEnableMenuItem( hWndMenu, CM_FIRSTPAGE, FALSE );
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FIRSTPAGE), (MPARAM)FALSE );
@@ -592,6 +593,7 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                                             findDlg->isCaseSensitive(), false );
 
                             WinEnableMenuItem( hWndMenu, CM_FINDAGAIN, TRUE );
+                            WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FINDAGAIN), (MPARAM)TRUE );
                         }
                     }
                     return (MRESULT)FALSE;

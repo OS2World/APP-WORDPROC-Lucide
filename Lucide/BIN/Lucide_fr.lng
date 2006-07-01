@@ -54,6 +54,7 @@ TBHINT_ACTUAL_SIZE=Taille r‚elle
 TBHINT_FIT_WINDOW=Adaptation … la fenˆtre
 TBHINT_FIT_WIDTH=Adaptation … la largeur
 TBHINT_FIND=Recherche...
+#? TBHINT_FINDAGAIN=Find again
 # toolbar's page number
 TB_PAGENUM=sur %d
 

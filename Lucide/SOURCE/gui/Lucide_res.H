@@ -50,6 +50,7 @@
 #define IDB_FITPAGE		28
 #define IDB_FITWIDTH	29
 #define IDB_FIND		30
+#define IDB_FINDAGAIN	31
 
 #define IDM_MAINMENU    100
 #define IDA_MAINACCEL	101

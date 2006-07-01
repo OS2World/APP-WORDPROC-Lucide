@@ -12,6 +12,7 @@ BITMAP IDB_100PERC      "bitmaps\\100perc.bmp"
 BITMAP IDB_FITPAGE      "bitmaps\\fitpage.bmp"
 BITMAP IDB_FITWIDTH     "bitmaps\\fitwidth.bmp"
 BITMAP IDB_FIND         "bitmaps\\find.bmp"
+BITMAP IDB_FINDAGAIN    "bitmaps\\findagain.bmp"
 
 POINTER IDP_HAND        "bitmaps\\hand.ptr"
 

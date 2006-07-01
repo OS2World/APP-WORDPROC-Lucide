@@ -292,5 +292,17 @@ HWND createToolbar( HWND hwnd )
     bs.enabled = TRUE;
     WinSendMsg( hToolBar, TBM_ADDBUTTON, (MPARAM)&bs, MPVOID );
 
+    bs.cmd = CM_FINDAGAIN;
+    bs.bubbleText = newstrdupL( TBHINT_FINDAGAIN );
+    bs.bubbleRes = 0;
+    bs.bubbleHmod = NULLHANDLE;
+    bs.pictRes = IDB_FINDAGAIN;
+    bs.pictHmod = NULLHANDLE;
+    bs.menuRes = 0;
+    bs.menuHmod = NULLHANDLE;
+    bs.checked = FALSE;
+    bs.enabled = TRUE;
+    WinSendMsg( hToolBar, TBM_ADDBUTTON, (MPARAM)&bs, MPVOID );
+
     return hToolBar;
 }
