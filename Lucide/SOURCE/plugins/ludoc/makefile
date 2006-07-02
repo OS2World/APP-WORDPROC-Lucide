@@ -33,12 +33,18 @@ name $(EXEDIR)\ludoc
 lib somtk 
 lib libconv
 export LuDocumentNewClass
+export _LuDocumentClassData
+export _LuDocumentCClassData
 export LuDocumentClassData=_LuDocumentClassData
 export LuDocumentCClassData=_LuDocumentCClassData
 export LuPixbufNewClass
+export _LuPixbufClassData
+export _LuPixbufCClassData
 export LuPixbufClassData=_LuPixbufClassData
 export LuPixbufCClassData=_LuPixbufCClassData
 export LuIndexNodeNewClass
+export _LuIndexNodeClassData
+export _LuIndexNodeCClassData
 export LuIndexNodeClassData=_LuIndexNodeClassData
 export LuIndexNodeCClassData=_LuIndexNodeCClassData
 export createObject
@@ -55,9 +61,8 @@ export cnvSysToUCS2
     wlink @tmpmake.lnk
     del tmpmake.lnk
 
-ludoc.lib: $(EXEDIR)\ludoc.dll
-	implib ludoc.lib $(EXEDIR)\ludoc.dll
-
+ludoc.lib: ludoc.def
+	implib ludoc.lib ludoc.def
 
 cpconv.obj: cpconv.cpp
 lupixbuf.obj: lupixbuf.cpp lupixbuf.xh

@@ -1,0 +1,25 @@
+LIBRARY     LUDOC.DLL
+
+EXPORTS
+    LuDocumentNewClass
+    _LuDocumentClassData
+    _LuDocumentCClassData
+    LuDocumentClassData
+    LuDocumentCClassData
+    LuPixbufNewClass
+    _LuPixbufClassData
+    _LuPixbufCClassData
+    LuPixbufClassData
+    LuPixbufCClassData
+    LuIndexNodeNewClass
+    _LuIndexNodeClassData
+    _LuIndexNodeCClassData
+    LuIndexNodeClassData
+    LuIndexNodeCClassData
+    cnvUniToUTF8
+    cnvUniBEToUTF8
+    cnvUTF8ToUni
+    cnvUTF8ToSys
+    cnvUniBEToSys
+    cnvUniToSys
+    cnvSysToUCS2

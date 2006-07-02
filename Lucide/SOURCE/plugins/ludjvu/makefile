@@ -31,11 +31,9 @@ name $(EXEDIR)\ludjvu
 lib ..\..\..\..\libdjvu\ddjvuapi.lib
 lib ..\ludoc\ludoc
 lib somtk 
-import _LuPixbufClassData ludoc.LuPixbufClassData
-import _LuIndexNodeClassData ludoc.LuIndexNodeClassData
-import _LuDocumentClassData ludoc.LuDocumentClassData
-import _LuDocumentCClassData ludoc.LuDocumentCClassData
 export LuDjvuDocumentNewClass
+export _LuDjvuDocumentClassData
+export _LuDjvuDocumentCClassData
 export LuDjvuDocumentClassData=_LuDjvuDocumentClassData
 export LuDjvuDocumentCClassData=_LuDjvuDocumentCClassData
 export createObject

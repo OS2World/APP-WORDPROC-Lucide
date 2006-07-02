@@ -31,10 +31,9 @@ name $(EXEDIR)\lujpeg
 lib ..\..\..\..\libjpeg\libjpeg.lib
 lib ..\ludoc\ludoc
 lib somtk 
-import _LuPixbufClassData ludoc.LuPixbufClassData
-import _LuDocumentClassData ludoc.LuDocumentClassData
-import _LuDocumentCClassData ludoc.LuDocumentCClassData
 export LuJpegDocumentNewClass
+export _LuJpegDocumentClassData
+export _LuJpegDocumentCClassData
 export LuJpegDocumentClassData=_LuJpegDocumentClassData
 export LuJpegDocumentCClassData=_LuJpegDocumentCClassData
 export createObject
