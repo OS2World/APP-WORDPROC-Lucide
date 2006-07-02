@@ -588,7 +588,7 @@ MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2, HRGN hrgn )
             sVscrollInc = __min( -1, -( cyClient - LINE_HEIGHT ) );
             break;
         case SB_PAGEDOWN:
-            sVscrollInc = __max( 1, cyClient + LINE_HEIGHT );
+            sVscrollInc = __max( 1, cyClient - LINE_HEIGHT );
             break;
         case SB_SLIDERTRACK:
         case SB_SLIDERPOSITION:
