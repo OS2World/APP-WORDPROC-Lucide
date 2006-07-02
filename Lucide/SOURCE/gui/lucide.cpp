@@ -421,7 +421,7 @@ void Lucide::loadDocument( const char *fn )
 
 void Lucide::openDocument()
 {
-	char dirbuf[ CCHMAXPATH ];
+    char dirbuf[ CCHMAXPATH ];
     PFILEDLG fd = new FILEDLG;
     memset( fd, 0, sizeof( FILEDLG ) );
     fd->cbSize = sizeof( FILEDLG );
@@ -765,6 +765,8 @@ int main( int argc, char **argv )
         WinSetWindowPos( hWndFrame, HWND_TOP, 100, 100, 630, 400,
                          SWP_SIZE | SWP_MOVE | SWP_SHOW | SWP_ACTIVATE );
     }
+
+    WinSetFocus( HWND_DESKTOP, WinWindowFromID( docViewer->getHWND(), FID_CLIENT ) );
 
     if ( argc > 1 ) {
         Lucide::loadDocument( argv[1] );

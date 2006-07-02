@@ -1566,11 +1566,19 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                 return TRUE;
 
             case VK_PAGEUP:
-                WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEUP ) );
+                if ( fsflags & KC_CTRL ) {
+                    vertScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ), NULLHANDLE );
+                } else {
+                    WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEUP ) );
+                }
                 return TRUE;
 
             case VK_PAGEDOWN:
-                WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEDOWN ) );
+                if ( fsflags & KC_CTRL ) {
+                    vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ), NULLHANDLE );
+                } else {
+                    WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEDOWN ) );
+                }
                 return TRUE;
 
             case VK_LEFT:
@@ -1580,6 +1588,15 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
             case VK_RIGHT:
                 WinSendMsg( hwnd, WM_HSCROLL, MPVOID, MPFROM2SHORT( 0, SB_LINERIGHT ) );
                 return TRUE;
+
+            case VK_HOME:
+                horizScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ), NULLHANDLE );
+                return TRUE;
+
+            case VK_END:
+                horizScroll( hwnd, MPFROM2SHORT( sHscrollMax, SB_SLIDERPOSITION ), NULLHANDLE );
+                return TRUE;
+
         }
     }
 
