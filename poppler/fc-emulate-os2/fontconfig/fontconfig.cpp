@@ -13,11 +13,6 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with gtk-gnutella; if not, write to the Free Software
- *  Foundation, Inc.:
- *      59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *----------------------------------------------------------------------
  */
 
@@ -50,6 +45,26 @@ static char *newstrdup( const char *s )
     char *temp = new char[ strlen( s ) + 1 ];
     strcpy( temp, s );
     return temp;
+}
+
+static string rtrim( const char *p )
+{
+    size_t len = strlen( p );
+    char *temp = new char[ len + 1 ];
+    strcpy( temp, p );
+
+    for ( int i = len - 1; i >= 0; i-- )
+    {
+        if ( isspace( temp[ i ] ) ) {
+            temp[ i ] = 0;
+        }
+        else {
+            break;
+        }
+    }
+    string r = temp;
+    delete temp;
+    return r;
 }
 
 // er_tokens - utility class
@@ -195,8 +210,8 @@ static void ftLoad( char *fn )
     else {
         FcfRecord r = (*fcfmap)[ fn ];
         if ( ( r.size == st.st_size ) && ( r.modified == st.st_mtime ) ) {
-            familyName = r.family;
-            styleName = r.style;
+            familyName = rtrim( r.family );
+            styleName = rtrim( r.style );
         }
         else {
             needread = true;
@@ -213,8 +228,8 @@ static void ftLoad( char *fn )
             return;
         }
 
-        familyName = ftface->family_name;
-        styleName = ftface->style_name;
+        familyName = rtrim( ftface->family_name );
+        styleName = rtrim( ftface->style_name );
 
         FT_Done_Face( ftface );
     }

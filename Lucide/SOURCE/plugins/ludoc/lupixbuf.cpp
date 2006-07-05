@@ -82,7 +82,7 @@ SOM_Scope void SOMLINK LuPixbufInit(LuPixbuf *somSelf,  Environment *ev,
 	    somThis->rowsize = (somThis->rowsize + 3) &~3;
 	}
     somThis->dlen = somThis->rowsize * somThis->height;
-    somThis->data = new char[ somThis->dlen ];
+    somThis->data = (char *)SOMMalloc( somThis->dlen );
     memset( somThis->data, 0xff, somThis->dlen );
 }
 
@@ -149,7 +149,7 @@ SOM_Scope void SOMLINK somDestruct(LuPixbuf *somSelf, octet doFree,
     LuPixbuf_BeginDestructor;
 
     // local LuPixbuf deinitialization code
-    delete somThis->data;
+    SOMFree( somThis->data );
     // local LuPixbuf deinitialization code end
 
     LuPixbuf_EndDestructor;
