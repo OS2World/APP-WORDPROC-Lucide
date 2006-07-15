@@ -60,8 +60,10 @@ class DocumentViewer
         virtual ~DocumentViewer();
 
         void setPageLayout( PgLayout layout );
+        PgLayout getPageLayout() { return ( continuous ? Continuous : SinglePage ); }
 
-        HWND getHWND() { return hWndDocFrame; }
+        HWND getFrameHWND() { return hWndDocFrame; }
+        HWND getViewHWND() { return hWndDoc; }
 
         void setDocument( LuDocument *_doc );
         void close();
@@ -76,6 +78,7 @@ class DocumentViewer
         void copyToClipbrd();
         void searchDocument( const char *_searchString, bool _caseSensitive,
                              bool _continueSearch );
+        void setFullscreen( bool _fullscreen );
 
         static void registerClass( HAB hab );
 
@@ -155,6 +158,11 @@ class DocumentViewer
         int drawareaIndex;
         bool closed;
         bool drawPS;
+        
+        // fullscreen
+        bool fullscreen;
+        PgLayout pglSave;
+        double zoomSave;
 
         // continuous view
         bool continuous;

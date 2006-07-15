@@ -36,7 +36,7 @@ MENU_SHOW_NAV_PANE=Afficher le panneau de navigation
 MENU_SINGLE_PAGE=Page simple
 MENU_CONTINUOUS=Continu
 MENU_WINDOW=~Fenˆtres
-MENU_FULLSCREEN=Plein ‚cran\tF11
+MENU_FULLSCREEN=Plein ‚cran\tCtrl+L
 MENU_HELP=~Aide
 MENU_PRODUCT_INFORMATION=Info. produit
 

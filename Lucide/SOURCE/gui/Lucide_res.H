@@ -87,7 +87,8 @@
 #define CM_FONTSINFO	409
 
 #define CM_NAVPANE		501
-#define CM_FULLSCREEN	502
+#define CM_MAXVIEW		502
+#define CM_FULLSCREEN	503
 
 #define CM_PRODINFO		601
 

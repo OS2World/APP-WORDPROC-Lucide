@@ -36,7 +36,7 @@ MENU_SHOW_NAV_PANE=Visa navigationspanel
 MENU_SINGLE_PAGE=Enstaka sida
 MENU_CONTINUOUS=Kontinuerlig
 MENU_WINDOW=~F”nster
-MENU_FULLSCREEN=Fullsk„rm\tF11
+MENU_FULLSCREEN=Fullsk„rm\tCtrl+L
 MENU_HELP=~Hj„lp
 MENU_PRODUCT_INFORMATION=Produktinformation
 

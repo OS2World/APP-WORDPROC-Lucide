@@ -93,6 +93,7 @@ char           *title     = NULL;
 bool  Lucide::dontSwitchPage = false;
 SHORT Lucide::splitterPos    = 100;
 bool  Lucide::showIndex      = true;
+bool  Lucide::isMaxview      = false;
 bool  Lucide::isFullscreen   = false;
 LuWindowPos Lucide::winPos   = {0};
 
@@ -462,11 +463,11 @@ void Lucide::checkNavpane()
 }
 
 
-void Lucide::toggleFullscreen()
+void Lucide::toggleMaxview()
 {
     ULONG ulFrameStyle = WinQueryWindowULong( hWndFrame, QWL_STYLE );
 
-    if ( isFullscreen )
+    if ( isMaxview )
     {
         WinSetParent( hFrameSysmenu,  hWndFrame, FALSE );
         WinSetParent( hFrameTitlebar, hWndFrame, FALSE );
@@ -494,7 +495,7 @@ void Lucide::toggleFullscreen()
                 MPFROMLONG( FCF_TITLEBAR | FCF_SIZEBORDER | FCF_SYSMENU | FCF_MINMAX ),
                 MPVOID );
 
-    if ( isFullscreen )
+    if ( isMaxview )
     {
         WinSetWindowUShort( hWndFrame, QWS_XRESTORE,  winPos.XRestore );
         WinSetWindowUShort( hWndFrame, QWS_YRESTORE,  winPos.YRestore );
@@ -510,9 +511,35 @@ void Lucide::toggleFullscreen()
     else
     {
         WinSetWindowPos( hWndFrame, HWND_TOP, 0, 0,
-                         WinQuerySysValue( HWND_DESKTOP, SV_CXFULLSCREEN ) - 1,
-                         WinQuerySysValue( HWND_DESKTOP, SV_CYFULLSCREEN ) +
-                            WinQuerySysValue( HWND_DESKTOP, SV_CYTITLEBAR ),
+                         WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN ),
+                         WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN ),
+                         SWP_SIZE | SWP_MOVE | SWP_ZORDER );
+    }
+
+    isMaxview = !isMaxview;
+}
+
+
+void Lucide::toggleFullscreen()
+{
+    if ( isFullscreen )
+    {
+        docViewer->setFullscreen( false );
+        WinSetParent( docViewer->getFrameHWND(), hWndFrame, TRUE );
+        WinSendMsg( hVertSplitter, SBM_SETWINDOWS,
+                    MPFROMHWND( indexWin->getHWND() ),
+                    MPFROMHWND( docViewer->getFrameHWND() ) );
+    }
+    else
+    {
+        docViewer->setFullscreen( true );
+        WinSendMsg( hVertSplitter, SBM_SETWINDOWS,
+                    MPFROMHWND( indexWin->getHWND() ),
+                    MPFROMHWND( NULLHANDLE ) );
+        WinSetParent( docViewer->getFrameHWND(), HWND_DESKTOP, FALSE );
+        WinSetWindowPos( docViewer->getFrameHWND(), HWND_TOP, 0, 0,
+                         WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN ),
+                         WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN ),
                          SWP_SIZE | SWP_MOVE | SWP_ZORDER );
     }
 
@@ -663,6 +690,10 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     }
                     return (MRESULT)FALSE;
 
+                case CM_MAXVIEW:
+                    Lucide::toggleMaxview();
+                    return (MRESULT)FALSE;
+
                 case CM_FULLSCREEN:
                     Lucide::toggleFullscreen();
                     return (MRESULT)FALSE;
@@ -732,7 +763,7 @@ int main( int argc, char **argv )
     docViewer = new DocumentViewer( hab, hWndFrame );
 
     WinSendMsg( hVertSplitter, SBM_SETWINDOWS,
-                MPFROMHWND( indexWin->getHWND() ), MPFROMHWND( docViewer->getHWND() ) );
+                MPFROMHWND( indexWin->getHWND() ), MPFROMHWND( docViewer->getFrameHWND() ) );
     Lucide::splitterPos = PrfQueryProfileInt( HINI_USERPROFILE, appName, splpos, Lucide::splitterPos );
     Lucide::showIndex = PrfQueryProfileInt( HINI_USERPROFILE, appName, showind, Lucide::showIndex );
     WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS,
@@ -766,7 +797,7 @@ int main( int argc, char **argv )
                          SWP_SIZE | SWP_MOVE | SWP_SHOW | SWP_ACTIVATE );
     }
 
-    WinSetFocus( HWND_DESKTOP, WinWindowFromID( docViewer->getHWND(), FID_CLIENT ) );
+    WinSetFocus( HWND_DESKTOP, docViewer->getViewHWND() );
 
     if ( argc > 1 ) {
         Lucide::loadDocument( argv[1] );

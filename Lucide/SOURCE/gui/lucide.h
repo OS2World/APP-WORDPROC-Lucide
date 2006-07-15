@@ -65,6 +65,7 @@ class Lucide
 		static char docName[ CCHMAXPATH ];
 		static bool docLoaded;
 		static char *loadError;
+		static bool isMaxview;
 		static bool isFullscreen;
 		static LuWindowPos winPos;
     
@@ -89,6 +90,7 @@ class Lucide
         static void setZoom( double zoom );
         static void enableCopy( bool enable );
         static void setPageLayout( PgLayout layout );
+        static void toggleMaxview();
         static void toggleFullscreen();
 };
 
