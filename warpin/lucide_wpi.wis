@@ -97,9 +97,12 @@ By pressing the "I agree" button, you agree to all terms and conditions to the b
 <README FORMAT=HTML>
 <B>LICENSE</B>
 <P>
+Lucide is licensed for use with eComStation only. You are not allowed to
+distribute the product by uploading it to public Internet servers or by any
+other means make it publicly available.
 
-Add the license description here.
-
+The plugins are released under CDDL/LGPL or GPL, depending on the plugin. See
+http://svn.netlabs.org/lucide/ for more information and source code.
 </README>
 </PAGE>
 

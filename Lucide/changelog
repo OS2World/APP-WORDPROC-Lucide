@@ -1,4 +1,22 @@
-Beta-1.2:
+Beta-2:
+  - Avoided using of fontconfig library, created replacement, testing
+    needed (closed tickets #30, #32, #35).
+  - New application icon and toolbar bitmaps.
+  - Implemented rotation.
+  - Centers pages if smaller than window, draw gray border (closed ticket #33).
+  - WPI creation scripts and dirs (closed ticket #9).
+  - Fullscreen implemented (closed ticket #6). Hotkey is Ctrl+L, like in
+    Acrobat. Mozilla-like fullscreen (F11) renamed to 'Maximized view'.
+  - Added document navigation shortcuts (up/down,pgup/pgdown,
+    ctrl-pgup/pgdown,home/end), (closed ticket #7).
+  - Interface changes as per Heiko Nitzsche suggestions, compatibility
+    changes (closed tickets #18, #40).
+  - Fixed Alt-F4 processing (closed ticket #41).
+  - Correctly set initial values for comboboxes in settings dialog.
+  - Fixed crash on double clicking an empty area in the navigation pane 
+    (closed ticket #38).
+  - Fixed SYS3180 crash when plugins resides not in current dir (closed
+    tickets #20, #29).
 
 
 Beta-1.1:

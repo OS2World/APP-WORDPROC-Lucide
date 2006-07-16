@@ -9,14 +9,14 @@ to easily add more plugins.
 :: Plugins ::
 
    Supported file type         Supported features
-  ---------------------------------------------------------------------
-         PDF                   Scaling, Navigation, Text selection,
-                               Searching, Asynchronous rendering
+  --------------------------------------------------------------------------
+         PDF                   Scaling, Rotation, Navigation, Text
+                               selection, Searching, Asynchronous rendering
 
          DJVU                  Scaling
 
          JPG                   -
-  ---------------------------------------------------------------------
+  --------------------------------------------------------------------------
 
 The DJVU plugin requires Innotek LIBC:
 
