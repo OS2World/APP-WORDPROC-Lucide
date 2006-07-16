@@ -62,6 +62,7 @@ typedef LuDocument_LuRectSequence    *PLuRectSequence;
 typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 
 #define LINE_HEIGHT     16
+#define BORDER_COLOR    0x808080L
 
 // DocumentViewer constructor
 DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
@@ -883,27 +884,28 @@ void DocumentViewer::drawthread( void *p )
     _endthread();
 }
 
-// handles WM_PAINT if document supports asynch rendering.
+// handles WM_PAINT if singlepage asynchronous rendering used
 // posts events to drawthread
 void DocumentViewer::wmPaintAsynch( HWND hwnd )
 {
     RECTL rcl;
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
-    RECTL rclWin = { 0 };
-    WinQueryWindowRect( hwnd, &rclWin );
-    if ( WinEqualRect( hab, &rcl, &rclWin ) ) {
-        GpiErase( hps );
-    }
+    GpiCreateLogColorTable( hpsBuffer, 0, LCOLF_RGB, 0, 0, NULL );
+    WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
+    BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
     WinEndPaint( hps );
 
     if ( doc != NULL )
     {
-        RECTL rclPage = { 0, 0, width, height };
-        if ( height < cyClient )
-        {
-            rclPage.yBottom = cyClient - height;
-            rclPage.yTop = cyClient;
+        LONG xPos = 0, yPos = 0;
+        if ( width < cxClient ) {
+            xPos = ( cxClient - width ) / 2;
         }
+        if ( height < cyClient ) {
+            yPos = ( cyClient - height ) / 2;
+        }
+
+        RECTL rclPage = { xPos, yPos, width + xPos, height + yPos };
         RECTL rclDraw = { 0 };
         if ( WinIntersectRect( hab, &rclDraw, &rcl, &rclPage ) )
         {
@@ -943,12 +945,9 @@ void DocumentViewer::wmPaintAsynch( HWND hwnd )
                 }
             }
             WinUnionRect( hab, &ppda->drawrect, &ppda->drawrect, &rclDraw );
-            ppda->startpos.x = sHscrollPos + ppda->drawrect.xLeft;
-            ppda->startpos.y = ( cyClient - ppda->drawrect.yTop ) + sVscrollPos;
-
-            // workaround ?
-            ppda->drawrect.xRight++;
-            ppda->drawrect.yTop++;
+            ppda->startpos.x = sHscrollPos + ppda->drawrect.xLeft - xPos;
+            ppda->startpos.y = ( yPos > 0 ) ? rclPage.yTop - ppda->drawrect.yTop :
+                    ( cyClient - ppda->drawrect.yTop ) + sVscrollPos;
 
             DosReleaseMutexSem( todrawAccess );
             DosPostEventSem( haveDraw );
@@ -962,7 +961,8 @@ void DocumentViewer::wmPaintContAsynch( HWND hwnd )
 {
     RECTL rcl, rclWin, rclDraw = { 0 };
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
-    GpiErase( hpsBuffer );
+    GpiCreateLogColorTable( hpsBuffer, 0, LCOLF_RGB, 0, 0, NULL );
+    WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
     BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
     WinEndPaint( hps );
 
@@ -1018,21 +1018,25 @@ void DocumentViewer::wmPaint( HWND hwnd )
 {
     RECTL rcl;
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
-    GpiErase( hpsBuffer );
+    GpiCreateLogColorTable( hpsBuffer, 0, LCOLF_RGB, 0, 0, NULL );
+    WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
 
     if ( doc != NULL )
     {
-        RECTL rclPage = { 0, 0, width, height };
-        if ( height < cyClient )
-        {
-            rclPage.yBottom = cyClient - height;
-            rclPage.yTop = cyClient;
+        LONG xPos = 0, yPos = 0;
+        if ( width < cxClient ) {
+            xPos = ( cxClient - width ) / 2;
         }
+        if ( height < cyClient ) {
+            yPos = ( cyClient - height ) / 2;
+        }
+
+        RECTL rclPage = { xPos, yPos, width + xPos, height + yPos };
         RECTL rclDraw = { 0 };
         if ( WinIntersectRect( hab, &rclDraw, &rcl, &rclPage ) )
         {
-            spos_x = sHscrollPos + rclDraw.xLeft;
-            spos_y = (cyClient - rclDraw.yTop) + sVscrollPos;
+            spos_x = sHscrollPos + rclDraw.xLeft - xPos;
+            spos_y = ( yPos > 0 ) ? rclPage.yTop - rclDraw.yTop : (cyClient - rclDraw.yTop) + sVscrollPos;
             LONG rclx = rclDraw.xRight - rclDraw.xLeft;
             LONG rcly = rclDraw.yTop - rclDraw.yBottom;
 
@@ -1119,17 +1123,29 @@ DrawAreas *DocumentViewer::findDrawAreas( PRECTL r )
             long pg = posToPagenum( i, &pageRest );
             if ( pg != foundpage )
             {
+                double w = pagesizes[ pg ].x * realzoom;
+
                 PageDrawArea pda;
                 pda.pagenum = pg;
-                pda.drawrect.xLeft   = __min( pagesizes[ pg ].x * realzoom, r->xLeft );
-                pda.drawrect.yBottom = __max( i - pageRest, r->yBottom );
-                pda.drawrect.xRight  = __min( pagesizes[ pg ].x * realzoom, r->xRight );
-                pda.drawrect.yTop    = i;
 
-                pda.startpos.x = sHscrollPos + pda.drawrect.xLeft;
-                pda.startpos.y = ( pagesizes[ pg ].y * realzoom ) - pageRest;
+                LONG xPos = 0;
+                if ( w < cxClient ) {
+                    xPos = ( cxClient - w ) / 2;
+                }
+                RECTL rclPage = { xPos, 0, width + xPos, height };
+                RECTL rclDraw = { 0 };
+                if ( WinIntersectRect( hab, &rclDraw, r, &rclPage ) )
+                {
+                    pda.drawrect.xLeft   = __min( w + xPos, rclDraw.xLeft );
+                    pda.drawrect.yBottom = __max( i - pageRest, rclDraw.yBottom );
+                    pda.drawrect.xRight  = __min( w + xPos, rclDraw.xRight );
+                    pda.drawrect.yTop    = i;
 
-                areas->push_back( pda );
+                    pda.startpos.x = sHscrollPos + pda.drawrect.xLeft - xPos;
+                    pda.startpos.y = ( pagesizes[ pg ].y * realzoom ) - pageRest;
+
+                    areas->push_back( pda );
+                }
                 foundpage = pg;
                 i -= pageRest;
             }
@@ -1172,7 +1188,8 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
 {
     RECTL rcl;
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
-    GpiErase( hpsBuffer );
+    GpiCreateLogColorTable( hpsBuffer, 0, LCOLF_RGB, 0, 0, NULL );
+    WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
 
     if ( doc != NULL )
     {
@@ -1189,7 +1206,6 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
             }
 
             spos_x = pda->startpos.x;
-            //spos_y = ( cyClient - pda->drawrect.yTop ) + ( sVscrollPos * VScrollStep );
             spos_y = pda->startpos.y;
             LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
             LONG rcly = pda->drawrect.yTop - pda->drawrect.yBottom;
