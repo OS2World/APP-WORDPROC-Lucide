@@ -1300,10 +1300,25 @@ void DocumentViewer::rotateRectangle( long pagenum, LuRectangle *r )
 // single page mode only
 void DocumentViewer::winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRectangle *r )
 {
-    r->x1 = ( startpoint->x + sHscrollPos ) / realzoom;
-    r->y1 = ( ( cyClient - startpoint->y ) + sVscrollPos ) / realzoom;
-    r->x2 = ( endpoint->x + sHscrollPos ) / realzoom;
-    r->y2 = ( ( cyClient - endpoint->y ) + sVscrollPos ) / realzoom;
+    LONG sx = startpoint->x;
+    LONG sy = startpoint->y;
+    LONG ex = endpoint->x;
+    LONG ey = endpoint->y;
+    if ( width < cxClient ) {
+        LONG xPos = ( cxClient - width ) / 2;
+        sx -= xPos;
+        ex -= xPos;
+    }
+    if ( height < cyClient ) {
+        LONG yPos = ( cyClient - height ) / 2;
+        sy += yPos;
+        ey += yPos;
+    }
+
+    r->x1 = ( sx + sHscrollPos ) / realzoom;
+    r->y1 = ( ( cyClient - sy ) + sVscrollPos ) / realzoom;
+    r->x2 = ( ex + sHscrollPos ) / realzoom;
+    r->y2 = ( ( cyClient - ey ) + sVscrollPos ) / realzoom;
 
     rotateRectangle( currentpage, r );
 }
@@ -1312,9 +1327,18 @@ void DocumentViewer::winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRec
 // continuous view mode only
 void DocumentViewer::winPosToDocPos( PageDrawArea *pda, LuRectangle *r )
 {
-    r->x1 = ( sHscrollPos + pda->drawrect.xLeft ) / realzoom;;
+    LONG sx = pda->drawrect.xLeft;
+    LONG ex = pda->drawrect.xRight;
+    double w = pagesizes[ pda->pagenum ].x * realzoom;
+    if ( w < cxClient ) {
+        LONG xPos = ( cxClient - w ) / 2;
+        sx -= xPos;
+        ex -= xPos;
+    }
+
+    r->x1 = ( sHscrollPos + sx ) / realzoom;;
     r->y1 = pda->startpos.y / realzoom;
-    r->x2 = ( ( pda->drawrect.xRight - pda->drawrect.xLeft ) / realzoom ) + r->x1;
+    r->x2 = ( ( ex - sx ) / realzoom ) + r->x1;
     r->y2 = ( ( pda->drawrect.yTop - pda->drawrect.yBottom ) / realzoom ) + r->y1;
 
     rotateRectangle( pda->pagenum, r );
@@ -1358,6 +1382,22 @@ void DocumentViewer::docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl )
     rcl->yBottom = cyClient - ( yplus + ( tmp_y2 * realzoom ) ) + ( sVscrollPos * VScrollStep );
     rcl->xRight  = ( tmp_x2 * realzoom ) - sHscrollPos;
     rcl->yTop    = cyClient - ( yplus + ( tmp_y1 * realzoom ) ) + ( sVscrollPos * VScrollStep );
+
+    LONG pw = w * realzoom;
+    if ( pw < cxClient ) {
+        LONG xPos = ( cxClient - pw ) / 2;
+        rcl->xLeft  += xPos;
+        rcl->xRight += xPos;
+    }
+    if ( !continuous )
+    {
+        LONG ph = h * realzoom;
+        if ( ph < cyClient ) {
+            LONG yPos = ( cyClient - ph ) / 2;
+            rcl->yBottom -= yPos;
+            rcl->yTop    -= yPos;
+        }
+    }
 }
 
 // creates region from sequence of rectangles
