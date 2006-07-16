@@ -1,0 +1,144 @@
+
+<!-- This is the profile for installing Lucide core and plugins. -->
+
+<WARPIN
+     OS="OS2_3x"
+     CODEPAGE=850
+>
+
+<!-- Every .WPI archive contains one or more packages. -->
+
+<HEAD>
+
+<PCK INDEX=1
+     PACKAGEID="XXXXXXXXXXXXX\Lucide\Lucide core\1\2\0"
+     TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
+     BASE
+     TITLE="Lucide Document Viewer"
+     CREATEOBJECT="WPFolder|Lucide for eCS|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;"
+     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU'
+     CREATEOBJECT='WPProgram|Lucide Readme|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;PROGTYPE=PM;PARAMETERS="$(1)\readme";STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|Lucide Changelog|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;PROGTYPE=PM;PARAMETERS="$(1)\changelog";STARTUPDIR=$(1);'
+     SELECT
+     >This package contains the Lucide Document Viewer.</PCK>
+
+<PCK INDEX=2
+     PACKAGEID="XXXXXXXXXXXXX\Lucide\Lucide plugin PDF\1\0\0"
+     TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
+     TITLE="Lucide PDF plugin"
+     REQUIRES=1
+     SELECT | FIXED
+     >This package contains a plugin to view PDF documents.</PCK>
+
+<PCK INDEX=3
+     PACKAGEID="XXXXXXXXXXXXX\Lucide\Lucide plugin DJVU\1\0\0"
+     TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
+     TITLE="Lucide DjVu plugin"
+     REQUIRES=1
+     SELECT | FIXED
+     >This package contains a plugin to view DJVU files.</PCK>
+
+<PCK INDEX=4
+     PACKAGEID="XXXXXXXXXXXXX\Lucide\Lucide plugin JPEG\1\0\0"
+     TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
+     TITLE="Lucide JPEG plugin"
+     REQUIRES=1
+     SELECT | FIXED
+     >This package contains a plugin to view JPEG images.</PCK>
+
+</HEAD>
+
+<!-- Here come the different pages. They are linked by
+     the <NEXTBUTTON> tags, which must have a target.
+     Each page must have a TYPE= attribute, which tells
+     WarpIn what will be visible on that page. -->
+
+<BODY>
+
+<!-- The TYPE_README will show a README text in a multi-line entry field. -->
+
+<PAGE INDEX=1 TYPE=README>
+<NEXTBUTTON TARGET=2>~Next</NEXTBUTTON>
+<TEXT>
+Select "Next" to continue.
+Select "Cancel" to abort installation.
+</TEXT>
+
+<README FORMAT=HTML>
+<B>Lucide for eComStation</B>
+<P>
+Lucide is a plugin based document viewer for eComStation. In its first incarnation
+it supports PDF, DjVu and JPEG files but new document types can easily be added to it.
+<P>
+Lucide itself is currently released as binary-only, the plugin sourcecode is available
+so developers can use this as a base for more plugins. The binary is not available
+at netlabs.org, you need an eComStation account to get it.
+<P>
+<BR>
+Supported features:
+<UL>
+  <LI>Feature 1
+  <LI>Feature 2
+  <LI>Feature 3
+</UL>
+<P>
+<BR>
+For further details please goto the Lucide project homepage:<BR>
+http://svn.netlabs.org/lucide/
+<BR>
+</README>
+</PAGE>
+
+<PAGE INDEX=2 TYPE=README>
+<NEXTBUTTON TARGET=3>~I agree</NEXTBUTTON>
+<TEXT>
+By pressing the "I agree" button, you agree to all terms and conditions to the below licence agreement.
+</TEXT>
+<README FORMAT=HTML>
+<B>LICENSE</B>
+<P>
+
+Add the license description here.
+
+</README>
+</PAGE>
+
+<!-- The TYPE=CONTAINER will list the packages which can be installed. -->
+
+<PAGE INDEX=3 TYPE=CONTAINER>
+<NEXTBUTTON TARGET=4>~Next</NEXTBUTTON>
+<TEXT>
+Please select the packages which are to be installed. You may change the target paths for the packages. Select either English or German GBMV2 package. Don't select both.
+</TEXT>
+</PAGE>
+
+
+<!-- The TYPE=CONFIGURE will allow the user to set the CONFIG.SYS and
+     WPS classes/objects stuff. -->
+
+<PAGE INDEX=4 TYPE=CONFIGURE>
+<NEXTBUTTON TARGET=5>~Next</NEXTBUTTON>
+<TEXT>
+
+Please select additional configuration that WarpIN should perform after installing this archive.
+
+</TEXT>
+</PAGE>
+
+<!-- Here's another TYPE=TEXT page before we install.
+     The special target "0" indicates that after this page we
+     should start installation.
+     Note that the TYPE=INSTALL page (which we had in Alpha #3)
+     is no longer supported. -->
+
+<PAGE INDEX=5 TYPE=TEXT>
+<NEXTBUTTON TARGET=0>I~nstall</NEXTBUTTON>
+<TEXT>
+
+
+
+Press "Install" to begin installing this archive.</TEXT>
+</PAGE>
+</BODY>
+</WARPIN>
+
