@@ -3,119 +3,138 @@
 #
 
 #
-# HauptmenÅ
+# Main menu
 #
 MENU_FILE=~Datei
-MENU_OPEN=ôffnen...\tCtrl+O
-MENU_SAVE_AS=Sichern als...
-MENU_EXPORT_TO_PS=Als PostScript exportieren...
-MENU_PAGE_SETUP=Seite einrichten...
+MENU_OPEN=ôffnen...\tStrg+O
+MENU_SAVE_AS=Sichern unter...
+MENU_EXPORT_TO_PS=Export nach PostScript...
+MENU_PAGE_SETUP=Seiteneinrichtung...
 MENU_PRINT=Drucken...
-MENU_DOCUMENT_INFO=Dokumenteninfo...
-MENU_FONTS_INFO=Fontsinfo...
-MENU_PLUGINS_LIST=Pluginsliste...
-MENU_EXIT=Beenden\tCtrl+X
+MENU_DOCUMENT_INFO=Dokumentinformationen...
+MENU_FONTS_INFO=Schrifteninformation...
+MENU_PLUGINS_LIST=Plugin-Liste...
+MENU_EXIT=Beenden\tStrg+X
 MENU_EDIT=~Bearbeiten
-MENU_COPY=Kopieren\tCtrl+Insert
-MENU_SELECT_ALL=Alles markieren
-MENU_FIND=Suchen...\tCtrl+F
-MENU_FINDAGAIN=Weitersuchen\tCtrl+G
+MENU_COPY=Kopieren\tStrg+Einfg
+MENU_SELECT_ALL=Alles markieren\tStrg+/
+MENU_FIND=Suchen...\tStrg+F
+MENU_FINDAGAIN=Weitersuchen\tStrg+G
+MENU_SETTINGS=Einstellungen
 MENU_DOCUMENT=~Dokument
-MENU_FIRST_PAGE=Seite eins
-MENU_PREV_PAGE=Vorherige Seite\t-
+MENU_FIRST_PAGE=Erste Seite
+MENU_PREV_PAGE=Vorige Seite\t-
 MENU_NEXT_PAGE=NÑchste Seite\t+
 MENU_LAST_PAGE=Letzte Seite
 MENU_GO_TO_PAGE=Gehe zu Seite...
-MENU_VIEW=~Ansicht
-MENU_FIT_WINDOW=An Fenster anpassen
-MENU_ACTUAL_SIZE=Grî·e aktualisieren
-MENU_FIT_WIDTH=Breite anpassen
-MENU_ROTATE_CW=Rotiere 90¯ im Uz
-MENU_ROTATE_CCW=Rotiere 90¯ gegen Uz
-MENU_SHOW_NAV_PANE=Navigationszeile anzeigen
-MENU_SINGLE_PAGE=Einzelseite
+MENU_VIEW=~Anzeige
+MENU_FIT_WINDOW=Ganze Seite
+MENU_ACTUAL_SIZE=Originalgrî·e
+MENU_FIT_WIDTH=Seitenbreite
+MENU_ROTATE_CW=90¯ im UZS drehen
+MENU_ROTATE_CCW=90¯ gegen UZS drehen
+MENU_SHOW_NAV_PANE=Navigator anzeigen
+MENU_SINGLE_PAGE=Einzelne Seite
 MENU_CONTINUOUS=Fortlaufend
+MENU_WINDOW=~Fenster
+MENU_FULLSCREEN=Vollbild\tF11
+MENU_HELP=~Hilfe
+MENU_PRODUCT_INFORMATION=Produktinformation
 
 #
 # Toolbar hints
 #
-TBHINT_OPEN=ôffne Dokument...
+TBHINT_OPEN=Dokument îffnen...
 TBHINT_PRINT=Drucken...
-TBHINT_SHOW_NAV_PANE=Zeige/Verstecke Navigationszeile
+TBHINT_SHOW_NAV_PANE=Navigator an/aus
 TBHINT_FIRST_PAGE=Erste Seite
-TBHINT_PREV_PAGE=Vorherige Seite
+TBHINT_PREV_PAGE=Vorige Seite
 TBHINT_NEXT_PAGE=NÑchste Seite
 TBHINT_LAST_PAGE=Letzte Seite
-TBHINT_ACTUAL_SIZE=Aktuelle Grî·e
-TBHINT_FIT_WINDOW=An Fenster anpassen
-TBHINT_FIT_WIDTH=Breite anpassen
-TBHINT_FIND=Suche...
-
-# toolbar's Seitennummer
+TBHINT_ACTUAL_SIZE=Originalgî·e
+TBHINT_FIT_WINDOW=Ganze Seite
+TBHINT_FIT_WIDTH=Seitenbreite
+TBHINT_FIND=Suchen...
+TBHINT_FINDAGAIN=Weitersuchen
+# toolbar's page number
 TB_PAGENUM=von %d
 
 #
-# Lucide Nachrichten ;)
+# Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=Lucide - Dokumenten Betrachter
-MSGS_NO_SUIT_PLUG=Kann kein passendes Plugin fÅr das angegebene Dokument finden!
-MSGS_FILE_LOAD_ERROR=Dateifehler beim laden!
+MSGS_MAIN_WIN_TITLE=Lucide - Document Viewer
+MSGS_NO_SUIT_PLUG=Kein passendes Plugin fÅr das Dokument gefunden!
+MSGS_FILE_LOAD_ERROR=Datei kann nicht gelesen werden!
+MSGS_LOADING_DOCUMENT=Lese Dokument, bitte warten...
 
 #
-# "Pluginliste" dialog
+# "Plugins list" dialog
 #
-PLUGLIST_PLUGINS_LIST=Pluginsliste
-PLUGLIST_CLOSE=Schlie·en
-
+PLUGLIST_PLUGINS_LIST=Plugin-Liste
+PLUGLIST_CLOSE=Schliessen
 # List columns titles
-PLUGLIST_PLUGIN_NAME=Pluginname
+PLUGLIST_PLUGIN_NAME=Plugin-Name
 PLUGLIST_SUPP_EXTS=UnterstÅtzte Erweiterungen
-PLUGLIST_PLUGIN_DESC=Pluginbeschreibung
+PLUGLIST_PLUGIN_DESC=Plugin-Beschreibung
 
 #
-# "Fontinfo" dialog
+# "Font info" dialog
 #
-FONTINFO_FONTINFO=Fontinfo
-FONTINFO_CLOSE=Schlie·en
-FONTINFO_ENUMERATING=Auflistung der Fonts, bitte warten...
-
+FONTINFO_FONTINFO=Schrifteninformation
+FONTINFO_CLOSE=Schliessen
+FONTINFO_ENUMERATING=ZÑhle Schriften, bitte warten...
 # List columns titles
 FONTINFO_NAME=Name
-FONTINFO_TYPE=Type
+FONTINFO_TYPE=Typ
 FONTINFO_EMBEDDED=Eingebettet?
 
 #
-# "Documenteninfo" dialog
+# "Document info" dialog
 #
-DOCINFO_DOCUMENT_INFO=Dokumenteninfo
-DOCINFO_CLOSE=Schlie·en
-
+DOCINFO_DOCUMENT_INFO=Dokumentinformationen
+DOCINFO_CLOSE=Schliessen
 # Document info keys
 DOCINFO_TITLE=Titel:
 DOCINFO_FORMAT=Format:
-DOCINFO_AUTHOR=Autor:
-DOCINFO_SUBJECT=Subject:
-DOCINFO_KEYWORDS=SchlÅsselwîrter:
-DOCINFO_CREATOR=Hersteller:
+DOCINFO_AUTHOR=Verfasser:
+DOCINFO_SUBJECT=Thema:
+DOCINFO_KEYWORDS=Stichwîrter:
+DOCINFO_CREATOR=Ersteller:
 DOCINFO_PRODUCER=Produzent:
 DOCINFO_CREATION_DATE=Erstellt am:
-DOCINFO_MOD_DATE=Modifiziert:
+DOCINFO_MOD_DATE=GeÑndert am:
 
 #
-# "Suchen" dialog
+# "Find" dialog
 #
-FIND_FIND=Suche
-FIND_FIND_WHAT=~Suche was:
-FIND_MATCH_CASE=~Match case
+FIND_FIND=Suchen
+FIND_FIND_WHAT=~Suchbegriff:
+FIND_MATCH_CASE=~Gro·-/Kleinschreibung beachten
 FIND_OK=~OK
 FIND_CANCEL=~Abbruch
-
-# andere 'Suchen'-bezogene Nachrichten
-FIND_SEARCH_PAGE_OF=Suche Seite %d von %d...
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=Durchsuche Seite %d von %d...
 FIND_NOT_FOUND=Nicht gefunden!
 
 #
-# "Fortschritt" dialog
+# "Progress" dialog
 #
 PDLG_PROGRESS=Fortschritt
 PDLG_CANCEL=~Abbruch
+
+#
+# About dialog
+#
+AD_ABOUT=öber
+AD_COPYRIGHTS=(c) by Eugene Romanenko, netlabs.org in Zusammenarbeit mit Serenity Systems International
+AD_OK=OK
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Einstellungen
+SD_DEFAULT_PAGE_LAYOUT=Standard Seitenlayout:
+SD_DEFAULT_ZOOM=Standard-Zoom:
+SD_OK=~OK
+SD_CANCEL=~Abbruch
+
