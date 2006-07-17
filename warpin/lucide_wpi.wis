@@ -11,7 +11,7 @@
 <HEAD>
 
 <PCK INDEX=1
-     PACKAGEID="XXXXXXXXXXXXX\Lucide\Lucide core\1\2\0"
+     PACKAGEID="netlabs.org\Lucide\Lucide core\1\2\0"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
      BASE
      TITLE="Lucide Document Viewer"
@@ -23,7 +23,7 @@
      >This package contains the Lucide Document Viewer.</PCK>
 
 <PCK INDEX=2
-     PACKAGEID="XXXXXXXXXXXXX\Lucide\Lucide plugin PDF\1\0\0"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin PDF\1\0\0"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
      TITLE="Lucide PDF plugin"
      REQUIRES=1
@@ -31,7 +31,7 @@
      >This package contains a plugin to view PDF documents.</PCK>
 
 <PCK INDEX=3
-     PACKAGEID="XXXXXXXXXXXXX\Lucide\Lucide plugin DJVU\1\0\0"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin DJVU\1\0\0"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
      TITLE="Lucide DjVu plugin"
      REQUIRES=1
@@ -39,7 +39,7 @@
      >This package contains a plugin to view DJVU files.</PCK>
 
 <PCK INDEX=4
-     PACKAGEID="XXXXXXXXXXXXX\Lucide\Lucide plugin JPEG\1\0\0"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin JPEG\1\0\0"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
      TITLE="Lucide JPEG plugin"
      REQUIRES=1
@@ -75,15 +75,15 @@ so developers can use this as a base for more plugins. The binary is not availab
 at netlabs.org, you need an eComStation account to get it.
 <P>
 <BR>
-Supported features:
+Features:
 <UL>
-  <LI>Feature 1
-  <LI>Feature 2
-  <LI>Feature 3
+  <LI>PDF, DjVU & JPEG Support
+  <LI>Drag & Drop Support
+  <LI>Fast & small
 </UL>
 <P>
 <BR>
-For further details please goto the Lucide project homepage:<BR>
+For further details please visit the Lucide project homepage:<BR>
 http://svn.netlabs.org/lucide/
 <BR>
 </README>
