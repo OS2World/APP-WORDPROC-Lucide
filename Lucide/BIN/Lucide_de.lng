@@ -20,7 +20,7 @@ MENU_COPY=Kopieren\tStrg+Einfg
 MENU_SELECT_ALL=Alles markieren\tStrg+/
 MENU_FIND=Suchen...\tStrg+F
 MENU_FINDAGAIN=Weitersuchen\tStrg+G
-MENU_SETTINGS=Einstellungen
+MENU_SETTINGS=Einstellungen...
 MENU_DOCUMENT=~Dokument
 MENU_FIRST_PAGE=Erste Seite
 MENU_PREV_PAGE=Vorige Seite\t-
@@ -37,7 +37,8 @@ MENU_SHOW_NAV_PANE=Navigator anzeigen
 MENU_SINGLE_PAGE=Einzelne Seite
 MENU_CONTINUOUS=Fortlaufend
 MENU_WINDOW=~Fenster
-MENU_FULLSCREEN=Vollbild\tStrg+L
+MENU_MAXVIEW=~Maximiert\tF11
+MENU_FULLSCREEN=~Vollbild\tStrg+L
 MENU_HELP=~Hilfe
 MENU_PRODUCT_INFORMATION=Produktinformation
 
@@ -126,6 +127,7 @@ PDLG_CANCEL=~Abbruch
 # About dialog
 #
 AD_ABOUT=öber
+AD_DESCRIPTION=Plugin-basierender Dokumentviewer mit UnterstÅtzung zahlreicher Dateiformate
 AD_COPYRIGHTS=(c) by Eugene Romanenko, netlabs.org in Zusammenarbeit mit Serenity Systems International
 AD_OK=OK
 
