@@ -9,7 +9,7 @@ Beta-2:
     Acrobat. Mozilla-like fullscreen (F11) renamed to 'Maximized view'.
   - Added document navigation shortcuts (up/down,pgup/pgdown,
     ctrl-pgup/pgdown,home/end), (closed ticket #7).
-  - Interface changes as per Heiko Nitzsche suggestions, compatibility
+  - Plugin interface changes as per Heiko Nitzsche suggestions, compatibility
     changes (closed tickets #18, #40).
   - Fixed Alt-F4 processing (closed ticket #41).
   - Correctly set initial values for comboboxes in settings dialog.

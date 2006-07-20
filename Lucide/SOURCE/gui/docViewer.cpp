@@ -62,7 +62,7 @@ typedef LuDocument_LuRectSequence    *PLuRectSequence;
 typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 
 #define LINE_HEIGHT     16
-#define BORDER_COLOR    0x808080L
+#define BORDER_COLOR    0x909090L
 
 // DocumentViewer constructor
 DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
@@ -106,6 +106,8 @@ DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
     VScrollStep = 1;
     WinSetRectEmpty( hab, &savedRcl );
     drawPS = false;
+    // fullscreen
+    fullscreen = false;
     // asynch draw
     abortAsynch = false;
     termdraw    = false;

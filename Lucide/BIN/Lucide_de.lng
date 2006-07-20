@@ -37,7 +37,7 @@ MENU_SHOW_NAV_PANE=Navigator anzeigen
 MENU_SINGLE_PAGE=Einzelne Seite
 MENU_CONTINUOUS=Fortlaufend
 MENU_WINDOW=~Fenster
-MENU_FULLSCREEN=Vollbild\tF11
+MENU_FULLSCREEN=Vollbild\tStrg+L
 MENU_HELP=~Hilfe
 MENU_PRODUCT_INFORMATION=Produktinformation
 
