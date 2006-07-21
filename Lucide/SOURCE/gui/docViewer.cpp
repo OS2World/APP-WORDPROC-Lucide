@@ -1071,13 +1071,9 @@ void DocumentViewer::wmPaint( HWND hwnd )
 
             drawSelection( currentpage, hpsBuffer, &rclDraw );
             drawFound( currentpage, hpsBuffer, &rclDraw );
-
-            BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
         }
     }
-    else {
-        BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
-    }
+    BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
     WinEndPaint( hps );
 }
 
@@ -1134,7 +1130,9 @@ DrawAreas *DocumentViewer::findDrawAreas( PRECTL r )
                 if ( w < cxClient ) {
                     xPos = ( cxClient - w ) / 2;
                 }
-                RECTL rclPage = { xPos, 0, width + xPos, height };
+                RECTL rclPage = { 0 };
+                LuRectangle lr = { 0, 0, pagesizes[ pg ].x, pagesizes[ pg ].y };
+                docPosToWinPos( pg, &lr, &rclPage );
                 RECTL rclDraw = { 0 };
                 if ( WinIntersectRect( hab, &rclDraw, r, &rclPage ) )
                 {
