@@ -223,6 +223,10 @@ void IndexWindow::clear( TreeRecord *parent )
 
 bool IndexWindow::goToPage( TreeRecord *parent, long page )
 {
+    if ( Lucide::dontSwitchPage ) {
+        return true;
+    }
+        
     SHORT atr = ( parent == NULL ) ? CMA_FIRST : CMA_FIRSTCHILD;
     TreeRecord *pr = (TreeRecord *)WinSendMsg( hWndIndex, CM_QUERYRECORD,
                             MPFROMP( parent ), MPFROM2SHORT( atr, CMA_ITEMORDER ) );
