@@ -195,12 +195,12 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
 
     char *pixbuf_data = (char *)pixbuf->getDataPtr( ev );
     char *src, *dst;
-    int i, y;
+    int i, y, linesize = __min( pb_rowsize, pixbuf_rowsize );
     for ( y = (src_height-1), i = 0; i < src_height; y--, i++ )
     {
         src = pbbuf + (y * pb_rowsize);
         dst = pixbuf_data + (i * pixbuf_rowsize);
-        memcpy( dst, src, src_width * bpp );
+        memcpy( dst, src, linesize );
     }
     delete pb;
 }
