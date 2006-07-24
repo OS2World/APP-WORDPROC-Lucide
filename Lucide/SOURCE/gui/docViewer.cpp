@@ -63,6 +63,8 @@ typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 
 #define LINE_HEIGHT     16
 #define BORDER_COLOR    0x909090L
+#define PAGEBACK_COLOR  0xFFFFFFL
+#define VERT_SPACE      2
 
 // DocumentViewer constructor
 DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
@@ -232,13 +234,13 @@ void DocumentViewer::countPagesizes()
     for ( long i = 0; i < totalpages; i++ )
     {
         doc->getPageSize( ev, i, &pagesizes[i].x, &pagesizes[i].y );
-        if ( ( rotation == 90 ) || ( rotation == 270 ) ) {
+        if ( isRotated() ) {
             double tmp = pagesizes[i].x;
             pagesizes[i].x = pagesizes[i].y;
             pagesizes[i].y = tmp;
         }
         fullwidth = __max( fullwidth, pagesizes[i].x );
-        fullheight += pagesizes[i].y;
+        fullheight += ( pagesizes[i].y + VERT_SPACE );
     }
 }
 
@@ -583,6 +585,7 @@ void DocumentViewer::adjustSize()
         height *= realzoom;
         fullwidth *= realzoom;
         fullheight *= realzoom;
+        fullheight += ( VERT_SPACE * totalpages );
     }
 }
 
@@ -639,7 +642,7 @@ MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2, HRGN hrgn )
 
     sVscrollInc = __max( -sVscrollPos * VScrollStep, __min( sVscrollInc,
                               ( sVscrollMax - sVscrollPos ) * VScrollStep ) );
-
+    sVscrollInc = ( sVscrollInc / VScrollStep ) * VScrollStep;
     if ( sVscrollInc != 0 )
     {
         sVscrollPos += (SHORT)( sVscrollInc / VScrollStep );
@@ -886,20 +889,18 @@ void DocumentViewer::drawthread( void *p )
     _endthread();
 }
 
-// handles WM_PAINT if singlepage asynchronous rendering used
+// handles WM_PAINT if single-page asynchronous rendering used
 // posts events to drawthread
 void DocumentViewer::wmPaintAsynch( HWND hwnd )
 {
+    LONG xPos = 0, yPos = 0;
+    RECTL rclPage = { 0 };
     RECTL rcl;
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
     GpiCreateLogColorTable( hpsBuffer, 0, LCOLF_RGB, 0, 0, NULL );
     WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
-    BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
-    WinEndPaint( hps );
-
     if ( doc != NULL )
     {
-        LONG xPos = 0, yPos = 0;
         if ( width < cxClient ) {
             xPos = ( cxClient - width ) / 2;
         }
@@ -907,7 +908,17 @@ void DocumentViewer::wmPaintAsynch( HWND hwnd )
             yPos = ( cyClient - height ) / 2;
         }
 
-        RECTL rclPage = { xPos, yPos, width + xPos, height + yPos };
+        rclPage.xLeft   = xPos;
+        rclPage.yBottom = yPos;
+        rclPage.xRight  = width + xPos;
+        rclPage.yTop    = height + yPos;
+        WinFillRect( hpsBuffer, &rclPage, PAGEBACK_COLOR );
+    }
+    BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
+    WinEndPaint( hps );
+
+    if ( doc != NULL )
+    {
         RECTL rclDraw = { 0 };
         if ( WinIntersectRect( hab, &rclDraw, &rcl, &rclPage ) )
         {
@@ -965,6 +976,29 @@ void DocumentViewer::wmPaintContAsynch( HWND hwnd )
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
     GpiCreateLogColorTable( hpsBuffer, 0, LCOLF_RGB, 0, 0, NULL );
     WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
+
+    if ( doc != NULL )
+    {
+        long foundpage = -1;
+        double pageRest;
+        for ( LONG i = rcl.yTop; i >= rcl.yBottom; i-- )
+        {
+            pageRest = 0;
+            long pg = posToPagenum( i, &pageRest );
+            if ( ( pg != foundpage ) && ( pg != -1 ) )
+            {
+                RECTL rclPage = { 0 };
+                LuRectangle lr = { 0, 0,
+                    isRotated() ? (pagesizes[ pg ].y - 1) : (pagesizes[ pg ].x - 1),
+                    isRotated() ? (pagesizes[ pg ].x - 1) : (pagesizes[ pg ].y - 1) };
+                docPosToWinPos( pg, &lr, &rclPage );
+                WinFillRect( hpsBuffer, &rclPage, PAGEBACK_COLOR );
+                foundpage = pg;
+                i -= pageRest;
+            }
+        }
+    }
+
     BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
     WinEndPaint( hps );
 
@@ -1083,16 +1117,18 @@ void DocumentViewer::wmPaint( HWND hwnd )
 long DocumentViewer::posToPagenum( LONG yPosWin, double *pageRest )
 {
     double yPos = ( cyClient - yPosWin ) + ( sVscrollPos * VScrollStep );
+    double pgstart = 0;
     double pgend = 0;
     for ( long i = 0; i < totalpages; i++ )
     {
-        pgend += ( pagesizes[ i ].y * realzoom );
-        if ( yPos < pgend ) {
+        pgend = pgstart + ( pagesizes[ i ].y * realzoom );
+        if ( ( yPos >= pgstart ) && ( yPos < pgend ) ) {
             *pageRest = pgend - yPos;
             return i;
         }
+        pgstart = ( pgend + VERT_SPACE );
     }
-    return 0;
+    return -1;
 }
 
 // founds vertical position of specified
@@ -1103,7 +1139,7 @@ double DocumentViewer::pagenumToPos( long pagenum )
     for ( long i = 0; i < pagenum; i++ ) {
         ypos += pagesizes[ i ].y;
     }
-    return ypos * realzoom;
+    return ( ( ypos * realzoom ) + ( pagenum * VERT_SPACE ) );
 }
 
 // founds pages and it's areas to draw
@@ -1119,11 +1155,11 @@ DrawAreas *DocumentViewer::findDrawAreas( PRECTL r )
         {
             pageRest = 0;
             long pg = posToPagenum( i, &pageRest );
-            if ( pg != foundpage )
+            if ( ( pg != foundpage ) && ( pg != -1 ) )
             {
                 double w = pagesizes[ pg ].x * realzoom;
 
-                PageDrawArea pda;
+                PageDrawArea pda = {0};
                 pda.pagenum = pg;
 
                 LONG xPos = 0;
@@ -1131,19 +1167,14 @@ DrawAreas *DocumentViewer::findDrawAreas( PRECTL r )
                     xPos = ( cxClient - w ) / 2;
                 }
                 RECTL rclPage = { 0 };
-                LuRectangle lr = { 0, 0, pagesizes[ pg ].x, pagesizes[ pg ].y };
+                LuRectangle lr = { 0, 0,
+                    isRotated() ? (pagesizes[ pg ].y - 1) : (pagesizes[ pg ].x - 1),
+                    isRotated() ? (pagesizes[ pg ].x - 1) : (pagesizes[ pg ].y - 1) };
                 docPosToWinPos( pg, &lr, &rclPage );
-                RECTL rclDraw = { 0 };
-                if ( WinIntersectRect( hab, &rclDraw, r, &rclPage ) )
+                if ( WinIntersectRect( hab, &pda.drawrect, r, &rclPage ) )
                 {
-                    pda.drawrect.xLeft   = __min( w + xPos, rclDraw.xLeft );
-                    pda.drawrect.yBottom = __max( i - pageRest, rclDraw.yBottom );
-                    pda.drawrect.xRight  = __min( w + xPos, rclDraw.xRight );
-                    pda.drawrect.yTop    = i;
-
                     pda.startpos.x = sHscrollPos + pda.drawrect.xLeft - xPos;
                     pda.startpos.y = ( pagesizes[ pg ].y * realzoom ) - pageRest;
-
                     areas->push_back( pda );
                 }
                 foundpage = pg;
@@ -1586,7 +1617,7 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
             pg = posToPagenum( ypos, &tmp );
         }
 
-        if ( links[ pg ] != NULL )
+        if ( ( pg != -1 ) && ( links[ pg ] != NULL ) )
         {
             for ( int i = 0; i < links[ pg ]->_length; i++ )
             {
@@ -1618,7 +1649,7 @@ BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
         pg = posToPagenum( ypos, &tmp );
     }
 
-    if ( links[ pg ] != NULL )
+    if ( ( pg != -1 ) && ( links[ pg ] != NULL ) )
     {
         for ( int i = 0; i < links[ pg ]->_length; i++ )
         {

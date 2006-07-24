@@ -36,8 +36,11 @@
 #define LuDjvuDocument_Class_Source
 
 #include "ludjvu.xih"
+#ifdef __WATCOMC__
 #include <ddjvuapiw.h>
-
+#else
+#include <ddjvuapi.h>
+#endif
 
 #define SCALE_FACTOR 0.2
 
@@ -75,6 +78,29 @@ extern "C" char * _System getDescription()
     return "DjVu plugin, based on DjVuLibre.";
 }
 
+
+static void djvu_handle_events( ddjvu_context_t *ctx )
+{
+    const ddjvu_message_t *msg;
+
+    if ( ctx == NULL ) {
+        return;
+    }
+
+    msg = ddjvu_message_wait( ctx );
+    while ( ( msg = ddjvu_message_peek( ctx ) ) )
+    {
+        switch ( msg->m_any.tag )
+        {
+            case DDJVU_ERROR:
+                // TODO: error message
+            default:
+                break;
+        }
+        ddjvu_message_pop( ctx );
+    }
+}
+
 SOM_Scope boolean  SOMLINK loadFile(LuDjvuDocument *somSelf,
                                      Environment *ev, string filename,
                                     string password, string* error)
@@ -96,8 +122,7 @@ SOM_Scope boolean  SOMLINK loadFile(LuDjvuDocument *somSelf,
     d->d_document = doc;
 
     while ( !ddjvu_document_decoding_done( d->d_document ) ) {
-        ddjvu_message_wait( d->d_context );
-        ddjvu_message_pop( d->d_context );
+        djvu_handle_events( d->d_context );
     }
 
     return TRUE;
@@ -132,8 +157,7 @@ SOM_Scope void  SOMLINK getPageSize(LuDjvuDocument *somSelf,
     ddjvu_pageinfo_t info = { 0 };
 
     while ( ddjvu_document_get_pageinfo( d->d_document, pagenum, &info ) < DDJVU_JOB_OK ) {
-        ddjvu_message_wait( d->d_context );
-        ddjvu_message_pop( d->d_context );
+        djvu_handle_events( d->d_context );
     }
 
     if ( width != NULL ) {
@@ -166,8 +190,7 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
     d_page = ddjvu_page_create_by_pageno( d->d_document, pagenum );
 
     while ( !ddjvu_page_decoding_done( d_page ) ) {
-        ddjvu_message_wait( d->d_context );
-        ddjvu_message_pop( d->d_context );
+        djvu_handle_events( d->d_context );
     }
 
     page_width = ddjvu_page_get_width( d_page ) * scale * SCALE_FACTOR;
@@ -188,6 +211,7 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
 
     LuPixbuf *pb = new LuPixbuf( ev, prect.w, prect.h, bpp );
     long pb_rowsize = pb->getRowSize( ev );
+    long pb_height = pb->getHeight( ev );
     char *pbbuf = (char *)pb->getDataPtr( ev );
     ddjvu_page_render( d_page, DDJVU_RENDER_COLOR,
                        &prect, &rrect, d->d_format,
@@ -195,12 +219,14 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
 
     char *pixbuf_data = (char *)pixbuf->getDataPtr( ev );
     char *src, *dst;
-    int i, y, linesize = __min( pb_rowsize, pixbuf_rowsize );
-    for ( y = (src_height-1), i = 0; i < src_height; y--, i++ )
+    int i, y;
+    int rowsize = __min( pb_rowsize, pixbuf_rowsize );
+    int height = __min( pb_height, pixbuf_height );
+    for ( y = (height-1), i = 0; i < height; y--, i++ )
     {
         src = pbbuf + (y * pb_rowsize);
         dst = pixbuf_data + (i * pixbuf_rowsize);
-        memcpy( dst, src, linesize );
+        memcpy( dst, src, rowsize );
     }
     delete pb;
 }
@@ -235,8 +261,7 @@ SOM_Scope LuPixbuf*  SOMLINK getThumbnail(LuDjvuDocument *somSelf,
     getThumbnailSize( somSelf, ev, pagenum, suggested_width, &thumb_width, &thumb_height );
 
     while ( ddjvu_thumbnail_status( d->d_document, pagenum, 1 ) < DDJVU_JOB_OK ) {
-            ddjvu_message_wait( d->d_context );
-            ddjvu_message_pop( d->d_context );
+        djvu_handle_events( d->d_context );
     }
 
     int t_width = thumb_width;

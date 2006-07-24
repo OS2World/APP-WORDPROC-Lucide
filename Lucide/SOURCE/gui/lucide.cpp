@@ -128,8 +128,11 @@ void Lucide::checkNavigationMenus()
     WinEnableMenuItem( hWndMenu, CM_LASTPAGE, enlast );
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_LASTPAGE), (MPARAM)enlast );
 
+    bool tmp = dontSwitchPage;
+    dontSwitchPage = true;
     WinSendDlgItemMsg( hToolBar, TBID_PAGENUM, SPBM_SETCURRENTVALUE,
                        MPFROMLONG( docViewer->getCurrentPage() + 1 ), MPVOID );
+    dontSwitchPage = tmp;
     indexWin->goToPage( NULL, docViewer->getCurrentPage() );
 }
 

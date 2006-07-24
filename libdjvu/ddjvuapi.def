@@ -11,6 +11,7 @@ EXPORTS
     ddjvu_document_job
     ddjvu_message_wait
     ddjvu_message_pop
+    ddjvu_message_peek
     ddjvu_context_release
     ddjvu_document_get_pagenum
     ddjvu_document_get_pageinfo

@@ -117,6 +117,7 @@ class DocumentViewer
         void determineCurrentPage();
         long posToPagenum( LONG yPosWin, double *pageRest );
         double pagenumToPos( long pagenum );
+        bool isRotated() { return ( (rotation==90) || (rotation==270) ); }
 
         static MRESULT EXPENTRY docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
         static MRESULT EXPENTRY docFrameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
