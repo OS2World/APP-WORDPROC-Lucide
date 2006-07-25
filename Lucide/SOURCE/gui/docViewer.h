@@ -68,7 +68,7 @@ class DocumentViewer
         void setDocument( LuDocument *_doc );
         void close();
         void goToPage( long page );
-        long getCurrentPage() { return currentpage; }
+        long getCurrentPage() { return currentpage; }  // Zero based
         void setZoom( double _zoom );
         double getZoom() { return zoom; }
         double getRealZoom() { return realzoom; }

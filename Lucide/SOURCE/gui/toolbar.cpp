@@ -181,7 +181,7 @@ HWND createToolbar( HWND hwnd )
     cs.ctrlHandle = WinCreateWindow( hToolBar, WC_SPINBUTTON, NULL,
                                      WS_VISIBLE|SPBS_MASTER|SPBS_NUMERICONLY|SPBS_JUSTCENTER,
                                      0,0,0,0, hToolBar, HWND_TOP, TBID_PAGENUM, NULL, NULL );
-    WinSendMsg( cs.ctrlHandle, SPBM_SETLIMITS, (MPARAM)0, (MPARAM)0 );
+    WinSendMsg( cs.ctrlHandle, SPBM_SETLIMITS, MPFROMLONG( 0 ), MPFROMLONG( 0 ) );
     WinSetPresParam( cs.ctrlHandle, PP_FONTNAMESIZE, deffontlen, deffont );
     cs.cx = 50;
     cs.cy = 0;

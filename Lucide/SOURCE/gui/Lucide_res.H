@@ -124,4 +124,8 @@
 #define IDC_DEFPGLAYOUT		10
 #define IDC_DEFZOOM			11
 
+#define IDD_GOTOPAGE		1007
+#define IDC_PAGE			10
+#define IDC_PAGES			11
+
 #endif // __LUCIDE_RES_H

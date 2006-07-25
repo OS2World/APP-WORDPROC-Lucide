@@ -25,7 +25,7 @@ MENU_FIRST_PAGE=F”rsta sidan
 MENU_PREV_PAGE=F”reg†ende sida\t-
 MENU_NEXT_PAGE=N„sta sida\t+
 MENU_LAST_PAGE=Sista sidan
-MENU_GO_TO_PAGE=G† till sidan...
+MENU_GO_TO_PAGE=G† till sidan...\tCtrl+N
 MENU_VIEW=~Visa
 MENU_FIT_WINDOW=Passa f”nster
 MENU_ACTUAL_SIZE=Verklig storlek
@@ -106,7 +106,7 @@ DOCINFO_MOD_DATE=Modifierad:
 # "Find" dialog
 #
 FIND_FIND=Finn
-FIND_FIND_WHAT=~Finn vad:
+FIND_FIND_WHAT=~Finn vad
 FIND_MATCH_CASE=~Matcha stor/liten bokstav
 FIND_OK=~OK
 FIND_CANCEL=~Avbryt

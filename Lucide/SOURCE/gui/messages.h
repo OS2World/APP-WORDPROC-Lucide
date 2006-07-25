@@ -88,5 +88,8 @@ extern const char *DOCINFO_MOD_DATE;
 extern const char *FIND_SEARCH_PAGE_OF;
 extern const char *FIND_NOT_FOUND;
 
+// 'Go to page' dialog
+extern const char *GTP_OF;
+
 
 #endif // __MESSAGES_H

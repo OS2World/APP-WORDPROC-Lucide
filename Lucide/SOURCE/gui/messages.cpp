@@ -88,3 +88,6 @@ const char *DOCINFO_MOD_DATE      = "DOCINFO_MOD_DATE";
 // "Find" dialog, other 'find'-related messages
 const char *FIND_SEARCH_PAGE_OF = "FIND_SEARCH_PAGE_OF";
 const char *FIND_NOT_FOUND      = "FIND_NOT_FOUND";
+
+// 'Go to page' dialog
+const char *GTP_OF = "GTP_OF";

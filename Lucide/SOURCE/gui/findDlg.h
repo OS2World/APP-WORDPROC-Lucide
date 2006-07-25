@@ -55,4 +55,23 @@ class FindDlg
         bool caseSensitive;
 };
 
+class GotoDlg
+{
+    public:
+        GotoDlg( HWND hWndFrame, long _pages, long _curpage );
+        virtual ~GotoDlg();
+
+        ULONG showDialog();
+        long getPage() { return page; }
+
+    private:
+
+        static MRESULT EXPENTRY gotoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
+
+        HWND hFrame;
+        long page;
+        long pages;
+        long curpage;
+};
+
 #endif // __FINDDLG_H

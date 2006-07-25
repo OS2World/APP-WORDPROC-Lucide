@@ -2,7 +2,6 @@
 # Main menu
 #
 
-MENU_FILE=~Файл
 MENU_OPEN=Открыть...\tCtrl+O
 MENU_SAVE_AS=Сохранить как...
 

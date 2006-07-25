@@ -41,6 +41,9 @@
 #else
 #include <ddjvuapi.h>
 #endif
+#ifdef __GNUC__
+#define __min(a,b)  (((a) < (b)) ? (a) : (b))
+#endif
 
 #define SCALE_FACTOR 0.2
 

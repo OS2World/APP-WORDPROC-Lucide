@@ -26,7 +26,7 @@ MENU_FIRST_PAGE=First page
 MENU_PREV_PAGE=Previous page\t-
 MENU_NEXT_PAGE=Next page\t+
 MENU_LAST_PAGE=Last page
-MENU_GO_TO_PAGE=Go to page...
+MENU_GO_TO_PAGE=Go to page...\tCtrl+N
 MENU_VIEW=~View
 MENU_FIT_WINDOW=Fit in window
 MENU_ACTUAL_SIZE=Actual size
@@ -109,7 +109,7 @@ DOCINFO_MOD_DATE=Modified:
 # "Find" dialog
 #
 FIND_FIND=Find
-FIND_FIND_WHAT=~Find what:
+FIND_FIND_WHAT=~Find what
 FIND_MATCH_CASE=~Match case
 FIND_OK=~OK
 FIND_CANCEL=~Cancel
@@ -135,7 +135,16 @@ AD_OK=OK
 # Settings dialog
 #
 SD_SETTINGS=Settings
-SD_DEFAULT_PAGE_LAYOUT=Default Page Layout:
-SD_DEFAULT_ZOOM=Default Zoom:
+SD_DEFAULT_PAGE_LAYOUT=Default Page Layout
+SD_DEFAULT_ZOOM=Default Zoom
 SD_OK=~OK
 SD_CANCEL=~Cancel
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=Go to page
+GTP_PAGE=Page
+GTP_OF=of %d
+GTP_OK=~OK
+GTP_CANCEL=~Cancel

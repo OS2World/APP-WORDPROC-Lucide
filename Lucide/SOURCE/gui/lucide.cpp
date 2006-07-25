@@ -112,11 +112,13 @@ void Lucide::setOfPages( long pages )
     snprintf( pgnum, sizeof( pgnum ), pgfrm, pages );
     delete pgfrm;
     WinSetDlgItemText( hToolBar, TBID_OFPAGES, pgnum );
-    WinSendDlgItemMsg( hToolBar, TBID_PAGENUM, SPBM_SETLIMITS, (MPARAM)pages, (MPARAM)1 );
+    WinSendDlgItemMsg( hToolBar, TBID_PAGENUM, SPBM_SETLIMITS,
+                       MPFROMLONG( pages ), MPFROMLONG( 1 ) );
 }
 
 void Lucide::checkNavigationMenus()
 {
+    WinEnableMenuItem( hWndMenu, CM_GOTOPAGE, TRUE );
     BOOL enfirst = ( docViewer->getCurrentPage() != 0 );
     BOOL enlast = ( docViewer->getCurrentPage() != ( doc->getPageCount( ev ) - 1 ) );
     WinEnableMenuItem( hWndMenu, CM_FIRSTPAGE, enfirst );
@@ -653,6 +655,20 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                 case CM_LASTPAGE:
                     Lucide::goToPage( doc->getPageCount( ev ) - 1 );
                     return (MRESULT)FALSE;
+
+                case CM_GOTOPAGE:
+                {
+                    GotoDlg *d = new GotoDlg( hWndFrame, doc->getPageCount( ev ),
+                                                docViewer->getCurrentPage() + 1 );
+                    if ( d->showDialog() == DID_OK ) {
+                        long pg = d->getPage();
+                        if ( pg > 0 ) {
+                            Lucide::goToPage( pg - 1 );
+                        }
+                    }
+                    delete d;
+                    return (MRESULT)FALSE;
+                }
 
                 case CM_FITWINDOW:
                     Lucide::setZoom( -2 );

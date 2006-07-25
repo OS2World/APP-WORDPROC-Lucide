@@ -25,7 +25,7 @@ MENU_FIRST_PAGE=PremiŠre page
 MENU_PREV_PAGE=Page pr‚c‚dente\t-
 MENU_NEXT_PAGE=Page suivante\t+
 MENU_LAST_PAGE=DerniŠre page
-MENU_GO_TO_PAGE=Aller … la page...
+MENU_GO_TO_PAGE=Aller … la page...\tCtrl+N
 MENU_VIEW=~Affichage
 MENU_FIT_WINDOW=Adapter … la fenˆtre
 MENU_ACTUAL_SIZE=Taille r‚elle
@@ -106,7 +106,7 @@ DOCINFO_MOD_DATE=Modifi‚ le :
 # "Find" dialog
 #
 FIND_FIND=Recherche
-FIND_FIND_WHAT=~Quoi chercher :
+FIND_FIND_WHAT=~Quoi chercher
 FIND_MATCH_CASE=~Respecter la casse
 FIND_OK=~OK
 FIND_CANCEL=~Annuler
@@ -124,5 +124,4 @@ PDLG_CANCEL=~Annuler
 # About dialog
 #
 AD_ABOUT=Infos produit
-AD_COPYRIGHTS=Copyrights here.
 AD_OK=OK
