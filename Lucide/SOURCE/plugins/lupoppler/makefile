@@ -14,7 +14,8 @@ EXEDIR = ..\..\..\BIN
 
 .idl.xh:
     sc -c -s"xc;xih;xh" -I..\ludoc $<
-     
+    ..\..\sominc\cnvsomex.cmd $@
+
 
 all: make.cfg lupplr.dll
    DEL MAKE.CFG
@@ -57,6 +58,7 @@ MAKE.CFG: makefile
 -xs
 -xr
 -sg
+-I..\..\sominc
 -I..\ludoc
 -I..\..\..\..\poppler\mypoppler
 -I..\..\..\..\poppler\mypoppler\poppler

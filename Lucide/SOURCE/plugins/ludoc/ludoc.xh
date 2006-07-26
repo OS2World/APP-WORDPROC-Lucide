@@ -185,7 +185,7 @@ SOMEXTERN struct LuDocumentCClassDataStructure {
 /*
  * -- Typedefs for LuDocument Method Procedures
  */
-SOMEXTERN {
+SOMEXTERNF {
 typedef boolean   SOMLINK somTP_LuDocument_loadFile(LuDocument *somSelf, Environment *ev, 
 		string filename, 
 		string password, 

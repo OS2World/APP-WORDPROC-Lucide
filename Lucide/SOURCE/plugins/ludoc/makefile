@@ -14,6 +14,7 @@ EXEDIR = ..\..\..\BIN
 
 .idl.xh:
     sc -c -s"xc;xih;xh" $<
+    ..\..\sominc\cnvsomex.cmd $@
      
 
 all: make.cfg ludoc.dll ludoc.lib
@@ -86,5 +87,6 @@ MAKE.CFG: makefile
 -ox
 -xs
 -xr
+-I..\..\sominc
 -DOS2
 | MAKE.CFG >NUL

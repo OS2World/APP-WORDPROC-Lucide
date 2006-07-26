@@ -69,7 +69,7 @@ SOMEXTERN struct LuPixbufCClassDataStructure {
 /*
  * -- Typedefs for LuPixbuf Method Procedures
  */
-SOMEXTERN {
+SOMEXTERNF {
 typedef void   SOMLINK somTP_LuPixbuf_LuPixbufInit(LuPixbuf *somSelf, Environment *ev, 
 		somInitCtrl* ctrl, 
 		long w, 

@@ -81,6 +81,7 @@ class Lucide
         
         static void openDocument();
         static void loadDocument( const char *fn );
+        static void saveDocumentAs();
         static void setDocument( LuDocument *_doc );
         static void checkNavigationMenus();
         static void checkZoomMenus();

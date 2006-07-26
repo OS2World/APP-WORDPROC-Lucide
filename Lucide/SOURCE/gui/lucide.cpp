@@ -262,6 +262,7 @@ void Lucide::checkMenus()
     enableZoomMenus();
     checkZoomMenus();
 
+    WinEnableMenuItem( hWndMenu, CM_SAVEAS, doc->isSaveable( ev ) );
     setOfPages( doc->getPageCount( ev ) );
     WinEnableMenuItem( hWndMenu, CM_FONTSINFO, doc->isHaveFontInfo( ev ) );
     WinEnableMenuItem( hWndMenu, CM_DOCINFO, TRUE );
@@ -449,6 +450,49 @@ void Lucide::openDocument()
     delete fd;
 }
 
+void Lucide::saveDocumentAs()
+{
+    char dirbuf[ CCHMAXPATH ];
+    PFILEDLG fd = new FILEDLG;
+    memset( fd, 0, sizeof( FILEDLG ) );
+    fd->cbSize = sizeof( FILEDLG );
+    fd->fl = FDS_CENTER | FDS_SAVEAS_DIALOG;
+    PrfQueryProfileString( HINI_USERPROFILE, appName, lvd, "",
+                           dirbuf, sizeof( dirbuf ) );
+    char fil[ _MAX_FNAME ] = "";
+    char ext[ _MAX_EXT ] = "";
+    _splitpath( docName, NULL, NULL, fil, ext );
+    snprintf( fd->szFullFile, sizeof( fd->szFullFile ),
+                "%s%s%s", dirbuf, fil, ext );
+    WinFileDlg( HWND_DESKTOP, hWndFrame, fd );
+    if ( fd->lReturn == DID_OK )
+    {
+        bool doSave = true;
+        if ( access( fd->szFullFile, F_OK ) == 0 )
+        {
+            char *t = newstrdupL( MSGS_WARNING );
+            char *m = newstrdupL( MSGS_OVERWRITE_FILE );
+            ULONG response = WinMessageBox( HWND_DESKTOP, hWndFrame, m, t,
+                                            0, MB_YESNO | MB_WARNING | MB_MOVEABLE );
+            delete m;
+            delete t;
+
+            doSave = ( response == MBID_YES );
+        }
+        if ( doSave )
+        {
+            if ( !doc->saveAs( ev, fd->szFullFile ) )
+            {
+                char *m = newstrdupL( MSGS_FILE_SAVE_ERROR );
+                WinMessageBox( HWND_DESKTOP, hWndFrame, m, NULL,
+                               0, MB_OK | MB_ERROR | MB_MOVEABLE );
+                delete m;
+            }
+        }
+    }
+    delete fd;
+}
+
 void Lucide::checkNavpane()
 {
     if ( Lucide::showIndex )
@@ -577,6 +621,10 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             {
                 case CM_OPEN:
                     Lucide::openDocument();
+                    return (MRESULT)FALSE;
+
+                case CM_SAVEAS:
+                    Lucide::saveDocumentAs();
                     return (MRESULT)FALSE;
 
                 case CM_EXIT:

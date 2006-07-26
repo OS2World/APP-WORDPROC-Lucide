@@ -146,6 +146,8 @@ typedef LuDjvuDocumentData* (SOMLINK * somTD_LuDjvuDocument_DataThunk)(void*);
   #define _renderPageToPixbuf somSelf->renderPageToPixbuf
   #define _getThumbnailSize somSelf->getThumbnailSize
   #define _getThumbnail somSelf->getThumbnail
+  #define _isSaveable somSelf->isSaveable
+  #define _saveAs somSelf->saveAs
   #define _somDefaultInit somSelf->somDefaultInit
   #define _somDestruct somSelf->somDestruct
 #endif
@@ -515,6 +517,86 @@ static somMethodProc* LuDjvuDocument_parent_LuDocument_getThumbnail_resolved;
    LuDjvuDocument_parent_LuDocument_getThumbnail(somSelf,ev,pagenum,suggested_width))
 
 /*
+ * Overridden method: isSaveable
+ */
+SOM_Scope boolean  SOMLINK isSaveable(LuDjvuDocument *somSelf, Environment *ev);
+static char *somMN_LuDjvuDocumentisSaveable = "LuDocument::isSaveable";
+static somId somId_LuDjvuDocumentisSaveable = &somMN_LuDjvuDocumentisSaveable;
+#ifdef somId_isSaveable
+#undef somId_isSaveable
+#else
+#define somId_isSaveable somId_LuDjvuDocumentisSaveable
+#endif
+typedef boolean   SOMLINK somTP_xih_LuDjvuDocument_isSaveable(LuDjvuDocument *somSelf, Environment *ev);
+typedef somTP_xih_LuDjvuDocument_isSaveable *somTD_xih_LuDjvuDocument_isSaveable;
+/* define the parent method call macro */
+static somMethodProc* LuDjvuDocument_parent_LuDocument_isSaveable_resolved;
+#define LuDjvuDocument_parent_LuDocument_isSaveable(somSelf,ev) \
+  ((( somTD_xih_LuDjvuDocument_isSaveable ) \
+      LuDjvuDocument_parent_LuDocument_isSaveable_resolved) \
+	(somSelf,ev))
+/* define a variety of (possibly ambiguous) short forms */
+#ifndef SOMGD_pmc_parent_isSaveable
+  #ifdef parent_isSaveable
+    #define SOMGD_pmc_parent_isSaveable
+    #undef parent_isSaveable
+  #else
+#define parent_isSaveable LuDjvuDocument_parent_LuDocument_isSaveable
+  #endif
+#endif
+#ifndef SOMGD_pmc_parent_LuDocument_isSaveable
+  #ifdef parent_LuDocument_isSaveable
+    #define SOMGD_pmc_parent_LuDocument_isSaveable
+    #undef parent_LuDocument_isSaveable
+  #else
+    #define parent_LuDocument_isSaveable LuDjvuDocument_parent_LuDocument_isSaveable
+  #endif
+#endif
+#define LuDjvuDocument_parents_isSaveable(somSelf,ev) (\
+   LuDjvuDocument_parent_LuDocument_isSaveable(somSelf,ev))
+
+/*
+ * Overridden method: saveAs
+ */
+SOM_Scope boolean  SOMLINK saveAs(LuDjvuDocument *somSelf, Environment *ev,
+		string filename);
+static char *somMN_LuDjvuDocumentsaveAs = "LuDocument::saveAs";
+static somId somId_LuDjvuDocumentsaveAs = &somMN_LuDjvuDocumentsaveAs;
+#ifdef somId_saveAs
+#undef somId_saveAs
+#else
+#define somId_saveAs somId_LuDjvuDocumentsaveAs
+#endif
+typedef boolean   SOMLINK somTP_xih_LuDjvuDocument_saveAs(LuDjvuDocument *somSelf, Environment *ev, 
+		string filename);
+typedef somTP_xih_LuDjvuDocument_saveAs *somTD_xih_LuDjvuDocument_saveAs;
+/* define the parent method call macro */
+static somMethodProc* LuDjvuDocument_parent_LuDocument_saveAs_resolved;
+#define LuDjvuDocument_parent_LuDocument_saveAs(somSelf,ev,filename) \
+  ((( somTD_xih_LuDjvuDocument_saveAs ) \
+      LuDjvuDocument_parent_LuDocument_saveAs_resolved) \
+	(somSelf,ev,filename))
+/* define a variety of (possibly ambiguous) short forms */
+#ifndef SOMGD_pmc_parent_saveAs
+  #ifdef parent_saveAs
+    #define SOMGD_pmc_parent_saveAs
+    #undef parent_saveAs
+  #else
+#define parent_saveAs LuDjvuDocument_parent_LuDocument_saveAs
+  #endif
+#endif
+#ifndef SOMGD_pmc_parent_LuDocument_saveAs
+  #ifdef parent_LuDocument_saveAs
+    #define SOMGD_pmc_parent_LuDocument_saveAs
+    #undef parent_LuDocument_saveAs
+  #else
+    #define parent_LuDocument_saveAs LuDjvuDocument_parent_LuDocument_saveAs
+  #endif
+#endif
+#define LuDjvuDocument_parents_saveAs(somSelf,ev,filename) (\
+   LuDjvuDocument_parent_LuDocument_saveAs(somSelf,ev,filename))
+
+/*
  * Overridden method: somDefaultInit
  */
 SOM_Scope void  SOMLINK somDefaultInit(LuDjvuDocument *somSelf,
@@ -566,6 +648,10 @@ static somOverrideMethod_t LuDjvuDocumentOM[] = {
          (somMethodProc *) getThumbnailSize  },
     {    &somId_LuDjvuDocumentgetThumbnail,
          (somMethodProc *) getThumbnail  },
+    {    &somId_LuDjvuDocumentisSaveable,
+         (somMethodProc *) isSaveable  },
+    {    &somId_LuDjvuDocumentsaveAs,
+         (somMethodProc *) saveAs  },
     {    &somId_LuDjvuDocumentsomDefaultInit,
          (somMethodProc *) somDefaultInit  },
     {    &somId_LuDjvuDocumentsomDestruct,
@@ -584,7 +670,7 @@ static somId somPCLuDjvuDocument[] = {
 };
 
 static somStaticClassInfo LuDjvuDocumentSCI = {
-    4, 0, 10, 0, 0, 0, /* layout version 4 */ 
+    4, 0, 12, 0, 0, 0, /* layout version 4 */ 
     LuDjvuDocument_MajorVersion, LuDjvuDocument_MinorVersion,
     sizeof(LuDjvuDocumentData), LuDjvuDocument_MaxNoMethods, 1,
     &somCN_LuDjvuDocument,
@@ -630,6 +716,10 @@ SOMClass * SOMLINK LuDjvuDocumentNewClass (integer4 somtmajorVersion,
           return ((SOMClass*)((void*)_LuDjvuDocument));
     LuDocumentNewClass(LuDocument_MajorVersion,LuDocument_MinorVersion);	/* static reference */
     result = (SOMClass*)((void*)somBuildClass(0xFFFFFFFF,&LuDjvuDocumentSCI, somtmajorVersion, somtminorVersion));
+    LuDjvuDocument_parent_LuDocument_saveAs_resolved = 
+	somParentNumResolve(LuDjvuDocumentCClassData.parentMtab, 1, LuDocumentClassData.saveAs);
+    LuDjvuDocument_parent_LuDocument_isSaveable_resolved = 
+	somParentNumResolve(LuDjvuDocumentCClassData.parentMtab, 1, LuDocumentClassData.isSaveable);
     LuDjvuDocument_parent_LuDocument_getThumbnail_resolved = 
 	somParentNumResolve(LuDjvuDocumentCClassData.parentMtab, 1, LuDocumentClassData.getThumbnail);
     LuDjvuDocument_parent_LuDocument_getThumbnailSize_resolved = 

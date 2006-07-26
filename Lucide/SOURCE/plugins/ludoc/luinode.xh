@@ -74,7 +74,7 @@ SOMEXTERN struct LuIndexNodeCClassDataStructure {
 /*
  * -- Typedefs for LuIndexNode Method Procedures
  */
-SOMEXTERN {
+SOMEXTERNF {
 typedef void   SOMLINK somTP_LuIndexNode_LuIndexNodeInit(LuIndexNode *somSelf, Environment *ev, 
 		somInitCtrl* ctrl, 
 		LuLink* link);

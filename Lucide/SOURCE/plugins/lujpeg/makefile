@@ -14,7 +14,8 @@ EXEDIR = ..\..\..\BIN
 
 .idl.xh:
     sc -c -s"xc;xih;xh" -I..\ludoc $<
-     
+    ..\..\sominc\cnvsomex.cmd $@
+
 
 all: make.cfg lujpeg.dll
    DEL MAKE.CFG
@@ -57,6 +58,7 @@ MAKE.CFG: makefile
 -ox
 -xs
 -xr
+-I..\..\sominc
 -I..\ludoc
 -I..\..\..\..\libjpeg
 -DOS2

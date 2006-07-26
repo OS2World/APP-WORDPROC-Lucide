@@ -36,6 +36,7 @@
 #include <os2.h>
 
 #include <stdio.h>
+#include <string.h>
 #include <string>
 
 #include <tb_spl.h>
@@ -46,9 +47,11 @@
 #include "messages.h"
 
 
-PFNWP pOldTbProc;
+PFNWP pOldTbProc; // Old toolbar window proc
+PFNWP pOldZeProc; // Old zoom entryfield window proc
 
 
+// Toolbar window proc
 static MRESULT EXPENTRY tbProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
     switch ( msg )
@@ -100,6 +103,37 @@ static MRESULT EXPENTRY tbProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             break;
     }
     return pOldTbProc( hwnd, msg, mp1, mp2 );
+}
+
+static char savedZeText[ 255 ] = "";
+// Zoom entryfield window proc
+static MRESULT EXPENTRY zeProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
+{
+    switch ( msg )
+    {
+        case WM_SETFOCUS:
+        {
+            char tmp[ 255 ] = "";
+
+            if ( SHORT1FROMMP( mp2 ) )
+            {
+                WinQueryWindowText( hwnd, sizeof( tmp ), tmp );
+                if ( strlen( tmp ) > 0 ) {
+                    strcpy( savedZeText, tmp );
+                }
+                WinSetWindowText( hwnd, "" );
+            }
+            else
+            {
+                WinQueryWindowText( hwnd, sizeof( tmp ), tmp );
+                if ( strlen( tmp ) == 0 ) {
+                    WinSetWindowText( hwnd, savedZeText );
+                }
+            }
+        }
+        break;
+    }
+    return pOldZeProc( hwnd, msg, mp1, mp2 );
 }
 
 
@@ -272,10 +306,11 @@ HWND createToolbar( HWND hwnd )
                                      0,0,0,0, hToolBar, HWND_TOP, TBID_ZOOM, NULL, NULL );
     WinSetPresParam( cs.ctrlHandle, PP_FONTNAMESIZE, deffontlen, deffont );
     std::string actsizetext = getLocalizedString( TBHINT_ACTUAL_SIZE );
-    setZoomValues( cs.ctrlHandle );
-    cs.cx = 80;
+    cs.cx = setZoomValues( cs.ctrlHandle ) +
+                ( WinQuerySysValue( HWND_DESKTOP, SV_CXVSCROLL ) * 2 );
     cs.cy = -100;
     cs.bubbleText = NULL;
+    pOldZeProc = WinSubclassWindow( WinWindowFromID( cs.ctrlHandle, CBID_EDIT ), zeProc );
     WinSendMsg( hToolBar, TBM_ADDCONTROL, (MPARAM)&cs, MPVOID );
 
     WinSendMsg( hToolBar, TBM_ADDSEPARATOR, MPVOID, MPVOID );

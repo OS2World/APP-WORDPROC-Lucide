@@ -61,7 +61,7 @@ SOMEXTERN struct LuDjvuDocumentCClassDataStructure {
 /*
  * -- Typedefs for LuDjvuDocument Method Procedures
  */
-SOMEXTERN {
+SOMEXTERNF {
 
 /*
  * -- Typedefs for Reintroduced Wrapper Methods

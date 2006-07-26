@@ -61,6 +61,9 @@ extern const char *MSGS_MAIN_WIN_TITLE;
 extern const char *MSGS_NO_SUIT_PLUG;
 extern const char *MSGS_FILE_LOAD_ERROR;
 extern const char *MSGS_LOADING_DOCUMENT;
+extern const char *MSGS_WARNING;
+extern const char *MSGS_OVERWRITE_FILE;
+extern const char *MSGS_FILE_SAVE_ERROR;
 
 // Plugins List columns titles
 extern const char *PLUGLIST_PLUGIN_NAME;

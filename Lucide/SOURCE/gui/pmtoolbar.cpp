@@ -491,13 +491,13 @@ VOID toolbarWndStruct::add( HWND hwnd, BYTE type, void *s )
         i->rcl.xRight = i->rcl.xLeft + TOOLBAR_SSIZE - 1;
     } else if ( i->type == ITYPE_CONTROL ) {
         i->rcl.xRight = i->rcl.xLeft + cs->cx - 1;
-        if ( cs->cy < 0 ) {
+        //if ( cs->cy < 0 ) {
             //i->rcl.yTop = i->rcl.yBottom + cs->cy - 1;
             i->rcl.yBottom += cs->cy;
-        }
+        //}
         WinSetWindowPos( i->ctrlHandle, HWND_TOP,
                          i->rcl.xLeft, i->rcl.yBottom,
-                         i->rcl.xRight-i->rcl.xLeft, i->rcl.yTop-i->rcl.yBottom,
+                         i->rcl.xRight-i->rcl.xLeft, i->rcl.yTop-i->rcl.yBottom + 1,
                          SWP_SIZE|SWP_MOVE|SWP_ZORDER|SWP_SHOW );
     } else {
         i->rcl.xRight = i->rcl.xLeft + pictSize - 1;

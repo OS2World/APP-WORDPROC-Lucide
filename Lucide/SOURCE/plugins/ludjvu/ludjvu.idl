@@ -27,6 +27,8 @@ interface LuDjvuDocument : LuDocument
         renderPageToPixbuf: override;
         getThumbnailSize: override;
         getThumbnail: override;
+        isSaveable: override;
+        saveAs: override;
 
         somDefaultInit: override, init;
         somDestruct: override;

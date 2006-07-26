@@ -1,0 +1,30 @@
+.autodepend
+
+OBJDIR = ..\..\..\OBJS
+EXEDIR = ..\..\..\BIN
+
+.path.o   = $(OBJDIR)
+.path.res = $(OBJDIR)
+.path.exe = $(EXEDIR)
+.path.dll = $(EXEDIR)
+
+CFLAGS=-O3 -s -Zomf -Zmtd -I..\ludoc -I..\..\..\..\libdjvu -I..\..\sominc -I.
+
+.cpp.o:
+     g++ $(CFLAGS) -c -o$@ $<
+
+.idl.xh:
+    sc -c -s"xc;xih;xh" -I..\ludoc $<
+    ..\..\sominc\cnvsomex.cmd $@
+
+
+all: ludjvu.dll
+
+ludjvu.dll: ludjvu.o ..\ludoc\ludoc.lib
+    g++ -s -Zomf -Zdll -Zcrtdll -o $(EXEDIR)\ludjvu.dll $(OBJDIR)\ludjvu.o ludjvu.def -l..\..\..\..\libdjvu\libdjvu.a -l..\ludoc\ludoc -lsomtk 
+
+
+ludjvu.o:   ludjvu.cpp ludjvu.xh
+
+ludjvu.cpp: ludjvu.idl
+
