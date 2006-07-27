@@ -1,6 +1,6 @@
 .autodepend
 
-TEST=0
+TEST=1
 VERSION=Beta 2.1
 
 !if $(TEST)==1
@@ -35,7 +35,7 @@ OBJS = Lucide.obj luutils.obj clipbrd.obj pmsplitter.obj pmtoolbar.obj \
        toolbar.obj pluginman.obj pluginViewDlg.obj docViewer.obj \
        linklab.obj wwbtn.obj intern.obj messages.obj indexWindow.obj \
        fontsInfoDlg.obj docInfoDlg.obj findDlg.obj progressDlg.obj \
-       aboutDlg.obj settingsDlg.obj lusettings.obj
+       aboutDlg.obj settingsDlg.obj lusettings.obj printDlg.obj
 
 Lucide.exe: $(OBJS) Lucide.res
   copy &&|
@@ -56,6 +56,7 @@ file $(OBJDIR)\docInfoDlg.obj
 file $(OBJDIR)\findDlg.obj
 file $(OBJDIR)\progressDlg.obj
 file $(OBJDIR)\aboutDlg.obj
+file $(OBJDIR)\printDlg.obj
 file $(OBJDIR)\settingsDlg.obj
 file $(OBJDIR)\lusettings.obj
 file $(OBJDIR)\docViewer.obj
@@ -93,6 +94,7 @@ docInfoDlg.obj:     docInfoDlg.cpp
 findDlg.obj:        findDlg.cpp
 progressDlg.obj:    progressDlg.cpp
 aboutDlg.obj:       aboutDlg.cpp
+printDlg.obj:       printDlg.cpp
 settingsDlg.obj:    settingsDlg.cpp
 lusettings.obj:     lusettings.cpp
 docViewer.obj:      docViewer.cpp
@@ -114,6 +116,7 @@ MAKE.CFG: makefile
 !if $(TEST)==1
 -D__TEST__
 !endif
+-I..\sominc
 -I..\plugins\ludoc
 -DOS2
 | MAKE.CFG >NUL

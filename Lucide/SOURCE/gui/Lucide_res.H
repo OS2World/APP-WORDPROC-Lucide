@@ -58,11 +58,10 @@
 
 #define CM_OPEN			101
 #define CM_SAVEAS		102
-#define CM_EXPORTTOPS	103
-#define CM_PAGESETUP	104
-#define CM_PRINT		105
-#define CM_PLUGINSLIST	106
-#define CM_EXIT			107
+#define CM_PAGESETUP	103
+#define CM_PRINT		104
+#define CM_PLUGINSLIST	105
+#define CM_EXIT			106
 
 #define CM_COPY			201
 #define CM_SELECTALL	202
@@ -127,5 +126,10 @@
 #define IDD_GOTOPAGE		1007
 #define IDC_PAGE			10
 #define IDC_PAGES			11
+
+#define IDD_PRINT			1008
+#define IDC_PNAME			10
+#define IDC_JOBPROPERTIES	11
+#define IDC_PDESCRIPTION	12
 
 #endif // __LUCIDE_RES_H

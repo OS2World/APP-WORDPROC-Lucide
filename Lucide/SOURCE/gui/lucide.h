@@ -93,6 +93,7 @@ class Lucide
         static void setPageLayout( PgLayout layout );
         static void toggleMaxview();
         static void toggleFullscreen();
+        static void focusDocview();
 };
 
 #endif // __LUCIDE_H

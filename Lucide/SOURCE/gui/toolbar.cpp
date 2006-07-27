@@ -82,6 +82,7 @@ static MRESULT EXPENTRY tbProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     {
                         if ( ( sResult > 0 ) && ( sResult < 1600 ) ) {
                             shortValueOk = true;
+                            Lucide::focusDocview();
                             Lucide::setZoom( (double)sResult / 100.0 );
                         }
                     }
@@ -94,6 +95,7 @@ static MRESULT EXPENTRY tbProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                         {
                             double z = convZoom( rc );
                             if ( z >= -2 ) {
+                                Lucide::focusDocview();
                                 Lucide::setZoom( z );
                             }
                         }

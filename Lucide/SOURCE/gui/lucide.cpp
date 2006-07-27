@@ -48,6 +48,7 @@
 #include "fontsInfoDlg.h"
 #include "docInfoDlg.h"
 #include "findDlg.h"
+#include "printDlg.h"
 #include "progressDlg.h"
 #include "settingsDlg.h"
 #include "docViewer.h"
@@ -216,7 +217,6 @@ void Lucide::checkMenus()
                     MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
 
         WinEnableMenuItem( hWndMenu, CM_SAVEAS, FALSE );
-        WinEnableMenuItem( hWndMenu, CM_EXPORTTOPS, FALSE );
         WinEnableMenuItem( hWndMenu, CM_PAGESETUP, FALSE );
         WinEnableMenuItem( hWndMenu, CM_PRINT, FALSE );
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_PRINT), (MPARAM)FALSE );
@@ -262,6 +262,7 @@ void Lucide::checkMenus()
     enableZoomMenus();
     checkZoomMenus();
 
+    WinEnableMenuItem( hWndMenu, CM_PRINT, TRUE );
     WinEnableMenuItem( hWndMenu, CM_SAVEAS, doc->isSaveable( ev ) );
     setOfPages( doc->getPageCount( ev ) );
     WinEnableMenuItem( hWndMenu, CM_FONTSINFO, doc->isHaveFontInfo( ev ) );
@@ -593,6 +594,11 @@ void Lucide::toggleFullscreen()
     isFullscreen = !isFullscreen;
 }
 
+void Lucide::focusDocview()
+{
+    WinSetFocus( HWND_DESKTOP, docViewer->getViewHWND() );
+}
+
 static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
     switch ( msg )
@@ -626,6 +632,16 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                 case CM_SAVEAS:
                     Lucide::saveDocumentAs();
                     return (MRESULT)FALSE;
+
+                case CM_PRINT:
+                {
+                    PrintDlg *d = new PrintDlg( hWndFrame, doc );
+                    if ( d->showDialog() == DID_OK ) {
+                        // print
+                    }
+                    delete d;
+                    return (MRESULT)FALSE;
+                }
 
                 case CM_EXIT:
                     WinPostMsg( hWndFrame, WM_CLOSE, NULL, NULL );
@@ -862,7 +878,7 @@ int main( int argc, char **argv )
                          SWP_SIZE | SWP_MOVE | SWP_SHOW | SWP_ACTIVATE );
     }
 
-    WinSetFocus( HWND_DESKTOP, docViewer->getViewHWND() );
+    Lucide::focusDocview();
 
     if ( argc > 1 ) {
         Lucide::loadDocument( argv[1] );

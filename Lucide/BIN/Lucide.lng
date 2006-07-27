@@ -8,7 +8,6 @@
 MENU_FILE=~File
 MENU_OPEN=Open...\tCtrl+O
 MENU_SAVE_AS=Save As...
-MENU_EXPORT_TO_PS=Export to PostScript...
 MENU_PAGE_SETUP=Page setup...
 MENU_PRINT=Print...
 MENU_DOCUMENT_INFO=Document info...
@@ -151,3 +150,14 @@ GTP_PAGE=Page
 GTP_OF=of %d
 GTP_OK=~OK
 GTP_CANCEL=~Cancel
+
+#
+# Print dialog
+#
+PD_TITLE=Print
+PD_PRINTER=Printer
+PD_NAME_LABEL=Name
+PD_JOB_PROPERTIES=Job properties
+PD_DRIVER_LABEL=Driver
+PD_BTNPRINT=Print
+PD_BTNCANCEL=Cancel
