@@ -34,6 +34,8 @@
 
 #define INCL_WIN
 #define INCL_DOS
+#define INCL_SPL
+#define INCL_SPLDOSPRINT
 #include <os2.h>
 
 #include <string>
@@ -263,6 +265,7 @@ void Lucide::checkMenus()
     checkZoomMenus();
 
     WinEnableMenuItem( hWndMenu, CM_PRINT, TRUE );
+    WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_PRINT), (MPARAM)TRUE );
     WinEnableMenuItem( hWndMenu, CM_SAVEAS, doc->isSaveable( ev ) );
     setOfPages( doc->getPageCount( ev ) );
     WinEnableMenuItem( hWndMenu, CM_FONTSINFO, doc->isHaveFontInfo( ev ) );
@@ -635,9 +638,10 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
                 case CM_PRINT:
                 {
-                    PrintDlg *d = new PrintDlg( hWndFrame, doc );
+                    PrintDlg *d = new PrintDlg( hWndFrame, doc, docViewer->getCurrentPage() + 1 );
                     if ( d->showDialog() == DID_OK ) {
                         // print
+                        //printDocument( doc, d->getCurrentQInfo() );
                     }
                     delete d;
                     return (MRESULT)FALSE;

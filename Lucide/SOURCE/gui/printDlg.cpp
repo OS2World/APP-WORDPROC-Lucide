@@ -45,32 +45,19 @@
 #include "Lucide_res.h"
 #include "luutils.h"
 
-extern HAB hab;
 
-#define DEVICENAME_LENGTH   32
-#define DRIVERNAME_LENGTH   128
-
-struct PrintDlgInternalData
+PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, long _currentpage )
 {
-    PPRQINFO3 pQueueInfo;
-    PPRQINFO3 pCurQueue;
-};
-
-
-PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc )
-{
-    hFrame = hWndFrame;
-    doc    = _doc;
-    data   = new PrintDlgInternalData;
-    memset( data, 0, sizeof( PrintDlgInternalData ) );
+    hFrame      = hWndFrame;
+    doc         = _doc;
+    currentpage = _currentpage;
+    psetup      = new PrintSetup;
+    memset( psetup, 0, sizeof( PrintSetup ) );
 }
 
 PrintDlg::~PrintDlg()
 {
-    if ( data->pQueueInfo != NULL ) {
-        free( data->pQueueInfo );
-    }
-    delete data;
+    delete psetup;
 }
 
 ULONG PrintDlg::showDialog()
@@ -79,12 +66,15 @@ ULONG PrintDlg::showDialog()
                       NULLHANDLE, IDD_PRINT, this );
 }
 
+void PrintDlg::getPrintSetup( PrintSetup *p ) {
+    memcpy( p, psetup, sizeof( PrintSetup ) );
+}
 
-void PrintDlg::setCurrentQInfo( HWND hwnd, void *i )
+void PrintDlg::setCurrentQInfo( HWND hwnd, PPRQINFO3 q )
 {
-    data->pCurQueue = (PPRQINFO3)i;
-    WinSetDlgItemText( hwnd, IDC_PNAME, data->pCurQueue->pszComment );
-    WinSetDlgItemText( hwnd, IDC_PDESCRIPTION, data->pCurQueue->pszDriverName );
+    memcpy( &(psetup->QueueInfo), q, sizeof( PRQINFO3 ) );
+    WinSetDlgItemText( hwnd, IDC_PNAME, psetup->QueueInfo.pszComment );
+    WinSetDlgItemText( hwnd, IDC_PDESCRIPTION, psetup->QueueInfo.pszDriverName );
     WinEnableControl( hwnd, IDC_JOBPROPERTIES, TRUE );
     WinEnableControl( hwnd, DID_OK, TRUE );
 }
@@ -96,17 +86,17 @@ void PrintDlg::enumQueues( HWND hwnd )
     SPLERR se = SplEnumQueue( NULL, 3, NULL, 0L, &cReturned,
                               &cTotal, &cbNeeded, NULL );
     if ( cTotal == 0L ) {
-        // TODO: 'no printers installed' message
+        // TODO: 'no printers installed' message  (?)
     }
 
-    data->pQueueInfo = (PPRQINFO3)malloc( cbNeeded );
+    pQueueInfo = (PPRQINFO3)malloc( cbNeeded );
 
-    se = SplEnumQueue( NULL, 3, data->pQueueInfo, cbNeeded, &cReturned,
+    se = SplEnumQueue( NULL, 3, pQueueInfo, cbNeeded, &cReturned,
                        &cTotal, &cbNeeded, NULL );
     if ( se != NO_ERROR ) {
         // TODO: error message
-        free( data->pQueueInfo );
-        data->pQueueInfo = NULL;
+        free( pQueueInfo );
+        pQueueInfo = NULL;
         return;
     }
 
@@ -114,12 +104,12 @@ void PrintDlg::enumQueues( HWND hwnd )
     for ( ULONG i = 0; i < cReturned; i++ )
     {
         sEntry = (SHORT)WinSendMsg( list, LM_INSERTITEM, MPFROMSHORT(LIT_END),
-                                    MPFROMP( data->pQueueInfo[i].pszComment ) );
+                                    MPFROMP( pQueueInfo[i].pszComment ) );
         WinSendMsg( list, LM_SETITEMHANDLE,
-                    MPFROMSHORT(sEntry), MPFROMP( &(data->pQueueInfo[i]) ) );
+                    MPFROMSHORT(sEntry), MPFROMP( &(pQueueInfo[i]) ) );
 
-        if ( data->pQueueInfo[i].fsType & PRQ3_TYPE_APPDEFAULT ) {
-            setCurrentQInfo( hwnd, &( data->pQueueInfo[i] ) );
+        if ( pQueueInfo[i].fsType & PRQ3_TYPE_APPDEFAULT ) {
+            setCurrentQInfo( hwnd, &( pQueueInfo[i] ) );
         }
     }
 }
@@ -127,7 +117,7 @@ void PrintDlg::enumQueues( HWND hwnd )
 
 void PrintDlg::showJobProperties()
 {
-    if ( data->pCurQueue == NULL ) {
+    if ( psetup->QueueInfo.pszName[0] == 0 ) {
         return;
     }
 
@@ -136,30 +126,30 @@ void PrintDlg::showJobProperties()
 
     // The pszDriverName is of the form DRIVER.DEVICE (e.g.,
     // LASERJET.HP LaserJet IID) so we need to separate it at the dot
-    int i = strcspn( data->pCurQueue->pszDriverName, "." );
+    int i = strcspn( psetup->QueueInfo.pszDriverName, "." );
     if ( i > 0 ) {
-        strncpy( achDriverName, data->pCurQueue->pszDriverName, i );
+        strncpy( achDriverName, psetup->QueueInfo.pszDriverName, i );
         achDriverName[ i ] = '\0';
-        strcpy( achDeviceName, &( data->pCurQueue->pszDriverName[ i + 1 ] ) );
+        strcpy( achDeviceName, &( psetup->QueueInfo.pszDriverName[ i + 1 ] ) );
     }
     else {
-        strcpy( achDriverName, data->pCurQueue->pszDriverName );
+        strcpy( achDriverName, psetup->QueueInfo.pszDriverName );
         *achDeviceName = '\0';
     }
 
     // There may be more than one printer assigned to this print queue
     // We will use the first in the comma separated list.  We would
     // need an expanded dialog for the user to be more specific.
-    char *pszTemp = strchr( data->pCurQueue->pszPrinters, ',' );
+    char *pszTemp = strchr( psetup->QueueInfo.pszPrinters, ',' );
     if ( pszTemp != NULL ) {
         // Strip off comma and trailing printer names
-        *pszTemp = '\0' ;
+        *pszTemp = '\0';
     }
 
     // Post the job properties dialog for the printer to allow the
     // user to modify the options
-    DevPostDeviceModes( hab, data->pCurQueue->pDriverData, achDriverName,
-                        achDeviceName, data->pCurQueue->pszPrinters, DPDM_POSTJOBPROP );
+    DevPostDeviceModes( hab, psetup->QueueInfo.pDriverData, achDriverName,
+                        achDeviceName, psetup->QueueInfo.pszPrinters, DPDM_POSTJOBPROP );
 }
 
 
@@ -183,21 +173,80 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
             _this = (PrintDlg *)mp2;
             localizeDialog( hwnd );
             centerWindow( _this->hFrame, hwnd );
+
+            // Enum printer queues
             _this->enumQueues( hwnd );
+
+            // Print range
+            WinCheckButton( hwnd, IDC_RANGEALL, TRUE );
+
+            // Set the print range spins
+            long pages = _this->doc->getPageCount( ev );
+            WinSendDlgItemMsg( hwnd, IDC_PGFROM, SPBM_SETLIMITS,
+                               MPFROMLONG( pages ), MPFROMLONG( 1 ) );
+            WinSendDlgItemMsg( hwnd, IDC_PGFROM, SPBM_SETCURRENTVALUE,
+                               MPFROMLONG( 1 ), MPVOID );
+            WinSendDlgItemMsg( hwnd, IDC_PGTO, SPBM_SETLIMITS,
+                               MPFROMLONG( pages ), MPFROMLONG( 1 ) );
+            WinSendDlgItemMsg( hwnd, IDC_PGTO, SPBM_SETCURRENTVALUE,
+                               MPFROMLONG( pages ), MPVOID );
+
+            // Set the print type
+            if ( _this->doc->isPostScriptExportable( ev ) ) {
+                WinEnableControl( hwnd, IDC_TYPE_POSTSCRIPT, TRUE );
+                WinCheckButton( hwnd, IDC_TYPE_POSTSCRIPT, TRUE );
+            }
+            else {
+                WinEnableControl( hwnd, IDC_TYPE_POSTSCRIPT, FALSE );
+                WinCheckButton( hwnd, IDC_TYPE_ASIMAGE, TRUE );
+            }
+            WinSendMsg( hwnd, WM_CONTROL,
+                        MPFROM2SHORT( IDC_TYPE_POSTSCRIPT, BN_CLICKED ),
+                        MPFROMHWND( WinWindowFromID( hwnd, IDC_TYPE_POSTSCRIPT ) ) );
+
+
             return (MRESULT)FALSE;
         }
 
         case WM_CONTROL:
         {
-            if ( (SHORT1FROMMP(mp1) == IDC_PNAME) && (SHORT2FROMMP(mp1) == CBN_ENTER) )
+            switch ( SHORT1FROMMP(mp1) )
             {
-                SHORT rc = (SHORT)WinSendDlgItemMsg( hwnd, IDC_PNAME, LM_QUERYSELECTION,
-                                                     MPFROMSHORT( LIT_CURSOR ), MPVOID );
-                if ( rc != LIT_NONE ) {
-                    MRESULT r = WinSendDlgItemMsg( hwnd, IDC_PNAME, LM_QUERYITEMHANDLE,
-                                                   MPFROMSHORT( rc ), MPVOID );
-                    _this->setCurrentQInfo( hwnd, r );
+                case IDC_PNAME:
+                {
+                    if ( SHORT2FROMMP(mp1) == CBN_ENTER )
+                    {
+                        SHORT rc = (SHORT)WinSendDlgItemMsg( hwnd, IDC_PNAME, LM_QUERYSELECTION,
+                                                             MPFROMSHORT( LIT_CURSOR ), MPVOID );
+                        if ( rc != LIT_NONE ) {
+                            MRESULT r = WinSendDlgItemMsg( hwnd, IDC_PNAME, LM_QUERYITEMHANDLE,
+                                                           MPFROMSHORT( rc ), MPVOID );
+                            _this->setCurrentQInfo( hwnd, (PPRQINFO3)r );
+                        }
+                    }
                 }
+                break;
+
+                case IDC_RANGEALL:
+                case IDC_RANGECURRENT:
+                case IDC_RANGEPAGES:
+                {
+                    BOOL en = WinQueryButtonCheckstate( hwnd, IDC_RANGEPAGES );
+                    WinEnableControl( hwnd, IDC_LABELFROM, en );
+                    WinEnableControl( hwnd, IDC_PGFROM, en );
+                    WinEnableControl( hwnd, IDC_LABELTO, en );
+                    WinEnableControl( hwnd, IDC_PGTO, en );
+                }
+                break;
+
+                case IDC_TYPE_POSTSCRIPT:
+                case IDC_TYPE_ASIMAGE:
+                {
+                    WinEnableControl( hwnd, IDC_HIGHER_IMAGE_QUALITY,
+                                WinQueryButtonCheckstate( hwnd, IDC_TYPE_ASIMAGE ) );
+                }
+                break;
+
             }
         }
         break;
@@ -211,7 +260,36 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
 
                 case DID_OK:
                     {
-                        // do
+                        _this->psetup->range = RangeAll;
+                        _this->psetup->pgfrom = 1;
+                        _this->psetup->pgto = _this->doc->getPageCount( ev );
+
+                        if ( WinQueryButtonCheckstate( hwnd, IDC_RANGECURRENT ) ) {
+                            _this->psetup->range = RangeCurrent;
+                            _this->psetup->pgfrom = _this->currentpage;
+                            _this->psetup->pgto = _this->currentpage;
+                        }
+
+                        if ( WinQueryButtonCheckstate( hwnd, IDC_RANGEPAGES ) )
+                        {
+                            _this->psetup->range = RangePages;
+                            LONG tmpVal = 0;
+                            BOOL rc = (BOOL)WinSendDlgItemMsg( hwnd, IDC_PGFROM, SPBM_QUERYVALUE, MPFROMP( &tmpVal ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                            if ( rc && ( tmpVal > 0 ) ) {
+                                _this->psetup->pgfrom = tmpVal;
+                            }
+                            rc = (BOOL)WinSendDlgItemMsg( hwnd, IDC_PGTO, SPBM_QUERYVALUE, MPFROMP( &tmpVal ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                            if ( rc && ( tmpVal > 0 ) ) {
+                                _this->psetup->pgto = tmpVal;
+                            }
+                        }
+
+                        _this->psetup->ptype = TypePostScript;
+                        if ( WinQueryButtonCheckstate( hwnd, IDC_TYPE_ASIMAGE ) ) {
+                            _this->psetup->ptype = TypeAsImage;
+                        }
+                        _this->psetup->higherQuality = WinQueryButtonCheckstate( hwnd, IDC_HIGHER_IMAGE_QUALITY );
+
                         WinDismissDlg( hwnd, DID_OK );
                     }
                     return (MRESULT)FALSE;

@@ -32,37 +32,30 @@
  * ***** END LICENSE BLOCK ***** */
 
 
-#ifndef __PRINTDLG_H
-#define __PRINTDLG_H
+#ifndef __PRINT_H
+#define __PRINT_H
 
-#include "print.h"
+extern HAB hab;
+extern Environment *ev;
 
+#define DEVICENAME_LENGTH   32
+#define DRIVERNAME_LENGTH   128
 
-class LuDocument;
-struct PrintDlgInternalData;
+enum PrintRange { RangeAll = 0, RangeCurrent = 1, RangePages = 2 };
+enum PrintType { TypePostScript = 0, TypeAsImage = 1 };
 
-class PrintDlg
+struct PrintSetup
 {
-    public:
-        PrintDlg( HWND hWndFrame, LuDocument *_doc, long _currentpage );
-        virtual ~PrintDlg();
-
-        ULONG showDialog();
-        void getPrintSetup( PrintSetup *p );
-
-    private:
-
-        void enumQueues( HWND hwnd );
-        void showJobProperties();
-        void setCurrentQInfo( HWND hwnd, PPRQINFO3 q );
-        static MRESULT EXPENTRY printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
-
-        HWND hFrame;
-        LuDocument *doc;
-        long currentpage;
-        PPRQINFO3 pQueueInfo;
-        PrintSetup *psetup;
+    PRQINFO3 QueueInfo;
+    PrintRange range;
+    long pgfrom;
+    long pgto;
+    PrintType ptype;
+    bool higherQuality;
 };
 
-#endif // __PRINTDLG_H
+class LuDocument;
+void printDocument( LuDocument *doc, PrintSetup *psetup );
+
+#endif // __PRINT_H
 

@@ -35,7 +35,8 @@ OBJS = Lucide.obj luutils.obj clipbrd.obj pmsplitter.obj pmtoolbar.obj \
        toolbar.obj pluginman.obj pluginViewDlg.obj docViewer.obj \
        linklab.obj wwbtn.obj intern.obj messages.obj indexWindow.obj \
        fontsInfoDlg.obj docInfoDlg.obj findDlg.obj progressDlg.obj \
-       aboutDlg.obj settingsDlg.obj lusettings.obj printDlg.obj
+       aboutDlg.obj settingsDlg.obj lusettings.obj printDlg.obj \
+       print.obj
 
 Lucide.exe: $(OBJS) Lucide.res
   copy &&|
@@ -57,6 +58,7 @@ file $(OBJDIR)\findDlg.obj
 file $(OBJDIR)\progressDlg.obj
 file $(OBJDIR)\aboutDlg.obj
 file $(OBJDIR)\printDlg.obj
+file $(OBJDIR)\print.obj
 file $(OBJDIR)\settingsDlg.obj
 file $(OBJDIR)\lusettings.obj
 file $(OBJDIR)\docViewer.obj
@@ -95,6 +97,7 @@ findDlg.obj:        findDlg.cpp
 progressDlg.obj:    progressDlg.cpp
 aboutDlg.obj:       aboutDlg.cpp
 printDlg.obj:       printDlg.cpp
+print.obj:          print.cpp
 settingsDlg.obj:    settingsDlg.cpp
 lusettings.obj:     lusettings.cpp
 docViewer.obj:      docViewer.cpp
