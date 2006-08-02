@@ -150,7 +150,7 @@ typedef boolean   SOMLINK somTP_LuPopplerDocument_saveAs(LuPopplerDocument *somS
 typedef somTP_LuPopplerDocument_saveAs *somTD_LuPopplerDocument_saveAs;
 typedef boolean   SOMLINK somTP_LuPopplerDocument_isPostScriptExportable(LuPopplerDocument *somSelf, Environment *ev);
 typedef somTP_LuPopplerDocument_isPostScriptExportable *somTD_LuPopplerDocument_isPostScriptExportable;
-typedef void   SOMLINK somTP_LuPopplerDocument_exportToPostScript(LuPopplerDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_LuPopplerDocument_exportToPostScript(LuPopplerDocument *somSelf, Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
@@ -586,7 +586,7 @@ boolean   isPostScriptExportable(Environment *ev)
 
 
 /* method: exportToPostScript */
-void   exportToPostScript(Environment *ev, 
+boolean   exportToPostScript(Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
@@ -594,7 +594,7 @@ void   exportToPostScript(Environment *ev,
 		double height, 
 		boolean duplex)
 {
-   SOM_ResolveD(this,LuPopplerDocument,LuDocument,exportToPostScript)
+   return SOM_ResolveD(this,LuPopplerDocument,LuDocument,exportToPostScript)
 	(this, ev,filename,first_page,last_page,width,height,duplex);
 }
 

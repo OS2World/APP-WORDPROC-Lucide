@@ -11,9 +11,10 @@ to easily add more plugins.
    Supported file type         Supported features
   --------------------------------------------------------------------------
          PDF                   Scaling, Rotation, Navigation, Text
-                               selection, Searching, Asynchronous rendering
+                               selection, Searching, Asynchronous rendering,
+                               PostScript printing
 
-         DJVU                  Scaling
+         DJVU                  Scaling, PostScript printing
 
          JPG                   -
   --------------------------------------------------------------------------

@@ -93,12 +93,18 @@ LuSettings     *settings  = NULL;
 char           *title     = NULL;
 
 
-bool  Lucide::dontSwitchPage = false;
-SHORT Lucide::splitterPos    = 100;
-bool  Lucide::showIndex      = true;
-bool  Lucide::isMaxview      = false;
-bool  Lucide::isFullscreen   = false;
-LuWindowPos Lucide::winPos   = {0};
+bool         Lucide::dontSwitchPage                = false;
+SHORT        Lucide::splitterPos                   = 100;
+bool         Lucide::showIndex                     = true;
+bool         Lucide::isMaxview                     = false;
+bool         Lucide::isFullscreen                  = false;
+LuWindowPos  Lucide::winPos                        = {0};
+char         Lucide::docFullName[ CCHMAXPATH ]     = "";
+char         Lucide::docFileName[ CCHMAXPATHCOMP ] = "";
+// static data for asynch loading document
+ProgressDlg *Lucide::loadProgressDlg               = NULL;
+bool         Lucide::docLoaded                     = false;;
+char        *Lucide::loadError                     = NULL;
 
 
 PFNWP pOldSplProc;
@@ -327,18 +333,12 @@ void Lucide::setPageLayout( PgLayout layout )
 }
 
 
-// static data for asynch loading document
-ProgressDlg *Lucide::loadProgressDlg       = NULL;
-char         Lucide::docName[ CCHMAXPATH ] = "";
-bool         Lucide::docLoaded             = false;;
-char        *Lucide::loadError             = NULL;
-
 void Lucide::loadthread( void *p )
 {
     HAB thab = WinInitialize( 0 );
     HMQ thmq = WinCreateMsgQueue( thab, 0 );
 
-    docLoaded = doc->loadFile( ev, docName, NULL, &loadError );
+    docLoaded = doc->loadFile( ev, docFullName, NULL, &loadError );
     loadProgressDlg->hide();
 
     WinDestroyMsgQueue( thmq );
@@ -378,7 +378,7 @@ void Lucide::loadDocument( const char *fn )
             }
             else
             {
-                strcpy( docName, fn );
+                strcpy( docFullName, fn );
                 docLoaded = false;;
                 loadError = NULL;
 
@@ -396,7 +396,9 @@ void Lucide::loadDocument( const char *fn )
                     char _fn[ _MAX_FNAME ];
                     char _ex[ _MAX_EXT ];
                     _splitpath( fn, NULL, NULL, _fn, _ex );
-                    snprintf( t, 2048, "%s%s - %s", _fn, _ex, title );
+                    strcpy( docFileName, _fn );
+                    strcat( docFileName, _ex );
+                    snprintf( t, 2048, "%s - %s", docFileName, title );
                     WinSetWindowText( hWndFrame, t );
                     delete t;
                     setDocument( doc );
@@ -465,7 +467,7 @@ void Lucide::saveDocumentAs()
                            dirbuf, sizeof( dirbuf ) );
     char fil[ _MAX_FNAME ] = "";
     char ext[ _MAX_EXT ] = "";
-    _splitpath( docName, NULL, NULL, fil, ext );
+    _splitpath( docFullName, NULL, NULL, fil, ext );
     snprintf( fd->szFullFile, sizeof( fd->szFullFile ),
                 "%s%s%s", dirbuf, fil, ext );
     WinFileDlg( HWND_DESKTOP, hWndFrame, fd );
@@ -641,7 +643,11 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     PrintDlg *d = new PrintDlg( hWndFrame, doc, docViewer->getCurrentPage() + 1 );
                     if ( d->showDialog() == DID_OK ) {
                         // print
-                        //printDocument( doc, d->getCurrentQInfo() );
+                        PrintSetup *p = new PrintSetup;
+                        memset( p, 0, sizeof( PrintSetup ) );
+                        d->getPrintSetup( p );
+                        printDocument( hWndFrame, doc, Lucide::docFileName, p );
+                        delete p;
                     }
                     delete d;
                     return (MRESULT)FALSE;
@@ -841,11 +847,11 @@ int main( int argc, char **argv )
                                      0, 0, 0, 0, hWndFrame, HWND_TOP,
                                      ID_SPLITTER, NULL, NULL );
 
-    indexWin = new IndexWindow( hab, hWndFrame );
+    indexWin = new IndexWindow( hWndFrame );
 
-    DocumentViewer::registerClass( hab );
+    DocumentViewer::registerClass();
 
-    docViewer = new DocumentViewer( hab, hWndFrame );
+    docViewer = new DocumentViewer( hWndFrame );
 
     WinSendMsg( hVertSplitter, SBM_SETWINDOWS,
                 MPFROMHWND( indexWin->getHWND() ), MPFROMHWND( docViewer->getFrameHWND() ) );

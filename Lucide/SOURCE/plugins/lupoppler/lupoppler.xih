@@ -908,7 +908,7 @@ static somMethodProc* LuPopplerDocument_parent_LuDocument_isPostScriptExportable
 /*
  * Overridden method: exportToPostScript
  */
-SOM_Scope void  SOMLINK exportToPostScript(LuPopplerDocument *somSelf, Environment *ev,
+SOM_Scope boolean  SOMLINK exportToPostScript(LuPopplerDocument *somSelf, Environment *ev,
 		string filename,
 		long first_page,
 		long last_page,
@@ -922,7 +922,7 @@ static somId somId_LuPopplerDocumentexportToPostScript = &somMN_LuPopplerDocumen
 #else
 #define somId_exportToPostScript somId_LuPopplerDocumentexportToPostScript
 #endif
-typedef void   SOMLINK somTP_xih_LuPopplerDocument_exportToPostScript(LuPopplerDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_xih_LuPopplerDocument_exportToPostScript(LuPopplerDocument *somSelf, Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 

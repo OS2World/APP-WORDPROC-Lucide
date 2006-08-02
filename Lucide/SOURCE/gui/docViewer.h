@@ -56,7 +56,7 @@ typedef std::vector<PageDrawArea> DrawAreas;
 class DocumentViewer
 {
     public:
-        DocumentViewer( HAB _hab, HWND hWndFrame );
+        DocumentViewer( HWND hWndFrame );
         virtual ~DocumentViewer();
 
         void setPageLayout( PgLayout layout );
@@ -80,7 +80,7 @@ class DocumentViewer
                              bool _continueSearch );
         void setFullscreen( bool _fullscreen );
 
-        static void registerClass( HAB hab );
+        static void registerClass();
 
         // Internal stuffs
     private:
@@ -128,7 +128,6 @@ class DocumentViewer
         static long _System asynchCallbackFnAbort( void *data );
 
         LuDocument *doc;
-        HAB hab;
         HWND hMainFrame;
         HWND hWndDocFrame;
         HWND hWndDoc;
@@ -148,7 +147,6 @@ class DocumentViewer
         LONG  spos_y;
         HPS hpsBuffer;
         HDC hdcBuffer;
-        Environment *ev;
         LuPixbuf *pixbuf;
         short bpp;
         double width, height, zoom, realzoom, fullwidth, fullheight;

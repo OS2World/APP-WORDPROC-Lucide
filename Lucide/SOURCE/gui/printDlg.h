@@ -59,6 +59,7 @@ class PrintDlg
 
         HWND hFrame;
         LuDocument *doc;
+        bool scalable;
         long currentpage;
         PPRQINFO3 pQueueInfo;
         PrintSetup *psetup;

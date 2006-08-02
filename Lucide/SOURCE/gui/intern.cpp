@@ -46,7 +46,7 @@ using namespace std;
 #include <string.h>
 #include <io.h>
 
-#include "lucide.h"
+#include "globals.h"
 #include "wwbtn.h"
 #include "luutils.h"
 

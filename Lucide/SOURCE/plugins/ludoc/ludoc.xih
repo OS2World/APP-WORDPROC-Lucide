@@ -548,7 +548,7 @@ static somApRdInfo isPostScriptExportableStubs = {0, 0, &isPostScriptExportableM
 /*
  * New Method: exportToPostScript
  */
-SOM_Scope void  SOMLINK exportToPostScript(LuDocument *somSelf, Environment *ev, 
+SOM_Scope boolean  SOMLINK exportToPostScript(LuDocument *somSelf, Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
@@ -569,7 +569,7 @@ static somId somDI_exportToPostScript = &somDS_exportToPostScript;
 static somFloatMap exportToPostScriptFloatMap = {
 20, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
 
-static somMethodInfo exportToPostScriptMethodInfo = {1, 40, &exportToPostScriptFloatMap};
+static somMethodInfo exportToPostScriptMethodInfo = {11, 40, &exportToPostScriptFloatMap};
 
 static somApRdInfo exportToPostScriptStubs = {0, 0, &exportToPostScriptMethodInfo};
 

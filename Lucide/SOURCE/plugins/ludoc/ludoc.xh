@@ -270,7 +270,7 @@ typedef boolean   SOMLINK somTP_LuDocument_saveAs(LuDocument *somSelf, Environme
 typedef somTP_LuDocument_saveAs *somTD_LuDocument_saveAs;
 typedef boolean   SOMLINK somTP_LuDocument_isPostScriptExportable(LuDocument *somSelf, Environment *ev);
 typedef somTP_LuDocument_isPostScriptExportable *somTD_LuDocument_isPostScriptExportable;
-typedef void   SOMLINK somTP_LuDocument_exportToPostScript(LuDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_LuDocument_exportToPostScript(LuDocument *somSelf, Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
@@ -706,7 +706,7 @@ boolean   isPostScriptExportable(Environment *ev)
 
 
 /* method: exportToPostScript */
-void   exportToPostScript(Environment *ev, 
+boolean   exportToPostScript(Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
@@ -714,7 +714,7 @@ void   exportToPostScript(Environment *ev,
 		double height, 
 		boolean duplex)
 {
-   SOM_ResolveD(this,LuDocument,LuDocument,exportToPostScript)
+   return SOM_ResolveD(this,LuDocument,LuDocument,exportToPostScript)
 	(this, ev,filename,first_page,last_page,width,height,duplex);
 }
 

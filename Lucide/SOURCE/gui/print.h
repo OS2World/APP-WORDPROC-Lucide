@@ -35,8 +35,6 @@
 #ifndef __PRINT_H
 #define __PRINT_H
 
-extern HAB hab;
-extern Environment *ev;
 
 #define DEVICENAME_LENGTH   32
 #define DRIVERNAME_LENGTH   128
@@ -55,7 +53,8 @@ struct PrintSetup
 };
 
 class LuDocument;
-void printDocument( LuDocument *doc, PrintSetup *psetup );
+void printDocument( HWND hWndFrame, LuDocument *doc,
+                    const char *title, PrintSetup *psetup );
 
 #endif // __PRINT_H
 

@@ -103,8 +103,8 @@ MRESULT EXPENTRY SettingsDlg::settingsDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
 
             // layout
             HWND hLayout = WinWindowFromID( hwnd, IDC_DEFPGLAYOUT );
-            std::string spage = getLocalizedString( MENU_SINGLE_PAGE );
-            std::string cont = getLocalizedString( MENU_CONTINUOUS );
+            std::string spage = getLocalizedString( SD_SINGLE_PAGE );
+            std::string cont = getLocalizedString( SD_CONTINUOUS );
             WinSendMsg( hLayout, LM_INSERTITEM, MPFROMSHORT(LIT_END),
                         MPFROMP( spage.c_str() ) );
             WinSendMsg( hLayout, LM_INSERTITEM, MPFROMSHORT(LIT_END),

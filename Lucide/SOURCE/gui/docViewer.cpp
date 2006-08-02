@@ -67,9 +67,8 @@ typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 #define VERT_SPACE      2
 
 // DocumentViewer constructor
-DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
+DocumentViewer::DocumentViewer( HWND hWndFrame )
 {
-    hab         = _hab;
     hMainFrame  = hWndFrame;
     sHscrollMax = 0;
     sVscrollMax = 0;
@@ -93,7 +92,6 @@ DocumentViewer::DocumentViewer( HAB _hab, HWND hWndFrame )
     zoom        = 1.0;
     realzoom    = 1.0;
     rotation    = 0;
-    ev          = somGetGlobalEnvironment();
     pixbuf      = NULL;
     spos_x      = 0;
     spos_y      = 0;
@@ -178,7 +176,7 @@ DocumentViewer::~DocumentViewer()
 
 
 // static, registration of a window class
-void DocumentViewer::registerClass( HAB hab )
+void DocumentViewer::registerClass()
 {
     WinRegisterClass( hab, "er.docview", docViewProc, CS_SIZEREDRAW, sizeof( ULONG ) * 2 );
 }
@@ -523,7 +521,7 @@ void DocumentViewer::searchthread( void *p )
         delete fmt;
         delete buf;
 
-        _this->foundrects[ i ] = _this->doc->searchText( _this->ev, i,
+        _this->foundrects[ i ] = _this->doc->searchText( ev, i,
                                         (char *)_this->searchString, _this->caseSensitive );
         if ( _this->foundrects[ i ] != NULL )
         {
@@ -814,7 +812,7 @@ long _System DocumentViewer::asynchCallbackFnDraw( void *data )
         pbmi.cy = rcly;
         pbmi.cPlanes = 1;
         pbmi.cBitCount = _this->bpp * 8;
-        GpiDrawBits( hps, _this->pixbuf->getDataPtr( _this->ev ), &pbmi, 4L,
+        GpiDrawBits( hps, _this->pixbuf->getDataPtr( ev ), &pbmi, 4L,
                      aptlPoints, lRop, BBO_IGNORE );
 
         WinReleasePS( hps );
@@ -850,8 +848,8 @@ void DocumentViewer::drawthread( void *p )
 
                 LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
                 LONG rcly = pda->drawrect.yTop - pda->drawrect.yBottom;
-                _this->pixbuf = new LuPixbuf( _this->ev, rclx, rcly, _this->bpp );
-                _this->doc->renderPageToPixbufAsynch( _this->ev, pda->pagenum,
+                _this->pixbuf = new LuPixbuf( ev, rclx, rcly, _this->bpp );
+                _this->doc->renderPageToPixbufAsynch( ev, pda->pagenum,
                        pda->startpos.x, pda->startpos.y, rclx, rcly, _this->realzoom,
                        _this->rotation, _this->pixbuf,
                        asynchCallbackFnDraw, asynchCallbackFnAbort, p );
@@ -876,7 +874,7 @@ void DocumentViewer::drawthread( void *p )
                     }
                     WinReleasePS( hps );
                 }
-                WinSetRectEmpty( _this->hab, &_this->savedRcl );
+                WinSetRectEmpty( thab, &_this->savedRcl );
                 delete _this->drawareas;
                 _this->drawareas = NULL;
             }

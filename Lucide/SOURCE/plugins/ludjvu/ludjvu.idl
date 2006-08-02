@@ -29,6 +29,8 @@ interface LuDjvuDocument : LuDocument
         getThumbnail: override;
         isSaveable: override;
         saveAs: override;
+        isPostScriptExportable: override;
+        exportToPostScript: override;
 
         somDefaultInit: override, init;
         somDestruct: override;

@@ -677,22 +677,21 @@ SOM_Scope boolean  SOMLINK isPostScriptExportable(LuPopplerDocument *somSelf,
 }
 
 
-SOM_Scope void  SOMLINK exportToPostScript(LuPopplerDocument *somSelf,
+SOM_Scope boolean SOMLINK exportToPostScript(LuPopplerDocument *somSelf,
                                     Environment *ev, string filename,
-                                   long first_page, long last_page,
-                                   double width, double height,
-                                   boolean duplex)
+                                    long first_page, long last_page,
+                                    double width, double height,
+                                    boolean duplex)
 {
     if ( filename == NULL ) {
-        return;
+        return FALSE;
     }
     if ( last_page < first_page ) {
-        return;
+        return FALSE;
     }
 
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
     PDFDoc *doc = ((PopplerDocument *)somThis->data)->doc;
-
 
     PSOutputDev *out = new PSOutputDev( filename, doc->getXRef(),
                                         doc->getCatalog(),
@@ -700,12 +699,17 @@ SOM_Scope void  SOMLINK exportToPostScript(LuPopplerDocument *somSelf,
                                         psModePS, (int)width, (int)height,
                                         duplex, 0, 0, 0, 0, gFalse );
 
+	if ( !out->isOk() ) {
+		delete out;
+        return FALSE;
+	}
 
-    for ( long i = first_page; i < last_page; i++ ) {
+    for ( long i = first_page; i <= last_page; i++ ) {
         doc->displayPage( out, i + 1, 72.0, 72.0, 0, gFalse, gTrue, gFalse );
     }
 
     delete out;
+    return TRUE;
 }
 
 

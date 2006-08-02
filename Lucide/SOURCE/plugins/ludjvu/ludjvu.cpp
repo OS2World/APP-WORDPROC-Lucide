@@ -5,6 +5,7 @@
  *     SOM incremental update: 2.24
  */
 
+
 /*
  * Copyright (c) 2006, Eugene Romanenko, netlabs.org
  *
@@ -104,6 +105,7 @@ static void djvu_handle_events( ddjvu_context_t *ctx )
     }
 }
 
+
 SOM_Scope boolean  SOMLINK loadFile(LuDjvuDocument *somSelf,
                                      Environment *ev, string filename,
                                     string password, string* error)
@@ -131,16 +133,19 @@ SOM_Scope boolean  SOMLINK loadFile(LuDjvuDocument *somSelf,
     return TRUE;
 }
 
+
 SOM_Scope short  SOMLINK getBpp(LuDjvuDocument *somSelf,  Environment *ev)
 {
     return 3;
 }
+
 
 SOM_Scope boolean  SOMLINK isScalable(LuDjvuDocument *somSelf,
                                        Environment *ev)
 {
     return TRUE;
 }
+
 
 SOM_Scope long  SOMLINK getPageCount(LuDjvuDocument *somSelf,
                                       Environment *ev)
@@ -149,6 +154,7 @@ SOM_Scope long  SOMLINK getPageCount(LuDjvuDocument *somSelf,
     DjvuDocument *d = (DjvuDocument *)somThis->data;
     return ddjvu_document_get_pagenum( d->d_document );
 }
+
 
 SOM_Scope void  SOMLINK getPageSize(LuDjvuDocument *somSelf,
                                      Environment *ev, long pagenum,
@@ -170,6 +176,7 @@ SOM_Scope void  SOMLINK getPageSize(LuDjvuDocument *somSelf,
         *height = info.height * SCALE_FACTOR;
     }
 }
+
 
 SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
                                             Environment *ev,
@@ -234,6 +241,7 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
     delete pb;
 }
 
+
 SOM_Scope boolean  SOMLINK getThumbnailSize(LuDjvuDocument *somSelf,
                                              Environment *ev,
                                             long pagenum,
@@ -252,6 +260,7 @@ SOM_Scope boolean  SOMLINK getThumbnailSize(LuDjvuDocument *somSelf,
 
     return TRUE;
 }
+
 
 SOM_Scope LuPixbuf*  SOMLINK getThumbnail(LuDjvuDocument *somSelf,
                                            Environment *ev, long pagenum,
@@ -293,6 +302,7 @@ SOM_Scope LuPixbuf*  SOMLINK getThumbnail(LuDjvuDocument *somSelf,
     return pixbuf;
 }
 
+
 SOM_Scope boolean  SOMLINK isSaveable(LuDjvuDocument *somSelf,
                                        Environment *ev)
 {
@@ -302,6 +312,7 @@ SOM_Scope boolean  SOMLINK isSaveable(LuDjvuDocument *somSelf,
     return FALSE;
 #endif
 }
+
 
 SOM_Scope boolean  SOMLINK saveAs(LuDjvuDocument *somSelf,  Environment *ev,
                                   string filename)
@@ -326,6 +337,52 @@ SOM_Scope boolean  SOMLINK saveAs(LuDjvuDocument *somSelf,  Environment *ev,
     return FALSE;
 #endif
 }
+
+
+SOM_Scope boolean  SOMLINK isPostScriptExportable(LuDjvuDocument *somSelf,
+                                                   Environment *ev)
+{
+#ifdef __GNUC__
+    return TRUE;
+#else
+    return FALSE;
+#endif
+}
+
+
+SOM_Scope boolean  SOMLINK exportToPostScript(LuDjvuDocument *somSelf,
+                                               Environment *ev,
+                                              string filename,
+                                              long first_page,
+                                              long last_page,
+                                              double width, double height,
+                                              boolean duplex)
+{
+#ifdef __GNUC__
+    LuDjvuDocumentData *somThis = LuDjvuDocumentGetData(somSelf);
+    DjvuDocument *d = (DjvuDocument *)somThis->data;
+
+    FILE *f = NULL;
+    if ( ( f = fopen( filename, "wb" ) ) == NULL ) {
+        return FALSE;
+    }
+
+    char pgbuf[ 20 ];
+    snprintf( pgbuf, 20, "-page=%d-%d", first_page + 1, last_page + 1 );
+    const char *optv[] = { pgbuf };
+
+    ddjvu_job_t *job = ddjvu_document_print( d->d_document, f, 1, optv );
+    while ( !ddjvu_job_done( job ) ) {
+        djvu_handle_events( d->d_context );
+    }
+    fclose( f );
+
+    return TRUE;
+#else
+    return FALSE;
+#endif
+}
+
 
 SOM_Scope void SOMLINK somDefaultInit(LuDjvuDocument *somSelf,
                                       som3InitCtrl* ctrl)

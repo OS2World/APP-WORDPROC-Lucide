@@ -40,7 +40,7 @@
 #include <string.h>
 #include <malloc.h>
 
-#include "lucide.h"
+#include "globals.h"
 #include "luutils.h"
 #include "lucide_res.h"
 

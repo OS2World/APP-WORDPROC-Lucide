@@ -35,11 +35,8 @@
 #ifndef __LUCIDE_H
 #define __LUCIDE_H
 
-extern const char *appName;
-extern const char *appVersion;
-extern HAB hab;
-extern char deffont[];
-extern int deffontlen;
+#include "globals.h"
+
 
 class LuDocument;
 class ProgressDlg;
@@ -62,7 +59,7 @@ class Lucide
     private:
     
 		static ProgressDlg *loadProgressDlg;
-		static char docName[ CCHMAXPATH ];
+		static char docFullName[ CCHMAXPATH ];
 		static bool docLoaded;
 		static char *loadError;
 		static bool isMaxview;
@@ -75,6 +72,7 @@ class Lucide
         static void loadthread( void *p );
 
     public:
+		static char docFileName[ CCHMAXPATHCOMP ];
         static bool dontSwitchPage;
         static SHORT splitterPos;
         static bool showIndex;

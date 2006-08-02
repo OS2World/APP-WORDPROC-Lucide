@@ -36,10 +36,6 @@
 #define __MESSAGES_H
 
 
-// Some menu item, which used not only in menu
-extern const char *MENU_SINGLE_PAGE;
-extern const char *MENU_CONTINUOUS;
-
 // Toolbar hints
 extern const char *TBHINT_OPEN;
 extern const char *TBHINT_PRINT;
@@ -64,6 +60,10 @@ extern const char *MSGS_LOADING_DOCUMENT;
 extern const char *MSGS_WARNING;
 extern const char *MSGS_OVERWRITE_FILE;
 extern const char *MSGS_FILE_SAVE_ERROR;
+
+// Settings dialog
+extern const char *SD_SINGLE_PAGE;
+extern const char *SD_CONTINUOUS;
 
 // Plugins List columns titles
 extern const char *PLUGLIST_PLUGIN_NAME;
@@ -93,6 +93,12 @@ extern const char *FIND_NOT_FOUND;
 
 // 'Go to page' dialog
 extern const char *GTP_OF;
+
+// Printing, other 'print'-related messages
+extern const char *PRINT_PRINTING_PAGE_OF;
+extern const char *PRINT_GENERATING_POSTSCRIPT;
+extern const char *PRINT_SPOOLING_POSTSCRIPT;
+extern const char *PRINT_FAILED;
 
 
 #endif // __MESSAGES_H

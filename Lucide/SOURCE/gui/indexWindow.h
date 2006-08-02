@@ -48,7 +48,7 @@ struct TreeRecord
 class IndexWindow
 {
     public:
-        IndexWindow( HAB _hab, HWND hWndFrame );
+        IndexWindow( HWND hWndFrame );
         virtual ~IndexWindow();
 
         HWND getHWND() { return hWndPanel; }
@@ -69,12 +69,10 @@ class IndexWindow
 		PFNWP pOldPanelProc;
         
     	LuDocument *doc;
-        HAB hab;
         HWND hMainFrame;
         HWND hWndPanel;
         HWND hWndBar;
     	HWND hWndIndex;
-		Environment *ev;
 		long totalpages;
 };
 

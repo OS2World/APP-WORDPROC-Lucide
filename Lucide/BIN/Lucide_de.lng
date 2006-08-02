@@ -5,7 +5,7 @@
 #
 # Main menu
 #
-MENU_FILE=~Datei
+MENU_DOCUMENT=~Dokument
 MENU_OPEN=ôffnen...\tStrg+O
 MENU_SAVE_AS=Sichern unter...
 MENU_PAGE_SETUP=Seiteneinrichtung...
@@ -20,7 +20,6 @@ MENU_SELECT_ALL=Alles markieren\tStrg+/
 MENU_FIND=Suchen...\tStrg+F
 MENU_FINDAGAIN=Weitersuchen\tStrg+G
 MENU_SETTINGS=Einstellungen...
-MENU_DOCUMENT=~Dokument
 MENU_FIRST_PAGE=Erste Seite
 MENU_PREV_PAGE=Vorige Seite\t-
 MENU_NEXT_PAGE=NÑchste Seite\t+
@@ -66,6 +65,9 @@ MSGS_MAIN_WIN_TITLE=Lucide - Document Viewer
 MSGS_NO_SUIT_PLUG=Kein passendes Plugin fÅr das Dokument gefunden!
 MSGS_FILE_LOAD_ERROR=Datei kann nicht gelesen werden!
 MSGS_LOADING_DOCUMENT=Lese Dokument, bitte warten...
+MSGS_WARNING=Warnung!
+MSGS_OVERWRITE_FILE=Datei existiert bereits. öberschreiben?
+MSGS_FILE_SAVE_ERROR=Fehler beim Schreiben der Datei!
 
 #
 # "Plugins list" dialog
@@ -138,4 +140,14 @@ SD_DEFAULT_PAGE_LAYOUT=Standard Seitenlayout
 SD_DEFAULT_ZOOM=Standard-Zoom
 SD_OK=~OK
 SD_CANCEL=~Abbruch
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=Gehe zu Seite
+GTP_PAGE=Seite
+GTP_OF=von %d
+GTP_OK=~OK
+GTP_CANCEL=~Abbruch
+
 

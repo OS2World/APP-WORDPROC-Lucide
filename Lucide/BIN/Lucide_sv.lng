@@ -5,7 +5,7 @@
 #
 # Main menu
 #
-MENU_FILE=~Arkiv
+MENU_DOCUMENT=~Dokument
 MENU_OPEN=™ppna...\tCtrl+O
 MENU_SAVE_AS=Spara som...
 MENU_PAGE_SETUP=Sida inst„llningar...
@@ -19,7 +19,6 @@ MENU_COPY=Kopiera\tCtrl+Insert
 MENU_SELECT_ALL=V„lj allt\tCtrl+/
 MENU_FIND=Finn...\tCtrl+F
 MENU_FINDAGAIN=Finn igen\tCtrl+G
-MENU_DOCUMENT=~Dokument
 MENU_FIRST_PAGE=F”rsta sidan
 MENU_PREV_PAGE=F”reg†ende sida\t-
 MENU_NEXT_PAGE=N„sta sida\t+

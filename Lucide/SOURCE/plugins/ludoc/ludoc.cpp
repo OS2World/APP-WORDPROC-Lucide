@@ -277,13 +277,14 @@ SOM_Scope boolean  SOMLINK isPostScriptExportable(LuDocument *somSelf,
 }
 
 
-SOM_Scope void  SOMLINK exportToPostScript(LuDocument *somSelf,  
+SOM_Scope boolean SOMLINK exportToPostScript(LuDocument *somSelf,
                                    Environment *ev,
                                    string filename, long first_page,
                                    long last_page, double width,
                                    double height, boolean duplex)
 {
     // Abstract method does nothing
+    return FALSE;
 }
 
 

@@ -35,11 +35,6 @@
 #include "messages.h"
 
 
-// Some menu item, which used not only in menu
-const char *MENU_SINGLE_PAGE = "MENU_SINGLE_PAGE";
-const char *MENU_CONTINUOUS  = "MENU_CONTINUOUS";
-
-
 // Toolbar hints
 const char *TBHINT_OPEN          = "TBHINT_OPEN";
 const char *TBHINT_PRINT         = "TBHINT_PRINT";
@@ -65,6 +60,10 @@ const char *MSGS_LOADING_DOCUMENT = "MSGS_LOADING_DOCUMENT";
 const char *MSGS_WARNING          = "MSGS_WARNING";
 const char *MSGS_OVERWRITE_FILE   = "MSGS_OVERWRITE_FILE";
 const char *MSGS_FILE_SAVE_ERROR  = "MSGS_FILE_SAVE_ERROR";
+
+// Settings dialog
+const char *SD_SINGLE_PAGE = "SD_SINGLE_PAGE";
+const char *SD_CONTINUOUS  = "SD_CONTINUOUS";
 
 // Plugins List columns titles
 const char *PLUGLIST_PLUGIN_NAME = "PLUGLIST_PLUGIN_NAME";
@@ -94,3 +93,10 @@ const char *FIND_NOT_FOUND      = "FIND_NOT_FOUND";
 
 // 'Go to page' dialog
 const char *GTP_OF = "GTP_OF";
+
+// Printing, other 'print'-related messages
+const char *PRINT_PRINTING_PAGE_OF      = "PRINT_PRINTING_PAGE_OF";
+const char *PRINT_GENERATING_POSTSCRIPT = "PRINT_GENERATING_POSTSCRIPT";
+const char *PRINT_SPOOLING_POSTSCRIPT   = "PRINT_SPOOLING_POSTSCRIPT";
+const char *PRINT_FAILED                = "PRINT_FAILED";
+

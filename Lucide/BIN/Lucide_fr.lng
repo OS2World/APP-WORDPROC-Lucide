@@ -5,7 +5,7 @@
 #
 # Main menu
 #
-MENU_FILE=~Fichier
+MENU_DOCUMENT=~Document
 MENU_OPEN=Ouvrir...\tCtrl+O
 MENU_SAVE_AS=Enregistrer sous...
 MENU_PAGE_SETUP=Mise en page...
@@ -19,7 +19,6 @@ MENU_COPY=Copier\tCtrl+Insert
 MENU_SELECT_ALL=S‚lectionner tout\tCtrl+/
 MENU_FIND=Rechercher...\tCtrl+F
 MENU_FINDAGAIN=Poursuivre la recherche\tCtrl+G
-MENU_DOCUMENT=~Document
 MENU_FIRST_PAGE=PremiŠre page
 MENU_PREV_PAGE=Page pr‚c‚dente\t-
 MENU_NEXT_PAGE=Page suivante\t+

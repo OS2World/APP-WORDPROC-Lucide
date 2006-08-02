@@ -39,6 +39,7 @@
 
 #include <ludoc.xh>
 
+#include "globals.h"
 #include "luutils.h"
 #include "fontsInfoDlg.h"
 #include "Lucide_res.h"
@@ -81,7 +82,6 @@ struct ListRec
 
 void FontsInfoDlg::loadList()
 {
-    Environment *ev = somGetGlobalEnvironment();
     LuDocument_LuFontInfoSequence *fonts = doc->getFontInfo( ev );
 
     if ( fonts != NULL )

@@ -49,14 +49,12 @@
 
 
 // IndexWindow constructor
-IndexWindow::IndexWindow( HAB _hab, HWND hWndFrame )
+IndexWindow::IndexWindow( HWND hWndFrame )
 {
-    hab         = _hab;
     hMainFrame  = hWndFrame;
     hWndIndex   = NULLHANDLE;
     doc         = NULL;
     totalpages  = 0;
-    ev          = somGetGlobalEnvironment();
 
     hWndPanel = WinCreateWindow( hWndFrame, WC_ER_SPLITTER, "",
                                  WS_VISIBLE | SBS_HSPLIT | SBS_SECONDFIXED,

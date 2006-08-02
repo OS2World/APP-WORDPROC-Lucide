@@ -12,6 +12,9 @@
 #include <luinode.idl>
 #include <lutypes.h>
 
+/**
+ * Note: all page numbers is zero-based.
+ */
 
 interface LuDocument : SOMObject
 {
@@ -307,8 +310,9 @@ interface LuDocument : SOMObject
      *         support this)
      *
      * Create a new postscript file and render document to.
+     * Return value: TRUE if PS document was generated successfully.
      **/
-    void exportToPostScript( in string filename, 
+    boolean exportToPostScript( in string filename, 
                      in long first_page, in long last_page,
                      in double width, in double height, in boolean duplex );
 

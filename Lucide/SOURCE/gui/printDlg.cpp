@@ -41,6 +41,7 @@
 
 #include <ludoc.xh>
 
+#include "globals.h"
 #include "printDlg.h"
 #include "Lucide_res.h"
 #include "luutils.h"
@@ -50,6 +51,7 @@ PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, long _currentpage )
 {
     hFrame      = hWndFrame;
     doc         = _doc;
+    scalable    = _doc->isScalable( ev );
     currentpage = _currentpage;
     psetup      = new PrintSetup;
     memset( psetup, 0, sizeof( PrintSetup ) );
@@ -242,8 +244,9 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                 case IDC_TYPE_POSTSCRIPT:
                 case IDC_TYPE_ASIMAGE:
                 {
+                    BOOL asimg = WinQueryButtonCheckstate( hwnd, IDC_TYPE_ASIMAGE );
                     WinEnableControl( hwnd, IDC_HIGHER_IMAGE_QUALITY,
-                                WinQueryButtonCheckstate( hwnd, IDC_TYPE_ASIMAGE ) );
+                                      asimg && _this->scalable );
                 }
                 break;
 
@@ -281,6 +284,11 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                             rc = (BOOL)WinSendDlgItemMsg( hwnd, IDC_PGTO, SPBM_QUERYVALUE, MPFROMP( &tmpVal ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
                             if ( rc && ( tmpVal > 0 ) ) {
                                 _this->psetup->pgto = tmpVal;
+                            }
+                            if ( _this->psetup->pgfrom > _this->psetup->pgto ) {
+                                long tmp = _this->psetup->pgfrom;
+                                _this->psetup->pgfrom = _this->psetup->pgto;
+                                _this->psetup->pgto = tmp;
                             }
                         }
 
