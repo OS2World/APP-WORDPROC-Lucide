@@ -47,7 +47,7 @@ SOMEXTERN SOMClass * SOMLINK LuPixbufNewClass(
 		integer4 minorVersion);
 
 /* The API to the LuPixbuf class object, and the methods it introduces. */
-SOMEXTERN struct LuPixbufClassDataStructure {
+SOMEXTERNS struct LuPixbufClassDataStructure {
 	SOMClass *classObject;
 	somMToken LuPixbufInit;
 	somMToken getWidth;
@@ -61,7 +61,7 @@ SOMEXTERN struct LuPixbufClassDataStructure {
 #define _LuPixbuf LuPixbufClassData.classObject
 
 /* The API to parentMtabs for LuPixbuf, and the instance data it introduces. */
-SOMEXTERN struct LuPixbufCClassDataStructure {
+SOMEXTERNS struct LuPixbufCClassDataStructure {
 	somMethodTabs parentMtab;
 	somDToken              instanceDataToken;
 } SOMDLINK LuPixbufCClassData;
@@ -69,7 +69,7 @@ SOMEXTERN struct LuPixbufCClassDataStructure {
 /*
  * -- Typedefs for LuPixbuf Method Procedures
  */
-SOMEXTERNF {
+SOMEXTERN {
 typedef void   SOMLINK somTP_LuPixbuf_LuPixbufInit(LuPixbuf *somSelf, Environment *ev, 
 		somInitCtrl* ctrl, 
 		long w, 

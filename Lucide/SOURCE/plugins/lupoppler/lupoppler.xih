@@ -914,7 +914,8 @@ SOM_Scope boolean  SOMLINK exportToPostScript(LuPopplerDocument *somSelf, Enviro
 		long last_page,
 		double width,
 		double height,
-		boolean duplex);
+		boolean duplex,
+		boolean* brkExport);
 static char *somMN_LuPopplerDocumentexportToPostScript = "LuDocument::exportToPostScript";
 static somId somId_LuPopplerDocumentexportToPostScript = &somMN_LuPopplerDocumentexportToPostScript;
 #ifdef somId_exportToPostScript
@@ -928,14 +929,15 @@ typedef boolean   SOMLINK somTP_xih_LuPopplerDocument_exportToPostScript(LuPoppl
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex);
+		boolean duplex, 
+		boolean* brkExport);
 typedef somTP_xih_LuPopplerDocument_exportToPostScript *somTD_xih_LuPopplerDocument_exportToPostScript;
 /* define the parent method call macro */
 static somMethodProc* LuPopplerDocument_parent_LuDocument_exportToPostScript_resolved;
-#define LuPopplerDocument_parent_LuDocument_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex) \
+#define LuPopplerDocument_parent_LuDocument_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex,brkExport) \
   ((( somTD_xih_LuPopplerDocument_exportToPostScript ) \
       LuPopplerDocument_parent_LuDocument_exportToPostScript_resolved) \
-	(somSelf,ev,filename,first_page,last_page,width,height,duplex))
+	(somSelf,ev,filename,first_page,last_page,width,height,duplex,brkExport))
 /* define a variety of (possibly ambiguous) short forms */
 #ifndef SOMGD_pmc_parent_exportToPostScript
   #ifdef parent_exportToPostScript
@@ -953,8 +955,8 @@ static somMethodProc* LuPopplerDocument_parent_LuDocument_exportToPostScript_res
     #define parent_LuDocument_exportToPostScript LuPopplerDocument_parent_LuDocument_exportToPostScript
   #endif
 #endif
-#define LuPopplerDocument_parents_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex) (\
-   LuPopplerDocument_parent_LuDocument_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex))
+#define LuPopplerDocument_parents_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex,brkExport) (\
+   LuPopplerDocument_parent_LuDocument_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex,brkExport))
 
 /*
  * Overridden method: isHaveFontInfo

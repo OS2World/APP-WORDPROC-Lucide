@@ -681,7 +681,7 @@ SOM_Scope boolean SOMLINK exportToPostScript(LuPopplerDocument *somSelf,
                                     Environment *ev, string filename,
                                     long first_page, long last_page,
                                     double width, double height,
-                                    boolean duplex)
+                                    boolean duplex, boolean* brkExport)
 {
     if ( filename == NULL ) {
         return FALSE;
@@ -704,7 +704,12 @@ SOM_Scope boolean SOMLINK exportToPostScript(LuPopplerDocument *somSelf,
         return FALSE;
 	}
 
-    for ( long i = first_page; i <= last_page; i++ ) {
+	if ( *brkExport ) {
+		delete out;
+        return TRUE;
+	}
+	
+    for ( long i = first_page; (i <= last_page) && !(*brkExport); i++ ) {
         doc->displayPage( out, i + 1, 72.0, 72.0, 0, gFalse, gTrue, gFalse );
     }
 

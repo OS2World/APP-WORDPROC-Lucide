@@ -2,10 +2,11 @@ LIBRARY LUDJVU INITINSTANCE TERMINSTANCE
 PROTMODE
 
 IMPORTS
-  __Z13somBuildClasslP24somStaticClassInfoStructll=som.somBuildClass
-  __Z19somParentNumResolveP16somMethodTabListiPv=som.somParentNumResolve
-  __Z16LuPixbufNewClassll=ludoc.LuPixbufNewClass
-  __Z18LuDocumentNewClassll=ludoc.LuDocumentNewClass
+	_LuDocumentNewClass=ludoc.LuDocumentNewClass
+	_LuPixbufNewClass=ludoc.LuPixbufNewClass
+	_somParentNumResolve=som.somParentNumResolve
+	_somBuildClass=som.somBuildClass
+	_somPrintf=som.somPrintf
 
 EXPORTS
   createObject

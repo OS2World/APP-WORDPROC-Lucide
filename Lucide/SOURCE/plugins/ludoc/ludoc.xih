@@ -554,7 +554,8 @@ SOM_Scope boolean  SOMLINK exportToPostScript(LuDocument *somSelf, Environment *
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex);
+		boolean duplex, 
+		boolean* brkExport);
 #ifndef somMN_exportToPostScript_defined
 #define somMN_exportToPostScript_defined
 static char *somMN_exportToPostScript = "exportToPostScript";
@@ -569,7 +570,7 @@ static somId somDI_exportToPostScript = &somDS_exportToPostScript;
 static somFloatMap exportToPostScriptFloatMap = {
 20, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
 
-static somMethodInfo exportToPostScriptMethodInfo = {11, 40, &exportToPostScriptFloatMap};
+static somMethodInfo exportToPostScriptMethodInfo = {11, 44, &exportToPostScriptFloatMap};
 
 static somApRdInfo exportToPostScriptStubs = {0, 0, &exportToPostScriptMethodInfo};
 

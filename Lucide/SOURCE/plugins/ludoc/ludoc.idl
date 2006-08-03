@@ -308,13 +308,18 @@ interface LuDocument : SOMObject
      *        generated PostScript)
      * duplex: whether to force duplex printing (on printers which
      *         support this)
+     * brkExport: pointer to boolean variable which must be checked
+     *            during generating postscript, if it's TRUE - interrupt
+     *            generation process. 
      *
      * Create a new postscript file and render document to.
-     * Return value: TRUE if PS document was generated successfully.
+     * Return value: TRUE if PS document was generated successfully, or
+     *               generation was interrupted, FALSE otherwise.
      **/
     boolean exportToPostScript( in string filename, 
                      in long first_page, in long last_page,
-                     in double width, in double height, in boolean duplex );
+                     in double width, in double height, in boolean duplex, 
+                     inout boolean brkExport );
 
 
     /**

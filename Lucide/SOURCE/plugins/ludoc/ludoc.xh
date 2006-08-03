@@ -139,7 +139,7 @@ SOMEXTERN SOMClass * SOMLINK LuDocumentNewClass(
 		integer4 minorVersion);
 
 /* The API to the LuDocument class object, and the methods it introduces. */
-SOMEXTERN struct LuDocumentClassDataStructure {
+SOMEXTERNS struct LuDocumentClassDataStructure {
 	SOMClass *classObject;
 	somMToken loadFile;
 	somMToken getBpp;
@@ -177,7 +177,7 @@ SOMEXTERN struct LuDocumentClassDataStructure {
 #define _LuDocument LuDocumentClassData.classObject
 
 /* The API to parentMtabs for LuDocument, and the instance data it introduces. */
-SOMEXTERN struct LuDocumentCClassDataStructure {
+SOMEXTERNS struct LuDocumentCClassDataStructure {
 	somMethodTabs parentMtab;
 	somDToken              instanceDataToken;
 } SOMDLINK LuDocumentCClassData;
@@ -185,7 +185,7 @@ SOMEXTERN struct LuDocumentCClassDataStructure {
 /*
  * -- Typedefs for LuDocument Method Procedures
  */
-SOMEXTERNF {
+SOMEXTERN {
 typedef boolean   SOMLINK somTP_LuDocument_loadFile(LuDocument *somSelf, Environment *ev, 
 		string filename, 
 		string password, 
@@ -276,7 +276,8 @@ typedef boolean   SOMLINK somTP_LuDocument_exportToPostScript(LuDocument *somSel
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex);
+		boolean duplex, 
+		boolean* brkExport);
 typedef somTP_LuDocument_exportToPostScript *somTD_LuDocument_exportToPostScript;
 typedef boolean   SOMLINK somTP_LuDocument_isHaveFontInfo(LuDocument *somSelf, Environment *ev);
 typedef somTP_LuDocument_isHaveFontInfo *somTD_LuDocument_isHaveFontInfo;
@@ -712,10 +713,11 @@ boolean   exportToPostScript(Environment *ev,
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex)
+		boolean duplex, 
+		boolean* brkExport)
 {
    return SOM_ResolveD(this,LuDocument,LuDocument,exportToPostScript)
-	(this, ev,filename,first_page,last_page,width,height,duplex);
+	(this, ev,filename,first_page,last_page,width,height,duplex,brkExport);
 }
 
 

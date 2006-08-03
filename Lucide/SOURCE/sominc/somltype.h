@@ -45,11 +45,7 @@
 
 #ifndef SOMEXTERN
   #ifdef __cplusplus
-  	#ifdef __GNUC__
-	    #define SOMEXTERN extern
-	#else
-	    #define SOMEXTERN extern "C"
-	#endif
+    #define SOMEXTERN extern "C"
     #ifdef __STR__
       #undef __STR__
     #endif
@@ -58,11 +54,11 @@
   #endif
 #endif
 
-#ifndef SOMEXTERNF
-  #ifdef __cplusplus
-    #define SOMEXTERNF extern "C"
+#ifndef SOMEXTERNS
+  #ifdef __GNUC__
+    #define SOMEXTERNS extern
   #else
-    #define SOMEXTERNF extern
+    #define SOMEXTERNS extern "C"
   #endif
 #endif
 

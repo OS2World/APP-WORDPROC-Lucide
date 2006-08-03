@@ -47,13 +47,13 @@ SOMEXTERN SOMClass * SOMLINK LuDjvuDocumentNewClass(
 		integer4 minorVersion);
 
 /* The API to the LuDjvuDocument class object, and the methods it introduces. */
-SOMEXTERN struct LuDjvuDocumentClassDataStructure {
+SOMEXTERNS struct LuDjvuDocumentClassDataStructure {
 	SOMClass *classObject;
 } SOMDLINK LuDjvuDocumentClassData;
 #define _LuDjvuDocument LuDjvuDocumentClassData.classObject
 
 /* The API to parentMtabs for LuDjvuDocument, and the instance data it introduces. */
-SOMEXTERN struct LuDjvuDocumentCClassDataStructure {
+SOMEXTERNS struct LuDjvuDocumentCClassDataStructure {
 	somMethodTabs parentMtab;
 	somDToken              instanceDataToken;
 } SOMDLINK LuDjvuDocumentCClassData;
@@ -61,7 +61,7 @@ SOMEXTERN struct LuDjvuDocumentCClassDataStructure {
 /*
  * -- Typedefs for LuDjvuDocument Method Procedures
  */
-SOMEXTERNF {
+SOMEXTERN {
 
 /*
  * -- Typedefs for Reintroduced Wrapper Methods
@@ -156,7 +156,8 @@ typedef boolean   SOMLINK somTP_LuDjvuDocument_exportToPostScript(LuDjvuDocument
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex);
+		boolean duplex, 
+		boolean* brkExport);
 typedef somTP_LuDjvuDocument_exportToPostScript *somTD_LuDjvuDocument_exportToPostScript;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_isHaveFontInfo(LuDjvuDocument *somSelf, Environment *ev);
 typedef somTP_LuDjvuDocument_isHaveFontInfo *somTD_LuDjvuDocument_isHaveFontInfo;
@@ -592,10 +593,11 @@ boolean   exportToPostScript(Environment *ev,
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex)
+		boolean duplex, 
+		boolean* brkExport)
 {
    return SOM_ResolveD(this,LuDjvuDocument,LuDocument,exportToPostScript)
-	(this, ev,filename,first_page,last_page,width,height,duplex);
+	(this, ev,filename,first_page,last_page,width,height,duplex,brkExport);
 }
 
 

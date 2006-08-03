@@ -151,7 +151,7 @@ SOMEXTERN SOMClass * SOMLINK SOMObjectNewClass(
 		integer4 minorVersion);
 
 /* The API to the SOMObject class object, and the methods it introduces. */
-SOMEXTERN struct SOMObjectClassDataStructure {
+SOMEXTERNS struct SOMObjectClassDataStructure {
 	SOMClass *classObject;
 	somMToken somInit;
 	somMToken somUninit;
@@ -189,7 +189,7 @@ SOMEXTERN struct SOMObjectClassDataStructure {
 #define _SOMObject SOMObjectClassData.classObject
 
 /* The API to parentMtabs for SOMObject, and the instance data it introduces. */
-SOMEXTERN struct SOMObjectCClassDataStructure {
+SOMEXTERNS struct SOMObjectCClassDataStructure {
 	somMethodTabs parentMtab;
 	somDToken              instanceDataToken;
 } SOMDLINK SOMObjectCClassData;
@@ -197,7 +197,7 @@ SOMEXTERN struct SOMObjectCClassDataStructure {
 /*
  * -- Typedefs for SOMObject Method Procedures
  */
-SOMEXTERNF {
+SOMEXTERN {
 typedef void   SOMLINK somTP_SOMObject_somDefaultInit(SOMObject *somSelf, 
 		som3InitCtrl* ctrl);
 typedef somTP_SOMObject_somDefaultInit *somTD_SOMObject_somDefaultInit;

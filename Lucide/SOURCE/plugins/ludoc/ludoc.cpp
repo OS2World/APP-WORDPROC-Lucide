@@ -5,6 +5,7 @@
  *     SOM incremental update: 2.24
  */
 
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: CDDL 1.0/LGPL 2.1
  *
@@ -277,11 +278,14 @@ SOM_Scope boolean  SOMLINK isPostScriptExportable(LuDocument *somSelf,
 }
 
 
-SOM_Scope boolean SOMLINK exportToPostScript(LuDocument *somSelf,
-                                   Environment *ev,
-                                   string filename, long first_page,
-                                   long last_page, double width,
-                                   double height, boolean duplex)
+SOM_Scope boolean  SOMLINK exportToPostScript(LuDocument *somSelf, 
+                                               Environment *ev, 
+                                              string filename, 
+                                              long first_page, 
+                                              long last_page, 
+                                              double width, double height, 
+                                              boolean duplex, 
+                                              boolean* brkExport)
 {
     // Abstract method does nothing
     return FALSE;

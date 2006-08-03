@@ -85,7 +85,7 @@ class LucidePrinting
         LuDocument *doc;
         char *title;
         PrintSetup *psetup;
-        bool abortPrinting;
+        boolean abortPrinting;
         ProgressDlg *progressDlg;
 
         static void printabort( void *data );
@@ -292,16 +292,24 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     double pwidth = ( (double)( curForm.cx - mLeft - mRight ) / 25.4 ) * 72.0;
     double pheight = ( (double)( curForm.cy - mTop - mBottom ) / 25.4 ) * 72.0;
 
-    char *tmpps = "TMPLUCID.PS";
-    BOOL rc = doc->exportToPostScript( ev, tmpps, psetup->pgfrom-1, psetup->pgto-1,
-                                       pwidth, pheight, false );
-    if ( !rc ) {
-        unlink( tmpps );
-        return false;
+    char tmpps[ CCHMAXPATHCOMP ] = "";
+    char *tmpenv = getenv( "TMP" );
+    strcpy( tmpps, ( tmpenv == NULL ) ? ".\\" : tmpenv );
+    if ( tmpps[ strlen( tmpps ) - 1 ] != '\\' ) {
+        strcat( tmpps, "\\" );
     }
+    strcat( tmpps, "TMPLUCID.PS" );
+
+    BOOL rc = doc->exportToPostScript( ev, tmpps, psetup->pgfrom-1, psetup->pgto-1,
+                                       pwidth, pheight, false, &abortPrinting );
+
     if ( abortPrinting ) {
         unlink( tmpps );
         return true;
+    }
+    if ( !rc ) {
+        unlink( tmpps );
+        return false;
     }
 
     char *spooling_ps = newstrdupL( PRINT_SPOOLING_POSTSCRIPT );
@@ -337,6 +345,13 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     }
 
     bool splerr = false;
+    char *pcl_prolog = "\x1b%-12345X@PJL JOB\n@PJL ENTER LANGUAGE = POSTSCRIPT \n";
+    char *pcl_epilog = "\x1b%-12345X@PJL EOJ\n";
+
+    if ( !( rc = SplQmWrite( hspl, strlen( pcl_prolog ), pcl_prolog ) ) ) {
+        splerr = true;
+    }
+
     void *buf = malloc( PS_PRINT_BUF_SIZE );
     int rd = 0;
     while ( rc && ( rd = fread( buf, 1, PS_PRINT_BUF_SIZE, f ) ) != 0 ) {
@@ -349,6 +364,12 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     free( buf );
     fclose( f );
     unlink( tmpps );
+
+    if ( !splerr ) {
+        if ( !( rc = SplQmWrite( hspl, strlen( pcl_epilog ), pcl_epilog ) ) ) {
+            splerr = true;
+        }
+    }
 
     if ( splerr ) {
         SplQmAbort( hspl );

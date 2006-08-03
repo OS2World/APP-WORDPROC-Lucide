@@ -55,7 +55,7 @@ SOMEXTERN SOMClass * SOMLINK LuIndexNodeNewClass(
 		integer4 minorVersion);
 
 /* The API to the LuIndexNode class object, and the methods it introduces. */
-SOMEXTERN struct LuIndexNodeClassDataStructure {
+SOMEXTERNS struct LuIndexNodeClassDataStructure {
 	SOMClass *classObject;
 	somMToken LuIndexNodeInit;
 	somMToken addChild;
@@ -66,7 +66,7 @@ SOMEXTERN struct LuIndexNodeClassDataStructure {
 #define _LuIndexNode LuIndexNodeClassData.classObject
 
 /* The API to parentMtabs for LuIndexNode, and the instance data it introduces. */
-SOMEXTERN struct LuIndexNodeCClassDataStructure {
+SOMEXTERNS struct LuIndexNodeCClassDataStructure {
 	somMethodTabs parentMtab;
 	somDToken              instanceDataToken;
 } SOMDLINK LuIndexNodeCClassData;
@@ -74,7 +74,7 @@ SOMEXTERN struct LuIndexNodeCClassDataStructure {
 /*
  * -- Typedefs for LuIndexNode Method Procedures
  */
-SOMEXTERNF {
+SOMEXTERN {
 typedef void   SOMLINK somTP_LuIndexNode_LuIndexNodeInit(LuIndexNode *somSelf, Environment *ev, 
 		somInitCtrl* ctrl, 
 		LuLink* link);

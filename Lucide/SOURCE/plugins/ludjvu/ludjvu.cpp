@@ -351,12 +351,10 @@ SOM_Scope boolean  SOMLINK isPostScriptExportable(LuDjvuDocument *somSelf,
 
 
 SOM_Scope boolean  SOMLINK exportToPostScript(LuDjvuDocument *somSelf,
-                                               Environment *ev,
-                                              string filename,
-                                              long first_page,
-                                              long last_page,
-                                              double width, double height,
-                                              boolean duplex)
+                                    Environment *ev, string filename,
+                                    long first_page, long last_page,
+                                    double width, double height,
+                                    boolean duplex, boolean* brkExport)
 {
 #ifdef __GNUC__
     LuDjvuDocumentData *somThis = LuDjvuDocumentGetData(somSelf);
@@ -372,7 +370,7 @@ SOM_Scope boolean  SOMLINK exportToPostScript(LuDjvuDocument *somSelf,
     const char *optv[] = { pgbuf };
 
     ddjvu_job_t *job = ddjvu_document_print( d->d_document, f, 1, optv );
-    while ( !ddjvu_job_done( job ) ) {
+    while ( !ddjvu_job_done( job ) && !(*brkExport) ) {
         djvu_handle_events( d->d_context );
     }
     fclose( f );
@@ -408,7 +406,7 @@ SOM_Scope void SOMLINK somDefaultInit(LuDjvuDocument *somSelf,
 SOM_Scope void SOMLINK somDestruct(LuDjvuDocument *somSelf, octet doFree,
                                    som3DestructCtrl* ctrl)
 {
-    LuDjvuDocumentData *somThis; /* set in BeginDestructor */
+    LuDjvuDocumentData *somThis; // set in BeginDestructor
     somDestructCtrl globalCtrl;
     somBooleanVector myMask;
     LuDjvuDocument_BeginDestructor;

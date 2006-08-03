@@ -156,7 +156,8 @@ typedef boolean   SOMLINK somTP_LuPopplerDocument_exportToPostScript(LuPopplerDo
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex);
+		boolean duplex, 
+		boolean* brkExport);
 typedef somTP_LuPopplerDocument_exportToPostScript *somTD_LuPopplerDocument_exportToPostScript;
 typedef boolean   SOMLINK somTP_LuPopplerDocument_isHaveFontInfo(LuPopplerDocument *somSelf, Environment *ev);
 typedef somTP_LuPopplerDocument_isHaveFontInfo *somTD_LuPopplerDocument_isHaveFontInfo;
@@ -592,10 +593,11 @@ boolean   exportToPostScript(Environment *ev,
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex)
+		boolean duplex, 
+		boolean* brkExport)
 {
    return SOM_ResolveD(this,LuPopplerDocument,LuDocument,exportToPostScript)
-	(this, ev,filename,first_page,last_page,width,height,duplex);
+	(this, ev,filename,first_page,last_page,width,height,duplex,brkExport);
 }
 
 

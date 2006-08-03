@@ -195,7 +195,7 @@ SOMEXTERN SOMClass * SOMLINK SOMClassNewClass(
 		integer4 minorVersion);
 
 /* The API to the SOMClass class object, and the methods it introduces. */
-SOMEXTERN struct SOMClassClassDataStructure {
+SOMEXTERNS struct SOMClassClassDataStructure {
 	SOMClass *classObject;
 	somMToken somNew;
 	somMToken somRenew;
@@ -277,7 +277,7 @@ SOMEXTERN struct SOMClassClassDataStructure {
 #define _SOMClass SOMClassClassData.classObject
 
 /* The API to parentMtabs for SOMClass, and the instance data it introduces. */
-SOMEXTERN struct SOMClassCClassDataStructure {
+SOMEXTERNS struct SOMClassCClassDataStructure {
 	somMethodTabs parentMtab;
 	somDToken              instanceDataToken;
 } SOMDLINK SOMClassCClassData;

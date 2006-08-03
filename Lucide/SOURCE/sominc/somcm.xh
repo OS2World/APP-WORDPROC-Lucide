@@ -84,7 +84,7 @@ SOMEXTERN SOMClass * SOMLINK SOMClassMgrNewClass(
 		integer4 minorVersion);
 
 /* The API to the SOMClassMgr class object, and the methods it introduces. */
-SOMEXTERN struct SOMClassMgrClassDataStructure {
+SOMEXTERNS struct SOMClassMgrClassDataStructure {
 	SOMClass *classObject;
 	somMToken somFindClsInFile;
 	somMToken somFindClass;
@@ -112,7 +112,7 @@ SOMEXTERN struct SOMClassMgrClassDataStructure {
 #define _SOMClassMgr SOMClassMgrClassData.classObject
 
 /* The API to parentMtabs for SOMClassMgr, and the instance data it introduces. */
-SOMEXTERN struct SOMClassMgrCClassDataStructure {
+SOMEXTERNS struct SOMClassMgrCClassDataStructure {
 	somMethodTabs parentMtab;
 	somDToken              instanceDataToken;
 } SOMDLINK SOMClassMgrCClassData;
@@ -120,7 +120,7 @@ SOMEXTERN struct SOMClassMgrCClassDataStructure {
 /*
  * -- Typedefs for SOMClassMgr Method Procedures
  */
-SOMEXTERNF {
+SOMEXTERN {
 typedef SOMClass*   SOMLINK somTP_SOMClassMgr_somLoadClassFile(SOMClassMgr *somSelf, 
 		somId classId, 
 		long majorVersion, 
