@@ -55,6 +55,7 @@ class PrintDlg
         void enumQueues( HWND hwnd );
         void showJobProperties();
         void setCurrentQInfo( HWND hwnd, PPRQINFO3 q );
+        bool isPostscriptDevice();
         static MRESULT EXPENTRY printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
 
         HWND hFrame;

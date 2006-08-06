@@ -6,39 +6,39 @@
 # Main menu
 #
 MENU_DOCUMENT=~Dokument
-MENU_OPEN=ôffnen...\tStrg+O
-MENU_SAVE_AS=Sichern unter...
-MENU_PAGE_SETUP=Seiteneinrichtung...
-MENU_PRINT=Drucken...
-MENU_DOCUMENT_INFO=Dokumentinformationen...
-MENU_FONTS_INFO=Schrifteninformation...
-MENU_PLUGINS_LIST=Plugin-Liste...
-MENU_EXIT=Beenden\tStrg+X
+MENU_OPEN=~ôffnen...\tStrg+O
+MENU_SAVE_AS=~Sichern unter...
+MENU_PAGE_SETUP=Seitenein~richtung...
+MENU_PRINT=~Drucken...
+MENU_DOCUMENT_INFO=Do~kumentinformationen...
+MENU_FONTS_INFO=Schr~ifteninformation...
+MENU_PLUGINS_LIST=Plugin-~Liste...
+MENU_EXIT=B~eenden\tStrg+X
 MENU_EDIT=~Bearbeiten
-MENU_COPY=Kopieren\tStrg+Einfg
-MENU_SELECT_ALL=Alles markieren\tStrg+/
-MENU_FIND=Suchen...\tStrg+F
-MENU_FINDAGAIN=Weitersuchen\tStrg+G
-MENU_SETTINGS=Einstellungen...
-MENU_FIRST_PAGE=Erste Seite
-MENU_PREV_PAGE=Vorige Seite\t-
-MENU_NEXT_PAGE=NÑchste Seite\t+
-MENU_LAST_PAGE=Letzte Seite
-MENU_GO_TO_PAGE=Gehe zu Seite...\tStrg+N
+MENU_COPY=~Kopieren\tStrg+Einfg
+MENU_SELECT_ALL=Alles ~markieren\tStrg+/
+MENU_FIND=~Suchen...\tStrg+F
+MENU_FINDAGAIN=~Weitersuchen\tStrg+G
+MENU_SETTINGS=~Einstellungen...
+MENU_FIRST_PAGE=~Erste Seite
+MENU_PREV_PAGE=~Vorige Seite\t-
+MENU_NEXT_PAGE=~NÑchste Seite\t+
+MENU_LAST_PAGE=~Letzte Seite
+MENU_GO_TO_PAGE=Gehe zu ~Seite...\tStrg+N
 MENU_VIEW=~Anzeige
-MENU_FIT_WINDOW=Ganze Seite
-MENU_ACTUAL_SIZE=Originalgrî·e
-MENU_FIT_WIDTH=Seitenbreite
-MENU_ROTATE_CW=90¯ im UZS drehen
-MENU_ROTATE_CCW=90¯ gegen UZS drehen
-MENU_SHOW_NAV_PANE=Navigator anzeigen
-MENU_SINGLE_PAGE=Einzelne Seite
-MENU_CONTINUOUS=Fortlaufend
+MENU_FIT_WINDOW=~Ganze Seite
+MENU_ACTUAL_SIZE=~Originalgrî·e
+MENU_FIT_WIDTH=Seiten~breite
+MENU_ROTATE_CW=90¯ im UZS ~drehen
+MENU_ROTATE_CCW=90¯ gegen ~UZS drehen
+MENU_SHOW_NAV_PANE=~Navigator anzeigen
+MENU_SINGLE_PAGE=Einzelne Sei~te
+MENU_CONTINUOUS=~Fortlaufend
 MENU_WINDOW=~Fenster
 MENU_MAXVIEW=~Maximiert\tF11
 MENU_FULLSCREEN=~Vollbild\tStrg+L
 MENU_HELP=~Hilfe
-MENU_PRODUCT_INFORMATION=Produktinformation
+MENU_PRODUCT_INFORMATION=~Produktinformation
 
 #
 # Toolbar hints
@@ -64,7 +64,7 @@ TB_PAGENUM=von %d
 MSGS_MAIN_WIN_TITLE=Lucide - Document Viewer
 MSGS_NO_SUIT_PLUG=Kein passendes Plugin fÅr das Dokument gefunden!
 MSGS_FILE_LOAD_ERROR=Datei kann nicht gelesen werden!
-MSGS_LOADING_DOCUMENT=Lese Dokument, bitte warten...
+MSGS_LOADING_DOCUMENT=ôffne Dokument, bitte warten...
 MSGS_WARNING=Warnung!
 MSGS_OVERWRITE_FILE=Datei existiert bereits. öberschreiben?
 MSGS_FILE_SAVE_ERROR=Fehler beim Schreiben der Datei!
@@ -73,7 +73,7 @@ MSGS_FILE_SAVE_ERROR=Fehler beim Schreiben der Datei!
 # "Plugins list" dialog
 #
 PLUGLIST_PLUGINS_LIST=Plugin-Liste
-PLUGLIST_CLOSE=Schliessen
+PLUGLIST_CLOSE=S~chliessen
 # List columns titles
 PLUGLIST_PLUGIN_NAME=Plugin-Name
 PLUGLIST_SUPP_EXTS=UnterstÅtzte Erweiterungen
@@ -83,7 +83,7 @@ PLUGLIST_PLUGIN_DESC=Plugin-Beschreibung
 # "Font info" dialog
 #
 FONTINFO_FONTINFO=Schrifteninformation
-FONTINFO_CLOSE=Schliessen
+FONTINFO_CLOSE=S~chliessen
 FONTINFO_ENUMERATING=ZÑhle Schriften, bitte warten...
 # List columns titles
 FONTINFO_NAME=Name
@@ -94,7 +94,7 @@ FONTINFO_EMBEDDED=Eingebettet?
 # "Document info" dialog
 #
 DOCINFO_DOCUMENT_INFO=Dokumentinformationen
-DOCINFO_CLOSE=Schliessen
+DOCINFO_CLOSE=S~chliessen
 # Document info keys
 DOCINFO_TITLE=Titel:
 DOCINFO_FORMAT=Format:
@@ -130,14 +130,16 @@ PDLG_CANCEL=~Abbruch
 AD_ABOUT=öber
 AD_DESCRIPTION=Plugin-basierender Dokumentviewer mit UnterstÅtzung zahlreicher Dateiformate
 AD_COPYRIGHTS=(c) by Eugene Romanenko, netlabs.org in Zusammenarbeit mit Serenity Systems International
-AD_OK=OK
+AD_OK=~OK
 
 #
 # Settings dialog
 #
 SD_SETTINGS=Einstellungen
-SD_DEFAULT_PAGE_LAYOUT=Standard Seitenlayout
-SD_DEFAULT_ZOOM=Standard-Zoom
+SD_DEFAULT_PAGE_LAYOUT=Standard ~Seitenlayout
+SD_DEFAULT_ZOOM=Standard-~Zoom
+SD_SINGLE_PAGE=Einzelne Seite
+SD_CONTINUOUS=Fortlaufend
 SD_OK=~OK
 SD_CANCEL=~Abbruch
 
@@ -150,4 +152,29 @@ GTP_OF=von %d
 GTP_OK=~OK
 GTP_CANCEL=~Abbruch
 
+#
+# Print dialog
+#
+PD_TITLE=Drucken
+PD_PRINTER=Drucker
+PD_NAME_LABEL=~Name
+PD_JOB_PROPERTIES=~Job-Eigenschaften
+PD_DRIVER_LABEL=Treiber
+PD_PRINT_RANGE=D~ruckbereich
+PD_RANGE_ALL=A~lles
+PD_RANGE_CURRENT_PAGE=A~ktuelle Seite
+PD_RANGE_PAGES=Sei~ten
+PD_FROM=~Von
+PD_TO=B~is
+PD_PRINT_TYPE=Druckformat
+PD_TYPE_POSTSCRIPT=Post~script
+PD_TYPE_ASIMAGE=Als ~Bild
+PD_HIGHER_IMAGE_QUALITY=~Hîhere BildqualitÑt (langsamer, benîtigt mehr Speicher)
+PD_BTNPRINT=~Drucken
+PD_BTNCANCEL=~Abbruch
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=Drucke Seite %d von %d...
+PRINT_GENERATING_POSTSCRIPT=Erzeuge Postscript-Datei...
+PRINT_SPOOLING_POSTSCRIPT=Sende Postscript-Daten...
+PRINT_FAILED=Drucken fehlgeschlagen!
 

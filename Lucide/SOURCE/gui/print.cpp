@@ -60,6 +60,10 @@ extern "C" {
                               LONG lCount, PPOINTL aptlPoints, LONG lRop, ULONG flOptions);
 }
 
+#ifndef DEVESC_ERROR
+#define DEVESC_ERROR        (-1L)
+#endif
+
 #define UNITS_MULTIPLIER    100
 #define STD_IMAGE_ZOOM      2.0
 #define HIGH_IMAGE_ZOOM     3.0
@@ -266,7 +270,6 @@ void LucidePrinting::printPagePm( long page, HPS hpsPrinter, PHCINFO pcurForm )
 }
 
 
-
 bool LucidePrinting::doPsPrint( HAB lhab )
 {
     CHAR         achDriverName[ DRIVERNAME_LENGTH ] = "";
@@ -300,14 +303,14 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     }
     strcat( tmpps, "TMPLUCID.PS" );
 
-    BOOL rc = doc->exportToPostScript( ev, tmpps, psetup->pgfrom-1, psetup->pgto-1,
-                                       pwidth, pheight, false, &abortPrinting );
+    boolean rcexp = doc->exportToPostScript( ev, tmpps, psetup->pgfrom-1, psetup->pgto-1,
+                                             pwidth, pheight, false, &abortPrinting );
 
     if ( abortPrinting ) {
         unlink( tmpps );
         return true;
     }
-    if ( !rc ) {
+    if ( !rcexp ) {
         unlink( tmpps );
         return false;
     }
@@ -316,7 +319,7 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     progressDlg->setText( spooling_ps );
     delete spooling_ps;
 
-    // build a devopenstruct for the call to SplQmOpen
+    // build a devopenstruct for the call to DevOpenDC
     dos.pszLogAddress = psetup->QueueInfo.pszName;              // 1
     strcpy( achDriverName, psetup->QueueInfo.pszDriverName );
     achDriverName[ strcspn( achDriverName, "." ) ] = '\0';
@@ -324,39 +327,35 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     dos.pdriv         = psetup->QueueInfo.pDriverData;          // 3
     dos.pszDataType   = "PM_Q_RAW";                             // 4
 
-    HSPL hspl = SplQmOpen( "*", 4L, (PQMOPENDATA)&dos );
-    if ( hspl == SPL_ERROR ) {
+    HDC hdcPrinter = DevOpenDC( lhab, OD_QUEUED, "*", 4L, (PDEVOPENDATA)&dos, NULLHANDLE );
+    if ( hdcPrinter == DEV_ERROR ) {
         unlink( tmpps );
         return false;
     }
 
-    rc = SplQmStartDoc( hspl, title );
-    if ( !rc ) {
-        SplQmAbort( hspl );
+    // Issue STARTDOC to begin printing
+    LONG rc = DevEscape( hdcPrinter, DEVESC_STARTDOC, strlen(title), (PBYTE)title, NULL, NULL );
+    if ( rc == DEVESC_ERROR ) {
+        DevCloseDC( hdcPrinter );
         unlink( tmpps );
         return false;
     }
 
     FILE *f = fopen( tmpps, "rb" );
     if ( f == NULL ) {
-        SplQmAbort( hspl );
+        DevEscape( hdcPrinter, DEVESC_ABORTDOC, 0L, NULL, NULL, NULL );
+        DevCloseDC( hdcPrinter );
         unlink( tmpps );
         return false;
     }
 
     bool splerr = false;
-    char *pcl_prolog = "\x1b%-12345X@PJL JOB\n@PJL ENTER LANGUAGE = POSTSCRIPT \n";
-    char *pcl_epilog = "\x1b%-12345X@PJL EOJ\n";
-
-    if ( !( rc = SplQmWrite( hspl, strlen( pcl_prolog ), pcl_prolog ) ) ) {
-        splerr = true;
-    }
-
     void *buf = malloc( PS_PRINT_BUF_SIZE );
     int rd = 0;
-    while ( rc && ( rd = fread( buf, 1, PS_PRINT_BUF_SIZE, f ) ) != 0 ) {
-        rc = SplQmWrite( hspl, rd, buf );
-        if ( !rc || abortPrinting ) {
+    while ( ( rc != DEVESC_ERROR ) && ( rd = fread( buf, 1, PS_PRINT_BUF_SIZE, f ) ) != 0 )
+    {
+        rc = DevEscape( hdcPrinter, DEVESC_RAWDATA, rd, (char *)buf, NULL, NULL );
+        if ( ( rc == DEVESC_ERROR ) || abortPrinting ) {
             splerr = true;
             break;
         }
@@ -365,25 +364,17 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     fclose( f );
     unlink( tmpps );
 
-    if ( !splerr ) {
-        if ( !( rc = SplQmWrite( hspl, strlen( pcl_epilog ), pcl_epilog ) ) ) {
-            splerr = true;
-        }
-    }
+    DevEscape( hdcPrinter, splerr ? DEVESC_ABORTDOC : DEVESC_ENDDOC,
+               0L, NULL, NULL, NULL );
+    DevCloseDC( hdcPrinter );
 
-    if ( splerr ) {
-        SplQmAbort( hspl );
-        if ( !abortPrinting ) {
-            return false;
-        }
-    }
-    else {
-        SplQmEndDoc( hspl );
-        SplQmClose( hspl );
+    if ( splerr && !abortPrinting ) {
+        return false;
     }
 
     return true;
 }
+
 
 bool LucidePrinting::queryCurrentForm( HAB lhab, PHCINFO pcurForm )
 {

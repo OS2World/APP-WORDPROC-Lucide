@@ -79,6 +79,20 @@ void PrintDlg::setCurrentQInfo( HWND hwnd, PPRQINFO3 q )
     WinSetDlgItemText( hwnd, IDC_PDESCRIPTION, psetup->QueueInfo.pszDriverName );
     WinEnableControl( hwnd, IDC_JOBPROPERTIES, TRUE );
     WinEnableControl( hwnd, DID_OK, TRUE );
+
+    // Set the print type
+    if ( doc->isPostScriptExportable( ev ) && isPostscriptDevice() ) {
+        WinEnableControl( hwnd, IDC_TYPE_POSTSCRIPT, TRUE );
+        WinCheckButton( hwnd, IDC_TYPE_POSTSCRIPT, TRUE );
+    }
+    else {
+        WinEnableControl( hwnd, IDC_TYPE_POSTSCRIPT, FALSE );
+        WinCheckButton( hwnd, IDC_TYPE_ASIMAGE, TRUE );
+    }
+
+    WinSendMsg( hwnd, WM_CONTROL,
+                MPFROM2SHORT( IDC_TYPE_POSTSCRIPT, BN_CLICKED ),
+                MPFROMHWND( WinWindowFromID( hwnd, IDC_TYPE_POSTSCRIPT ) ) );
 }
 
 void PrintDlg::enumQueues( HWND hwnd )
@@ -154,6 +168,30 @@ void PrintDlg::showJobProperties()
                         achDeviceName, psetup->QueueInfo.pszPrinters, DPDM_POSTJOBPROP );
 }
 
+bool PrintDlg::isPostscriptDevice()
+{
+    char *achDriverName = new char[ DRIVERNAME_LENGTH ];
+
+    // build a devopenstruct for the call to DevOpenDC
+    DEVOPENSTRUC *dos   = new DEVOPENSTRUC;
+    memset( dos, 0, sizeof( DEVOPENSTRUC ) );
+    dos->pszLogAddress = psetup->QueueInfo.pszName;              // 1
+    strcpy( achDriverName, psetup->QueueInfo.pszDriverName );
+    achDriverName[ strcspn( achDriverName, "." ) ] = '\0';
+    dos->pszDriverName = achDriverName;                          // 2
+    dos->pdriv = psetup->QueueInfo.pDriverData;                  // 3
+
+    long lTech = 0;
+    HDC hdcPrinterInfo = DevOpenDC( hab, OD_INFO, "*", 3L, (PDEVOPENDATA)dos, NULLHANDLE );
+    if ( hdcPrinterInfo != DEV_ERROR ) {
+        DevQueryCaps( hdcPrinterInfo, CAPS_TECHNOLOGY, sizeof(long), &lTech );
+        DevCloseDC( hdcPrinterInfo );
+    }
+
+    delete achDriverName;
+    delete dos;
+    return ( lTech == CAPS_TECH_POSTSCRIPT );
+}
 
 MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
@@ -176,9 +214,6 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
             localizeDialog( hwnd );
             centerWindow( _this->hFrame, hwnd );
 
-            // Enum printer queues
-            _this->enumQueues( hwnd );
-
             // Print range
             WinCheckButton( hwnd, IDC_RANGEALL, TRUE );
 
@@ -193,19 +228,8 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
             WinSendDlgItemMsg( hwnd, IDC_PGTO, SPBM_SETCURRENTVALUE,
                                MPFROMLONG( pages ), MPVOID );
 
-            // Set the print type
-            if ( _this->doc->isPostScriptExportable( ev ) ) {
-                WinEnableControl( hwnd, IDC_TYPE_POSTSCRIPT, TRUE );
-                WinCheckButton( hwnd, IDC_TYPE_POSTSCRIPT, TRUE );
-            }
-            else {
-                WinEnableControl( hwnd, IDC_TYPE_POSTSCRIPT, FALSE );
-                WinCheckButton( hwnd, IDC_TYPE_ASIMAGE, TRUE );
-            }
-            WinSendMsg( hwnd, WM_CONTROL,
-                        MPFROM2SHORT( IDC_TYPE_POSTSCRIPT, BN_CLICKED ),
-                        MPFROMHWND( WinWindowFromID( hwnd, IDC_TYPE_POSTSCRIPT ) ) );
-
+            // Enum printer queues
+            _this->enumQueues( hwnd );
 
             return (MRESULT)FALSE;
         }
