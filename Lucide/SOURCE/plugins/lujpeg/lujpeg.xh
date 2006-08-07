@@ -47,13 +47,13 @@ SOMEXTERN SOMClass * SOMLINK LuJpegDocumentNewClass(
 		integer4 minorVersion);
 
 /* The API to the LuJpegDocument class object, and the methods it introduces. */
-SOMEXTERN struct LuJpegDocumentClassDataStructure {
+SOMEXTERNS struct LuJpegDocumentClassDataStructure {
 	SOMClass *classObject;
 } SOMDLINK LuJpegDocumentClassData;
 #define _LuJpegDocument LuJpegDocumentClassData.classObject
 
 /* The API to parentMtabs for LuJpegDocument, and the instance data it introduces. */
-SOMEXTERN struct LuJpegDocumentCClassDataStructure {
+SOMEXTERNS struct LuJpegDocumentCClassDataStructure {
 	somMethodTabs parentMtab;
 	somDToken              instanceDataToken;
 } SOMDLINK LuJpegDocumentCClassData;
@@ -150,13 +150,14 @@ typedef boolean   SOMLINK somTP_LuJpegDocument_saveAs(LuJpegDocument *somSelf, E
 typedef somTP_LuJpegDocument_saveAs *somTD_LuJpegDocument_saveAs;
 typedef boolean   SOMLINK somTP_LuJpegDocument_isPostScriptExportable(LuJpegDocument *somSelf, Environment *ev);
 typedef somTP_LuJpegDocument_isPostScriptExportable *somTD_LuJpegDocument_isPostScriptExportable;
-typedef void   SOMLINK somTP_LuJpegDocument_exportToPostScript(LuJpegDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_LuJpegDocument_exportToPostScript(LuJpegDocument *somSelf, Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex);
+		boolean duplex, 
+		boolean* brkExport);
 typedef somTP_LuJpegDocument_exportToPostScript *somTD_LuJpegDocument_exportToPostScript;
 typedef boolean   SOMLINK somTP_LuJpegDocument_isHaveFontInfo(LuJpegDocument *somSelf, Environment *ev);
 typedef somTP_LuJpegDocument_isHaveFontInfo *somTD_LuJpegDocument_isHaveFontInfo;
@@ -586,16 +587,17 @@ boolean   isPostScriptExportable(Environment *ev)
 
 
 /* method: exportToPostScript */
-void   exportToPostScript(Environment *ev, 
+boolean   exportToPostScript(Environment *ev, 
 		string filename, 
 		long first_page, 
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex)
+		boolean duplex, 
+		boolean* brkExport)
 {
-   SOM_ResolveD(this,LuJpegDocument,LuDocument,exportToPostScript)
-	(this, ev,filename,first_page,last_page,width,height,duplex);
+   return SOM_ResolveD(this,LuJpegDocument,LuDocument,exportToPostScript)
+	(this, ev,filename,first_page,last_page,width,height,duplex,brkExport);
 }
 
 

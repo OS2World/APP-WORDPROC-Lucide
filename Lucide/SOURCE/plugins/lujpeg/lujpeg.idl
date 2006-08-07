@@ -20,7 +20,6 @@ interface LuJpegDocument : LuDocument
 
     implementation 
     {
-
 	    void *data;
     	
         loadFile: override;

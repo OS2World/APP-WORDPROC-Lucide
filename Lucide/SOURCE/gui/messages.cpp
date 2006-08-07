@@ -60,6 +60,7 @@ const char *MSGS_LOADING_DOCUMENT = "MSGS_LOADING_DOCUMENT";
 const char *MSGS_WARNING          = "MSGS_WARNING";
 const char *MSGS_OVERWRITE_FILE   = "MSGS_OVERWRITE_FILE";
 const char *MSGS_FILE_SAVE_ERROR  = "MSGS_FILE_SAVE_ERROR";
+const char *MSGS_PAGE             = "MSGS_PAGE";
 
 // Settings dialog
 const char *SD_SINGLE_PAGE = "SD_SINGLE_PAGE";

@@ -42,6 +42,7 @@
 #include "indexWindow.h"
 #include "luutils.h"
 #include "tb_spl.h"
+#include "messages.h"
 
 
 #define ID_BAR      1
@@ -166,6 +167,7 @@ void IndexWindow::addNodes( TreeRecord *parent, LuIndexNode *n )
 
 void IndexWindow::loadPagesList()
 {
+    char *msgpage = newstrdupL( MSGS_PAGE );
     CNRINFO ci;
     ci.cb = sizeof( CNRINFO );
     WinSendMsg( hWndIndex, CM_QUERYCNRINFO, MPFROMP( &ci ), MPFROMSHORT( ci.cb ) );
@@ -173,10 +175,10 @@ void IndexWindow::loadPagesList()
     ci.flWindowAttr |= ( CV_TEXT | CV_MINI );
     WinSendMsg( hWndIndex, CM_SETCNRINFO, MPFROMP( &ci ), MPFROMLONG( CMA_FLWINDOWATTR ) );
 
-    char pgbuf[ 20 ];
+    char pgbuf[ 64 ];
     for ( int i = 0; i < totalpages; i++ )
     {
-        snprintf( pgbuf, sizeof(pgbuf), "Page %d", i + 1 );
+        snprintf( pgbuf, sizeof(pgbuf), "%s %d", msgpage, i + 1 );
         RECORDINSERT ri;
         TreeRecord *pr = (TreeRecord *)WinSendMsg( hWndIndex, CM_ALLOCRECORD,
            MPFROMLONG( sizeof( TreeRecord ) - sizeof( MINIRECORDCORE ) ), MPFROMSHORT( 1 ) );
@@ -197,6 +199,7 @@ void IndexWindow::loadPagesList()
         ri.fInvalidateRecord = TRUE;
         WinSendMsg( hWndIndex, CM_INSERTRECORD, MPFROMP( pr ), MPFROMP( &ri ) );
     }
+    delete msgpage;
 }
 
 void IndexWindow::clear( TreeRecord *parent )
@@ -224,7 +227,7 @@ bool IndexWindow::goToPage( TreeRecord *parent, long page )
     if ( Lucide::dontSwitchPage ) {
         return true;
     }
-        
+
     SHORT atr = ( parent == NULL ) ? CMA_FIRST : CMA_FIRSTCHILD;
     TreeRecord *pr = (TreeRecord *)WinSendMsg( hWndIndex, CM_QUERYRECORD,
                             MPFROMP( parent ), MPFROM2SHORT( atr, CMA_ITEMORDER ) );

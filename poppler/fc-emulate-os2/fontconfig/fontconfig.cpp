@@ -423,6 +423,15 @@ FcBool FcInit()
 #define DEFAULT_SANSSERIF_FONT      "helvetica"
 #define DEFAULT_MONOSPACED_FONT     "courier"
 
+static bool isSansserif( const char *family )
+{
+    return ( ( strstr( family, "swiss" ) != NULL ) ||
+             ( strstr( family, "sans" ) != NULL ) ||
+             ( strcmp( family, "arial" ) == 0 ) ||
+             ( strcmp( family, "tahoma" ) == 0 ) ||
+             ( strcmp( family, "verdana" ) == 0 ) );
+}
+
 static string buildFontKey( FcPattern *p, bool useDefaultFonts )
 {
     string key = p->family;
@@ -434,14 +443,19 @@ static string buildFontKey( FcPattern *p, bool useDefaultFonts )
         }
         else
         {
-            if ( ( strstr( p->family, "swiss" ) != NULL ) ||
-                 ( strstr( p->family, "sans" ) != NULL ) )
-            {
+            if ( isSansserif( p->family ) ) {
                 key = DEFAULT_SANSSERIF_FONT;
             }
             else {
                 key = DEFAULT_SERIF_FONT;
             }
+        }
+    }
+    else
+    {
+        // use 'Symbol Set' (SYMB.PFB) instead of 'Symbol'
+        if ( strcmp( p->family, "symbol" ) == 0 ) {
+            key = "symbol set";
         }
     }
 
@@ -480,7 +494,7 @@ FcFontSet *FcFontSort( FcConfig *config, FcPattern *p, FcBool trim,
         pat->filename = newstrdup( (*fontmap)[ key ].c_str() );
     }
 
-    //printf( "MATCHED STYLE: %s, FILENAME: %s\n", key.c_str(), pat->filename );
+//printf( "MATCHED STYLE: %s, FILENAME: %s\n", key.c_str(), pat->filename );
 
     FcFontSet *fs = new FcFontSet;
     fs->nfont = 1;
@@ -525,8 +539,8 @@ FcPattern *FcPatternBuild( void *,
                     const char *fcSpacing, FcType tSpacing, int spacing,
                     const char *fcLang, FcType tLang, const char *lang, void * )
 {
-    //printf( "FAMILY: %s, SLANT: %d, WEIGHT: %d, WIDTH: %d, SPACING: %d, LANG: %s\n",
-    //        family, slant, weight, width, spacing, lang );
+//printf( "FAMILY: %s, SLANT: %d, WEIGHT: %d, WIDTH: %d, SPACING: %d, LANG: %s\n",
+//            family, slant, weight, width, spacing, lang );
 
     FcPattern *p = new FcPattern;
     p->family   = newstrdup( family );

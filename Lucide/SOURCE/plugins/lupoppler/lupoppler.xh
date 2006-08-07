@@ -47,13 +47,13 @@ SOMEXTERN SOMClass * SOMLINK LuPopplerDocumentNewClass(
 		integer4 minorVersion);
 
 /* The API to the LuPopplerDocument class object, and the methods it introduces. */
-SOMEXTERN struct LuPopplerDocumentClassDataStructure {
+SOMEXTERNS struct LuPopplerDocumentClassDataStructure {
 	SOMClass *classObject;
 } SOMDLINK LuPopplerDocumentClassData;
 #define _LuPopplerDocument LuPopplerDocumentClassData.classObject
 
 /* The API to parentMtabs for LuPopplerDocument, and the instance data it introduces. */
-SOMEXTERN struct LuPopplerDocumentCClassDataStructure {
+SOMEXTERNS struct LuPopplerDocumentCClassDataStructure {
 	somMethodTabs parentMtab;
 	somDToken              instanceDataToken;
 } SOMDLINK LuPopplerDocumentCClassData;
@@ -61,7 +61,7 @@ SOMEXTERN struct LuPopplerDocumentCClassDataStructure {
 /*
  * -- Typedefs for LuPopplerDocument Method Procedures
  */
-SOMEXTERNF {
+SOMEXTERN {
 
 /*
  * -- Typedefs for Reintroduced Wrapper Methods

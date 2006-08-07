@@ -60,6 +60,7 @@ extern const char *MSGS_LOADING_DOCUMENT;
 extern const char *MSGS_WARNING;
 extern const char *MSGS_OVERWRITE_FILE;
 extern const char *MSGS_FILE_SAVE_ERROR;
+extern const char *MSGS_PAGE;
 
 // Settings dialog
 extern const char *SD_SINGLE_PAGE;
