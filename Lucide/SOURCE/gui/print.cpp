@@ -214,7 +214,7 @@ void LucidePrinting::printPagePm( long page, HPS hpsPrinter, PHCINFO pcurForm )
     LONG pheight = ( pcurForm->cy - mTop - mBottom ) * UNITS_MULTIPLIER;
 
     double zoom = 1.0;
-    if ( doc->isScalable( ev ) )
+    if ( doc->isScalable( ev ) && !doc->isFixedImage( ev ) )
     {
         double maxcoeff = psetup->higherQuality ? HIGH_IMAGE_ZOOM : STD_IMAGE_ZOOM;
         zoom = __min( (double)pwidth / w, (double)pheight / h );
