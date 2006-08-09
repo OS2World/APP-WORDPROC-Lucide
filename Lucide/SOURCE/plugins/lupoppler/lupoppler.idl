@@ -49,6 +49,7 @@ interface LuPopplerDocument : LuDocument
         getThumbnailSize: override;
         getThumbnail: override;
         searchText: override;
+        isFixedImage: override;
         
         somDefaultInit: override, init;
         somDestruct: override;

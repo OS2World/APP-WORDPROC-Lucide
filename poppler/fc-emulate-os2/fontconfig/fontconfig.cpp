@@ -154,17 +154,20 @@ struct _FcPattern
 
 FcConfig *FcConfigGetCurrent()
 {
+    // STUB
     return NULL;
 }
 
 FcBool FcConfigSubstitute( FcConfig *config, FcPattern *p, FcMatchKind kind )
 {
+    // STUB
     return FcTrue;
 }
 
 
 void FcDefaultSubstitute( FcPattern *pattern )
 {
+    // STUB
 }
 
 void FcFontSetDestroy( FcFontSet *s )
@@ -507,6 +510,7 @@ FcFontSet *FcFontSort( FcConfig *config, FcPattern *p, FcBool trim,
 
 void FcFontSetSortDestroy( FcFontSet *fs )
 {
+    // STUB
 }
 
 void FcPatternDestroy( FcPattern *p )
@@ -518,6 +522,8 @@ void FcPatternDestroy( FcPattern *p )
 
 FcResult FcPatternGetInteger( const FcPattern *p, const char *object, int n, int *i )
 {
+    // STUB
+    *i = 0;
     return FcResultMatch;
 }
 

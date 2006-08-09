@@ -31,7 +31,7 @@
 #define SOM_Scope static
 #endif
 
-#define LuDocument_MaxNoMethods 32
+#define LuDocument_MaxNoMethods 33
 
 /*
  * -- Instance Data
@@ -91,6 +91,7 @@ typedef void LuDocumentData;
   #define _loadFile somSelf->loadFile
   #define _getBpp somSelf->getBpp
   #define _isScalable somSelf->isScalable
+  #define _isFixedImage somSelf->isFixedImage
   #define _isRotable somSelf->isRotable
   #define _getPageCount somSelf->getPageCount
   #define _getPageSize somSelf->getPageSize
@@ -194,6 +195,25 @@ static somId somDI_isScalable = &somDS_isScalable;
 static somMethodInfo isScalableMethodInfo = {10, 8, 0};
 
 static somApRdInfo isScalableStubs = {0, 0, &isScalableMethodInfo};
+
+/*
+ * New Method: isFixedImage
+ */
+SOM_Scope boolean  SOMLINK isFixedImage(LuDocument *somSelf, Environment *ev);
+#ifndef somMN_isFixedImage_defined
+#define somMN_isFixedImage_defined
+static char *somMN_isFixedImage = "isFixedImage";
+static somId somId_isFixedImage = &somMN_isFixedImage;
+#endif  /* somMN_isFixedImage_defined */
+#ifndef somDS_isFixedImage_defined
+#define somDS_isFixedImage_defined
+static char *somDS_isFixedImage = "::LuDocument::isFixedImage";
+static somId somDI_isFixedImage = &somDS_isFixedImage;
+#endif  /* somDS_isFixedImage_defined */
+
+static somMethodInfo isFixedImageMethodInfo = {10, 8, 0};
+
+static somApRdInfo isFixedImageStubs = {0, 0, &isFixedImageMethodInfo};
 
 /*
  * New Method: isRotable
@@ -784,6 +804,16 @@ static somStaticMethod_t LuDocumentSM[] = {
 #else
          (somMethodProc *) ((void*) &isScalableStubs) },
 #endif
+    {    &LuDocumentClassData.isFixedImage,
+         &somId_isFixedImage,
+         &somDI_isFixedImage,
+         (somMethodProc *) isFixedImage,
+         (somMethodProc *)((void*)-1),
+#ifdef isFixedImage_somApRdDefault
+         0},
+#else
+         (somMethodProc *) ((void*) &isFixedImageStubs) },
+#endif
     {    &LuDocumentClassData.isRotable,
          &somId_isRotable,
          &somDI_isRotable,
@@ -1067,7 +1097,7 @@ static somProcMethods_t LuDocumentPM[] = {
     (somMethodProc *) freeDocumentInfo};
 
 static somStaticClassInfo LuDocumentSCI = {
-    4, 28, 1, 0, 4, 0, /* layout version 4 */ 
+    4, 29, 1, 0, 4, 0, /* layout version 4 */ 
     LuDocument_MajorVersion, LuDocument_MinorVersion,
     0, LuDocument_MaxNoMethods, 1,
     &somCN_LuDocument,
@@ -1090,7 +1120,7 @@ static somStaticClassInfo LuDocumentSCI = {
     0, /* no sci development level check */
     0, /* number of SelectInheritedMethods */
     0, /* no SelectInheritedMethods */
-    32, /* number of classdata entries */
+    33, /* number of classdata entries */
     0, /* no list provided currently */
     0, /* number of migrated methods */
     0, /* no migrated method implementations */

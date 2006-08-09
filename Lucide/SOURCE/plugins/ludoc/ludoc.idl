@@ -33,6 +33,7 @@ interface LuDocument : SOMObject
      * Loads the specified file.
      *
      * Return value: TRUE if file loaded, FALSE otherwise.
+     * Default return value: FALSE
      *
      * Note: error string allocated using SOMMalloc(),
      *       use SOMFree() to free.
@@ -44,6 +45,10 @@ interface LuDocument : SOMObject
      * getBpp
      *
      * Return value: Number of bytes per pixel used for draw.
+     *               Allowed values is 3 (24 bit) or 4 (32 bit).
+     *               4 bytes per pixel is same as 3, but padded
+     *               with dummy byte.
+     * Default return value: 0
      **/
     short getBpp();
 
@@ -53,8 +58,23 @@ interface LuDocument : SOMObject
      * (See renderPageToPixbuf(), scale)
      *
      * Return value: TRUE if document scalable, FALSE otherwise.
+     * Default return value: FALSE
      **/
     boolean isScalable();
+
+
+    /**
+     * isFixedImage
+     * 
+     * Determines if upscaling doesn't improve image quality.
+     * Must return TRUE for fixed-size images/bitmaps.
+     * Must return FALSE for documents which renders fonts/vector images,
+     *   so upscaling improves quality of rendered image.
+     *
+     * Used to determine better printing parameters.
+     * Default return value: TRUE
+     **/
+    boolean isFixedImage();
 
 
     /**
@@ -63,6 +83,7 @@ interface LuDocument : SOMObject
      * (See renderPageToPixbuf(), rotation)
      *
      * Return value: TRUE if document can be rotated, FALSE otherwise.
+     * Default return value: FALSE
      **/
     boolean isRotable();
 
@@ -73,6 +94,7 @@ interface LuDocument : SOMObject
      * Returns the number of pages in a loaded document.
      *
      * Return value: Number of pages
+     * Default return value: 0
      **/
     long getPageCount();
 
@@ -100,6 +122,7 @@ interface LuDocument : SOMObject
      * scale: scale specified as pixels per point
      *        (if isScalable() is FALSE, scale ignored and assumed 1.0)
      * rotation: rotate the document by the specified degree
+     *           allowed values is 0, 90, 180, 270
      *        (if isRotable() is FALSE, rotation ignored and assumed 0)
      * pixbuf: pixbuf to render into
      *
@@ -118,6 +141,7 @@ interface LuDocument : SOMObject
      * See renderPageToPixbufAsynch()
      *
      * Return value: TRUE if document can be rendered asynchronously.
+     * Default return value: FALSE
      **/
     boolean isAsynchRenderingSupported();
 
@@ -129,6 +153,9 @@ interface LuDocument : SOMObject
      * draw function, abort function and functions data.
      * Callback functions must be defined as
      * long _System *asynchCallbackFn( void *data );
+     *
+     * Note: you must implement renderPageToPixbuf() also, as
+     *       it used during printing.
      **/
     void renderPageToPixbufAsynch( in long pagenum, in long src_x, 
     			   in long src_y, in long src_width, in long src_height,
@@ -143,7 +170,12 @@ interface LuDocument : SOMObject
      * See renderPageToPS()
      *
      * Return value: TRUE if document will render directly into
-     *               presentation space.
+     *               presentation space using renderPageToPS().
+     *
+     * Note: You may not implement renderPageToPixbuf() if 
+     *       isRenderIntoPS() is TRUE.
+     *
+     * Default return value: FALSE
      **/
     boolean isRenderIntoPS();
     
@@ -158,6 +190,7 @@ interface LuDocument : SOMObject
      * scale: scale specified as pixels per point
      *        (if isScalable() is FALSE, scale ignored and assumed 1.0)
      * rotation: rotate the document by the specified degree
+     *           allowed values is 0, 90, 180, 270
      *        (if isRotable() is FALSE, rotation ignored and assumed 0)
      * hps: handle of presentation space to render into
      * rect: pointer to RECTL structure, defines render area on HPS
@@ -180,6 +213,7 @@ interface LuDocument : SOMObject
      * Return value: TRUE if document contains text, which
      *               can be selected by user, searched, etc, 
      *               FALSE otherwise.
+     * Default return value: FALSE
      **/
     boolean isHaveText();
 
@@ -196,6 +230,7 @@ interface LuDocument : SOMObject
      * Return value: a newly allocated LuRectSequence, or NULL if
      *               nothing selected or document doesn't have
      *               selectable text
+     * Default return value: NULL
      *
      * Note: SOMMalloc() must be used for all memory allocations.
      **/
@@ -225,6 +260,7 @@ interface LuDocument : SOMObject
      *               or until LuDocument object destroyed.
      *
      * Note: Charset of returned string must be UTF-8
+     * Default return value: NULL
      **/
     string getText( in long pagenum, in LuRectangle selection );
 
@@ -236,6 +272,7 @@ interface LuDocument : SOMObject
      *
      * Return value: TRUE if document may contain navigable links,
      *               FALSE otherwise.
+     * Default return value: FALSE
      **/
     boolean isHaveLinks();
 
@@ -252,6 +289,7 @@ interface LuDocument : SOMObject
      *               or NULL if no links on page.
      *
      * Note: SOMMalloc() must be used for all memory allocations.
+     * Default return value: NULL
      **/
     LuLinkMapSequence *getLinkMapping( in long pagenum );
 
@@ -271,6 +309,7 @@ interface LuDocument : SOMObject
      *
      * Return value: TRUE if document can be saved in same format
      *               as original, FALSE otherwise.
+     * Default return value: FALSE
      **/
     boolean isSaveable();
 
@@ -283,6 +322,7 @@ interface LuDocument : SOMObject
      *
      * Return value: TRUE, if the document was successfully saved,
      *               FALSE otherwise.
+     * Default return value: FALSE
      **/
     boolean saveAs( in string filename );
 
@@ -292,6 +332,7 @@ interface LuDocument : SOMObject
      *
      * Return value: TRUE if document can be exported to
      *               PostScript, FALSE otherwise.
+     * Default return value: FALSE
      **/
     boolean isPostScriptExportable();
 
@@ -313,8 +354,9 @@ interface LuDocument : SOMObject
      *            generation process. 
      *
      * Create a new postscript file and render document to.
-     * Return value: TRUE if PS document was generated successfully, or
+     * Return value: TRUE if PS document was generated successfully or
      *               generation was interrupted, FALSE otherwise.
+     * Default return value: FALSE
      **/
     boolean exportToPostScript( in string filename, 
                      in long first_page, in long last_page,
@@ -329,6 +371,7 @@ interface LuDocument : SOMObject
      *
      * Return value: TRUE if getFontInfo() can return information about
      *               fonts used in document, FALSE otherwise.
+     * Default return value: FALSE
      **/
     boolean isHaveFontInfo();
 
@@ -343,6 +386,7 @@ interface LuDocument : SOMObject
      *
      * Returned sequence must be freed with freeFontInfo() when done.
      * Note: SOMMalloc() must be used for all memory allocations.
+     * Default return value: NULL
      **/
     LuFontInfoSequence *getFontInfo();
 
@@ -365,6 +409,7 @@ interface LuDocument : SOMObject
      * See getIndex()
      *
      * Return value: TRUE if document have index, FALSE otherwise.
+     * Default return value: FALSE
      **/
     boolean isHaveIndex();
 
@@ -397,6 +442,7 @@ interface LuDocument : SOMObject
      *
      * Return value: a new LuIndexNode, which represents an index root,
      *               or NULL, if document doesn't have an index.
+     * Default return value: NULL
      **/
     LuIndexNode getIndex();
 
@@ -432,6 +478,7 @@ interface LuDocument : SOMObject
      * appropriate thumbnail exists.
      *
      * Return value: TRUE, if page has a thumbnail associated with it.
+     * Default return value: FALSE
      **/
     boolean getThumbnailSize( in long pagenum, in short suggested_width, inout short width, inout short height );
 
@@ -446,6 +493,7 @@ interface LuDocument : SOMObject
      *
      * Return value: pointer to LuPixbuf, if page has a thumbnail associated with it
      *               or NULL.
+     * Default return value: NULL
      **/
     LuPixbuf getThumbnail( in long pagenum, in short suggested_width );
 
@@ -461,6 +509,7 @@ interface LuDocument : SOMObject
      *
      * Return value: a newly allocated LuRectSequence, or NULL if
      *               nothing found
+     * Default return value: NULL
      *
      * Note: SOMMalloc() must be used for all memory allocations.
      **/
@@ -482,7 +531,7 @@ interface LuDocument : SOMObject
                       isHaveFontInfo, getFontInfo, freeFontInfo,
                       isHaveIndex, getIndex, getDocumentInfo,
                       freeDocumentInfo, getThumbnailSize, getThumbnail,
-                      searchText;
+                      searchText, isFixedImage;
 
 
         somDefaultInit: override, init;

@@ -79,6 +79,7 @@ typedef LuPopplerDocumentData* (SOMLINK * somTD_LuPopplerDocument_DataThunk)(voi
   #define _loadFile somSelf->loadFile
   #define _getBpp somSelf->getBpp
   #define _isScalable somSelf->isScalable
+  #define _isFixedImage somSelf->isFixedImage
   #define _isRotable somSelf->isRotable
   #define _getPageCount somSelf->getPageCount
   #define _getPageSize somSelf->getPageSize
@@ -164,6 +165,7 @@ typedef LuPopplerDocumentData* (SOMLINK * somTD_LuPopplerDocument_DataThunk)(voi
   #define _getThumbnailSize somSelf->getThumbnailSize
   #define _getThumbnail somSelf->getThumbnail
   #define _searchText somSelf->searchText
+  #define _isFixedImage somSelf->isFixedImage
   #define _somDefaultInit somSelf->somDefaultInit
   #define _somDestruct somSelf->somDestruct
 #endif
@@ -1289,6 +1291,45 @@ static somMethodProc* LuPopplerDocument_parent_LuDocument_searchText_resolved;
    LuPopplerDocument_parent_LuDocument_searchText(somSelf,ev,pagenum,text,caseSensitive))
 
 /*
+ * Overridden method: isFixedImage
+ */
+SOM_Scope boolean  SOMLINK isFixedImage(LuPopplerDocument *somSelf, Environment *ev);
+static char *somMN_LuPopplerDocumentisFixedImage = "LuDocument::isFixedImage";
+static somId somId_LuPopplerDocumentisFixedImage = &somMN_LuPopplerDocumentisFixedImage;
+#ifdef somId_isFixedImage
+#undef somId_isFixedImage
+#else
+#define somId_isFixedImage somId_LuPopplerDocumentisFixedImage
+#endif
+typedef boolean   SOMLINK somTP_xih_LuPopplerDocument_isFixedImage(LuPopplerDocument *somSelf, Environment *ev);
+typedef somTP_xih_LuPopplerDocument_isFixedImage *somTD_xih_LuPopplerDocument_isFixedImage;
+/* define the parent method call macro */
+static somMethodProc* LuPopplerDocument_parent_LuDocument_isFixedImage_resolved;
+#define LuPopplerDocument_parent_LuDocument_isFixedImage(somSelf,ev) \
+  ((( somTD_xih_LuPopplerDocument_isFixedImage ) \
+      LuPopplerDocument_parent_LuDocument_isFixedImage_resolved) \
+	(somSelf,ev))
+/* define a variety of (possibly ambiguous) short forms */
+#ifndef SOMGD_pmc_parent_isFixedImage
+  #ifdef parent_isFixedImage
+    #define SOMGD_pmc_parent_isFixedImage
+    #undef parent_isFixedImage
+  #else
+#define parent_isFixedImage LuPopplerDocument_parent_LuDocument_isFixedImage
+  #endif
+#endif
+#ifndef SOMGD_pmc_parent_LuDocument_isFixedImage
+  #ifdef parent_LuDocument_isFixedImage
+    #define SOMGD_pmc_parent_LuDocument_isFixedImage
+    #undef parent_LuDocument_isFixedImage
+  #else
+    #define parent_LuDocument_isFixedImage LuPopplerDocument_parent_LuDocument_isFixedImage
+  #endif
+#endif
+#define LuPopplerDocument_parents_isFixedImage(somSelf,ev) (\
+   LuPopplerDocument_parent_LuDocument_isFixedImage(somSelf,ev))
+
+/*
  * Overridden method: somDefaultInit
  */
 SOM_Scope void  SOMLINK somDefaultInit(LuPopplerDocument *somSelf,
@@ -1376,6 +1417,8 @@ static somOverrideMethod_t LuPopplerDocumentOM[] = {
          (somMethodProc *) getThumbnail  },
     {    &somId_LuPopplerDocumentsearchText,
          (somMethodProc *) searchText  },
+    {    &somId_LuPopplerDocumentisFixedImage,
+         (somMethodProc *) isFixedImage  },
     {    &somId_LuPopplerDocumentsomDefaultInit,
          (somMethodProc *) somDefaultInit  },
     {    &somId_LuPopplerDocumentsomDestruct,
@@ -1394,7 +1437,7 @@ static somId somPCLuPopplerDocument[] = {
 };
 
 static somStaticClassInfo LuPopplerDocumentSCI = {
-    4, 0, 28, 0, 0, 0, /* layout version 4 */ 
+    4, 0, 29, 0, 0, 0, /* layout version 4 */ 
     LuPopplerDocument_MajorVersion, LuPopplerDocument_MinorVersion,
     sizeof(LuPopplerDocumentData), LuPopplerDocument_MaxNoMethods, 1,
     &somCN_LuPopplerDocument,
@@ -1440,6 +1483,8 @@ SOMClass * SOMLINK LuPopplerDocumentNewClass (integer4 somtmajorVersion,
           return ((SOMClass*)((void*)_LuPopplerDocument));
     LuDocumentNewClass(LuDocument_MajorVersion,LuDocument_MinorVersion);	/* static reference */
     result = (SOMClass*)((void*)somBuildClass(0xFFFFFFFF,&LuPopplerDocumentSCI, somtmajorVersion, somtminorVersion));
+    LuPopplerDocument_parent_LuDocument_isFixedImage_resolved = 
+	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.isFixedImage);
     LuPopplerDocument_parent_LuDocument_searchText_resolved = 
 	somParentNumResolve(LuPopplerDocumentCClassData.parentMtab, 1, LuDocumentClassData.searchText);
     LuPopplerDocument_parent_LuDocument_getThumbnail_resolved = 

@@ -79,6 +79,7 @@ typedef LuJpegDocumentData* (SOMLINK * somTD_LuJpegDocument_DataThunk)(void*);
   #define _loadFile somSelf->loadFile
   #define _getBpp somSelf->getBpp
   #define _isScalable somSelf->isScalable
+  #define _isFixedImage somSelf->isFixedImage
   #define _isRotable somSelf->isRotable
   #define _getPageCount somSelf->getPageCount
   #define _getPageSize somSelf->getPageSize

@@ -75,6 +75,8 @@ typedef short   SOMLINK somTP_LuDjvuDocument_getBpp(LuDjvuDocument *somSelf, Env
 typedef somTP_LuDjvuDocument_getBpp *somTD_LuDjvuDocument_getBpp;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_isScalable(LuDjvuDocument *somSelf, Environment *ev);
 typedef somTP_LuDjvuDocument_isScalable *somTD_LuDjvuDocument_isScalable;
+typedef boolean   SOMLINK somTP_LuDjvuDocument_isFixedImage(LuDjvuDocument *somSelf, Environment *ev);
+typedef somTP_LuDjvuDocument_isFixedImage *somTD_LuDjvuDocument_isFixedImage;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_isRotable(LuDjvuDocument *somSelf, Environment *ev);
 typedef somTP_LuDjvuDocument_isRotable *somTD_LuDjvuDocument_isRotable;
 typedef long   SOMLINK somTP_LuDjvuDocument_getPageCount(LuDjvuDocument *somSelf, Environment *ev);
@@ -399,6 +401,14 @@ short   getBpp(Environment *ev)
 boolean   isScalable(Environment *ev)
 {
    return SOM_ResolveD(this,LuDjvuDocument,LuDocument,isScalable)
+	(this, ev);
+}
+
+
+/* method: isFixedImage */
+boolean   isFixedImage(Environment *ev)
+{
+   return SOM_ResolveD(this,LuDjvuDocument,LuDocument,isFixedImage)
 	(this, ev);
 }
 

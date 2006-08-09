@@ -75,6 +75,8 @@ typedef short   SOMLINK somTP_LuJpegDocument_getBpp(LuJpegDocument *somSelf, Env
 typedef somTP_LuJpegDocument_getBpp *somTD_LuJpegDocument_getBpp;
 typedef boolean   SOMLINK somTP_LuJpegDocument_isScalable(LuJpegDocument *somSelf, Environment *ev);
 typedef somTP_LuJpegDocument_isScalable *somTD_LuJpegDocument_isScalable;
+typedef boolean   SOMLINK somTP_LuJpegDocument_isFixedImage(LuJpegDocument *somSelf, Environment *ev);
+typedef somTP_LuJpegDocument_isFixedImage *somTD_LuJpegDocument_isFixedImage;
 typedef boolean   SOMLINK somTP_LuJpegDocument_isRotable(LuJpegDocument *somSelf, Environment *ev);
 typedef somTP_LuJpegDocument_isRotable *somTD_LuJpegDocument_isRotable;
 typedef long   SOMLINK somTP_LuJpegDocument_getPageCount(LuJpegDocument *somSelf, Environment *ev);
@@ -399,6 +401,14 @@ short   getBpp(Environment *ev)
 boolean   isScalable(Environment *ev)
 {
    return SOM_ResolveD(this,LuJpegDocument,LuDocument,isScalable)
+	(this, ev);
+}
+
+
+/* method: isFixedImage */
+boolean   isFixedImage(Environment *ev)
+{
+   return SOM_ResolveD(this,LuJpegDocument,LuDocument,isFixedImage)
 	(this, ev);
 }
 

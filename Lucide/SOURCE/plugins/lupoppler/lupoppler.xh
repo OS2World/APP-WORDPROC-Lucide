@@ -75,6 +75,8 @@ typedef short   SOMLINK somTP_LuPopplerDocument_getBpp(LuPopplerDocument *somSel
 typedef somTP_LuPopplerDocument_getBpp *somTD_LuPopplerDocument_getBpp;
 typedef boolean   SOMLINK somTP_LuPopplerDocument_isScalable(LuPopplerDocument *somSelf, Environment *ev);
 typedef somTP_LuPopplerDocument_isScalable *somTD_LuPopplerDocument_isScalable;
+typedef boolean   SOMLINK somTP_LuPopplerDocument_isFixedImage(LuPopplerDocument *somSelf, Environment *ev);
+typedef somTP_LuPopplerDocument_isFixedImage *somTD_LuPopplerDocument_isFixedImage;
 typedef boolean   SOMLINK somTP_LuPopplerDocument_isRotable(LuPopplerDocument *somSelf, Environment *ev);
 typedef somTP_LuPopplerDocument_isRotable *somTD_LuPopplerDocument_isRotable;
 typedef long   SOMLINK somTP_LuPopplerDocument_getPageCount(LuPopplerDocument *somSelf, Environment *ev);
@@ -399,6 +401,14 @@ short   getBpp(Environment *ev)
 boolean   isScalable(Environment *ev)
 {
    return SOM_ResolveD(this,LuPopplerDocument,LuDocument,isScalable)
+	(this, ev);
+}
+
+
+/* method: isFixedImage */
+boolean   isFixedImage(Environment *ev)
+{
+   return SOM_ResolveD(this,LuPopplerDocument,LuDocument,isFixedImage)
 	(this, ev);
 }
 

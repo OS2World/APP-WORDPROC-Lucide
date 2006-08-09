@@ -1,5 +1,6 @@
 /* 
- * Convert 'SOMEXTERN {' to 'SOMEXTERNF {' 
+ * Convert 'SOMEXTERN struct' to 'SOMEXTERNS struct'
+ * (for gcc compatibility)
  *
  * Usage:
  *    cnvsomex <filename.xh>

@@ -79,6 +79,7 @@ typedef LuDjvuDocumentData* (SOMLINK * somTD_LuDjvuDocument_DataThunk)(void*);
   #define _loadFile somSelf->loadFile
   #define _getBpp somSelf->getBpp
   #define _isScalable somSelf->isScalable
+  #define _isFixedImage somSelf->isFixedImage
   #define _isRotable somSelf->isRotable
   #define _getPageCount somSelf->getPageCount
   #define _getPageSize somSelf->getPageSize
@@ -150,6 +151,7 @@ typedef LuDjvuDocumentData* (SOMLINK * somTD_LuDjvuDocument_DataThunk)(void*);
   #define _saveAs somSelf->saveAs
   #define _isPostScriptExportable somSelf->isPostScriptExportable
   #define _exportToPostScript somSelf->exportToPostScript
+  #define _isFixedImage somSelf->isFixedImage
   #define _somDefaultInit somSelf->somDefaultInit
   #define _somDestruct somSelf->somDestruct
 #endif
@@ -691,6 +693,45 @@ static somMethodProc* LuDjvuDocument_parent_LuDocument_exportToPostScript_resolv
    LuDjvuDocument_parent_LuDocument_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex,brkExport))
 
 /*
+ * Overridden method: isFixedImage
+ */
+SOM_Scope boolean  SOMLINK isFixedImage(LuDjvuDocument *somSelf, Environment *ev);
+static char *somMN_LuDjvuDocumentisFixedImage = "LuDocument::isFixedImage";
+static somId somId_LuDjvuDocumentisFixedImage = &somMN_LuDjvuDocumentisFixedImage;
+#ifdef somId_isFixedImage
+#undef somId_isFixedImage
+#else
+#define somId_isFixedImage somId_LuDjvuDocumentisFixedImage
+#endif
+typedef boolean   SOMLINK somTP_xih_LuDjvuDocument_isFixedImage(LuDjvuDocument *somSelf, Environment *ev);
+typedef somTP_xih_LuDjvuDocument_isFixedImage *somTD_xih_LuDjvuDocument_isFixedImage;
+/* define the parent method call macro */
+static somMethodProc* LuDjvuDocument_parent_LuDocument_isFixedImage_resolved;
+#define LuDjvuDocument_parent_LuDocument_isFixedImage(somSelf,ev) \
+  ((( somTD_xih_LuDjvuDocument_isFixedImage ) \
+      LuDjvuDocument_parent_LuDocument_isFixedImage_resolved) \
+	(somSelf,ev))
+/* define a variety of (possibly ambiguous) short forms */
+#ifndef SOMGD_pmc_parent_isFixedImage
+  #ifdef parent_isFixedImage
+    #define SOMGD_pmc_parent_isFixedImage
+    #undef parent_isFixedImage
+  #else
+#define parent_isFixedImage LuDjvuDocument_parent_LuDocument_isFixedImage
+  #endif
+#endif
+#ifndef SOMGD_pmc_parent_LuDocument_isFixedImage
+  #ifdef parent_LuDocument_isFixedImage
+    #define SOMGD_pmc_parent_LuDocument_isFixedImage
+    #undef parent_LuDocument_isFixedImage
+  #else
+    #define parent_LuDocument_isFixedImage LuDjvuDocument_parent_LuDocument_isFixedImage
+  #endif
+#endif
+#define LuDjvuDocument_parents_isFixedImage(somSelf,ev) (\
+   LuDjvuDocument_parent_LuDocument_isFixedImage(somSelf,ev))
+
+/*
  * Overridden method: somDefaultInit
  */
 SOM_Scope void  SOMLINK somDefaultInit(LuDjvuDocument *somSelf,
@@ -750,6 +791,8 @@ static somOverrideMethod_t LuDjvuDocumentOM[] = {
          (somMethodProc *) isPostScriptExportable  },
     {    &somId_LuDjvuDocumentexportToPostScript,
          (somMethodProc *) exportToPostScript  },
+    {    &somId_LuDjvuDocumentisFixedImage,
+         (somMethodProc *) isFixedImage  },
     {    &somId_LuDjvuDocumentsomDefaultInit,
          (somMethodProc *) somDefaultInit  },
     {    &somId_LuDjvuDocumentsomDestruct,
@@ -768,7 +811,7 @@ static somId somPCLuDjvuDocument[] = {
 };
 
 static somStaticClassInfo LuDjvuDocumentSCI = {
-    4, 0, 14, 0, 0, 0, /* layout version 4 */ 
+    4, 0, 15, 0, 0, 0, /* layout version 4 */ 
     LuDjvuDocument_MajorVersion, LuDjvuDocument_MinorVersion,
     sizeof(LuDjvuDocumentData), LuDjvuDocument_MaxNoMethods, 1,
     &somCN_LuDjvuDocument,
@@ -814,6 +857,8 @@ SOMClass * SOMLINK LuDjvuDocumentNewClass (integer4 somtmajorVersion,
           return ((SOMClass*)((void*)_LuDjvuDocument));
     LuDocumentNewClass(LuDocument_MajorVersion,LuDocument_MinorVersion);	/* static reference */
     result = (SOMClass*)((void*)somBuildClass(0xFFFFFFFF,&LuDjvuDocumentSCI, somtmajorVersion, somtminorVersion));
+    LuDjvuDocument_parent_LuDocument_isFixedImage_resolved = 
+	somParentNumResolve(LuDjvuDocumentCClassData.parentMtab, 1, LuDocumentClassData.isFixedImage);
     LuDjvuDocument_parent_LuDocument_exportToPostScript_resolved = 
 	somParentNumResolve(LuDjvuDocumentCClassData.parentMtab, 1, LuDocumentClassData.exportToPostScript);
     LuDjvuDocument_parent_LuDocument_isPostScriptExportable_resolved = 

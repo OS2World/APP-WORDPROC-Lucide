@@ -173,6 +173,7 @@ SOMEXTERNS struct LuDocumentClassDataStructure {
 	somMToken getThumbnailSize;
 	somMToken getThumbnail;
 	somMToken searchText;
+	somMToken isFixedImage;
 } SOMDLINK LuDocumentClassData;
 #define _LuDocument LuDocumentClassData.classObject
 
@@ -195,6 +196,8 @@ typedef short   SOMLINK somTP_LuDocument_getBpp(LuDocument *somSelf, Environment
 typedef somTP_LuDocument_getBpp *somTD_LuDocument_getBpp;
 typedef boolean   SOMLINK somTP_LuDocument_isScalable(LuDocument *somSelf, Environment *ev);
 typedef somTP_LuDocument_isScalable *somTD_LuDocument_isScalable;
+typedef boolean   SOMLINK somTP_LuDocument_isFixedImage(LuDocument *somSelf, Environment *ev);
+typedef somTP_LuDocument_isFixedImage *somTD_LuDocument_isFixedImage;
 typedef boolean   SOMLINK somTP_LuDocument_isRotable(LuDocument *somSelf, Environment *ev);
 typedef somTP_LuDocument_isRotable *somTD_LuDocument_isRotable;
 typedef long   SOMLINK somTP_LuDocument_getPageCount(LuDocument *somSelf, Environment *ev);
@@ -519,6 +522,14 @@ short   getBpp(Environment *ev)
 boolean   isScalable(Environment *ev)
 {
    return SOM_ResolveD(this,LuDocument,LuDocument,isScalable)
+	(this, ev);
+}
+
+
+/* method: isFixedImage */
+boolean   isFixedImage(Environment *ev)
+{
+   return SOM_ResolveD(this,LuDocument,LuDocument,isFixedImage)
 	(this, ev);
 }
 

@@ -52,6 +52,7 @@ PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, long _currentpage )
     hFrame      = hWndFrame;
     doc         = _doc;
     scalable    = _doc->isScalable( ev );
+    fixed       = _doc->isFixedImage( ev );
     currentpage = _currentpage;
     psetup      = new PrintSetup;
     memset( psetup, 0, sizeof( PrintSetup ) );
@@ -240,7 +241,9 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
             {
                 case IDC_PNAME:
                 {
-                    if ( SHORT2FROMMP(mp1) == CBN_ENTER )
+                    //somPrintf( "IDC_PNAME: %d\n", SHORT2FROMMP(mp1) );
+
+                    if ( SHORT2FROMMP(mp1) == CBN_LBSELECT )
                     {
                         SHORT rc = (SHORT)WinSendDlgItemMsg( hwnd, IDC_PNAME, LM_QUERYSELECTION,
                                                              MPFROMSHORT( LIT_CURSOR ), MPVOID );
@@ -270,7 +273,7 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                 {
                     BOOL asimg = WinQueryButtonCheckstate( hwnd, IDC_TYPE_ASIMAGE );
                     WinEnableControl( hwnd, IDC_HIGHER_IMAGE_QUALITY,
-                                      asimg && _this->scalable );
+                                      asimg && _this->scalable && !_this->fixed );
                 }
                 break;
 

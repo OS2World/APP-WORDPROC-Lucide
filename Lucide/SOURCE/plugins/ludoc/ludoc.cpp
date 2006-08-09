@@ -101,6 +101,13 @@ SOM_Scope boolean  SOMLINK isScalable(LuDocument *somSelf,  Environment *ev)
 }
 
 
+SOM_Scope boolean  SOMLINK isFixedImage(LuDocument *somSelf, 
+                                         Environment *ev)
+{
+    return TRUE;
+}
+
+
 SOM_Scope boolean  SOMLINK isRotable(LuDocument *somSelf,  Environment *ev)
 {
     return FALSE;
