@@ -1,0 +1,151 @@
+#
+# Lucide language file, NL
+#
+
+#
+# Main menu
+#
+MENU_DOCUMENT=~Document
+MENU_OPEN=~Openen...\tCtrl+O
+MENU_SAVE_AS=Op~slaan als...
+MENU_PAGE_SETUP=~Pagina-instelling
+MENU_PRINT=Af~drukken...
+MENU_DOCUMENT_INFO=~Document informatie
+MENU_FONTS_INFO=Lettert~ype informatie
+MENU_PLUGINS_LIST=P~lug-in lijst...
+MENU_EXIT=E~inde\tCtrl+X
+MENU_EDIT=B~ewerken
+MENU_COPY=~Kopi‰ren\tCtrl+Insert
+MENU_SELECT_ALL=~Alles selecteren\tCtrl+/
+MENU_FIND=~Zoeken...\tCtrl+F
+MENU_FINDAGAIN=O~pnieuw zoeken\tCtrl+G
+MENU_SETTINGS=In~stellingen
+MENU_FIRST_PAGE=~Eerste pagina
+MENU_PREV_PAGE=Vo~rige pagina\t-
+MENU_NEXT_PAGE=~Volgende pagina\t+
+MENU_LAST_PAGE=~Laatste pagina
+MENU_GO_TO_PAGE=~Ga naar pagina...\tCtrl+N
+MENU_VIEW=Weerga~ve
+MENU_FIT_WINDOW=Ven~stergrootte
+MENU_ACTUAL_SIZE=~Ware grootte
+MENU_FIT_WIDTH=Venster~breedte
+MENU_ROTATE_CW=Roteer 90ø ~met de klok mee
+MENU_ROTATE_CCW=Roteer 90ø ~tegen de klok in
+MENU_SHOW_NAV_PANE=~Tonen navigatie paneel
+MENU_SINGLE_PAGE=Enkele p~agina
+MENU_CONTINUOUS=D~oorlopend
+MENU_WINDOW=Ve~nster
+MENU_MAXVIEW=~Maximale weergave\tF11
+MENU_FULLSCREEN=Volledig ~scherm\tCtrl+L
+MENU_HELP=~Help
+MENU_PRODUCT_INFORMATION=~Product Informatie
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=Openen document...
+TBHINT_PRINT=Afdrukken...
+TBHINT_SHOW_NAV_PANE=Tonen/verbergen navigatie paneel
+TBHINT_FIRST_PAGE=Eerste pagina
+TBHINT_PREV_PAGE=Vorige pagina
+TBHINT_NEXT_PAGE=Volgende pagina
+TBHINT_LAST_PAGE=Laatste pagina
+TBHINT_ACTUAL_SIZE=Ware grootte
+TBHINT_FIT_WINDOW=Passend in het venster
+TBHINT_FIT_WIDTH=Passende breedte
+TBHINT_FIND=Zoeken...
+TBHINT_FINDAGAIN=Opnieuw zoeken
+# toolbar's page number
+TB_PAGENUM=van %d
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=Lucide - Document Bekijker
+MSGS_NO_SUIT_PLUG=Kan geen passende plug-in vinden voor opgegeven document!
+MSGS_FILE_LOAD_ERROR=Bestand inleesfout!
+MSGS_LOADING_DOCUMENT=Inlezen document, even geduld a.u.b
+MSGS_WARNING=Waarschuwing!
+MSGS_OVERWRITE_FILE=Bestand bestaat al. Overschrijven?
+MSGS_FILE_SAVE_ERROR=Fout bij het opslaan van het bestand!
+
+#
+# "Plugins list" dialog
+#
+PLUGLIST_PLUGINS_LIST=Plug-in lijst
+PLUGLIST_CLOSE=~Sluiten
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Plug-in naam
+PLUGLIST_SUPP_EXTS=Ondersteunde extensies
+PLUGLIST_PLUGIN_DESC=Plug-in omschrijving
+
+#
+# "Font info" dialog
+#
+FONTINFO_FONTINFO=Lettertype informatie
+FONTINFO_CLOSE=~Sluiten
+FONTINFO_ENUMERATING=Opzoeken van de lettertypes, even geduld a.u.b.
+# List columns titles
+FONTINFO_NAME=Naam
+FONTINFO_TYPE=Type
+FONTINFO_EMBEDDED=Ingebouwd?
+
+#
+# "Document info" dialog
+#
+DOCINFO_DOCUMENT_INFO=Document informatie
+DOCINFO_CLOSE=~Sluiten
+# Document info keys
+DOCINFO_TITLE=Titel:
+DOCINFO_FORMAT=Indeling:
+DOCINFO_AUTHOR=Auteur:
+DOCINFO_SUBJECT=Onderwerp:
+DOCINFO_KEYWORDS=Trefwoorden:
+DOCINFO_CREATOR=Gemaakt in:
+DOCINFO_PRODUCER=Met:
+DOCINFO_CREATION_DATE=Gemaakt op:
+DOCINFO_MOD_DATE=Veranderd op:
+
+#
+# "Find" dialog
+#
+FIND_FIND=Zoeken
+FIND_FIND_WHAT=Waarop wilt u zoeken?
+FIND_MATCH_CASE=Onderscheid ~hoofd-/kleine letters
+FIND_OK=~OK
+FIND_CANCEL=~Annuleren
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=Doorzoeken pagina %d van %d...
+FIND_NOT_FOUND=Onderwerp is niet gevonden!
+
+#
+# "Progress" dialog
+#
+PDLG_PROGRESS=Voortgang
+PDLG_CANCEL=~Annuleren
+
+#
+# About dialog
+#
+AD_ABOUT=Info
+AD_DESCRIPTION=Op plug-ins gebaseerde document bekijker met ondersteuning voor diverse bestandsindelingen
+AD_COPYRIGHTS=(c) van Eugene Romanenko, netlabs.org in samenwerking met Serenity Systems International
+AD_OK=~OK
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Instellingen
+SD_DEFAULT_PAGE_LAYOUT=Standaard pagina-indeling
+SD_DEFAULT_ZOOM=Standaard zoom
+SD_OK=~OK
+SD_CANCEL=~Annuleren
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=Ga naar pagina
+GTP_PAGE=Pagina
+GTP_OF=van %d
+GTP_OK=~OK
+GTP_CANCEL=~Annuleren
