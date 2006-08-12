@@ -740,10 +740,10 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
                     MPFROM2SHORT( cxClient, width ), MPVOID );
         WinEnableWindow( hWndHscroll, (BOOL)( sHscrollMax != 0 ) );
 
+        VScrollStep = 1;
         if ( continuous )
         {
             realVscrollMax = __max( 0, fullheight - cyClient );
-            VScrollStep = LINE_HEIGHT;
             ULONG ssize = realVscrollMax / VScrollStep;
             while ( ssize > 32000 ) {
                 VScrollStep += LINE_HEIGHT;
@@ -751,10 +751,12 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
             }
 
             sVscrollMax = (SHORT)ssize;
+            if ( realVscrollMax > ( sVscrollMax * VScrollStep ) ) {
+                sVscrollMax += 1;
+            }
         }
         else {
             realVscrollMax = sVscrollMax = (SHORT)__max( 0, height - cyClient );
-            VScrollStep = 1;
         }
         sVscrollPos = __min( sVscrollPos, sVscrollMax );
 
