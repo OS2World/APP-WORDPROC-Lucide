@@ -199,6 +199,7 @@ void DocumentViewer::setDocument( LuDocument *_doc )
 
         pagesizes = new LuSize[ totalpages ];
         countPagesizes();
+        adjustSize();
 
         selrects = new PLuRectSequence[ totalpages ];
         memset( selrects, 0, sizeof( PLuRectSequence ) * totalpages );
@@ -220,10 +221,6 @@ void DocumentViewer::setDocument( LuDocument *_doc )
             enableAsynchDraw = doc->isAsynchRenderingSupported( ev );
         }
         goToPage( 0 );
-
-        if ( continuous ) {
-            drawPage();
-        }
     }
 }
 
