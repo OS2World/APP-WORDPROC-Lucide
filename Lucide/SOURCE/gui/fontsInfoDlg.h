@@ -63,6 +63,8 @@ class FontsInfoDlg
         
         // columns titles
         PSZ name, type, embed;
+        // embed values
+        PSZ emb_notembedded, emb_embedded, emb_embeddedsubset;
 };
 
 #endif // __FONTSINFODLG_H

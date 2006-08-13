@@ -331,9 +331,6 @@ SOM_Scope void  SOMLINK freeFontInfo(Environment *ev,
                 if ( fonts->_buffer[ i ].type != NULL ) {
                     SOMFree( fonts->_buffer[ i ].type );
                 }
-                if ( fonts->_buffer[ i ].embedded != NULL ) {
-                    SOMFree( fonts->_buffer[ i ].embedded );
-                }
             }
 
             SOMFree( fonts->_buffer );

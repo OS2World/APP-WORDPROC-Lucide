@@ -75,6 +75,10 @@ extern const char *PLUGLIST_PLUGIN_DESC;
 extern const char *FONTINFO_NAME;
 extern const char *FONTINFO_TYPE;
 extern const char *FONTINFO_EMBEDDED;
+// 'Fonts Info' Embedded types
+extern const char *FONTINFO_EMBED_NOT_EMBEDDED;
+extern const char *FONTINFO_EMBED_EMBEDDED;
+extern const char *FONTINFO_EMBED_EMBEDDED_SUBSET;
 
 
 // "Document info" dialog,  Document info keys

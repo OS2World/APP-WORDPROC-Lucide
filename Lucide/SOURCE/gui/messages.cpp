@@ -75,6 +75,10 @@ const char *PLUGLIST_PLUGIN_DESC = "PLUGLIST_PLUGIN_DESC";
 const char *FONTINFO_NAME     = "FONTINFO_NAME";
 const char *FONTINFO_TYPE     = "FONTINFO_TYPE";
 const char *FONTINFO_EMBEDDED = "FONTINFO_EMBEDDED";
+// 'Fonts Info' Embedded types
+const char *FONTINFO_EMBED_NOT_EMBEDDED    = "FONTINFO_EMBED_NOT_EMBEDDED";
+const char *FONTINFO_EMBED_EMBEDDED        = "FONTINFO_EMBED_EMBEDDED";
+const char *FONTINFO_EMBED_EMBEDDED_SUBSET = "FONTINFO_EMBED_EMBEDDED_SUBSET";
 
 
 // "Document info" dialog,  Document info keys

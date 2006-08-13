@@ -21,12 +21,12 @@
  * Alternatively, the contents of this file may be used under the terms of
  * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
  * in which case the provisions of the LGPL are applicable instead of those
- * above. If you wish to allow use of your version of this file only under the 
+ * above. If you wish to allow use of your version of this file only under the
  * terms of the LGPL, and not to allow others to use your version of this file
  * under the terms of the CDDL, indicate your decision by deleting the
  * provisions above and replace them with the notice and other provisions
  * required by the LGPL. If you do not delete the provisions above, a recipient
- * may use your version of this file under the terms of any one of the CDDL 
+ * may use your version of this file under the terms of any one of the CDDL
  * or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
@@ -55,6 +55,9 @@ FontsInfoDlg::FontsInfoDlg( HWND hWndFrame, LuDocument *_doc )
     name       = newstrdupL( FONTINFO_NAME );
     type       = newstrdupL( FONTINFO_TYPE );
     embed      = newstrdupL( FONTINFO_EMBEDDED );
+    emb_notembedded    = newstrdupL( FONTINFO_EMBED_NOT_EMBEDDED );
+    emb_embedded       = newstrdupL( FONTINFO_EMBED_EMBEDDED );
+    emb_embeddedsubset = newstrdupL( FONTINFO_EMBED_EMBEDDED_SUBSET );
 }
 
 FontsInfoDlg::~FontsInfoDlg()
@@ -62,6 +65,9 @@ FontsInfoDlg::~FontsInfoDlg()
     delete name;
     delete type;
     delete embed;
+    delete emb_notembedded;
+    delete emb_embedded;
+    delete emb_embeddedsubset;
 }
 
 void FontsInfoDlg::doDialog()
@@ -99,7 +105,19 @@ void FontsInfoDlg::loadList()
             r->miniRecordCore.pszIcon = newstrdup( fonts->_buffer[i].name );
             r->miniRecordCore.hptrIcon = NULLHANDLE;
             r->type = newstrdup( fonts->_buffer[i].type );
-            r->embed = newstrdup( fonts->_buffer[i].embedded );
+            r->embed = NULL;
+            switch ( fonts->_buffer[i].embedded )
+            {
+                case LU_FONTEMBED_NOT_EMBEDDED:
+                    r->embed = newstrdup( emb_notembedded );
+                    break;
+                case LU_FONTEMBED_EMBEDDED:
+                    r->embed = newstrdup( emb_embedded );
+                    break;
+                case LU_FONTEMBED_EMBEDDED_SUBSET:
+                    r->embed = newstrdup( emb_embeddedsubset );
+                    break;
+            }
 
             RECORDINSERT ri;
             ri.cb = sizeof( RECORDINSERT );

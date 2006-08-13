@@ -90,6 +90,10 @@ FONTINFO_ENUMERATING=Enumerating fonts, please wait...
 FONTINFO_NAME=Name
 FONTINFO_TYPE=Type
 FONTINFO_EMBEDDED=Embedded?
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=Not embedded
+FONTINFO_EMBED_EMBEDDED=Embedded
+FONTINFO_EMBED_EMBEDDED_SUBSET=Embedded subset
 
 #
 # "Document info" dialog

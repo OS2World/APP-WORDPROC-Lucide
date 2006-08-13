@@ -800,18 +800,15 @@ SOM_Scope LuDocument_LuFontInfoSequence*  SOMLINK getFontInfo(LuPopplerDocument 
         fonts->_buffer[i].type = somstrdup( t );
 
         // embedded
-        char *e = NULL;
         if ( info->getEmbedded() ) {
             if ( info->getSubset() ) {
-                e = "Embedded subset";
+                fonts->_buffer[i].embedded = LU_FONTEMBED_EMBEDDED_SUBSET;
             } else {
-                e = "Embedded";
+                fonts->_buffer[i].embedded = LU_FONTEMBED_EMBEDDED;
             }
         } else {
-            e = "Not embedded";
+            fonts->_buffer[i].embedded = LU_FONTEMBED_NOT_EMBEDDED;
         }
-        fonts->_buffer[i].embedded = somstrdup( e );
-
     }
 
     return fonts;

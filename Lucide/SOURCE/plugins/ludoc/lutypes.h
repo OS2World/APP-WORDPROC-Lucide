@@ -66,11 +66,15 @@ struct LuLinkMapping
 };
 
 
+#define LU_FONTEMBED_NOT_EMBEDDED		0
+#define LU_FONTEMBED_EMBEDDED			1
+#define LU_FONTEMBED_EMBEDDED_SUBSET	2
+
 struct LuFontInfo
 {
-	char *name;
-	char *type;
-	char *embedded;
+	char  *name;
+	char  *type;
+	short embedded;
 };
 
 	
