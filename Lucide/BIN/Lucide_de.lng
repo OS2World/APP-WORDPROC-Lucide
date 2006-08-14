@@ -68,6 +68,7 @@ MSGS_LOADING_DOCUMENT=™ffne Dokument, bitte warten...
 MSGS_WARNING=Warnung!
 MSGS_OVERWRITE_FILE=Datei existiert bereits. šberschreiben?
 MSGS_FILE_SAVE_ERROR=Fehler beim Schreiben der Datei!
+MSGS_PAGE=Seite
 
 #
 # "Plugins list" dialog
