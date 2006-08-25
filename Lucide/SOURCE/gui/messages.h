@@ -100,6 +100,7 @@ extern const char *FIND_NOT_FOUND;
 extern const char *GTP_OF;
 
 // Printing, other 'print'-related messages
+extern const char *PD_WRONG_MARGINS;
 extern const char *PRINT_PRINTING_PAGE_OF;
 extern const char *PRINT_GENERATING_POSTSCRIPT;
 extern const char *PRINT_SPOOLING_POSTSCRIPT;

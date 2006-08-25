@@ -50,6 +50,11 @@ struct PrintSetup
     long pgto;
     PrintType ptype;
     bool higherQuality;
+    long margin_top;
+    long margin_left;
+    long margin_bottom;
+    long margin_right;
+    int copies;
 };
 
 class LuDocument;

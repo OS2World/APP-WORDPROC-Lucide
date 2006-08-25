@@ -39,7 +39,6 @@
 
 
 class LuDocument;
-struct PrintDlgInternalData;
 
 class PrintDlg
 {
@@ -53,9 +52,14 @@ class PrintDlg
     private:
 
         void enumQueues( HWND hwnd );
-        void showJobProperties();
+        void showJobProperties( HWND hwnd );
         void setCurrentQInfo( HWND hwnd, PPRQINFO3 q );
+        HDC getInfoDC();
         bool isPostscriptDevice();
+        bool isPortraitOrientation();
+        void setPortraitOrientation( bool portrait, HWND hwnd );
+        bool queryCurrentForm();
+        void applyForm( HWND hwnd );
         static MRESULT EXPENTRY printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
 
         HWND hFrame;
@@ -64,8 +68,10 @@ class PrintDlg
         bool fixed;
         long currentpage;
         PPRQINFO3 pQueueInfo;
+        PHCINFO pcurForm;
         PrintSetup *psetup;
 };
+
 
 #endif // __PRINTDLG_H
 

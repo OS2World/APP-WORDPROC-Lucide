@@ -138,9 +138,17 @@
 #define IDC_PGFROM          17
 #define IDC_LABELTO         18
 #define IDC_PGTO            19
-#define IDC_TYPE_POSTSCRIPT	201
-#define IDC_TYPE_ASIMAGE	21
-#define IDC_HIGHER_IMAGE_QUALITY	22
+#define IDC_COPIES			20
+#define IDC_TYPE_POSTSCRIPT	21
+#define IDC_TYPE_ASIMAGE	22
+#define IDC_HIGHER_IMAGE_QUALITY	23
+#define IDC_PORTRAIT		24
+#define IDC_LANDSCAPE		25
+#define IDC_MLEFT			26
+#define IDC_MRIGHT			27
+#define IDC_MTOP			28
+#define IDC_MBOTTOM			29
+#define IDC_SELECTED_FORM	30
 
 
 #endif // __LUCIDE_RES_H

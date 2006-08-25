@@ -68,7 +68,6 @@ extern "C" {
 #define STD_IMAGE_ZOOM      2.0
 #define HIGH_IMAGE_ZOOM     3.0
 #define PS_PRINT_BUF_SIZE   32768
-#define TEST_MARGIN         10
 
 
 class LucidePrinting
@@ -133,6 +132,7 @@ void LucidePrinting::doPrint()
 bool LucidePrinting::doPmPrint( HAB lhab )
 {
     CHAR         achDriverName[ DRIVERNAME_LENGTH ] = "";
+    CHAR         achQueueProcParams[ 8 ] = "";
     DEVOPENSTRUC dos   = { 0 };
     SIZEL        sizel = { 0 };
 
@@ -142,14 +142,18 @@ bool LucidePrinting::doPmPrint( HAB lhab )
     }
 
     // build a devopenstruct for the call to DevOpenDC
-    dos.pszLogAddress = psetup->QueueInfo.pszName;              // 1
+    dos.pszLogAddress      = psetup->QueueInfo.pszName;              // 1
     strcpy( achDriverName, psetup->QueueInfo.pszDriverName );
     achDriverName[ strcspn( achDriverName, "." ) ] = '\0';
-    dos.pszDriverName = achDriverName;                          // 2
-    dos.pdriv         = psetup->QueueInfo.pDriverData;          // 3
-    dos.pszDataType   = "PM_Q_STD";                             // 4
+    dos.pszDriverName      = achDriverName;                          // 2
+    dos.pdriv              = psetup->QueueInfo.pDriverData;          // 3
+    dos.pszDataType        = "PM_Q_STD";                             // 4
+    dos.pszComment         = (PSZ)appName;                           // 5
+    dos.pszQueueProcName   = NULL;                                   // 6
+    snprintf( achQueueProcParams, sizeof( achQueueProcParams ), "COP=%d", psetup->copies );
+    dos.pszQueueProcParams = achQueueProcParams;                     // 7
 
-    HDC hdcPrinter = DevOpenDC( lhab, OD_QUEUED, "*", 4L, (PDEVOPENDATA)&dos, NULLHANDLE );
+    HDC hdcPrinter = DevOpenDC( lhab, OD_QUEUED, "*", 7L, (PDEVOPENDATA)&dos, NULLHANDLE );
     if ( hdcPrinter == DEV_ERROR ) {
         return false;
     }
@@ -204,10 +208,10 @@ void LucidePrinting::printPagePm( long page, HPS hpsPrinter, PHCINFO pcurForm )
     doc->getPageSize( ev, page, &w, &h );
 
     // Magrins
-    LONG mLeft   = __max( TEST_MARGIN, pcurForm->xLeftClip );
-    LONG mBottom = __max( TEST_MARGIN, pcurForm->yBottomClip );
-    LONG mRight  = __max( TEST_MARGIN, pcurForm->cx - pcurForm->xRightClip );
-    LONG mTop    = __max( TEST_MARGIN, pcurForm->cy - pcurForm->yTopClip );
+    LONG mLeft   = __max( psetup->margin_left, pcurForm->xLeftClip );
+    LONG mBottom = __max( psetup->margin_bottom, pcurForm->yBottomClip );
+    LONG mRight  = __max( psetup->margin_right, pcurForm->cx - pcurForm->xRightClip );
+    LONG mTop    = __max( psetup->margin_top, pcurForm->cy - pcurForm->yTopClip );
 
     // Count paper page size in hi-metric
     LONG pwidth = ( pcurForm->cx - mLeft - mRight ) * UNITS_MULTIPLIER;
@@ -273,6 +277,7 @@ void LucidePrinting::printPagePm( long page, HPS hpsPrinter, PHCINFO pcurForm )
 bool LucidePrinting::doPsPrint( HAB lhab )
 {
     CHAR         achDriverName[ DRIVERNAME_LENGTH ] = "";
+    CHAR         achQueueProcParams[ 8 ] = "";
     DEVOPENSTRUC dos   = { 0 };
     SIZEL        sizel = { 0 };
 
@@ -286,10 +291,10 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     delete generating_ps;
 
     // Magrins
-    LONG mLeft   = __max( TEST_MARGIN, curForm.xLeftClip );
-    LONG mBottom = __max( TEST_MARGIN, curForm.yBottomClip );
-    LONG mRight  = __max( TEST_MARGIN, curForm.cx - curForm.xRightClip );
-    LONG mTop    = __max( TEST_MARGIN, curForm.cy - curForm.yTopClip );
+    LONG mLeft   = __max( psetup->margin_left, curForm.xLeftClip );
+    LONG mBottom = __max( psetup->margin_bottom, curForm.yBottomClip );
+    LONG mRight  = __max( psetup->margin_right, curForm.cx - curForm.xRightClip );
+    LONG mTop    = __max( psetup->margin_top, curForm.cy - curForm.yTopClip );
 
     // Count paper page size in 1/72 inches
     double pwidth = ( (double)( curForm.cx - mLeft - mRight ) / 25.4 ) * 72.0;
@@ -320,14 +325,18 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     delete spooling_ps;
 
     // build a devopenstruct for the call to DevOpenDC
-    dos.pszLogAddress = psetup->QueueInfo.pszName;              // 1
+    dos.pszLogAddress      = psetup->QueueInfo.pszName;              // 1
     strcpy( achDriverName, psetup->QueueInfo.pszDriverName );
     achDriverName[ strcspn( achDriverName, "." ) ] = '\0';
-    dos.pszDriverName = achDriverName;                          // 2
-    dos.pdriv         = psetup->QueueInfo.pDriverData;          // 3
-    dos.pszDataType   = "PM_Q_RAW";                             // 4
+    dos.pszDriverName      = achDriverName;                          // 2
+    dos.pdriv              = psetup->QueueInfo.pDriverData;          // 3
+    dos.pszDataType        = "PM_Q_RAW";                             // 4
+    dos.pszComment         = (PSZ)appName;                           // 5
+    dos.pszQueueProcName   = NULL;                                   // 6
+    snprintf( achQueueProcParams, sizeof( achQueueProcParams ), "COP=%d", psetup->copies );
+    dos.pszQueueProcParams = achQueueProcParams;                     // 7
 
-    HDC hdcPrinter = DevOpenDC( lhab, OD_QUEUED, "*", 4L, (PDEVOPENDATA)&dos, NULLHANDLE );
+    HDC hdcPrinter = DevOpenDC( lhab, OD_QUEUED, "*", 7L, (PDEVOPENDATA)&dos, NULLHANDLE );
     if ( hdcPrinter == DEV_ERROR ) {
         unlink( tmpps );
         return false;
@@ -391,10 +400,6 @@ bool LucidePrinting::queryCurrentForm( HAB lhab, PHCINFO pcurForm )
     if ( hdcPrinterInfo == DEV_ERROR ) {
         return false;
     }
-
-    //long lTech = 0;
-    //DevQueryCaps( hdcPrinterInfo, CAPS_TECHNOLOGY, sizeof(long), &lTech );
-    //somPrintf( "lTech: 0x%x\n", lTech );
 
     LONG lForms = DevQueryHardcopyCaps( hdcPrinterInfo, 0, 0, NULL );
     if ( lForms == DQHC_ERROR ) {

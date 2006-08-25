@@ -36,6 +36,7 @@
 #define INCL_DOS
 #define INCL_SPL
 #define INCL_SPLDOSPRINT
+#define INCL_DEV
 #include <os2.h>
 
 #include <string>

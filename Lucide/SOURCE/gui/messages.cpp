@@ -100,6 +100,7 @@ const char *FIND_NOT_FOUND      = "FIND_NOT_FOUND";
 const char *GTP_OF = "GTP_OF";
 
 // Printing, other 'print'-related messages
+const char *PD_WRONG_MARGINS            = "PD_WRONG_MARGINS";
 const char *PRINT_PRINTING_PAGE_OF      = "PRINT_PRINTING_PAGE_OF";
 const char *PRINT_GENERATING_POSTSCRIPT = "PRINT_GENERATING_POSTSCRIPT";
 const char *PRINT_SPOOLING_POSTSCRIPT   = "PRINT_SPOOLING_POSTSCRIPT";

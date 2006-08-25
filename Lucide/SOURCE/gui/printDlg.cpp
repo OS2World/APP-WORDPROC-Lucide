@@ -45,6 +45,7 @@
 #include "printDlg.h"
 #include "Lucide_res.h"
 #include "luutils.h"
+#include "messages.h"
 
 
 PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, long _currentpage )
@@ -54,12 +55,15 @@ PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, long _currentpage )
     scalable    = _doc->isScalable( ev );
     fixed       = _doc->isFixedImage( ev );
     currentpage = _currentpage;
+    pcurForm    = new HCINFO;
+    memset( pcurForm, 0, sizeof( HCINFO ) );
     psetup      = new PrintSetup;
     memset( psetup, 0, sizeof( PrintSetup ) );
 }
 
 PrintDlg::~PrintDlg()
 {
+    delete pcurForm;
     delete psetup;
 }
 
@@ -94,6 +98,10 @@ void PrintDlg::setCurrentQInfo( HWND hwnd, PPRQINFO3 q )
     WinSendMsg( hwnd, WM_CONTROL,
                 MPFROM2SHORT( IDC_TYPE_POSTSCRIPT, BN_CLICKED ),
                 MPFROMHWND( WinWindowFromID( hwnd, IDC_TYPE_POSTSCRIPT ) ) );
+
+    WinCheckButton( hwnd, isPortraitOrientation() ? IDC_PORTRAIT : IDC_LANDSCAPE, TRUE );
+
+    applyForm( hwnd );
 }
 
 void PrintDlg::enumQueues( HWND hwnd )
@@ -132,7 +140,7 @@ void PrintDlg::enumQueues( HWND hwnd )
 }
 
 
-void PrintDlg::showJobProperties()
+void PrintDlg::showJobProperties( HWND hwnd )
 {
     if ( psetup->QueueInfo.pszName[0] == 0 ) {
         return;
@@ -167,12 +175,14 @@ void PrintDlg::showJobProperties()
     // user to modify the options
     DevPostDeviceModes( hab, psetup->QueueInfo.pDriverData, achDriverName,
                         achDeviceName, psetup->QueueInfo.pszPrinters, DPDM_POSTJOBPROP );
+
+    WinCheckButton( hwnd, isPortraitOrientation() ? IDC_PORTRAIT : IDC_LANDSCAPE, TRUE );
+    applyForm( hwnd );
 }
 
-bool PrintDlg::isPostscriptDevice()
+HDC PrintDlg::getInfoDC()
 {
     char *achDriverName = new char[ DRIVERNAME_LENGTH ];
-
     // build a devopenstruct for the call to DevOpenDC
     DEVOPENSTRUC *dos   = new DEVOPENSTRUC;
     memset( dos, 0, sizeof( DEVOPENSTRUC ) );
@@ -182,16 +192,232 @@ bool PrintDlg::isPostscriptDevice()
     dos->pszDriverName = achDriverName;                          // 2
     dos->pdriv = psetup->QueueInfo.pDriverData;                  // 3
 
-    long lTech = 0;
     HDC hdcPrinterInfo = DevOpenDC( hab, OD_INFO, "*", 3L, (PDEVOPENDATA)dos, NULLHANDLE );
+
+    delete achDriverName;
+    delete dos;
+
+    return hdcPrinterInfo;
+}
+
+bool PrintDlg::isPostscriptDevice()
+{
+    long lTech = 0;
+    HDC hdcPrinterInfo = getInfoDC();
     if ( hdcPrinterInfo != DEV_ERROR ) {
         DevQueryCaps( hdcPrinterInfo, CAPS_TECHNOLOGY, sizeof(long), &lTech );
         DevCloseDC( hdcPrinterInfo );
     }
-
-    delete achDriverName;
-    delete dos;
     return ( lTech == CAPS_TECH_POSTSCRIPT );
+}
+
+// **************************************************
+// OpenWatcom headers doesn't have these declarations
+// **************************************************
+#ifndef DJP_SJ_ORIENTATION
+typedef struct _djpItem
+{
+    ULONG       cb;
+    ULONG       ulProperty;
+    LONG        lType;
+    ULONG       ulNumReturned;
+    ULONG       ulValue;
+} DJP_ITEM, *PDJP_ITEM;
+
+#define DJP_ALL                 1L
+#define DJP_CURRENT             2L
+#define DJP_NONE                0L
+#define DJP_SJ_ORIENTATION      1L
+
+#define DJP_ORI_PORTRAIT        1L
+#define DJP_ORI_LANDSCAPE       2L
+#define DJP_ORI_REV_PORTRAIT    3L
+#define DJP_ORI_REV_LANDSCAPE   4L
+#endif
+// **************************************************
+
+bool PrintDlg::isPortraitOrientation()
+{
+    bool rVal = true;
+
+    HDC hdcPrinterInfo = getInfoDC();
+    if ( hdcPrinterInfo != DEV_ERROR )
+    {
+        DJP_ITEM djp[ 2 ] = { { 0 } };
+
+        // Get Orientation from Job Properties
+        djp[0].cb = sizeof( DJP_ITEM );
+        djp[0].ulProperty = DJP_SJ_ORIENTATION;
+        djp[0].lType = DJP_CURRENT;
+        djp[0].ulNumReturned = 1;
+        djp[0].ulValue = 1;
+
+        djp[1].cb = sizeof( DJP_ITEM );
+        djp[1].ulProperty = 0;
+        djp[1].lType = DJP_NONE;
+        djp[1].ulNumReturned = 1;
+        djp[1].ulValue = 0;
+
+        LONG outSz = psetup->QueueInfo.pDriverData->cb;
+        LONG rc = DevEscape( hdcPrinterInfo, DEVESC_QUERYJOBPROPERTIES,
+                             sizeof( DJP_ITEM ) * 2, (PCHAR)djp,
+                             &outSz, (PCHAR)psetup->QueueInfo.pDriverData );
+
+        if ( ( rc == DEV_OK ) || ( rc == DEV_WARNING ) )
+        {
+            if ( ( djp[0].lType != DJP_NONE ) &&
+                 ( djp[0].ulProperty == DJP_SJ_ORIENTATION ) &&
+                 ( djp[0].lType > 0 ) )
+            {
+                if ( ( djp[0].ulValue == DJP_ORI_LANDSCAPE ) ||
+                     ( djp[0].ulValue == DJP_ORI_REV_LANDSCAPE ) ) {
+                    rVal = false;
+                }
+            }
+        }
+
+        DevCloseDC( hdcPrinterInfo );
+    }
+
+    return rVal;
+}
+
+
+void PrintDlg::setPortraitOrientation( bool portrait, HWND hwnd )
+{
+    HDC hdcPrinterInfo = getInfoDC();
+    if ( hdcPrinterInfo != DEV_ERROR )
+    {
+        DJP_ITEM djp[ 2 ] = { { 0 } };
+
+        // Set Orientation
+        djp[0].cb = sizeof( DJP_ITEM );
+        djp[0].ulProperty = DJP_SJ_ORIENTATION;
+        djp[0].lType = DJP_CURRENT;
+        djp[0].ulNumReturned = 1;
+        djp[0].ulValue = portrait ? DJP_ORI_PORTRAIT : DJP_ORI_LANDSCAPE;
+
+        djp[1].cb = sizeof( DJP_ITEM );
+        djp[1].ulProperty = 0;
+        djp[1].lType = DJP_NONE;
+        djp[1].ulNumReturned = 1;
+        djp[1].ulValue = 0;
+
+        LONG outSz = psetup->QueueInfo.pDriverData->cb;
+        DevEscape( hdcPrinterInfo, DEVESC_SETJOBPROPERTIES,
+                   sizeof( DJP_ITEM ) * 2, (PCHAR)djp,
+                   &outSz, (PCHAR)psetup->QueueInfo.pDriverData );
+
+        DevCloseDC( hdcPrinterInfo );
+
+        applyForm( hwnd );
+    }
+}
+
+
+bool PrintDlg::queryCurrentForm()
+{
+    HDC hdcPrinterInfo = getInfoDC();
+    if ( hdcPrinterInfo == DEV_ERROR ) {
+        return false;
+    }
+
+    LONG lForms = DevQueryHardcopyCaps( hdcPrinterInfo, 0, 0, NULL );
+    if ( lForms == DQHC_ERROR ) {
+        DevCloseDC( hdcPrinterInfo );
+        return false;
+    }
+
+    HCINFO *forms = new HCINFO[ lForms ];
+    memset( forms, 0, sizeof( HCINFO ) * lForms );
+    lForms = DevQueryHardcopyCaps( hdcPrinterInfo, 0, lForms, forms );
+    if ( lForms == DQHC_ERROR ) {
+        delete forms;
+        DevCloseDC( hdcPrinterInfo );
+        return false;
+    }
+
+    for ( LONG i = 0; i < lForms; i++ ) {
+        if ( forms[i].flAttributes & HCAPS_CURRENT ) {
+            memcpy( pcurForm, &( forms[i] ), sizeof( HCINFO ) );
+            break;
+        }
+    }
+
+    delete forms;
+    DevCloseDC( hdcPrinterInfo );
+    return true;
+}
+
+void PrintDlg::applyForm( HWND hwnd )
+{
+    if ( queryCurrentForm() )
+    {
+        WinSetDlgItemText( hwnd, IDC_SELECTED_FORM, pcurForm->szFormname );
+
+        long margin_top_min    = pcurForm->cy - pcurForm->yTopClip;
+        long margin_left_min   = pcurForm->xLeftClip;
+        long margin_bottom_min = pcurForm->yBottomClip;
+        long margin_right_min  = pcurForm->cx - pcurForm->xRightClip;
+
+        long margin_top_max    = pcurForm->cy - margin_bottom_min;
+        long margin_left_max   = pcurForm->cx - margin_right_min;
+        long margin_bottom_max = pcurForm->cy - margin_top_min;
+        long margin_right_max  = pcurForm->cx - margin_left_min;
+
+        WinSendDlgItemMsg( hwnd, IDC_MTOP, SPBM_SETLIMITS,
+                           MPFROMLONG( margin_top_max ), MPFROMLONG( margin_top_min ) );
+        WinSendDlgItemMsg( hwnd, IDC_MTOP, SPBM_SETCURRENTVALUE,
+                           MPFROMLONG( margin_top_min ), MPVOID );
+        WinSendDlgItemMsg( hwnd, IDC_MLEFT, SPBM_SETLIMITS,
+                           MPFROMLONG( margin_left_max ), MPFROMLONG( margin_left_min ) );
+        WinSendDlgItemMsg( hwnd, IDC_MLEFT, SPBM_SETCURRENTVALUE,
+                           MPFROMLONG( margin_left_min ), MPVOID );
+        WinSendDlgItemMsg( hwnd, IDC_MBOTTOM, SPBM_SETLIMITS,
+                           MPFROMLONG( margin_bottom_max ), MPFROMLONG( margin_bottom_min ) );
+        WinSendDlgItemMsg( hwnd, IDC_MBOTTOM, SPBM_SETCURRENTVALUE,
+                           MPFROMLONG( margin_bottom_min ), MPVOID );
+        WinSendDlgItemMsg( hwnd, IDC_MRIGHT, SPBM_SETLIMITS,
+                           MPFROMLONG( margin_right_max ), MPFROMLONG( margin_right_min ) );
+        WinSendDlgItemMsg( hwnd, IDC_MRIGHT, SPBM_SETCURRENTVALUE,
+                           MPFROMLONG( margin_right_min ), MPVOID );
+
+        //somPrintf( "cx %d, cy %d, xLeftClip %d, yBottomClip %d, xRightClip %d, yTopClip %d\n",
+        //           pcurForm->cx, pcurForm->cy, pcurForm->xLeftClip, pcurForm->yBottomClip,
+        //           pcurForm->xRightClip, pcurForm->yTopClip );
+
+    }
+    else {
+        WinSetDlgItemText( hwnd, IDC_SELECTED_FORM, "" );
+    }
+}
+
+
+// do not allow round-trip on spins
+static MRESULT EXPENTRY spinProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
+{
+    PFNWP oldSpinProc = (PFNWP)WinQueryWindowULong( hwnd, QWL_USER );
+
+    if ( msg == SPBM_SPINDOWN )
+    {
+        LONG upLimit = 0, lowLimit = 0, curVal = 0;
+        WinSendMsg( hwnd, SPBM_QUERYLIMITS, MPFROMP( &upLimit ), MPFROMP( &lowLimit ) );
+        WinSendMsg( hwnd, SPBM_QUERYVALUE, MPFROMP( &curVal ), MPFROM2SHORT( 0, SPBQ_DONOTUPDATE ) );
+        if ( curVal <= lowLimit ) {
+            return (MRESULT)TRUE;
+        }
+    }
+    else if ( msg == SPBM_SPINUP )
+    {
+        LONG upLimit = 0, lowLimit = 0, curVal = 0;
+        WinSendMsg( hwnd, SPBM_QUERYLIMITS, MPFROMP( &upLimit ), MPFROMP( &lowLimit ) );
+        WinSendMsg( hwnd, SPBM_QUERYVALUE, MPFROMP( &curVal ), MPFROM2SHORT( 0, SPBQ_DONOTUPDATE ) );
+        if ( curVal >= upLimit ) {
+            return (MRESULT)TRUE;
+        }
+    }
+
+    return oldSpinProc( hwnd, msg, mp1, mp2 );
 }
 
 MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
@@ -229,8 +455,27 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
             WinSendDlgItemMsg( hwnd, IDC_PGTO, SPBM_SETCURRENTVALUE,
                                MPFROMLONG( pages ), MPVOID );
 
+            // Number of copies
+            WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_SETLIMITS,
+                               MPFROMLONG( 999 ), MPFROMLONG( 1 ) );
+            WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_SETCURRENTVALUE,
+                               MPFROMLONG( 1 ), MPVOID );
+
             // Enum printer queues
             _this->enumQueues( hwnd );
+
+            HWND spin = WinWindowFromID( hwnd, IDC_MLEFT );
+            PFNWP proc = WinSubclassWindow( spin, spinProc );
+            WinSetWindowULong( spin, QWL_USER, (ULONG)proc );
+            spin = WinWindowFromID( hwnd, IDC_MRIGHT );
+            proc = WinSubclassWindow( spin, spinProc );
+            WinSetWindowULong( spin, QWL_USER, (ULONG)proc );
+            spin = WinWindowFromID( hwnd, IDC_MTOP );
+            proc = WinSubclassWindow( spin, spinProc );
+            WinSetWindowULong( spin, QWL_USER, (ULONG)proc );
+            spin = WinWindowFromID( hwnd, IDC_MBOTTOM );
+            proc = WinSubclassWindow( spin, spinProc );
+            WinSetWindowULong( spin, QWL_USER, (ULONG)proc );
 
             return (MRESULT)FALSE;
         }
@@ -241,8 +486,6 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
             {
                 case IDC_PNAME:
                 {
-                    //somPrintf( "IDC_PNAME: %d\n", SHORT2FROMMP(mp1) );
-
                     if ( SHORT2FROMMP(mp1) == CBN_LBSELECT )
                     {
                         SHORT rc = (SHORT)WinSendDlgItemMsg( hwnd, IDC_PNAME, LM_QUERYSELECTION,
@@ -277,6 +520,14 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                 }
                 break;
 
+                case IDC_PORTRAIT:
+                case IDC_LANDSCAPE:
+                {
+                    bool portrait = WinQueryButtonCheckstate( hwnd, IDC_PORTRAIT );
+                    _this->setPortraitOrientation( portrait, hwnd );
+                }
+                break;
+
             }
         }
         break;
@@ -285,11 +536,36 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
             switch (SHORT1FROMMP(mp1))
             {
                 case IDC_JOBPROPERTIES:
-                    _this->showJobProperties();
+                    _this->showJobProperties( hwnd );
                     return (MRESULT)FALSE;
 
                 case DID_OK:
                     {
+                        long ml = 0, mr = 0, mt = 0, mb = 0;
+                        WinSendDlgItemMsg( hwnd, IDC_MLEFT, SPBM_QUERYVALUE, MPFROMP( &ml ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                        WinSendDlgItemMsg( hwnd, IDC_MRIGHT, SPBM_QUERYVALUE, MPFROMP( &mr ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                        WinSendDlgItemMsg( hwnd, IDC_MTOP, SPBM_QUERYVALUE, MPFROMP( &mt ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                        WinSendDlgItemMsg( hwnd, IDC_MBOTTOM, SPBM_QUERYVALUE, MPFROMP( &mb ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+
+                        if ( ( _this->pcurForm->cx < ( ml + mr ) ) ||
+                             ( _this->pcurForm->cy < ( mt + mb ) ) )
+                        {
+                            char *wrongmargins = newstrdupL( PD_WRONG_MARGINS );
+                            WinMessageBox( HWND_DESKTOP, _this->hFrame, wrongmargins, NULL,
+                                           1, MB_OK | MB_ERROR | MB_MOVEABLE );
+                            delete wrongmargins;
+                            return (MRESULT)FALSE;  // Return, don't leave dialog
+                        }
+
+                        _this->psetup->margin_left   = ml;
+                        _this->psetup->margin_right  = mr;
+                        _this->psetup->margin_top    = mt;
+                        _this->psetup->margin_bottom = mb;
+
+                        LONG cp = 0;
+                        WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_QUERYVALUE, MPFROMP( &cp ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                        _this->psetup->copies = cp;
+
                         _this->psetup->range = RangeAll;
                         _this->psetup->pgfrom = 1;
                         _this->psetup->pgto = _this->doc->getPageCount( ev );
