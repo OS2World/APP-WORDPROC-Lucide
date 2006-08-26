@@ -111,21 +111,26 @@ static char savedZeText[ 255 ] = "";
 // Zoom entryfield window proc
 static MRESULT EXPENTRY zeProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
+    char tmp[ 255 ] = "";
+
     switch ( msg )
     {
+
+        // clear field on click
+        case WM_BUTTON1CLICK:
+        {
+            WinQueryWindowText( hwnd, sizeof( tmp ), tmp );
+            if ( strlen( tmp ) > 0 ) {
+                strcpy( savedZeText, tmp );
+            }
+            WinSetWindowText( hwnd, "" );
+        }
+        break;
+
+        // restore text if empty when losing focus
         case WM_SETFOCUS:
         {
-            char tmp[ 255 ] = "";
-
-            if ( SHORT1FROMMP( mp2 ) )
-            {
-                WinQueryWindowText( hwnd, sizeof( tmp ), tmp );
-                if ( strlen( tmp ) > 0 ) {
-                    strcpy( savedZeText, tmp );
-                }
-                WinSetWindowText( hwnd, "" );
-            }
-            else
+            if ( !SHORT1FROMMP( mp2 ) )
             {
                 WinQueryWindowText( hwnd, sizeof( tmp ), tmp );
                 if ( strlen( tmp ) == 0 ) {
@@ -134,6 +139,7 @@ static MRESULT EXPENTRY zeProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             }
         }
         break;
+
     }
     return pOldZeProc( hwnd, msg, mp1, mp2 );
 }

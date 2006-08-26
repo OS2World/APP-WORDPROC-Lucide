@@ -1,3 +1,15 @@
+Beta-3:
+  - Added basic printing features, you may print documents as image or
+    as postscript on postscript-capable printers.
+  - Fixed scrolling problem introduced in beta2 (closed tickets #53, #56, #64).
+  - Drawing fixes and improvements (closed ticket #69).
+  - Added 'Go to page' dialog, 'Save As...' menuitem works.
+  - Djvu plugin improvements, get rid of ddjvuapi.dll.
+  - Ability to compile plugins with gcc.
+  - Fixes for font substitution (closed ticket #70).
+  - NLS-files updates.
+  
+
 Beta-2:
   - Avoided using of fontconfig library, created replacement, testing
     needed (closed tickets #30, #32, #35).
