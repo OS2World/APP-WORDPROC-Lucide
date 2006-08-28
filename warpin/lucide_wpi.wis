@@ -11,7 +11,7 @@
 <HEAD>
 
 <PCK INDEX=1
-     PACKAGEID="netlabs.org\Lucide\Lucide core\1\2\0"
+     PACKAGEID="netlabs.org\Lucide\Lucide core\0\9\3"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
      BASE
      TITLE="Lucide Document Viewer"
@@ -77,9 +77,9 @@ at netlabs.org, you need an eComStation account to get it.
 <BR>
 Features:
 <UL>
-  <LI>PDF, DjVU & JPEG Support
-  <LI>Drag & Drop Support
-  <LI>Fast & small
+  <LI>PDF, DjVand JPEG Support
+  <LI>Draand Drop Support
+  <LI>Fast and small
 </UL>
 <P>
 <BR>
