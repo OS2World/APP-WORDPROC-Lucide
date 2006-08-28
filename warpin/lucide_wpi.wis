@@ -23,7 +23,7 @@
      >This package contains the Lucide Document Viewer.</PCK>
 
 <PCK INDEX=2
-     PACKAGEID="netlabs.org\Lucide\Lucide plugin PDF\1\0\0"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin PDF\0\9\3"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
      TITLE="Lucide PDF plugin"
      REQUIRES=1
@@ -31,7 +31,7 @@
      >This package contains a plugin to view PDF documents.</PCK>
 
 <PCK INDEX=3
-     PACKAGEID="netlabs.org\Lucide\Lucide plugin DJVU\1\0\0"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin DJVU\0\9\3"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
      TITLE="Lucide DjVu plugin"
      REQUIRES=1
@@ -39,7 +39,7 @@
      >This package contains a plugin to view DJVU files.</PCK>
 
 <PCK INDEX=4
-     PACKAGEID="netlabs.org\Lucide\Lucide plugin JPEG\1\0\0"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin JPEG\0\9\3"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
      TITLE="Lucide JPEG plugin"
      REQUIRES=1
@@ -111,7 +111,7 @@ http://svn.netlabs.org/lucide/ for more information and source code.
 <PAGE INDEX=3 TYPE=CONTAINER>
 <NEXTBUTTON TARGET=4>~Next</NEXTBUTTON>
 <TEXT>
-Please select the packages which are to be installed. You may change the target paths for the packages. Select either English or German GBMV2 package. Don't select both.
+Please select the packages which are to be installed. You may change the target paths for the packages. 
 </TEXT>
 </PAGE>
 
