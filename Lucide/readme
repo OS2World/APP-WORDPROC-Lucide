@@ -23,11 +23,8 @@ The DJVU plugin requires Innotek LIBC:
 
     ftp://ftp.netlabs.org/pub/gcc/libc-0.6.1-csd1.zip
 
+PostScript printing requires PostScript-capable printer (pscript.drv).
 
-:: Limitations & Bugs ::
-
- - Printing is not yet implemented
- - Some menuitems do not work
 
 To see a full list of features and enhancements consult the Lucide TRAC at:
 

@@ -19,6 +19,7 @@ MENU_COPY=Kopiera\tCtrl+Insert
 MENU_SELECT_ALL=V„lj allt\tCtrl+/
 MENU_FIND=Finn...\tCtrl+F
 MENU_FINDAGAIN=Finn igen\tCtrl+G
+MENU_SETTINGS=~Inst„llningar
 MENU_FIRST_PAGE=F”rsta sidan
 MENU_PREV_PAGE=F”reg†ende sida\t-
 MENU_NEXT_PAGE=N„sta sida\t+
@@ -34,6 +35,7 @@ MENU_SHOW_NAV_PANE=Visa navigationspanel
 MENU_SINGLE_PAGE=Enstaka sida
 MENU_CONTINUOUS=Kontinuerlig
 MENU_WINDOW=~F”nster
+MENU_MAXVIEW=~Maximerad visning\tF11
 MENU_FULLSCREEN=Fullsk„rm\tCtrl+L
 MENU_HELP=~Hj„lp
 MENU_PRODUCT_INFORMATION=Produktinformation
@@ -52,7 +54,7 @@ TBHINT_ACTUAL_SIZE=Verklig storlek
 TBHINT_FIT_WINDOW=Passa f”nster
 TBHINT_FIT_WIDTH=Passa bredd
 TBHINT_FIND=Finn...
-#? TBHINT_FINDAGAIN=Find again
+TBHINT_FINDAGAIN=Finn igen
 # toolbar's page number
 TB_PAGENUM=av %d
 
@@ -62,6 +64,11 @@ TB_PAGENUM=av %d
 MSGS_MAIN_WIN_TITLE=Lucide - Dokumentvisare
 MSGS_NO_SUIT_PLUG=Kan inte hitta n†gon l„mplig plugin f”r specificerat dokument!
 MSGS_FILE_LOAD_ERROR=Filladdningsfel!
+MSGS_LOADING_DOCUMENT=Laddar dokument, var v„nlig v„nta...
+MSGS_WARNING=Varning!
+MSGS_OVERWRITE_FILE=Filen existerar redan. Skriv ”ver?
+MSGS_FILE_SAVE_ERROR=Fel vid sparande av fil!
+MSGS_PAGE=Sida
 
 #
 # "Plugins list" dialog
@@ -83,6 +90,10 @@ FONTINFO_ENUMERATING=R„knar upp fonter, var v„nlig v„nta...
 FONTINFO_NAME=Namn
 FONTINFO_TYPE=Typ
 FONTINFO_EMBEDDED=Inb„ddad?
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=Inte inb„ddad
+FONTINFO_EMBED_EMBEDDED=Inb„ddad
+FONTINFO_EMBED_EMBEDDED_SUBSET=Delvis inb„ddad
 
 #
 # "Document info" dialog
@@ -122,5 +133,63 @@ PDLG_CANCEL=~Avbryt
 # About dialog
 #
 AD_ABOUT=Om
+AD_DESCRIPTION=Plugin-baserad dokumentvisare med st”d f”r diverse filformat
 AD_COPYRIGHTS=(c) 2006 f”r Eugene Romanenko, netlabs.org i samarbete med Serenity Systems International
 AD_OK=OK
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Inst„llningar
+SD_DEFAULT_PAGE_LAYOUT=Standard ~sidolayout
+SD_DEFAULT_ZOOM=Standard ~zoom
+SD_SINGLE_PAGE=Enstaka sida
+SD_CONTINUOUS=Kontinuerlig
+SD_OK=~OK
+SD_CANCEL=~Avbryt
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=G† till sidan
+GTP_PAGE=Sidan
+GTP_OF=av %d
+GTP_OK=~OK
+GTP_CANCEL=~Avbryt
+
+#
+# Print dialog
+#
+PD_TITLE=Skriv ut
+PD_PRINTER=Skrivare
+PD_NAME_LABEL=~Namn
+PD_JOB_PROPERTIES=~Jobbegenskaper
+PD_DRIVER_LABEL=Drivrutin
+PD_PRINT_RANGE_AND_COPIES=Utskrifts~omr†de och kopior
+PD_RANGE_ALL=~Alla
+PD_RANGE_CURRENT_PAGE=A~ktuell sida
+PD_RANGE_PAGES=Si~dor
+PD_FROM=~Fr†n
+PD_TO=~Till
+PD_NUMBER_OF_COPIES=~Antal kopior
+PD_PRINT_TYPE=Utskriftstyp
+PD_TYPE_POSTSCRIPT=Post~script
+PD_TYPE_ASIMAGE=Som b~ild
+PD_HIGHER_IMAGE_QUALITY=~H”gre bildkvalit‚ (l†ngsammare och kr„ver mer minne)
+PD_PAGE_ORIENTATION=Sidorientering
+PD_PORTRAIT=Portr„tt
+PD_LANDSCAPE=Landskap
+PD_MARGINS=Marginaler (mm)
+PD_MLEFT=V„nster
+PD_MRIGHT=H”ger
+PD_MTOP=Topp
+PD_MBOTTOM=Botten
+PD_SELECTED_FORM=V„lj format
+PD_BTNPRINT=~Skriv ut
+PD_BTNCANCEL=~Avbryt
+PD_WRONG_MARGINS=Fel marginaler!
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=Skriver ut sidan %d av %d...
+PRINT_GENERATING_POSTSCRIPT=Skapar postscriptfil...
+PRINT_SPOOLING_POSTSCRIPT=Spoolar postscriptdata...
+PRINT_FAILED=Utskrift misslyckades!
