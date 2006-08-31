@@ -9,42 +9,144 @@
 <!-- Every .WPI archive contains one or more packages. -->
 
 <HEAD>
-
+<TITLE>=("title")</TITLE>
+<REXX NAME=title>
+Call Rxfuncadd 'SysLoadFuncs','RexxUtil','SysLoadFuncs'
+Call SysLoadFuncs
+/* get boot drive language */
+_lang = Value('lang',,'os2environment')
+_id = Translate(Left(_lang,2))
+If _id = 'ZH' Then Do
+ _id = Translate(Substr(_lang,3,2))
+ If _id = 'CN' Then _id = 'CX'
+End
+Select
+ When _id = 'DE' Then Do
+  _title = 'Lucide - Document Viewer'
+  _folder = 'Lucide for eCS'
+  _prog = 'Lucide'
+  _readme = 'Lucide Readme'
+  _change = 'Lucide Change Log'
+  _plug_pdf = 'Lucide PDF plugin'
+  _plug_djvu = 'Lucide DjVu plugin'
+  _plug_jpeg = 'Lucide JPEG plugin'
+ End
+ When _id = 'NL' Then Do 
+  _title = 'Lucide - Document Bekijker'
+  _folder = 'Lucide for eCS'
+  _prog = 'Lucide'
+  _readme = 'Lucide Readme'
+  _change = 'Lucide Change Log'
+  _plug_pdf = 'Lucide PDF plugin'
+  _plug_djvu = 'Lucide DjVu plugin'
+  _plug_jpeg = 'Lucide JPEG plugin'
+ End
+ When _id = 'FR' Then Do
+  _title = 'Lucide - Afficheur de document'
+  _folder = 'Lucide for eCS'
+  _prog = 'Lucide'
+  _readme = 'Lucide Readme'
+  _change = 'Lucide Change Log'
+  _plug_pdf = 'Lucide PDF plugin'
+  _plug_djvu = 'Lucide DjVu plugin'
+  _plug_jpeg = 'Lucide JPEG plugin'
+ End
+ When _id = 'SV' Then Do
+  _title = 'Lucide - Dokumentvisare'
+  _folder = 'Lucide for eCS'
+  _prog = 'Lucide'
+  _readme = 'Lucide Readme'
+  _change = 'Lucide Change Log'
+  _plug_pdf = 'Lucide PDF plugin'
+  _plug_djvu = 'Lucide DjVu plugin'
+  _plug_jpeg = 'Lucide JPEG plugin'
+ End
+ Otherwise Do
+  _title = 'Lucide - Document Viewer'
+  _folder = 'Lucide for eCS'
+  _prog = 'Lucide'
+  _readme = 'Lucide Readme'
+  _change = 'Lucide Change Log'
+  _plug_pdf = 'Lucide PDF plugin'
+  _plug_djvu = 'Lucide DjVu plugin'
+  _plug_jpeg = 'Lucide JPEG plugin'
+ End
+End
+rc = WirexxPutEnv('title',_title)
+rc = WirexxPutEnv('folder',_folder)
+rc = WirexxPutEnv('prog',_prog)
+rc = WirexxPutEnv('readme',_readme)
+rc = WirexxPutEnv('change',_change)
+rc = WirexxPutEnv('plug_pdf',_plug_pdf)
+rc = WirexxPutEnv('plug_djvu',_plug_djvu)
+rc = WirexxPutEnv('plug_jpeg',_plug_jpeg)
+Return _title
+</REXX>
+<REXX NAME=folder>
+Return WirexxGetEnv('folder')
+</REXX>
+<REXX NAME=prog>
+ans = WirexxShowMessage(WirexxGetEnv('title'),'Make Lucide the default program for PDF files?','0004'x)
+If ans = 6 Then Do
+ /* clear any previous associations */
+ Call SysIni 'USER','PMWP_ASSOC_FILTER','*.PDF','DELETE:'
+ Call SysIni 'USER','PMWP_ASSOC_FILTER','*PDF','DELETE:'
+ Call SysIni 'USER','PMWP_ASSOC_TYPE','Acrobat Document','DELETE:'
+End
+Return WirexxGetEnv('prog')
+</REXX>
+<REXX NAME=readme>
+Return WirexxGetEnv('readme')
+</REXX>
+<REXX NAME=change>
+Return WirexxGetEnv('change')
+</REXX>
+<REXX NAME=plug_pdf>
+Return WirexxGetEnv('plug_pdf')
+</REXX>
+<REXX NAME=plug_djvu>
+Return WirexxGetEnv('plug_djvu')
+</REXX>
+<REXX NAME=plug_jpeg>
+Return WirexxGetEnv('plug_jpeg')
+</REXX>
 <PCK INDEX=1
      PACKAGEID="netlabs.org\Lucide\Lucide core\0\9\3"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
      BASE
-     TITLE="Lucide Document Viewer"
-     CREATEOBJECT="WPFolder|Lucide for eCS|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;"
-     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU'
-     CREATEOBJECT='WPProgram|Lucide Readme|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;PROGTYPE=PM;PARAMETERS="$(1)\readme";STARTUPDIR=$(1);'
-     CREATEOBJECT='WPProgram|Lucide Changelog|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;PROGTYPE=PM;PARAMETERS="$(1)\changelog";STARTUPDIR=$(1);'
+     TITLE="=("title")"
+     CREATEOBJECT="WPFolder|=("folder")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;"
+     CREATEOBJECT="REPLACE WPProgram|=("prog")|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;"
+     CREATEOBJECT="REPLACE WPProgram|=("readme")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;PROGTYPE=PM;PARAMETERS="$(1)\readme";STARTUPDIR=$(1);"
+     CREATEOBJECT="REPLACE WPProgram|=("change")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;PROGTYPE=PM;PARAMETERS="$(1)\changelog";STARTUPDIR=$(1);"
+     WRITEPROFILE="USER\Lucide\Path|$(1)"
+     CLEARPROFILE="USER\Lucide\Path"
      SELECT
-     >This package contains the Lucide Document Viewer.</PCK>
+     >=("title").</PCK>
 
 <PCK INDEX=2
      PACKAGEID="netlabs.org\Lucide\Lucide plugin PDF\0\9\3"
-     TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
-     TITLE="Lucide PDF plugin"
+     TARGET="$(1)"
+     TITLE="=("plug_pdf")"
      REQUIRES=1
      SELECT | FIXED
-     >This package contains a plugin to view PDF documents.</PCK>
+     >=("plug_pdf")</PCK>
 
 <PCK INDEX=3
      PACKAGEID="netlabs.org\Lucide\Lucide plugin DJVU\0\9\3"
-     TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
-     TITLE="Lucide DjVu plugin"
+     TARGET="$(1)"
+     TITLE="=("plug_djvu")"
      REQUIRES=1
      SELECT | FIXED
-     >This package contains a plugin to view DJVU files.</PCK>
+     >=("plug_djvu")</PCK>
 
 <PCK INDEX=4
      PACKAGEID="netlabs.org\Lucide\Lucide plugin JPEG\0\9\3"
-     TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
-     TITLE="Lucide JPEG plugin"
+     TARGET="$(1)"
+     TITLE="=("plug_jpeg")"
      REQUIRES=1
      SELECT | FIXED
-     >This package contains a plugin to view JPEG images.</PCK>
+     >=("plug_jpeg")</PCK>
 
 </HEAD>
 
@@ -77,8 +179,8 @@ at netlabs.org, you need an eComStation account to get it.
 <BR>
 Features:
 <UL>
-  <LI>PDF, DjVU and JPEG Support
-  <LI>Drag and Drop Support
+  <LI>PDF, DjVand JPEG Support
+  <LI>Draand Drop Support
   <LI>Fast and small
 </UL>
 <P>
