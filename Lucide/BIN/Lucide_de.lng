@@ -1,6 +1,6 @@
 #
 # Lucide language file, DE
-#
+# (for Beta 3)
 
 #
 # Main menu
@@ -90,6 +90,10 @@ FONTINFO_ENUMERATING=ZÑhle Schriften, bitte warten...
 FONTINFO_NAME=Name
 FONTINFO_TYPE=Typ
 FONTINFO_EMBEDDED=Eingebettet?
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=Nein
+FONTINFO_EMBED_EMBEDDED=Ja
+FONTINFO_EMBED_EMBEDDED_SUBSET=Teilweise
 
 #
 # "Document info" dialog
@@ -117,7 +121,7 @@ FIND_OK=~OK
 FIND_CANCEL=~Abbruch
 # other 'find'-related messages
 FIND_SEARCH_PAGE_OF=Durchsuche Seite %d von %d...
-FIND_NOT_FOUND=Nicht gefunden!
+FIND_NOT_FOUND=Suchbegriff nicht gefunden!
 
 #
 # "Progress" dialog
@@ -161,19 +165,29 @@ PD_PRINTER=Drucker
 PD_NAME_LABEL=~Name
 PD_JOB_PROPERTIES=~Job-Eigenschaften
 PD_DRIVER_LABEL=Treiber
-#? PD_PRINT_RANGE_AND_COPIES=Print ~range and copies
+PD_PRINT_RANGE_AND_COPIES=D~uckbereich und Kopien
 PD_RANGE_ALL=A~lles
 PD_RANGE_CURRENT_PAGE=A~ktuelle Seite
 PD_RANGE_PAGES=Sei~ten
 PD_FROM=~Von
 PD_TO=B~is
-#? PD_NUMBER_OF_COPIES=~Number of copies
+PD_NUMBER_OF_COPIES=An~zahl Kopien
 PD_PRINT_TYPE=Druckformat
 PD_TYPE_POSTSCRIPT=Post~script
 PD_TYPE_ASIMAGE=Als ~Bild
 PD_HIGHER_IMAGE_QUALITY=~Hîhere BildqualitÑt (langsamer, benîtigt mehr Speicher)
+PD_PAGE_ORIENTATION=Seitenausrichtung
+PD_PORTRAIT=H~ochformat
+PD_LANDSCAPE=~Querformat
+PD_MARGINS=SeitenrÑnder (mm)
+PD_MLEFT=Links
+PD_MRIGHT=Rechts
+PD_MTOP=Oben
+PD_MBOTTOM=Unten
+PD_SELECTED_FORM=AusgewÑhltes Papierformat:
 PD_BTNPRINT=~Drucken
 PD_BTNCANCEL=~Abbruch
+PD_WRONG_MARGINS=UngÅltige SeitenrÑnder!
 # other 'print'-related messages
 PRINT_PRINTING_PAGE_OF=Drucke Seite %d von %d...
 PRINT_GENERATING_POSTSCRIPT=Erzeuge Postscript-Datei...
