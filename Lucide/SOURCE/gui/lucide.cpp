@@ -226,7 +226,6 @@ void Lucide::checkMenus()
                     MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
 
         WinEnableMenuItem( hWndMenu, CM_SAVEAS, FALSE );
-        WinEnableMenuItem( hWndMenu, CM_PAGESETUP, FALSE );
         WinEnableMenuItem( hWndMenu, CM_PRINT, FALSE );
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_PRINT), (MPARAM)FALSE );
         WinEnableMenuItem( hWndMenu, CM_DOCINFO, FALSE );
