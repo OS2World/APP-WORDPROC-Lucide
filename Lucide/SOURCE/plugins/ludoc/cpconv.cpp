@@ -243,22 +243,98 @@ static void convSpchars( UniChar *uni )
             case 0x2018:
             case 0x2019:
             case 0x2032:
-                *uni = 0x0027;
+                *uni = 0x0027; // '
                 break;
             case 0x201C:
             case 0x201D:
             case 0x00AB:
             case 0x00BB:
-                *uni = 0x0022;
+                *uni = 0x0022; // "
                 break;
             case 0x2014:
-                *uni = 0x002D;
+                *uni = 0x002D; // -
                 break;
         }
         *uni++;
     }
 }
 
+
+// Ligatures table
+struct Ligature { UniChar unicode;  wchar_t *equivalent;  int equivalentLength; };
+
+// Table from [http://en.wikipedia.org/wiki/Ligature_(typography)#Unicode]
+#define NUM_LIGATURES   38
+static Ligature ligatures[ NUM_LIGATURES ] = {
+    { 0x00DF, L"fs",  2 }, { 0x00E6, L"AE",  2 }, { 0x00C6, L"ae",  2 },
+    { 0x0152, L"OE",  2 }, { 0x0153, L"oe",  2 }, { 0x0276, L"oe",  2 },
+    { 0x0132, L"IJ",  2 }, { 0x0133, L"ij",  2 }, { 0x014A, L"Ng",  2 },
+    { 0x014B, L"ng",  2 }, { 0x01F6, L"Hv",  2 }, { 0x0195, L"hv",  2 },
+    { 0x01C4, L"DZ",  2 }, { 0x01C5, L"Dz",  2 }, { 0x01C6, L"dz",  2 },
+    { 0x01C7, L"LJ",  2 }, { 0x01C8, L"Lj",  2 }, { 0x01C9, L"lj",  2 },
+    { 0x01CA, L"NJ",  2 }, { 0x01CB, L"Nj",  2 }, { 0x01CC, L"nj",  2 },
+    { 0x01F1, L"DZ",  2 }, { 0x01F2, L"Dz",  2 }, { 0x01F3, L"dz",  2 },
+    { 0x02A3, L"dz",  2 }, { 0x02A6, L"ts",  2 }, { 0x02A9, L"fng", 3 },
+    { 0x02AA, L"ls",  2 }, { 0x02AB, L"lz",  2 }, { 0x02AC, L"ww",  2 },
+    { 0x1D6B, L"ue",  2 }, { 0xFB00, L"ff",  2 }, { 0xFB01, L"fi",  2 },
+    { 0xFB02, L"fl",  2 }, { 0xFB03, L"ffi", 3 }, { 0xFB04, L"ffl", 3 },
+    { 0xFB05, L"ft",  2 }, { 0xFB06, L"st",  2 }
+};
+
+// If unichar is ligature - returns number of additional chars
+// which replaces the ligature, zero otherwise.
+inline int isLigature( UniChar ch )
+{
+    for ( int i = 0; i < NUM_LIGATURES; i++ ) {
+        if ( ch == ligatures[ i ].unicode ) {
+            return ligatures[ i ].equivalentLength - 1;
+        }
+    }
+    return 0;
+}
+
+// If unichar is ligature - returns pointer to struct Ligature
+// which contains replacement for ligature, NULL otherwise.
+inline Ligature *getReplLigature( UniChar ch )
+{
+    for ( int i = 0; i < NUM_LIGATURES; i++ ) {
+        if ( ch == ligatures[ i ].unicode ) {
+            return &( ligatures[ i ] );
+        }
+    }
+    return NULL;
+}
+
+// Return number of chars which should be added to string
+// length to fit the string with converted ligatures.
+// If no ligatures in string - returns zero.
+static int ligaturesLength( UniChar *str )
+{
+    int llen = 0;
+    while ( *str != 0 ) {
+        llen += isLigature( *str++ );
+    }
+    return llen;
+}
+
+// replaces ligatures in src into dst
+// src remains unchanged
+static void replLigatures( UniChar *src, UniChar *dst )
+{
+    while ( *src != 0 )
+    {
+        Ligature *lig = getReplLigature( *src );
+        if ( lig == NULL ) {
+            *dst++ = *src++;
+        }
+        else {
+            for ( int i = 0; i < lig->equivalentLength; i++ ) {
+                *dst++ = lig->equivalent[ i ];
+            }
+            *src++;
+        }
+    }
+}
 
 extern "C" LONG APIENTRY cnvUTF8ToSys( const char **in, unsigned *in_left,
                                        char **out, unsigned *out_left )
@@ -271,6 +347,16 @@ extern "C" LONG APIENTRY cnvUTF8ToSys( const char **in, unsigned *in_left,
     cnvUTF8ToUni( in, in_left, &uni, &ulen );
     uni = savuni;
     ulen = savulen;
+    int liglen = ligaturesLength( (UniChar *)uni );
+    if ( liglen > 0 )  // string contain ligature(s)
+    {
+        unsigned ulen_tmp = ulen + ( liglen * 2 );
+        char *uni_tmp = new char[ ulen_tmp ];
+        replLigatures( (UniChar *)uni, (UniChar *)uni_tmp );
+        delete uni;
+        uni = uni_tmp;
+        ulen = ulen_tmp;
+    }
     convSpchars( (UniChar *)uni );
     cpconv c( 1200 );
     LONG rc = c.conv( (const char **)&uni, &ulen, out, out_left );
