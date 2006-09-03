@@ -21,12 +21,12 @@
  * Alternatively, the contents of this file may be used under the terms of
  * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
  * in which case the provisions of the LGPL are applicable instead of those
- * above. If you wish to allow use of your version of this file only under the 
+ * above. If you wish to allow use of your version of this file only under the
  * terms of the LGPL, and not to allow others to use your version of this file
  * under the terms of the CDDL, indicate your decision by deleting the
  * provisions above and replace them with the notice and other provisions
  * required by the LGPL. If you do not delete the provisions above, a recipient
- * may use your version of this file under the terms of any one of the CDDL 
+ * may use your version of this file under the terms of any one of the CDDL
  * or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
@@ -134,8 +134,9 @@ static void loadLng( map<string,string> *array, const char *file, bool exitOnErr
     }
 }
 
-static const char *lfilespec1 = "%sLUCIDE_%s.LNG";
-static const char *lfilespec2 = "%sLUCIDE.LNG";
+static const char *lfilespec1 = "%sLUCIDE_%s_%s.LNG";
+static const char *lfilespec2 = "%sLUCIDE_%s.LNG";
+static const char *lfilespec3 = "%sLUCIDE.LNG";
 
 void loadLang()
 {
@@ -155,12 +156,12 @@ void loadLang()
 
     afbuf lfile( _MAX_PATH );
 
-    snprintf( lfile.buffer, lfile.getSize(), lfilespec1, appdir, "EN" );
+    snprintf( lfile.buffer, lfile.getSize(), lfilespec2, appdir, "EN" );
     if ( access( lfile.buffer, F_OK ) == 0 ) {
         loadLng( langDefault, lfile.buffer, true );
     }
     else {
-        snprintf( lfile.buffer, lfile.getSize(), lfilespec2, appdir );
+        snprintf( lfile.buffer, lfile.getSize(), lfilespec3, appdir );
         loadLng( langDefault, lfile.buffer, true );
     }
 
@@ -168,6 +169,8 @@ void loadLang()
     if ( lng == NULL ) {
         return;
     }
+
+    // Find language specifier
     char *upos = strchr( lng, '_' );
     if ( upos == NULL ) {
         return;
@@ -179,9 +182,31 @@ void loadLang()
     char lngSpec[ 4 ];
     memset( lngSpec, 0, sizeof( lngSpec ) );
     strncpy( lngSpec, lng, lngSpecLen );
-    if ( stricmp( lngSpec, "EN" ) != 0 )
+
+    // Find territory specifier
+    char *lrest = upos + 1;
+    char terrSpec[ 4 ];
+    memset( terrSpec, 0, sizeof( terrSpec ) );
+    if ( strlen( lrest ) >= 2 ) {
+        strncpy( terrSpec, lrest, 2 );
+    }
+
+    bool nlsLoaded = false;
+    if ( terrSpec[0] != 0 )
     {
-        snprintf( lfile.buffer, lfile.getSize(), lfilespec1, appdir, lngSpec );
+        // First, search the file with territory specifier
+        snprintf( lfile.buffer, lfile.getSize(), lfilespec1, appdir, lngSpec, terrSpec );
+        if ( access( lfile.buffer, F_OK ) == 0 ) {
+            // File with territory specifier exist, load it
+            loadLng( langCurrent, lfile.buffer, false );
+            nlsLoaded = true;
+        }
+
+    }
+    if ( !nlsLoaded )
+    {
+        // File with territory specifier not found, load file without territory specifier
+        snprintf( lfile.buffer, lfile.getSize(), lfilespec2, appdir, lngSpec );
         loadLng( langCurrent, lfile.buffer, false );
     }
 }
