@@ -1,3 +1,11 @@
+Beta-4:
+  - Replace ligatures when converting text from unicode to system 
+    codepage (closed ticket #45) 
+  - Lucide's internationalization now respects 'territory' modifier.
+  - Added 'Traditional Chinese (Taiwan)' NLS-file, updated German and
+    Swedish NLS-files.
+
+
 Beta-3:
   - Added basic printing features, you may print documents as image or
     as postscript on postscript-capable printers.

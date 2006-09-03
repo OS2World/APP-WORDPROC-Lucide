@@ -181,6 +181,7 @@ void FcFontSetDestroy( FcFontSet *s )
 
 static void ftLoad( char *fn )
 {
+    //printf( "Loading font %s\n", fn );
     int l = strlen( fn );
     if ( l < 5 ) {
         return;
@@ -230,6 +231,13 @@ static void ftLoad( char *fn )
         if ( FT_New_Face( ftlib, fn, 0, &ftface ) ) {
             return;
         }
+        //printf( "readed, family_name: %s   style_name: %s\n", ftface->family_name, ftface->style_name );
+
+        if ( ( ftface->family_name == NULL ) || ( ftface->style_name == NULL ) ) {
+            printf( "Broken font file: %s\n", fn );
+            FT_Done_Face( ftface );
+            return;
+        }
 
         familyName = rtrim( ftface->family_name );
         styleName = rtrim( ftface->style_name );
@@ -259,6 +267,7 @@ static void ftLoad( char *fn )
     fcfr.modified = st.st_mtime;
 
     (*fcfmap)[ fn ] = fcfr;
+    //printf( "Done loading font %s\n", fn );
 }
 
 
