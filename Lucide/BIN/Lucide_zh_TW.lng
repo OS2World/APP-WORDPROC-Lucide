@@ -1,0 +1,196 @@
+#
+# Lucide language file, TW
+#
+
+#
+# Main menu
+#
+MENU_DOCUMENT=文件(~D)
+MENU_OPEN=開啟(~O)...\tCtrl+O
+MENU_SAVE_AS=另存新檔(~S)...
+MENU_PAGE_SETUP=設定頁面(~G)...
+MENU_PRINT=列印(~P)...
+MENU_DOCUMENT_INFO=文件資訊(~D)...
+MENU_FONTS_INFO=字體資訊(~I)...
+MENU_PLUGINS_LIST=Plugins 列表(~L)...
+MENU_EXIT=離開(~X)\tCtrl+X
+MENU_EDIT=編輯(~E)
+MENU_COPY=複製(~C)\tCtrl+Insert
+MENU_SELECT_ALL=全部選取(~A)\tCtrl+/
+MENU_FIND=搜尋(~F)...\tCtrl+F
+MENU_FINDAGAIN=再搜尋(~G)\tCtrl+G
+MENU_SETTINGS=設定(~S)
+MENU_FIRST_PAGE=第一頁(~F)
+MENU_PREV_PAGE=上一頁(~P)\t-
+MENU_NEXT_PAGE=下一頁(~N)\t+
+MENU_LAST_PAGE=最後一頁(~L)
+MENU_GO_TO_PAGE=跳頁(~G)...\tCtrl+N
+MENU_VIEW=顯示(~V)
+MENU_FIT_WINDOW=符合視窗(~T)
+MENU_ACTUAL_SIZE=實際尺寸(~A)
+MENU_FIT_WIDTH=符合寬度(~W)
+MENU_ROTATE_CW=順時鐘方向90度(~R)
+MENU_ROTATE_CCW=逆時鐘方向90度(~C)
+MENU_SHOW_NAV_PANE=顯示導引框(~S)
+MENU_SINGLE_PAGE=單頁(~S)
+MENU_CONTINUOUS=連續(~O)
+MENU_WINDOW=視窗(~W)
+MENU_MAXVIEW=最大化顯示(~M)\tF11
+MENU_FULLSCREEN=全螢幕(~F)\tCtrl+L
+MENU_HELP=解說(~H)
+MENU_PRODUCT_INFORMATION=產品資訊(~P)
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=開啟文件...
+TBHINT_PRINT=列印...
+TBHINT_SHOW_NAV_PANE=顯示/隱藏導引框
+TBHINT_FIRST_PAGE=第一頁
+TBHINT_PREV_PAGE=上一頁
+TBHINT_NEXT_PAGE=下一頁
+TBHINT_LAST_PAGE=最後一頁
+TBHINT_ACTUAL_SIZE=實際尺寸
+TBHINT_FIT_WINDOW=符合視窗
+TBHINT_FIT_WIDTH=符合寬度
+TBHINT_FIND=搜尋...
+TBHINT_FINDAGAIN=再搜尋
+# toolbar's page number
+TB_PAGENUM=之 %d
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=Lucide - 文件檢視器
+MSGS_NO_SUIT_PLUG=無法找到適合此文件的 Plugin!
+MSGS_FILE_LOAD_ERROR=檔案載入錯誤!
+MSGS_LOADING_DOCUMENT=載入文件中，請稍候...
+MSGS_WARNING=警告!
+MSGS_OVERWRITE_FILE=檔案已存在，要取代嗎？
+MSGS_FILE_SAVE_ERROR=存案錯誤!
+MSGS_PAGE=頁
+
+#
+# "Plugins list" dialog
+#
+PLUGLIST_PLUGINS_LIST=Plugins 列表
+PLUGLIST_CLOSE=關閉(~C)
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Plugin 名稱
+PLUGLIST_SUPP_EXTS=支援的副檔名
+PLUGLIST_PLUGIN_DESC=Plugin 描述
+
+#
+# "Font info" dialog
+#
+FONTINFO_FONTINFO=字體資訊
+FONTINFO_CLOSE=關閉(~C)
+FONTINFO_ENUMERATING=列出字體中，請稍候...
+# List columns titles
+FONTINFO_NAME=名稱
+FONTINFO_TYPE=類型
+FONTINFO_EMBEDDED=嵌入?
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=未嵌入
+FONTINFO_EMBED_EMBEDDED=已嵌入
+FONTINFO_EMBED_EMBEDDED_SUBSET=嵌入子集
+
+#
+# "Document info" dialog
+#
+DOCINFO_DOCUMENT_INFO=文件資訊
+DOCINFO_CLOSE=關閉(~C)
+# Document info keys
+DOCINFO_TITLE=標題:
+DOCINFO_FORMAT=格式:
+DOCINFO_AUTHOR=作者:
+DOCINFO_SUBJECT=主題:
+DOCINFO_KEYWORDS=關鍵字:
+DOCINFO_CREATOR=建立者:
+DOCINFO_PRODUCER=製作者:
+DOCINFO_CREATION_DATE=建立日期:
+DOCINFO_MOD_DATE=修改日期:
+
+#
+# "Find" dialog
+#
+FIND_FIND=搜尋
+FIND_FIND_WHAT=搜尋目標(~F)
+FIND_MATCH_CASE=區分大小寫(~M)
+FIND_OK=~OK
+FIND_CANCEL=取消(~C)
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=搜尋頁 %d 之 %d...
+FIND_NOT_FOUND=找不到!
+
+#
+# "Progress" dialog
+#
+PDLG_PROGRESS=進行
+PDLG_CANCEL=取消(~C)
+
+#
+# About dialog
+#
+AD_ABOUT=關於
+AD_DESCRIPTION=Plugin-based document viewer with support for various file formats
+AD_COPYRIGHTS=(c) by Eugene Romanenko, netlabs.org in co-operation with Serenity Systems International
+AD_OK=~OK
+
+#
+# Settings dialog
+#
+SD_SETTINGS=設定
+SD_DEFAULT_PAGE_LAYOUT=預設頁頁面設定(~P)
+SD_DEFAULT_ZOOM=預設縮放大小(~Z)
+SD_SINGLE_PAGE=單頁
+SD_CONTINUOUS=連續
+SD_OK=~OK
+SD_CANCEL=取消(~C)
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=跳頁
+GTP_PAGE=頁
+GTP_OF=之 %d
+GTP_OK=~OK
+GTP_CANCEL=取消(~C)
+
+#
+# Print dialog
+#
+PD_TITLE=列印
+PD_PRINTER=印表機
+PD_NAME_LABEL=名稱(~N)
+PD_JOB_PROPERTIES=工作屬性(~J)
+PD_DRIVER_LABEL=印表機程式
+PD_PRINT_RANGE_AND_COPIES=列印範圍及份數(~R)
+PD_RANGE_ALL=全部(~A)
+PD_RANGE_CURRENT_PAGE=目前頁面(~U)
+PD_RANGE_PAGES=頁面(~G)
+PD_FROM=從(~F)
+PD_TO=到(~T)
+PD_NUMBER_OF_COPIES=列印份數(~N)
+PD_PRINT_TYPE=列印類型
+PD_TYPE_POSTSCRIPT=Post~script
+PD_TYPE_ASIMAGE=以圖形方式列印(~I)
+PD_HIGHER_IMAGE_QUALITY=高品質圖形(~H) (較慢且需較多記憶體)
+PD_PAGE_ORIENTATION=頁面方向
+PD_PORTRAIT=直印
+PD_LANDSCAPE=橫印
+PD_MARGINS=邊界 (mm)
+PD_MLEFT=左邊
+PD_MRIGHT=右邊
+PD_MTOP=頂端
+PD_MBOTTOM=底端
+PD_SELECTED_FORM=紙張大小
+PD_BTNPRINT=列印(~P)
+PD_BTNCANCEL=取消(~C)
+PD_WRONG_MARGINS=錯誤邊界!
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=列印頁 %d 之 %d...
+PRINT_GENERATING_POSTSCRIPT=產生 Postscript 檔...
+PRINT_SPOOLING_POSTSCRIPT=排存 Postscript 資料...
+PRINT_FAILED=列印錯誤!
+
