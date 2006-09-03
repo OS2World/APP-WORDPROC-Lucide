@@ -58,6 +58,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <setjmp.h>
 #include <jpeglib.h>
 
 
@@ -95,6 +96,21 @@ struct JpegDocument
     double height;
 };
 
+struct lujpeg_error_mgr
+{
+    struct jpeg_error_mgr jem;
+    jmp_buf setjmp_buffer;
+};
+
+METHODDEF(void) lujpeg_error_exit( j_common_ptr cinfo )
+{
+    lujpeg_error_mgr *err = (lujpeg_error_mgr *)cinfo->err;
+    char buffer[ JMSG_LENGTH_MAX ];
+    (*cinfo->err->format_message)( cinfo, buffer );
+    fprintf( stderr, "JPEG decoding error:\n%s\n", buffer );
+    longjmp( err->setjmp_buffer, 1 );
+}
+
 
 SOM_Scope boolean  SOMLINK loadFile(LuJpegDocument *somSelf,
                                      Environment *ev, string filename,
@@ -110,8 +126,16 @@ SOM_Scope boolean  SOMLINK loadFile(LuJpegDocument *somSelf,
 
     short bpp = getBpp( somSelf, ev );
     jpeg_decompress_struct cinfo;
-    jpeg_error_mgr jerr;
-    cinfo.err = jpeg_std_error( &jerr );
+    lujpeg_error_mgr ljerr;
+    cinfo.err = jpeg_std_error( &ljerr.jem );
+    ljerr.jem.error_exit = lujpeg_error_exit;
+    if ( setjmp( ljerr.setjmp_buffer ) ) {
+        // If we get here, the JPEG code has signaled an error.
+        jpeg_destroy_decompress( &cinfo );
+        fclose( infile );
+        return FALSE;
+    }
+
     jpeg_create_decompress( &cinfo );
     jpeg_stdio_src( &cinfo, infile );
     jpeg_read_header( &cinfo, TRUE );

@@ -4,6 +4,9 @@ Beta-4:
   - Lucide's internationalization now respects 'territory' modifier.
   - Added 'Traditional Chinese (Taiwan)' NLS-file, updated German and
     Swedish NLS-files.
+  - Fixed crash on PDF load during fonts enumeration on font files which
+    FreeType doesn't understand (closed ticket #83)
+  - Prevent Lucide from close on broken JPEGs (closed ticket #80)
 
 
 Beta-3:
