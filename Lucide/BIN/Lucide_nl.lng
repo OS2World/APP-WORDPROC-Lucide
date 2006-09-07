@@ -1,5 +1,5 @@
 #
-# Lucide language file, NL
+# Lucide language file, NL (demo3)
 #
 
 #
@@ -68,6 +68,7 @@ MSGS_LOADING_DOCUMENT=Inlezen document, even geduld a.u.b
 MSGS_WARNING=Waarschuwing!
 MSGS_OVERWRITE_FILE=Bestand bestaat al. Overschrijven?
 MSGS_FILE_SAVE_ERROR=Fout bij het opslaan van het bestand!
+MSGS_PAGE=Pagina
 
 #
 # "Plugins list" dialog
@@ -89,6 +90,10 @@ FONTINFO_ENUMERATING=Opzoeken van de lettertypes, even geduld a.u.b.
 FONTINFO_NAME=Naam
 FONTINFO_TYPE=Type
 FONTINFO_EMBEDDED=Ingebouwd?
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=Niet ingebouwd
+FONTINFO_EMBED_EMBEDDED=Ingebouwd
+FONTINFO_EMBED_EMBEDDED_SUBSET=Ingebouwd subset
 
 #
 # "Document info" dialog
@@ -138,6 +143,8 @@ AD_OK=~OK
 SD_SETTINGS=Instellingen
 SD_DEFAULT_PAGE_LAYOUT=Standaard pagina-indeling
 SD_DEFAULT_ZOOM=Standaard zoom
+SD_SINGLE_PAGE=Per pagina
+SD_CONTINUOUS=Doorlopend
 SD_OK=~OK
 SD_CANCEL=~Annuleren
 
@@ -149,3 +156,41 @@ GTP_PAGE=Pagina
 GTP_OF=van %d
 GTP_OK=~OK
 GTP_CANCEL=~Annuleren
+
+#
+# Print dialog
+#
+PD_TITLE=Afdrukken
+PD_PRINTER=Printer
+PD_NAME_LABEL=~Naam
+PD_JOB_PROPERTIES=Taak ~instellingen
+PD_DRIVER_LABEL=Stuurprogramma
+PD_PRINT_RANGE_AND_COPIES=Afdrukgebied en kopie‰n
+PD_RANGE_ALL=A~lles
+PD_RANGE_CURRENT_PAGE=H~uidige pagina
+PD_RANGE_PAGES=Pa~gina's
+PD_FROM=~Van
+PD_TO=~Tot
+PD_NUMBER_OF_COPIES=Aantal ~kopie‰n
+PD_PRINT_TYPE=Afdruktype
+PD_TYPE_POSTSCRIPT=Post~script
+PD_TYPE_ASIMAGE=Als af~beelding
+PD_HIGHER_IMAGE_QUALITY=~Hogeere afbeeldings kwaliteit (langzamer en vraagt meer geheugen)
+PD_PAGE_ORIENTATION=Pagina ori‰ntatie
+PD_PORTRAIT=Staand
+PD_LANDSCAPE=Liggend
+PD_MARGINS=Marges (mm)
+PD_MLEFT=Links
+PD_MRIGHT=Rechts
+PD_MTOP=Boven
+PD_MBOTTOM=Onder
+PD_SELECTED_FORM=Gekozen formulier
+PD_BTNPRINT=Af~drukken
+PD_BTNCANCEL=~Annuleren
+PD_WRONG_MARGINS=Verkeerde marge!
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=Afdrukken pagina %d van %d...
+PRINT_GENERATING_POSTSCRIPT=Genereren van postscript bestand...
+PRINT_SPOOLING_POSTSCRIPT=Postscript gegevens aan het bufferen...
+PRINT_FAILED=Afdrukken is mislukt!
+

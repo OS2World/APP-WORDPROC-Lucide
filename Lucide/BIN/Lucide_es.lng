@@ -1,0 +1,200 @@
+#
+# Lucide language file, ES
+#
+
+#
+# Main menu
+#
+MENU_DOCUMENT=~Archivo
+
+MENU_OPEN=~Abrir...\tCtrl+O
+MENU_SAVE_AS=~Guardar como...
+MENU_PAGE_SETUP=~Preferencias de p gina...
+MENU_PRINT=~Imprimir...
+MENU_PLUGINS_LIST=~Lista de plugins...
+MENU_EXIT=~Salir\tCtrl+X
+
+MENU_EDIT=~Editar
+MENU_COPY=~Copia\tCtrl+Insert
+MENU_SELECT_ALL=~Seleccionar todo\tCtrl+/
+MENU_FIND=~Buscar...\tCtrl+F
+MENU_FINDAGAIN=Buscar si~guiente\tCtrl+G
+MENU_SETTINGS=~Preferencias
+
+MENU_VIEW=~Ver
+MENU_FIT_WINDOW=Ajustar a la ~ventana
+MENU_ACTUAL_SIZE=~Tama¤o real
+MENU_FIT_WIDTH=Ajustar al ~ancho
+MENU_FIRST_PAGE=~Primera p gina
+MENU_PREV_PAGE=P gina anterior\t-
+MENU_NEXT_PAGE=P gina ~siguiente\t+
+MENU_LAST_PAGE=~éltima p gina
+MENU_GO_TO_PAGE=~Ir a la p gina...\tCtrl+N
+MENU_ROTATE_CW=~Girar 90ø en sentido horario
+MENU_ROTATE_CCW=Girar 90ø en sentido antihorario
+MENU_SINGLE_PAGE=~Una p gina cada vez
+MENU_CONTINUOUS=Estilo ~continuo
+MENU_DOCUMENT_INFO=~Informaci¢n sobre el documento...
+MENU_FONTS_INFO=~Fonts utilizadas...
+
+MENU_WINDOW=V~entana
+MENU_SHOW_NAV_PANE=Mostrar panel de ~navegaci¢n
+MENU_MAXVIEW=~Maximizar vista\tF11
+MENU_FULLSCREEN=~Pantalla completa\tCtrl+L
+
+MENU_HELP=A~yuda
+MENU_PRODUCT_INFORMATION=~Acerca de
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=Abrir documento...
+TBHINT_PRINT=Imprimir...
+TBHINT_SHOW_NAV_PANE=Mostrar/ocultar el panel de navegaci¢n
+TBHINT_FIRST_PAGE=Primera p gina
+TBHINT_PREV_PAGE=P gina anterior
+TBHINT_NEXT_PAGE=Siguiente p gina
+TBHINT_LAST_PAGE=éltima p gina
+TBHINT_ACTUAL_SIZE=Tama¤o real
+TBHINT_FIT_WINDOW=Ajustar alto de las p ginas a la ventana
+TBHINT_FIT_WIDTH=Ajustar ancho de las p ginas a la ventana
+TBHINT_FIND=Buscar...
+TBHINT_FINDAGAIN=Buscar siguiente
+# toolbar's page number
+TB_PAGENUM=de %d
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=Lucide - Visor de documentos
+MSGS_NO_SUIT_PLUG=­No puede encontrarse un plugin adecuado para el documento especificado!
+MSGS_FILE_LOAD_ERROR=­Error cargando el archivo!
+MSGS_LOADING_DOCUMENT=Cargando el documento, por favor espere...
+MSGS_WARNING=­Atenci¢n!
+MSGS_OVERWRITE_FILE=El archivo ya existe. ¨Desea sustituirlo?
+MSGS_FILE_SAVE_ERROR=­Error guardando el archivo!
+MSGS_PAGE=P gina
+
+#
+# "Plugins list" dialog
+#
+PLUGLIST_PLUGINS_LIST=Lista de plugins
+PLUGLIST_CLOSE=~Cerrar
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Nombre del plugin
+PLUGLIST_SUPP_EXTS=Extensiones soportadas
+PLUGLIST_PLUGIN_DESC=Descripci¢n del plugin
+
+#
+# "Font info" dialog
+#
+FONTINFO_FONTINFO=Font info
+FONTINFO_CLOSE=~Close
+FONTINFO_ENUMERATING=Enumerando fonts, espere por favor...
+# List columns titles
+FONTINFO_NAME=Nombre
+FONTINFO_TYPE=Tipo
+FONTINFO_EMBEDDED=¨Incluida en el documento?
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=No
+FONTINFO_EMBED_EMBEDDED=S¡
+FONTINFO_EMBED_EMBEDDED_SUBSET=Parcialmente
+
+#
+# "Document info" dialog
+#
+DOCINFO_DOCUMENT_INFO=Informaci¢n sobre el documento
+DOCINFO_CLOSE=~Cerrar
+# Document info keys
+DOCINFO_TITLE=T¡tulo:
+DOCINFO_FORMAT=Formato:
+DOCINFO_AUTHOR=Autor:
+DOCINFO_SUBJECT=Tema:
+DOCINFO_KEYWORDS=Palabras clave:
+DOCINFO_CREATOR=Creado con:
+DOCINFO_PRODUCER=Producido con:
+DOCINFO_CREATION_DATE=Creado:
+DOCINFO_MOD_DATE=Modificado:
+
+#
+# "Find" dialog
+#
+FIND_FIND=Buscar
+FIND_FIND_WHAT=Qu‚ ~buscar
+FIND_MATCH_CASE=Distinguir ~may£sculas/min£sculas
+FIND_OK=~Bien
+FIND_CANCEL=~Cancelar
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=Buscando - p gina %d de %d...
+FIND_NOT_FOUND=­No se encuentra!
+
+#
+# "Progress" dialog
+#
+PDLG_PROGRESS=Progreso
+PDLG_CANCEL=~Cancelar
+
+#
+# About dialog
+#
+AD_ABOUT=Acerca de
+AD_DESCRIPTION=Visor de documentos con arquitectura de plugins y soporte para varios formatos de archivo
+AD_COPYRIGHTS=(c) por Eugene Romanenko, netlabs.org en colaboraci¢n con Serenity Systems International
+AD_OK=~Bien
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Opciones
+SD_DEFAULT_PAGE_LAYOUT=~Ver p ginas
+SD_DEFAULT_ZOOM=~Zoom por omisi¢n
+SD_SINGLE_PAGE=Una p gina cada vez
+SD_CONTINUOUS=Estilo continuo
+SD_OK=~Bien
+SD_CANCEL=~Cancelar
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=Ir a la p gina
+GTP_PAGE=P gina
+GTP_OF=de %d
+GTP_OK=~Bien
+GTP_CANCEL=~Cancelar
+
+#
+# Print dialog
+#
+PD_TITLE=Imprimir
+PD_PRINTER=Impresora
+PD_NAME_LABEL=~Nombre
+PD_JOB_PROPERTIES=~Propiedades del trabajo
+PD_DRIVER_LABEL=Controlador
+PD_PRINT_RANGE_AND_COPIES=~Rango de impresi¢n y n§ de copias
+PD_RANGE_ALL=~Todas
+PD_RANGE_CURRENT_PAGE=S¢lo la p gina ~actual
+PD_RANGE_PAGES=~P ginas
+PD_FROM=~de
+PD_TO=~a
+PD_NUMBER_OF_COPIES=~N£mero de copias
+PD_PRINT_TYPE=~Tipo de impresi¢n
+PD_TYPE_POSTSCRIPT=Postscript
+PD_TYPE_ASIMAGE=Como imagen
+PD_HIGHER_IMAGE_QUALITY=Mayor ~calidad de imagen (m s lento, requiere m s memoria)
+PD_PAGE_ORIENTATION=~Orientaci¢n de las p ginas
+PD_PORTRAIT=Vertical
+PD_LANDSCAPE=Apaisada
+PD_MARGINS=~M rgenes (mm)
+PD_MLEFT=Izquierdo
+PD_MRIGHT=Derecho
+PD_MTOP=Superior
+PD_MBOTTOM=Inferior
+PD_SELECTED_FORM=Formato seleccionado
+PD_BTNPRINT=~Imprimir
+PD_BTNCANCEL=~Cancelar
+PD_WRONG_MARGINS=­M rgenes err¢neos!
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=Imprimiendo p gina %d de %d...
+PRINT_GENERATING_POSTSCRIPT=Generando archivo postscript...
+PRINT_SPOOLING_POSTSCRIPT=Enviando datos postcript al controlador de spool...
+PRINT_FAILED=­Error al imprimir!
