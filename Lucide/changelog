@@ -1,10 +1,12 @@
 Beta-4:
   - Replace ligatures when converting text from unicode to system 
-    codepage (closed ticket #45) 
+    codepage (closed ticket #45).
   - Lucide's internationalization now respects 'territory' modifier.
   - Fixed crash on PDF load during fonts enumeration on font files which
-    FreeType doesn't understand (closed ticket #83)
-  - Prevent Lucide from close on broken JPEGs (closed ticket #80)
+    FreeType doesn't understand (closed ticket #83).
+  - Prevent Lucide from close on broken JPEGs (closed ticket #80).
+  - In single-page view pressing PgUp/PgDn if already at top/bottom of page
+    moves to previous/next page (closed ticket #73).
   - Added NLS-files: Spanish, Traditional Chinese (Taiwan).
   - Updated NLS-files: Dutch, German, Swedish.
 

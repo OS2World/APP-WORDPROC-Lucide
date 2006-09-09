@@ -1714,8 +1714,14 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                 }
                 else
                 {
-                    if ( fullscreen ) {
+                    bool dojump = ( !continuous && ( sVscrollPos == 0 )
+                                        && ( currentpage > 0 ) );
+
+                    if ( fullscreen || dojump ) {
                         goToPage( currentpage - 1 );
+                        if ( dojump ) {
+                            vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ), NULLHANDLE );
+                        }
                     } else {
                         WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEUP ) );
                     }
@@ -1733,7 +1739,9 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                 }
                 else
                 {
-                    if ( fullscreen ) {
+                    bool dojump = ( !continuous && ( sVscrollPos == sVscrollMax ) );
+
+                    if ( fullscreen || dojump ) {
                         goToPage( currentpage + 1 );
                     } else {
                         WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEDOWN ) );
