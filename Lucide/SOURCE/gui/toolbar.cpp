@@ -316,7 +316,7 @@ HWND createToolbar( HWND hwnd )
     std::string actsizetext = getLocalizedString( TBHINT_ACTUAL_SIZE );
     cs.cx = setZoomValues( cs.ctrlHandle ) +
                 ( WinQuerySysValue( HWND_DESKTOP, SV_CXVSCROLL ) * 2 );
-    cs.cy = -100;
+    cs.cy = -200;
     cs.bubbleText = NULL;
     pOldZeProc = WinSubclassWindow( WinWindowFromID( cs.ctrlHandle, CBID_EDIT ), zeProc );
     WinSendMsg( hToolBar, TBM_ADDCONTROL, (MPARAM)&cs, MPVOID );
