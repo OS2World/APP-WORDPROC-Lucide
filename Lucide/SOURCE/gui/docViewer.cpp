@@ -91,6 +91,7 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     bpp         = 0;
     zoom        = 1.0;
     realzoom    = 1.0;
+    zoomMode    = false;
     rotation    = 0;
     pixbuf      = NULL;
     spos_x      = 0;
@@ -122,7 +123,9 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     selrects = NULL;
     // links
     links = NULL;
-    handptr = WinLoadPointer( HWND_DESKTOP, NULLHANDLE, IDP_HAND );
+    handPtr = WinLoadPointer( HWND_DESKTOP, NULLHANDLE, IDP_HAND );
+    zoomInPtr = WinLoadPointer( HWND_DESKTOP, NULLHANDLE, IDP_ZOOM_IN );
+    zoomOutPtr = WinLoadPointer( HWND_DESKTOP, NULLHANDLE, IDP_ZOOM_OUT );
     // search
     foundrects = NULL;
     searchString = NULL;
@@ -161,7 +164,9 @@ DocumentViewer::~DocumentViewer()
         freeLinks();
     }
 
-    WinDestroyPointer( handptr );
+    WinDestroyPointer( handPtr );
+    WinDestroyPointer( zoomInPtr );
+    WinDestroyPointer( zoomOutPtr );
 
     if ( ( hpsBuffer != NULLHANDLE ) && ( hdcBuffer != NULLHANDLE ) ) {
         DestroyGraphicsBuffer( hpsBuffer, hdcBuffer );
@@ -354,6 +359,9 @@ void DocumentViewer::goToPage( long page )
 //         -2 - fit page
 void DocumentViewer::setZoom( double _zoom )
 {
+    if ( ( _zoom == 0 ) || ( _zoom < -2 ) || ( ( _zoom > 0 ) && ( _zoom < 0.05 ) ) ) {
+        return;
+    }
 
     if ( doc != NULL ) {
         if ( doc->isScalable( ev ) ) {
@@ -1525,89 +1533,154 @@ void DocumentViewer::scrollToPos( HWND hwnd, HRGN hrgn, LONG xpos, LONG ypos,
 // changes mouse ptr to 'hand' if it moves over link area
 BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
 {
-    if ( mousePressed && ( doc != NULL ) )
+    if ( zoomMode )
     {
-        selectionEnd.x = xpos;
-        selectionEnd.y = ypos;
-
-        if ( continuous )
+        HPOINTER ptr = zoomInPtr;
+        if ( WinGetPhysKeyState( HWND_DESKTOP, 0x1d ) & 0x8000 ) {
+            ptr = zoomOutPtr;
+        }
+        WinSetPointer( HWND_DESKTOP, ptr );
+        return TRUE;
+    }
+    else
+    {
+        if ( mousePressed && ( doc != NULL ) )
         {
-            scrollToPos( hwnd, NULLHANDLE, xpos, ypos, true );
+            selectionEnd.x = xpos;
+            selectionEnd.y = ypos;
 
-            RECTL selRect = {
-                selectionStart.x < selectionEnd.x ? selectionStart.x : selectionEnd.x,
-                selectionStart.y < selectionEnd.y ? selectionStart.y : selectionEnd.y,
-                selectionStart.x < selectionEnd.x ? selectionEnd.x : selectionStart.x,
-                selectionStart.y < selectionEnd.y ? selectionEnd.y : selectionStart.y
-            };
-
-            DrawAreas *areas = findDrawAreas( &selRect );
-
-            HPS hps = WinGetPS( hwnd );
-            GpiSetMix( hps, FM_XOR );
-            GpiSetColor( hps, CLR_YELLOW );
-
-            for ( int i = 0; i < areas->size(); i++ )
+            if ( continuous )
             {
-                PageDrawArea *pda = &(*areas)[ i ];
+                scrollToPos( hwnd, NULLHANDLE, xpos, ypos, true );
 
-                winPosToDocPos( pda, &(selection[pda->pagenum]) );
+                RECTL selRect = {
+                    selectionStart.x < selectionEnd.x ? selectionStart.x : selectionEnd.x,
+                    selectionStart.y < selectionEnd.y ? selectionStart.y : selectionEnd.y,
+                    selectionStart.x < selectionEnd.x ? selectionEnd.x : selectionStart.x,
+                    selectionStart.y < selectionEnd.y ? selectionEnd.y : selectionStart.y
+                };
 
-                HRGN clearRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ] );
-                LuDocument::freeRectangles( ev, selrects[ pda->pagenum ] );
-                selrects[ pda->pagenum ] = doc->getSelectionRectangles( ev, pda->pagenum, &(selection[pda->pagenum]) );
-                HRGN selectRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ] );
+                DrawAreas *areas = findDrawAreas( &selRect );
+
+                HPS hps = WinGetPS( hwnd );
+                GpiSetMix( hps, FM_XOR );
+                GpiSetColor( hps, CLR_YELLOW );
+
+                for ( int i = 0; i < areas->size(); i++ )
+                {
+                    PageDrawArea *pda = &(*areas)[ i ];
+
+                    winPosToDocPos( pda, &(selection[pda->pagenum]) );
+
+                    HRGN clearRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ] );
+                    LuDocument::freeRectangles( ev, selrects[ pda->pagenum ] );
+                    selrects[ pda->pagenum ] = doc->getSelectionRectangles( ev, pda->pagenum, &(selection[pda->pagenum]) );
+                    HRGN selectRegion = rectsToRegion( pda->pagenum, hps, selrects[ pda->pagenum ] );
+                    GpiCombineRegion( hps, selectRegion, selectRegion, clearRegion, CRGN_XOR );
+                    GpiPaintRegion( hps, selectRegion );
+                    GpiDestroyRegion( hps, clearRegion );
+                    GpiDestroyRegion( hps, selectRegion );
+                }
+
+                WinReleasePS( hps );
+                delete areas;
+            }
+            else
+            {
+                winPosToDocPos( &selectionStart, &selectionEnd, &(selection[currentpage]) );
+
+                HPS hps = WinGetPS( hwnd );
+                HRGN scrolledRegion = NULLHANDLE; //GpiCreateRegion( hps, 0, NULL );
+
+                scrollToPos( hwnd, scrolledRegion, xpos, ypos, true );
+
+                // 127/191/255
+                //LONG lclr = ( 127 << 16 ) | ( 191 << 8 ) | 255;
+                //LONG lclr = ( 128 << 16 ) | ( 64 << 8 );
+                //LONG ltabl[ 1 ] = { lclr };
+                //GpiCreateLogColorTable( hps, 0, LCOLF_CONSECRGB, 100, 1, ltabl );
+
+                GpiSetMix( hps, FM_XOR );
+                GpiSetColor( hps, CLR_YELLOW );
+                //GpiSetColor( hps, 100 );
+
+                HRGN clearRegion = rectsToRegion( currentpage, hps, selrects[ currentpage ] );
+                LuDocument::freeRectangles( ev, selrects[ currentpage ] );
+                if ( ( selectionStart.x == selectionEnd.x ) &&
+                     ( selectionStart.y == selectionEnd.y ) ) {
+                    selrects[ currentpage ] = NULL;
+                    memset( &(selection[ currentpage ]), 0, sizeof( LuRectangle ) );
+                }
+                else {
+                    selrects[ currentpage ] = doc->getSelectionRectangles( ev, currentpage, &(selection[currentpage]) );
+                }
+                HRGN selectRegion = rectsToRegion( currentpage, hps, selrects[ currentpage ] );
                 GpiCombineRegion( hps, selectRegion, selectRegion, clearRegion, CRGN_XOR );
+                //GpiCombineRegion( hps, selectRegion, selectRegion, scrolledRegion, CRGN_DIFF );
                 GpiPaintRegion( hps, selectRegion );
                 GpiDestroyRegion( hps, clearRegion );
                 GpiDestroyRegion( hps, selectRegion );
-            }
+                //GpiDestroyRegion( hps, scrolledRegion );
 
-            WinReleasePS( hps );
-            delete areas;
+                WinReleasePS( hps );
+            }
         }
-        else
+        else if ( links != NULL )
         {
-            winPosToDocPos( &selectionStart, &selectionEnd, &(selection[currentpage]) );
-
-            HPS hps = WinGetPS( hwnd );
-            HRGN scrolledRegion = NULLHANDLE; //GpiCreateRegion( hps, 0, NULL );
-
-            scrollToPos( hwnd, scrolledRegion, xpos, ypos, true );
-
-            // 127/191/255
-            //LONG lclr = ( 127 << 16 ) | ( 191 << 8 ) | 255;
-            //LONG lclr = ( 128 << 16 ) | ( 64 << 8 );
-            //LONG ltabl[ 1 ] = { lclr };
-            //GpiCreateLogColorTable( hps, 0, LCOLF_CONSECRGB, 100, 1, ltabl );
-
-            GpiSetMix( hps, FM_XOR );
-            GpiSetColor( hps, CLR_YELLOW );
-            //GpiSetColor( hps, 100 );
-
-            HRGN clearRegion = rectsToRegion( currentpage, hps, selrects[ currentpage ] );
-            LuDocument::freeRectangles( ev, selrects[ currentpage ] );
-            if ( ( selectionStart.x == selectionEnd.x ) &&
-                 ( selectionStart.y == selectionEnd.y ) ) {
-                selrects[ currentpage ] = NULL;
-                memset( &(selection[ currentpage ]), 0, sizeof( LuRectangle ) );
+            long pg = currentpage;
+            if ( continuous ) {
+                double tmp;
+                pg = posToPagenum( ypos, &tmp );
             }
-            else {
-                selrects[ currentpage ] = doc->getSelectionRectangles( ev, currentpage, &(selection[currentpage]) );
-            }
-            HRGN selectRegion = rectsToRegion( currentpage, hps, selrects[ currentpage ] );
-            GpiCombineRegion( hps, selectRegion, selectRegion, clearRegion, CRGN_XOR );
-            //GpiCombineRegion( hps, selectRegion, selectRegion, scrolledRegion, CRGN_DIFF );
-            GpiPaintRegion( hps, selectRegion );
-            GpiDestroyRegion( hps, clearRegion );
-            GpiDestroyRegion( hps, selectRegion );
-            //GpiDestroyRegion( hps, scrolledRegion );
 
-            WinReleasePS( hps );
+            if ( ( pg != -1 ) && ( links[ pg ] != NULL ) )
+            {
+                for ( int i = 0; i < links[ pg ]->_length; i++ )
+                {
+                    RECTL r = {0};
+                    docPosToWinPos( pg, &(links[ pg ]->_buffer[i].area), &r );
+
+                    POINTL ptl = { xpos, ypos };
+                    if ( WinPtInRect( hab, &r, &ptl ) ) {
+                        WinSetPointer( HWND_DESKTOP, handPtr );
+                        return TRUE;
+                    }
+                }
+            }
         }
     }
-    else if ( links != NULL )
+    return FALSE;
+}
+
+// handles WM_BUTTON1CLICK
+BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
+{
+    if ( zoomMode )
     {
+        double z = getRealZoom() / 4;
+        double zval = 0;
+        bool doPlus = false;
+        if ( WinGetPhysKeyState( HWND_DESKTOP, 0x1d ) & 0x8000 ) {
+            zval = getRealZoom() - z;
+        } else {
+            zval = getRealZoom() + z;
+            doPlus = true;
+        }
+        zval = (long)( zval * 20.0 ) / 20.0;   // Round to 0.05 (5%)
+        if ( zval == getRealZoom() ) {
+            zval += ( doPlus ? 0.01 : -0.01 );
+        }
+        if ( zval > 0.1 ) {
+            Lucide::setZoom( zval );
+        }
+        return TRUE;
+    }
+    else
+    {
+        if ( links == NULL ) {
+            return FALSE;
+        }
+
         long pg = currentpage;
         if ( continuous ) {
             double tmp;
@@ -1622,65 +1695,33 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
                 docPosToWinPos( pg, &(links[ pg ]->_buffer[i].area), &r );
 
                 POINTL ptl = { xpos, ypos };
-                if ( WinPtInRect( hab, &r, &ptl ) ) {
-                    WinSetPointer( HWND_DESKTOP, handptr );
+                if ( WinPtInRect( hab, &r, &ptl ) )
+                {
+                    if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_EXTERNAL_URI )
+                    {
+                        WinMessageBox( HWND_DESKTOP, hMainFrame,
+                            links[ pg ]->_buffer[i].link.uri, "URI", 1,
+                            MB_OK | MB_INFORMATION | MB_MOVEABLE );
+                    }
+                    else if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_TITLE )
+                    {
+                        char *title = links[ pg ]->_buffer[i].link.title;
+                        if ( title == NULL ) {
+                            title = "???";
+                        }
+                        WinMessageBox( HWND_DESKTOP, hMainFrame,
+                            title, "?", 1, MB_OK | MB_INFORMATION | MB_MOVEABLE );
+                    }
+                    else if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_PAGE )
+                    {
+                        goToPage( links[ pg ]->_buffer[i].link.page );
+                    }
+
                     return TRUE;
                 }
             }
         }
     }
-
-    return FALSE;
-}
-
-// handles WM_BUTTON1CLICK
-BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
-{
-    if ( links == NULL ) {
-        return FALSE;
-    }
-
-    long pg = currentpage;
-    if ( continuous ) {
-        double tmp;
-        pg = posToPagenum( ypos, &tmp );
-    }
-
-    if ( ( pg != -1 ) && ( links[ pg ] != NULL ) )
-    {
-        for ( int i = 0; i < links[ pg ]->_length; i++ )
-        {
-            RECTL r = {0};
-            docPosToWinPos( pg, &(links[ pg ]->_buffer[i].area), &r );
-
-            POINTL ptl = { xpos, ypos };
-            if ( WinPtInRect( hab, &r, &ptl ) )
-            {
-                if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_EXTERNAL_URI )
-                {
-                    WinMessageBox( HWND_DESKTOP, hMainFrame,
-                        links[ pg ]->_buffer[i].link.uri, "URI", 1,
-                        MB_OK | MB_INFORMATION | MB_MOVEABLE );
-                }
-                else if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_TITLE )
-                {
-                    char *title = links[ pg ]->_buffer[i].link.title;
-                    if ( title == NULL ) {
-                        title = "???";
-                    }
-                    WinMessageBox( HWND_DESKTOP, hMainFrame,
-                        title, "?", 1, MB_OK | MB_INFORMATION | MB_MOVEABLE );
-                }
-                else if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_PAGE )
-                {
-                    goToPage( links[ pg ]->_buffer[i].link.page );
-                }
-
-                return TRUE;
-            }
-        }
-    }
-
     return FALSE;
 }
 
@@ -1783,6 +1824,11 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
     if ( ( fsflags & KC_CHAR ) && !( fsflags & KC_KEYUP ) && ( usch == '-' ) ) {
         goToPage( currentpage - 1 );
         return TRUE;
+    }
+
+    // Ctrl
+    if ( ( fsflags & KC_VIRTUALKEY ) && ( usvk == VK_CTRL ) && zoomMode ) {
+        wmMouseMove( hwnd, 0, 0 ); // to switch mouse pointer if in zoomMode
     }
 
     return FALSE;

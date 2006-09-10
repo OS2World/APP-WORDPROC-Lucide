@@ -23,6 +23,7 @@ MENU_VIEW=~View
 MENU_FIT_WINDOW=Fi~t in window
 MENU_ACTUAL_SIZE=~Actual size
 MENU_FIT_WIDTH=Fit ~width
+MENU_ZOOM_IN_OUT=~Zoom in/out
 MENU_FIRST_PAGE=~First page
 MENU_PREV_PAGE=~Previous page\t-
 MENU_NEXT_PAGE=~Next page\t+

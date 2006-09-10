@@ -157,6 +157,7 @@ void Lucide::enableZoomMenus()
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_ACTSIZE), (MPARAM)scalable );
     WinEnableMenuItem( hWndMenu, CM_FITWIDTH, scalable );
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FITWIDTH), (MPARAM)scalable );
+    WinEnableMenuItem( hWndMenu, CM_ZOOM_IN_OUT, scalable );
     WinEnableControl( hToolBar, TBID_ZOOM, scalable );
     BOOL rotable = doc->isRotable( ev );
     WinEnableMenuItem( hWndMenu, CM_ROTATE90CW, rotable );
@@ -254,6 +255,7 @@ void Lucide::checkMenus()
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_ACTSIZE), (MPARAM)FALSE );
         WinEnableMenuItem( hWndMenu, CM_FITWIDTH, FALSE );
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FITWIDTH), (MPARAM)FALSE );
+        WinEnableMenuItem( hWndMenu, CM_ZOOM_IN_OUT, FALSE );
         WinEnableControl( hToolBar, TBID_ZOOM, FALSE );
 
         WinEnableMenuItem( hWndMenu, CM_ROTATE90CW, FALSE );
@@ -604,6 +606,18 @@ void Lucide::focusDocview()
     WinSetFocus( HWND_DESKTOP, docViewer->getViewHWND() );
 }
 
+void Lucide::toggleZoom()
+{
+    if ( ( doc != NULL ) && doc->isScalable( ev ) )
+    {
+        bool isZoom = !docViewer->isZoomMode();
+
+        WinSendMsg( hWndMenu, MM_SETITEMATTR, MPFROM2SHORT( CM_ZOOM_IN_OUT, TRUE ),
+                MPFROM2SHORT( MIA_CHECKED, isZoom ? MIA_CHECKED : FALSE ) );
+        docViewer->setZoomMode( isZoom );
+    }
+}
+
 static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
     switch ( msg )
@@ -754,6 +768,10 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
                 case CM_FITWIDTH:
                     Lucide::setZoom( -1 );
+                    return (MRESULT)FALSE;
+
+                case CM_ZOOM_IN_OUT:
+                    Lucide::toggleZoom();
                     return (MRESULT)FALSE;
 
                 case CM_SINGLEPAGE:

@@ -87,6 +87,7 @@ class Lucide
         static void checkNavpane();
         static void goToPage( long page );
         static void setZoom( double zoom );
+        static void toggleZoom();
         static void enableCopy( bool enable );
         static void setPageLayout( PgLayout layout );
         static void toggleMaxview();

@@ -72,6 +72,8 @@ class DocumentViewer
         void setZoom( double _zoom );
         double getZoom() { return zoom; }
         double getRealZoom() { return realzoom; }
+        void setZoomMode( bool _zoomMode ) { zoomMode = _zoomMode; }
+        bool isZoomMode() { return zoomMode; }
         void setRotation( long _rotation );
         long getRotation() { return rotation; }
         void selectAll();
@@ -150,6 +152,7 @@ class DocumentViewer
         LuPixbuf *pixbuf;
         short bpp;
         double width, height, zoom, realzoom, fullwidth, fullheight;
+        boolean zoomMode;
         long rotation;
         long totalpages, currentpage;
         ProgressDlg *progressDlg;
@@ -186,7 +189,6 @@ class DocumentViewer
 
         // links
         LuDocument_LuLinkMapSequence **links;
-        HPOINTER handptr;
 
         // search
         LuDocument_LuRectSequence **foundrects;
@@ -194,6 +196,11 @@ class DocumentViewer
         bool caseSensitive;
         bool continueSearch;
         bool abortSearch;
+        
+        // pointers
+        HPOINTER handPtr;
+        HPOINTER zoomInPtr;
+        HPOINTER zoomOutPtr;
 };
 
 #endif // __DOCVIEWER_H

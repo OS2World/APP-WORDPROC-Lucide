@@ -39,6 +39,8 @@
 #define IDB_LOGO        2
 
 #define IDP_HAND        10
+#define IDP_ZOOM_IN		11
+#define IDP_ZOOM_OUT	12
 
 #define IDB_OPEN        20
 #define IDB_PRINT       21
@@ -77,12 +79,13 @@
 #define CM_FITWINDOW    401
 #define CM_ACTSIZE      402
 #define CM_FITWIDTH     403
-#define CM_ROTATE90CW   404
-#define CM_ROTATE90CCW  405
-#define CM_SINGLEPAGE   406
-#define CM_CONTINUOUS   407
-#define CM_DOCINFO      408
-#define CM_FONTSINFO    409
+#define CM_ZOOM_IN_OUT	404
+#define CM_ROTATE90CW   405
+#define CM_ROTATE90CCW  406
+#define CM_SINGLEPAGE   407
+#define CM_CONTINUOUS   408
+#define CM_DOCINFO      409
+#define CM_FONTSINFO    410
 
 #define CM_NAVPANE      501
 #define CM_MAXVIEW      502
