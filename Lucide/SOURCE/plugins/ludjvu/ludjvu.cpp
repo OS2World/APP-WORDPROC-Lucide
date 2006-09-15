@@ -354,7 +354,7 @@ SOM_Scope boolean  SOMLINK exportToPostScript(LuDjvuDocument *somSelf,
                                     Environment *ev, string filename,
                                     long first_page, long last_page,
                                     double width, double height,
-                                    boolean duplex, boolean* brkExport)
+                                    boolean* brkExport)
 {
 #ifdef __GNUC__
     LuDjvuDocumentData *somThis = LuDjvuDocumentGetData(somSelf);

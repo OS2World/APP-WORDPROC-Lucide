@@ -648,7 +648,6 @@ SOM_Scope boolean  SOMLINK exportToPostScript(LuDjvuDocument *somSelf, Environme
 		long last_page,
 		double width,
 		double height,
-		boolean duplex,
 		boolean* brkExport);
 static char *somMN_LuDjvuDocumentexportToPostScript = "LuDocument::exportToPostScript";
 static somId somId_LuDjvuDocumentexportToPostScript = &somMN_LuDjvuDocumentexportToPostScript;
@@ -663,15 +662,14 @@ typedef boolean   SOMLINK somTP_xih_LuDjvuDocument_exportToPostScript(LuDjvuDocu
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex, 
 		boolean* brkExport);
 typedef somTP_xih_LuDjvuDocument_exportToPostScript *somTD_xih_LuDjvuDocument_exportToPostScript;
 /* define the parent method call macro */
 static somMethodProc* LuDjvuDocument_parent_LuDocument_exportToPostScript_resolved;
-#define LuDjvuDocument_parent_LuDocument_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex,brkExport) \
+#define LuDjvuDocument_parent_LuDocument_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,brkExport) \
   ((( somTD_xih_LuDjvuDocument_exportToPostScript ) \
       LuDjvuDocument_parent_LuDocument_exportToPostScript_resolved) \
-	(somSelf,ev,filename,first_page,last_page,width,height,duplex,brkExport))
+	(somSelf,ev,filename,first_page,last_page,width,height,brkExport))
 /* define a variety of (possibly ambiguous) short forms */
 #ifndef SOMGD_pmc_parent_exportToPostScript
   #ifdef parent_exportToPostScript
@@ -689,8 +687,8 @@ static somMethodProc* LuDjvuDocument_parent_LuDocument_exportToPostScript_resolv
     #define parent_LuDocument_exportToPostScript LuDjvuDocument_parent_LuDocument_exportToPostScript
   #endif
 #endif
-#define LuDjvuDocument_parents_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex,brkExport) (\
-   LuDjvuDocument_parent_LuDocument_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,duplex,brkExport))
+#define LuDjvuDocument_parents_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,brkExport) (\
+   LuDjvuDocument_parent_LuDocument_exportToPostScript(somSelf,ev,filename,first_page,last_page,width,height,brkExport))
 
 /*
  * Overridden method: isFixedImage

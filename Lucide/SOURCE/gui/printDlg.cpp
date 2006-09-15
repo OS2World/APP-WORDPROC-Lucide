@@ -588,11 +588,6 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                             if ( rc && ( tmpVal > 0 ) ) {
                                 _this->psetup->pgto = tmpVal;
                             }
-                            if ( _this->psetup->pgfrom > _this->psetup->pgto ) {
-                                long tmp = _this->psetup->pgfrom;
-                                _this->psetup->pgfrom = _this->psetup->pgto;
-                                _this->psetup->pgto = tmp;
-                            }
                         }
 
                         _this->psetup->ptype = TypePostScript;

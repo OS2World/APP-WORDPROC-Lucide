@@ -322,12 +322,12 @@ static GBool abortCheckCbk( void *data )
     asynchCallbackData *cd = (asynchCallbackData *)data;
     DosQuerySysInfo( QSV_MS_COUNT, QSV_MS_COUNT, &now, sizeof( long ) );
     long dist = ( now - cd->tmr );
-    if ( ( dist > cd->delay ) || cd->forceDraw ) 
+    if ( ( dist > cd->delay ) || cd->forceDraw )
     {
-    	// Note: we use out->getBitmap() on each iteration instead
-    	//       of remembering pointer to bitmap before call
-    	//       page->displaySlice() because OutputDev may change
-    	//       bitmap during page->displaySlice() processing.
+        // Note: we use out->getBitmap() on each iteration instead
+        //       of remembering pointer to bitmap before call
+        //       page->displaySlice() because OutputDev may change
+        //       bitmap during page->displaySlice() processing.
         copy_page_to_pixbuf( cd->ev, cd->out->getBitmap(), cd->pixbuf );
         cd->fnd( cd->fndata );
         cd->tmr = now;
@@ -681,36 +681,36 @@ SOM_Scope boolean SOMLINK exportToPostScript(LuPopplerDocument *somSelf,
                                     Environment *ev, string filename,
                                     long first_page, long last_page,
                                     double width, double height,
-                                    boolean duplex, boolean* brkExport)
+                                    boolean* brkExport)
 {
     if ( filename == NULL ) {
-        return FALSE;
-    }
-    if ( last_page < first_page ) {
         return FALSE;
     }
 
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
     PDFDoc *doc = ((PopplerDocument *)somThis->data)->doc;
 
-    PSOutputDev *out = new PSOutputDev( filename, doc->getXRef(),
-                                        doc->getCatalog(),
-                                        first_page + 1, last_page + 1,
+    PSOutputDev *out = new PSOutputDev( filename, doc->getXRef(), doc->getCatalog(),
+                                (first_page <= last_page) ? (first_page + 1) : (last_page + 1),
+                                (first_page <= last_page) ? (last_page + 1) : (first_page + 1),
                                         psModePS, (int)width, (int)height,
-                                        duplex, 0, 0, 0, 0, gFalse );
+                                        gFalse, 0, 0, 0, 0, gFalse );
 
-	if ( !out->isOk() ) {
-		delete out;
+    if ( !out->isOk() ) {
+        delete out;
         return FALSE;
-	}
+    }
 
-	if ( *brkExport ) {
-		delete out;
+    if ( *brkExport ) {
+        delete out;
         return TRUE;
-	}
-	
-    for ( long i = first_page; (i <= last_page) && !(*brkExport); i++ ) {
-        doc->displayPage( out, i + 1, 72.0, 72.0, 0, gFalse, gTrue, gFalse );
+    }
+
+    long pagestoprint = abs( last_page - first_page ) + 1;
+    long pg = first_page;
+    for ( long i = 0; (i < pagestoprint) && !(*brkExport); i++ ) {
+        doc->displayPage( out, pg + 1, 72.0, 72.0, 0, gFalse, gTrue, gFalse );
+        pg += ( first_page <= last_page ) ? 1 : -1;
     }
 
     delete out;
@@ -1302,7 +1302,7 @@ SOM_Scope LuDocument_LuRectSequence*  SOMLINK searchText(LuPopplerDocument *somS
 }
 
 
-SOM_Scope boolean  SOMLINK isFixedImage(LuPopplerDocument *somSelf, 
+SOM_Scope boolean  SOMLINK isFixedImage(LuPopplerDocument *somSelf,
                                          Environment *ev)
 {
     return FALSE;

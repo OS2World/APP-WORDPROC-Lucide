@@ -347,8 +347,6 @@ interface LuDocument : SOMObject
      *        (These values will end up in the DocumentMedia, the
      *        BoundingBox DSC comments and other places in the
      *        generated PostScript)
-     * duplex: whether to force duplex printing (on printers which
-     *         support this)
      * brkExport: pointer to boolean variable which must be checked
      *            during generating postscript, if it's TRUE - interrupt
      *            generation process. 
@@ -360,7 +358,7 @@ interface LuDocument : SOMObject
      **/
     boolean exportToPostScript( in string filename, 
                      in long first_page, in long last_page,
-                     in double width, in double height, in boolean duplex, 
+                     in double width, in double height,
                      inout boolean brkExport );
 
 

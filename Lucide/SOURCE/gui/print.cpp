@@ -168,12 +168,14 @@ bool LucidePrinting::doPmPrint( HAB lhab )
     // Issue STARTDOC to begin printing
     DevEscape( hdcPrinter, DEVESC_STARTDOC, strlen(title), (PBYTE)title, NULL, NULL );
 
-    long totalpages = psetup->pgto - psetup->pgfrom + 1;
-    for ( long pg = psetup->pgfrom; pg <= psetup->pgto; pg++ )
+
+    long totalpages = abs( psetup->pgto - psetup->pgfrom ) + 1;
+    long pg = psetup->pgfrom;
+    for ( long i = 0; i < totalpages; i++ )
     {
         char *fmt = newstrdupL( PRINT_PRINTING_PAGE_OF );
         char *buf = new char[ 255 ];
-        snprintf( buf, 255, fmt, pg, totalpages );
+        snprintf( buf, 255, fmt, pg, i + 1, totalpages );
         progressDlg->setText( buf );
         delete fmt;
         delete buf;
@@ -187,6 +189,8 @@ bool LucidePrinting::doPmPrint( HAB lhab )
         if ( abortPrinting ) {
             break;
         }
+
+        pg += ( psetup->pgfrom <= psetup->pgto ) ? 1 : -1;
     }
 
     // Issue DEVESC_ENDDOC, or DEVESC_ABORTDOC if printing was aborted
@@ -309,7 +313,7 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     strcat( tmpps, "TMPLUCID.PS" );
 
     boolean rcexp = doc->exportToPostScript( ev, tmpps, psetup->pgfrom-1, psetup->pgto-1,
-                                             pwidth, pheight, false, &abortPrinting );
+                                             pwidth, pheight, &abortPrinting );
 
     if ( abortPrinting ) {
         unlink( tmpps );

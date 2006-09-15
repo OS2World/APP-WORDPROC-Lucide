@@ -158,7 +158,6 @@ typedef boolean   SOMLINK somTP_LuDjvuDocument_exportToPostScript(LuDjvuDocument
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex, 
 		boolean* brkExport);
 typedef somTP_LuDjvuDocument_exportToPostScript *somTD_LuDjvuDocument_exportToPostScript;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_isHaveFontInfo(LuDjvuDocument *somSelf, Environment *ev);
@@ -603,11 +602,10 @@ boolean   exportToPostScript(Environment *ev,
 		long last_page, 
 		double width, 
 		double height, 
-		boolean duplex, 
 		boolean* brkExport)
 {
    return SOM_ResolveD(this,LuDjvuDocument,LuDocument,exportToPostScript)
-	(this, ev,filename,first_page,last_page,width,height,duplex,brkExport);
+	(this, ev,filename,first_page,last_page,width,height,brkExport);
 }
 
 
