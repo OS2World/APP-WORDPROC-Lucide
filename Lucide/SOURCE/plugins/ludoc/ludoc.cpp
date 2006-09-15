@@ -285,21 +285,6 @@ SOM_Scope boolean  SOMLINK isPostScriptExportable(LuDocument *somSelf,
 }
 
 
-
-/*
- * SOM_Scope boolean  SOMLINK exportToPostScript(LuDocument *somSelf, 
- *                                                Environment *ev, 
- *                                               string filename, 
- *                                               long first_page, 
- *                                               long last_page, 
- *                                               double width, double height, 
- *                                               boolean duplex, 
- *                                               boolean* brkExport)
- */
-
-/*
- * The prototype for exportToPostScript was replaced by the following prototype:
- */
 SOM_Scope boolean  SOMLINK exportToPostScript(LuDocument *somSelf, 
                                                Environment *ev, 
                                               string filename, 
