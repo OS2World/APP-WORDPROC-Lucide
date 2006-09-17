@@ -86,6 +86,8 @@ std::string str( double n );
 std::string time2string( unsigned long time );
 #endif
 
+extern "C" int startBrowser( const char *url );
+
 
 #endif // __LUUTILS_H
 

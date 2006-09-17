@@ -61,6 +61,7 @@ const char *MSGS_WARNING          = "MSGS_WARNING";
 const char *MSGS_OVERWRITE_FILE   = "MSGS_OVERWRITE_FILE";
 const char *MSGS_FILE_SAVE_ERROR  = "MSGS_FILE_SAVE_ERROR";
 const char *MSGS_PAGE             = "MSGS_PAGE";
+const char *MSGS_ERROR_STARTING_BROWSER = "MSGS_ERROR_STARTING_BROWSER";
 
 // Settings dialog
 const char *SD_SINGLE_PAGE = "SD_SINGLE_PAGE";

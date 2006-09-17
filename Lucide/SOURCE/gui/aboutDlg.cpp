@@ -44,8 +44,8 @@
 #include "luutils.h"
 #include "lucide_res.h"
 
-void setLinkPointer( HPOINTER hp );
-void toLink( HWND hwnd );
+extern "C" void setLinkPointer( HPOINTER hp );
+extern "C" void toLink( HWND hwnd );
 BOOL DrawTransparentBitmap( HAB hab, HPS hpsDraw, PPOINTL drawptl, HBITMAP hbmp );
 
 typedef struct

@@ -71,6 +71,7 @@ MSGS_WARNING=Warning!
 MSGS_OVERWRITE_FILE=File already exist. Overwrite?
 MSGS_FILE_SAVE_ERROR=Error saving file!
 MSGS_PAGE=Page
+MSGS_ERROR_STARTING_BROWSER=Error starting browser!
 
 #
 # "Plugins list" dialog

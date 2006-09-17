@@ -22,7 +22,7 @@ EXEDIR = ..\..\BIN
      WPP386 @make.cfg -fo$@ $<
 
 .C.OBJ:
-     WPP386 @make.cfg -fo$@ $<
+     WCC386 -zq -zp=4 -bm -sg -fo$@ $<
 
 .idl.xh:
     sc -c -s"xc;xih;xh" ..\plugins\ludoc $<
@@ -36,7 +36,7 @@ OBJS = Lucide.obj luutils.obj clipbrd.obj pmsplitter.obj pmtoolbar.obj \
        linklab.obj wwbtn.obj intern.obj messages.obj indexWindow.obj \
        fontsInfoDlg.obj docInfoDlg.obj findDlg.obj progressDlg.obj \
        aboutDlg.obj settingsDlg.obj lusettings.obj printDlg.obj \
-       print.obj
+       print.obj stbrowser.obj
 
 Lucide.exe: $(OBJS) Lucide.res
   copy &&|
@@ -67,6 +67,7 @@ file $(OBJDIR)\linklab.obj
 file $(OBJDIR)\wwbtn.obj
 file $(OBJDIR)\intern.obj
 file $(OBJDIR)\messages.obj
+file $(OBJDIR)\stbrowser.obj
 name $(EXEDIR)\Lucide
 lib ..\plugins\ludoc\ludoc
 lib somtk
@@ -106,6 +107,7 @@ intern.obj:         intern.cpp
 messages.obj:       messages.cpp
 linklab.obj:        linklab.c
 wwbtn.obj:          wwbtn.c
+stbrowser.obj:      stbrowser.c
 
 
 MAKE.CFG: makefile

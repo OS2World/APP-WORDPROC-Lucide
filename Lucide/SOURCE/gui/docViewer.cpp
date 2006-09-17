@@ -53,7 +53,8 @@
 
 
 // OpenWatcom headers doesn't have GpiDrawBits() declaration
-extern "C" {
+extern "C"
+{
     LONG APIENTRY GpiDrawBits(HPS hps, PVOID pBits, PBITMAPINFO2 pbmiInfoTable,
                               LONG lCount, PPOINTL aptlPoints, LONG lRop, ULONG flOptions);
 }
@@ -1702,9 +1703,13 @@ BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
                 {
                     if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_EXTERNAL_URI )
                     {
-                        WinMessageBox( HWND_DESKTOP, hMainFrame,
-                            links[ pg ]->_buffer[i].link.uri, "URI", 1,
-                            MB_OK | MB_INFORMATION | MB_MOVEABLE );
+                        if ( !startBrowser( links[ pg ]->_buffer[i].link.uri ) )
+                        {
+                            char *m = newstrdupL( MSGS_ERROR_STARTING_BROWSER );
+                            WinMessageBox( HWND_DESKTOP, hMainFrame, m,
+                                       NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
+                            delete m;
+                        }
                     }
                     else if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_TITLE )
                     {
