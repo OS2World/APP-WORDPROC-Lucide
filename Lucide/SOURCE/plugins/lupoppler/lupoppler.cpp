@@ -594,6 +594,10 @@ SOM_Scope LuDocument_LuLinkMapSequence*  SOMLINK getLinkMapping(LuPopplerDocumen
                                                                 long pagenum)
 {
     LuDocument_LuLinkMapSequence *mapping = NULL;
+    mapping = (LuDocument_LuLinkMapSequence *)SOMMalloc( sizeof( LuDocument_LuLinkMapSequence ) );
+    mapping->_maximum = 0;
+    mapping->_length = 0;
+    mapping->_buffer = NULL;
 
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
     PopplerDocument *document = (PopplerDocument *)somThis->data;
@@ -604,8 +608,8 @@ SOM_Scope LuDocument_LuLinkMapSequence*  SOMLINK getLinkMapping(LuPopplerDocumen
                             document->doc->getCatalog()->getBaseURI() );
     obj.free();
 
-    if ( links == NULL ) {
-        return NULL;
+    if ( links == NULL ) {  // No links, return empty LuLinkMapSequence
+        return mapping;
     }
 
     double height = 0;
@@ -613,34 +617,32 @@ SOM_Scope LuDocument_LuLinkMapSequence*  SOMLINK getLinkMapping(LuPopplerDocumen
 
     int len = links->getNumLinks();
 
-    if ( len > 0 )
-    {
-        mapping = (LuDocument_LuLinkMapSequence *)SOMMalloc( sizeof( LuDocument_LuLinkMapSequence ) );
-        mapping->_maximum = len;
-        mapping->_length = len;
+    mapping->_maximum = len;
+    mapping->_length = len;
+    if ( len != 0 ) {
         mapping->_buffer = (LuLinkMapping *)SOMMalloc( sizeof( LuLinkMapping ) * len );
+    }
 
-        for ( int i = 0; i < len; i++ )
-        {
-            Link *link = links->getLink( i );
-            LinkAction *link_action = link->getAction();
-            build_link( document->doc, &(mapping->_buffer[ i ].link), NULL, link_action );
+    for ( int i = 0; i < len; i++ )
+    {
+        Link *link = links->getLink( i );
+        LinkAction *link_action = link->getAction();
+        build_link( document->doc, &(mapping->_buffer[ i ].link), NULL, link_action );
 
-            link->getRect( &(mapping->_buffer[ i ].area.x1),
-                           &(mapping->_buffer[ i ].area.y1),
-                           &(mapping->_buffer[ i ].area.x2),
-                           &(mapping->_buffer[ i ].area.y2) );
+        link->getRect( &(mapping->_buffer[ i ].area.x1),
+                       &(mapping->_buffer[ i ].area.y1),
+                       &(mapping->_buffer[ i ].area.x2),
+                       &(mapping->_buffer[ i ].area.y2) );
 
-            mapping->_buffer[ i ].area.x1 -= page->page->getCropBox()->x1;
-            mapping->_buffer[ i ].area.x2 -= page->page->getCropBox()->x1;
-            mapping->_buffer[ i ].area.y1 -= page->page->getCropBox()->y1;
-            mapping->_buffer[ i ].area.y2 -= page->page->getCropBox()->y1;
+        mapping->_buffer[ i ].area.x1 -= page->page->getCropBox()->x1;
+        mapping->_buffer[ i ].area.x2 -= page->page->getCropBox()->x1;
+        mapping->_buffer[ i ].area.y1 -= page->page->getCropBox()->y1;
+        mapping->_buffer[ i ].area.y2 -= page->page->getCropBox()->y1;
 
-            double y1 = mapping->_buffer[ i ].area.y1;
-            double y2 = mapping->_buffer[ i ].area.y2;
-            mapping->_buffer[ i ].area.y1 = height - y2;
-            mapping->_buffer[ i ].area.y2 = height - y1;
-        }
+        double y1 = mapping->_buffer[ i ].area.y1;
+        double y2 = mapping->_buffer[ i ].area.y2;
+        mapping->_buffer[ i ].area.y1 = height - y2;
+        mapping->_buffer[ i ].area.y2 = height - y1;
     }
 
     return mapping;

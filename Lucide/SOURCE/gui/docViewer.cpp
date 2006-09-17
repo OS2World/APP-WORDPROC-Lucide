@@ -122,6 +122,7 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     selection = NULL;
     selrects = NULL;
     // links
+    haveLinks = false;
     links = NULL;
     handPtr = WinLoadPointer( HWND_DESKTOP, NULLHANDLE, IDP_HAND );
     zoomInPtr = WinLoadPointer( HWND_DESKTOP, NULLHANDLE, IDP_ZOOM_IN );
@@ -201,6 +202,7 @@ void DocumentViewer::setDocument( LuDocument *_doc )
         if ( !doc->isScalable( ev ) ) {
             zoom = 1;
         }
+        haveLinks = doc->isHaveLinks( ev );
 
         pagesizes = new LuSize[ totalpages ];
         countPagesizes();
@@ -279,6 +281,7 @@ void DocumentViewer::close()
     currentpage = 0;
     fullwidth   = 0;
     fullheight  = 0;
+    haveLinks   = false;
 
     DosReleaseMutexSem( todrawAccess );
 }
@@ -601,7 +604,7 @@ void DocumentViewer::drawPage()
         selrects[ currentpage ] = NULL;
 
         if ( links != NULL ) {
-            if ( links[ currentpage ] == NULL ) {
+            if ( ( links[ currentpage ] == NULL ) && haveLinks ) {
                 links[ currentpage ] = doc->getLinkMapping( ev, currentpage );
             }
         }
@@ -1042,7 +1045,7 @@ void DocumentViewer::wmPaintContAsynch( HWND hwnd )
             PageDrawArea *pda = &(*drawareas)[ i ];
 
             // load links for page if not loaded before
-            if ( links[ pda->pagenum ] == NULL ) {
+            if ( ( links[ pda->pagenum ] == NULL ) && haveLinks ) {
                 links[ pda->pagenum ] = doc->getLinkMapping( ev, pda->pagenum );
             }
         }
@@ -1237,7 +1240,7 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
             PageDrawArea *pda = &(*drawareas)[ i ];
 
             // load links for page if not loaded before
-            if ( links[ pda->pagenum ] == NULL ) {
+            if ( ( links[ pda->pagenum ] == NULL ) && haveLinks ) {
                 links[ pda->pagenum ] = doc->getLinkMapping( ev, pda->pagenum );
             }
 

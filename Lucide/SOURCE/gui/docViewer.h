@@ -188,6 +188,7 @@ class DocumentViewer
         LuDocument_LuRectSequence **selrects;
 
         // links
+        bool haveLinks;
         LuDocument_LuLinkMapSequence **links;
 
         // search

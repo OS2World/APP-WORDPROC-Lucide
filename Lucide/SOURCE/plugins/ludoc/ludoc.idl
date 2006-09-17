@@ -285,11 +285,10 @@ interface LuDocument : SOMObject
      * This sequence must be freed
      * with freeLinkMapping() when done.
      *
-     * Return value: A pointer to sequence of LuLinkMapping
-     *               or NULL if no links on page.
+     * Return value: A pointer to sequence of LuLinkMapping.
      *
      * Note: SOMMalloc() must be used for all memory allocations.
-     * Default return value: NULL
+     * Default return value: pointer to empty LuLinkMapSequence
      **/
     LuLinkMapSequence *getLinkMapping( in long pagenum );
 

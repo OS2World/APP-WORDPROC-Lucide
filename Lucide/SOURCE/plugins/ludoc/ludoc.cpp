@@ -233,8 +233,13 @@ SOM_Scope LuDocument_LuLinkMapSequence*  SOMLINK getLinkMapping(LuDocument *somS
                                                                  Environment *ev,
                                                                 long pagenum)
 {
-    // Abstract method does nothing
-    return NULL;
+    // Abstract method, returns empty sequence
+    LuDocument_LuLinkMapSequence *mapping = NULL;
+    mapping = (LuDocument_LuLinkMapSequence *)SOMMalloc( sizeof( LuDocument_LuLinkMapSequence ) );
+    mapping->_maximum = 0;
+    mapping->_length = 0;
+    mapping->_buffer = NULL;
+    return mapping;
 }
 
 
