@@ -158,6 +158,7 @@ void Lucide::enableZoomMenus()
     WinEnableMenuItem( hWndMenu, CM_FITWIDTH, scalable );
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FITWIDTH), (MPARAM)scalable );
     WinEnableMenuItem( hWndMenu, CM_ZOOM_IN_OUT, scalable );
+    WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_ZOOM_IN_OUT), (MPARAM)scalable );
     WinEnableControl( hToolBar, TBID_ZOOM, scalable );
     BOOL rotable = doc->isRotable( ev );
     WinEnableMenuItem( hWndMenu, CM_ROTATE90CW, rotable );
@@ -256,6 +257,7 @@ void Lucide::checkMenus()
         WinEnableMenuItem( hWndMenu, CM_FITWIDTH, FALSE );
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FITWIDTH), (MPARAM)FALSE );
         WinEnableMenuItem( hWndMenu, CM_ZOOM_IN_OUT, FALSE );
+        WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_ZOOM_IN_OUT), (MPARAM)FALSE );
         WinEnableControl( hToolBar, TBID_ZOOM, FALSE );
 
         WinEnableMenuItem( hWndMenu, CM_ROTATE90CW, FALSE );
@@ -614,6 +616,7 @@ void Lucide::toggleZoom()
 
         WinSendMsg( hWndMenu, MM_SETITEMATTR, MPFROM2SHORT( CM_ZOOM_IN_OUT, TRUE ),
                 MPFROM2SHORT( MIA_CHECKED, isZoom ? MIA_CHECKED : FALSE ) );
+        WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( CM_ZOOM_IN_OUT ), (MPARAM)isZoom );
         docViewer->setZoomMode( isZoom );
     }
 }

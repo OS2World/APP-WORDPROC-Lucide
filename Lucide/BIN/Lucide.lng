@@ -57,6 +57,7 @@ TBHINT_FIT_WINDOW=Fit in window
 TBHINT_FIT_WIDTH=Fit width
 TBHINT_FIND=Find...
 TBHINT_FINDAGAIN=Find again
+TBHINT_ZOOM_IN_OUT=Zoom in/out
 # toolbar's page number
 TB_PAGENUM=of %d
 

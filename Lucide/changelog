@@ -1,4 +1,5 @@
 Beta-4:
+  - Added 'Zoom In/Out' button to zoom in/out with mouse click/ctrl+click.
   - Replace ligatures when converting text from unicode to system 
     codepage (closed ticket #45).
   - Lucide's internationalization now respects 'territory' modifier.

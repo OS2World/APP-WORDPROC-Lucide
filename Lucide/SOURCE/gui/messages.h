@@ -49,6 +49,7 @@ extern const char *TBHINT_FIT_WINDOW;
 extern const char *TBHINT_FIT_WIDTH;
 extern const char *TBHINT_FIND;
 extern const char *TBHINT_FINDAGAIN;
+extern const char *TBHINT_ZOOM_IN_OUT;
 // toolbar's page number
 extern const char *TB_PAGENUM;
 

@@ -48,6 +48,7 @@ const char *TBHINT_FIT_WINDOW    = "TBHINT_FIT_WINDOW";
 const char *TBHINT_FIT_WIDTH     = "TBHINT_FIT_WIDTH";
 const char *TBHINT_FIND          = "TBHINT_FIND";
 const char *TBHINT_FINDAGAIN     = "TBHINT_FINDAGAIN";
+const char *TBHINT_ZOOM_IN_OUT   = "TBHINT_ZOOM_IN_OUT";
 // toolbar's page number
 const char *TB_PAGENUM           = "TB_PAGENUM";
 

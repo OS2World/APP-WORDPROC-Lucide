@@ -16,6 +16,7 @@ BITMAP IDB_FITPAGE      "bitmaps\\fitpage.bmp"
 BITMAP IDB_FITWIDTH     "bitmaps\\fitwidth.bmp"
 BITMAP IDB_FIND         "bitmaps\\find.bmp"
 BITMAP IDB_FINDAGAIN    "bitmaps\\findagain.bmp"
+BITMAP IDB_MGLASS       "bitmaps\\mglass.bmp"
 
 POINTER IDP_HAND        "bitmaps\\hand.ptr"
 POINTER IDP_ZOOM_IN     "bitmaps\\zoom_in.ptr"
