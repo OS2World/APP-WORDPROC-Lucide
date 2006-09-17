@@ -62,6 +62,6 @@ MAKE.CFG: makefile
 -I..\ludoc
 -I..\..\..\..\poppler\mypoppler
 -I..\..\..\..\poppler\mypoppler\poppler
--I..\..\..\..\poppler\fontconfig-2.3.2-os2
+-I..\..\..\..\poppler\fc-emulate-os2
 -DOS2
 | MAKE.CFG >NUL
