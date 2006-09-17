@@ -7,6 +7,8 @@ Beta-4:
   - Prevent Lucide from close on broken JPEGs (closed ticket #80).
   - In single-page view pressing PgUp/PgDn if already at top/bottom of page
     moves to previous/next page (closed ticket #73).
+  - Enable printing in reverse order (closed ticket #88).
+  - Internal fixes.
   - Added NLS-files: Spanish, Traditional Chinese (Taiwan).
   - Updated NLS-files: Dutch, German, Swedish.
 
