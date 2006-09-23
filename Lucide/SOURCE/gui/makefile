@@ -28,7 +28,7 @@ EXEDIR = ..\..\BIN
     sc -c -s"xc;xih;xh" ..\plugins\ludoc $<
 
 
-all: make.cfg Lucide.exe
+all: make.cfg Lucide.exe lcd.exe
    DEL MAKE.CFG
 
 OBJS = Lucide.obj luutils.obj clipbrd.obj pmsplitter.obj pmtoolbar.obj \
@@ -71,16 +71,32 @@ file $(OBJDIR)\stbrowser.obj
 name $(EXEDIR)\Lucide
 lib ..\plugins\ludoc\ludoc
 lib somtk
-
 | tmpmake.lnk >NUL
     wlink @tmpmake.lnk
-    RC -n $(OBJDIR)\Lucide.RES $(EXEDIR)\Lucide.exe >NUL
+    RC -n $(OBJDIR)\Lucide.res $(EXEDIR)\Lucide.exe >NUL
     del tmpmake.lnk
-    
 
-Lucide.res: Lucide.rc dialogs.rc
+
+lcd.exe: lcd.obj lcd.res
+  copy &&|
+option quiet
+system os2v2_pm
+option map=$(OBJDIR)\lcd
+option statics
+file $(OBJDIR)\lcd.obj
+name $(EXEDIR)\lcd
+| tmpmake.lnk >NUL
+    wlink @tmpmake.lnk
+    RC -n $(OBJDIR)\lcd.res $(EXEDIR)\lcd.exe >NUL
+    del tmpmake.lnk
+
+
+Lucide.res: Lucide.rc dialogs.rc Lucide_res.H
     RC -n -r Lucide.rc $(OBJDIR)\Lucide.res
 
+lcd.res: lcd.rc
+    RC -n -r lcd.rc $(OBJDIR)\lcd.res
+    
 
 Lucide.cpp: ..\plugins\ludoc\ludoc.xh
 
@@ -108,6 +124,7 @@ messages.obj:       messages.cpp
 linklab.obj:        linklab.c
 wwbtn.obj:          wwbtn.c
 stbrowser.obj:      stbrowser.c
+lcd.obj:            lcd.c
 
 
 MAKE.CFG: makefile

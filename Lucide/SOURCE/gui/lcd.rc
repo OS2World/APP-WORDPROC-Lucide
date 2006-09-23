@@ -1,0 +1,3 @@
+#include "Lucide_res.H"
+
+ICON IDI_MAIN_ICON      "bitmaps\\lucide.ico"
