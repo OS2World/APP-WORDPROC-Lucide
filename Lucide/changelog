@@ -9,6 +9,8 @@ Beta-4:
   - In single-page view pressing PgUp/PgDn if already at top/bottom of page
     moves to previous/next page (closed ticket #73).
   - Enable printing in reverse order (closed ticket #88).
+  - Added small executor (lcd.exe) to set beginlibpath and then execute 
+    Lucide.exe.
   - Internal fixes.
   - Added NLS-files: Spanish, Traditional Chinese (Taiwan).
   - Updated NLS-files: Dutch, German, Swedish.
