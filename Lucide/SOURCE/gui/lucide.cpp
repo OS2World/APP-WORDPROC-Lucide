@@ -170,8 +170,7 @@ void Lucide::setZoomChecks( SHORT cmd, SHORT cbind, double zoom )
 {
     if ( cmd != -1 )
     {
-        WinSendMsg( hWndMenu, MM_SETITEMATTR, MPFROM2SHORT( cmd, TRUE ),
-                            MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
+        WinCheckMenuItem( hWndMenu, cmd, TRUE );
         WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( cmd ), (MPARAM)TRUE );
     }
 
@@ -194,14 +193,11 @@ void Lucide::checkZoomMenus()
 {
     double zoom = docViewer->getZoom();
 
-    WinSendMsg( hWndMenu, MM_SETITEMATTR, MPFROM2SHORT( CM_FITWINDOW, TRUE ),
-                        MPFROM2SHORT( MIA_CHECKED, FALSE ) );
+    WinCheckMenuItem( hWndMenu, CM_FITWINDOW, FALSE );
     WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT(CM_FITWINDOW), (MPARAM)FALSE );
-    WinSendMsg( hWndMenu, MM_SETITEMATTR, MPFROM2SHORT( CM_ACTSIZE, TRUE ),
-                        MPFROM2SHORT( MIA_CHECKED, FALSE ) );
+    WinCheckMenuItem( hWndMenu, CM_ACTSIZE, FALSE );
     WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT(CM_ACTSIZE), (MPARAM)FALSE );
-    WinSendMsg( hWndMenu, MM_SETITEMATTR, MPFROM2SHORT( CM_FITWIDTH, TRUE ),
-                        MPFROM2SHORT( MIA_CHECKED, FALSE ) );
+    WinCheckMenuItem( hWndMenu, CM_FITWIDTH, FALSE );
     WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT(CM_FITWIDTH), (MPARAM)FALSE );
 
     if ( zoom == -2 ) {
@@ -223,9 +219,7 @@ void Lucide::checkMenus()
     if ( doc == NULL )
     {
         // "single page" mode by default
-        WinSendMsg( hWndMenu, MM_SETITEMATTR,
-                    MPFROM2SHORT( CM_SINGLEPAGE, TRUE ),
-                    MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
+        WinCheckMenuItem( hWndMenu, CM_SINGLEPAGE, TRUE );
 
         WinEnableMenuItem( hWndMenu, CM_SAVEAS, FALSE );
         WinEnableMenuItem( hWndMenu, CM_PRINT, FALSE );
@@ -314,23 +308,13 @@ void Lucide::setDocument( LuDocument *_doc )
 
 void Lucide::setPageLayout( PgLayout layout )
 {
-    if ( layout == SinglePage )
-    {
-        WinSendMsg( hWndMenu, MM_SETITEMATTR,
-                    MPFROM2SHORT( CM_SINGLEPAGE, TRUE ),
-                    MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
-        WinSendMsg( hWndMenu, MM_SETITEMATTR,
-                    MPFROM2SHORT( CM_CONTINUOUS, TRUE ),
-                    MPFROM2SHORT( MIA_CHECKED, FALSE ) );
+    if ( layout == SinglePage ) {
+        WinCheckMenuItem( hWndMenu, CM_SINGLEPAGE, TRUE );
+        WinCheckMenuItem( hWndMenu, CM_CONTINUOUS, FALSE );
     }
-    else
-    {
-        WinSendMsg( hWndMenu, MM_SETITEMATTR,
-                    MPFROM2SHORT( CM_SINGLEPAGE, TRUE ),
-                    MPFROM2SHORT( MIA_CHECKED, FALSE ) );
-        WinSendMsg( hWndMenu, MM_SETITEMATTR,
-                    MPFROM2SHORT( CM_CONTINUOUS, TRUE ),
-                    MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
+    else {
+        WinCheckMenuItem( hWndMenu, CM_SINGLEPAGE, FALSE );
+        WinCheckMenuItem( hWndMenu, CM_CONTINUOUS, TRUE );
     }
 
     docViewer->setPageLayout( layout );
@@ -505,16 +489,12 @@ void Lucide::saveDocumentAs()
 
 void Lucide::checkNavpane()
 {
-    if ( Lucide::showIndex )
-    {
-        WinSendMsg( hWndMenu, MM_SETITEMATTR, MPFROM2SHORT( CM_NAVPANE, TRUE ),
-                MPFROM2SHORT( MIA_CHECKED, MIA_CHECKED ) );
+    if ( Lucide::showIndex ) {
+        WinCheckMenuItem( hWndMenu, CM_NAVPANE, TRUE );
         WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( CM_NAVPANE ), (MPARAM)TRUE );
     }
-    else
-    {
-        WinSendMsg( hWndMenu, MM_SETITEMATTR, MPFROM2SHORT( CM_NAVPANE, TRUE ),
-                MPFROM2SHORT( MIA_CHECKED, FALSE ) );
+    else {
+        WinCheckMenuItem( hWndMenu, CM_NAVPANE, FALSE );
         WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( CM_NAVPANE ), (MPARAM)FALSE );
     }
 }
@@ -614,8 +594,7 @@ void Lucide::toggleZoom()
     {
         bool isZoom = !docViewer->isZoomMode();
 
-        WinSendMsg( hWndMenu, MM_SETITEMATTR, MPFROM2SHORT( CM_ZOOM_IN_OUT, TRUE ),
-                MPFROM2SHORT( MIA_CHECKED, isZoom ? MIA_CHECKED : FALSE ) );
+        WinCheckMenuItem( hWndMenu, CM_ZOOM_IN_OUT, isZoom );
         WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( CM_ZOOM_IN_OUT ), (MPARAM)isZoom );
         docViewer->setZoomMode( isZoom );
     }
