@@ -128,8 +128,7 @@ void PrintDlg::enumQueues( HWND hwnd )
     USHORT sEntry;
     for ( ULONG i = 0; i < cReturned; i++ )
     {
-        sEntry = (SHORT)WinSendMsg( list, LM_INSERTITEM, MPFROMSHORT(LIT_END),
-                                    MPFROMP( pQueueInfo[i].pszComment ) );
+        sEntry = (SHORT)WinInsertLboxItem( list, LIT_END, pQueueInfo[i].pszComment );
         WinSendMsg( list, LM_SETITEMHANDLE,
                     MPFROMSHORT(sEntry), MPFROMP( &(pQueueInfo[i]) ) );
 

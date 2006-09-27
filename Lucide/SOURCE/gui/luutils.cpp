@@ -59,36 +59,6 @@ afbuf::afbuf( unsigned int s )
     memset( buffer, 0, s );
 }
 
-void DestroyGraphicsBuffer( HPS hpsBuffer, HDC hdcBuffer )
-{
-    if( hpsBuffer && hdcBuffer )
-    {
-        HBITMAP hbm = GpiSetBitmap( hpsBuffer, NULLHANDLE );
-
-        if ( hbm != NULLHANDLE ) {
-            GpiDeleteBitmap( hbm );
-        }
-
-        GpiDestroyPS( hpsBuffer );
-        DevCloseDC( hdcBuffer );
-
-        hpsBuffer = hdcBuffer = NULLHANDLE;
-    }
-}
-
-void BlitGraphicsBuffer( HPS hps, HPS hpsBuffer, PRECTL prclPaint )
-{
-    POINTL aptl[ 3 ];
-
-    aptl[ 0 ].x = prclPaint->xLeft;
-    aptl[ 0 ].y = prclPaint->yBottom;
-    aptl[ 1 ].x = prclPaint->xRight;
-    aptl[ 1 ].y = prclPaint->yTop;
-    aptl[ 2 ].x = prclPaint->xLeft;
-    aptl[ 2 ].y = prclPaint->yBottom;
-
-    GpiBitBlt( hps, hpsBuffer, 3L, aptl, ROP_SRCCOPY, BBO_IGNORE );
-}
 
 BOOL CreateGraphicsBuffer( HAB hab, PRECTL prectl, HPS hps,
                            HPS *phpsBuffer, HDC *phdcBuffer )
@@ -158,6 +128,37 @@ BOOL CreateGraphicsBuffer( HAB hab, PRECTL prectl, HPS hps,
     return FALSE;
 }
 
+void BlitGraphicsBuffer( HPS hps, HPS hpsBuffer, PRECTL prclPaint )
+{
+    POINTL aptl[ 3 ];
+
+    aptl[ 0 ].x = prclPaint->xLeft;
+    aptl[ 0 ].y = prclPaint->yBottom;
+    aptl[ 1 ].x = prclPaint->xRight;
+    aptl[ 1 ].y = prclPaint->yTop;
+    aptl[ 2 ].x = prclPaint->xLeft;
+    aptl[ 2 ].y = prclPaint->yBottom;
+
+    GpiBitBlt( hps, hpsBuffer, 3L, aptl, ROP_SRCCOPY, BBO_IGNORE );
+}
+
+void DestroyGraphicsBuffer( HPS hpsBuffer, HDC hdcBuffer )
+{
+    if( hpsBuffer && hdcBuffer )
+    {
+        HBITMAP hbm = GpiSetBitmap( hpsBuffer, NULLHANDLE );
+
+        if ( hbm != NULLHANDLE ) {
+            GpiDeleteBitmap( hbm );
+        }
+
+        GpiDestroyPS( hpsBuffer );
+        DevCloseDC( hdcBuffer );
+
+        hpsBuffer = hdcBuffer = NULLHANDLE;
+    }
+}
+
 
 char *newstrdup( const char *s )
 {
@@ -196,12 +197,10 @@ BOOL PMRestoreWindowPos( PCSZ pIniName, PCSZ pAppName, PCSZ pKeyName,
         SwpOptions |= SWP_ACTIVATE;
     }
 
-    if ( pIniName == NULL )  // пишем в user profile
-    {
+    if ( pIniName == NULL ) { // пишем в user profile
         hini = HINI_USER;
     }
-    else
-    {
+    else {
         hini = PrfOpenProfile( WinQueryAnchorBlock( hwnd ), pIniName );
     }
 
@@ -209,8 +208,12 @@ BOOL PMRestoreWindowPos( PCSZ pIniName, PCSZ pAppName, PCSZ pKeyName,
     {
         if ( PrfQueryProfileData( hini, pAppName, pKeyName, &wp, &ulWpSize ) )
         {
-            if ( wp.Swp.fl & SWP_MAXIMIZE )  SwpOptions |= SWP_MAXIMIZE;
-            else if ( wp.Swp.fl & SWP_MINIMIZE )  SwpOptions |= SWP_MINIMIZE;
+            if ( wp.Swp.fl & SWP_MAXIMIZE ) {
+                SwpOptions |= SWP_MAXIMIZE;
+            }
+            else if ( wp.Swp.fl & SWP_MINIMIZE ) {
+                SwpOptions |= SWP_MINIMIZE;
+            }
 
             if ( min ) {
                 SwpOptions &= ~SWP_MAXIMIZE;
@@ -231,8 +234,12 @@ BOOL PMRestoreWindowPos( PCSZ pIniName, PCSZ pAppName, PCSZ pKeyName,
                 sx = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
                 sy = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
 
-                if ( wp.Swp.x > sx )  wp.Swp.x = sx - wp.Swp.cx;
-                if ( wp.Swp.y > sy )  wp.Swp.y = sy - wp.Swp.cy;
+                if ( wp.Swp.x > sx ) {
+                    wp.Swp.x = sx - wp.Swp.cx;
+                }
+                if ( wp.Swp.y > sy ) {
+                    wp.Swp.y = sy - wp.Swp.cy;
+                }
             }
 
             WinSetWindowPos( hwnd, NULLHANDLE,
@@ -248,7 +255,9 @@ BOOL PMRestoreWindowPos( PCSZ pIniName, PCSZ pAppName, PCSZ pKeyName,
             rval = TRUE;
         }
 
-        if ( pIniName != NULL )  PrfCloseProfile( hini );
+        if ( pIniName != NULL ) {
+            PrfCloseProfile( hini );
+        }
     }
     return rval;
 }
@@ -447,20 +456,20 @@ SHORT setZoomValues( HWND lbox )
     char *fitwindtext = newstrdupL( TBHINT_FIT_WINDOW );
     char *fitwidthtext = newstrdupL( TBHINT_FIT_WIDTH );
     WinSetWindowText( lbox, actsizetext );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( actsizetext ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( fitwindtext ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( fitwidthtext ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "12.5%" ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "25%" ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "50%" ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "100%" ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "125%" ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "150%" ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "200%" ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "300%" ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "400%" ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "800%" ) );
-    WinSendMsg( lbox, LM_INSERTITEM, MPFROMSHORT(LIT_END), MPFROMP( "1600%" ) );
+    WinInsertLboxItem( lbox, LIT_END, actsizetext );
+    WinInsertLboxItem( lbox, LIT_END, fitwindtext );
+    WinInsertLboxItem( lbox, LIT_END, fitwidthtext );
+    WinInsertLboxItem( lbox, LIT_END, "12.5%" );
+    WinInsertLboxItem( lbox, LIT_END, "25%" );
+    WinInsertLboxItem( lbox, LIT_END, "50%" );
+    WinInsertLboxItem( lbox, LIT_END, "100%" );
+    WinInsertLboxItem( lbox, LIT_END, "125%" );
+    WinInsertLboxItem( lbox, LIT_END, "150%" );
+    WinInsertLboxItem( lbox, LIT_END, "200%" );
+    WinInsertLboxItem( lbox, LIT_END, "300%" );
+    WinInsertLboxItem( lbox, LIT_END, "400%" );
+    WinInsertLboxItem( lbox, LIT_END, "800%" );
+    WinInsertLboxItem( lbox, LIT_END, "1600%" );
 
     HPS hps = WinGetPS( lbox );
     SHORT actsizelen = getStringPixSize( hps, actsizetext );

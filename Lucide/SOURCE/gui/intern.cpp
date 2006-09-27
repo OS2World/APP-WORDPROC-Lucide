@@ -65,18 +65,11 @@ static string unescapeControls( const char *s )
     string r = s;
     for ( int i = 0; i < NUM_ESCAPES; i++ )
     {
-        const char *r_c = r.c_str();
-        char *p = strstr( r_c, escapes[i][0] );
-        if ( p != NULL )
-        {
-            int len = strlen( r_c ) + 1;
-            char *tmp = new char[ len ];
-            memset( tmp, 0, len );
-            memcpy( tmp, r_c, p - r_c );
-            strcat( tmp, escapes[i][1] );
-            strcat( tmp, p + strlen( escapes[i][0] ) );
-            r = tmp;
-            delete tmp;
+        int startpos = 0;
+        int findpos = -1;
+        while ( ( findpos = r.find( escapes[i][0], startpos ) ) != -1 ) {
+            r.replace( findpos, 2, escapes[i][1] );
+            startpos = findpos + 1;
         }
     }
     return r;

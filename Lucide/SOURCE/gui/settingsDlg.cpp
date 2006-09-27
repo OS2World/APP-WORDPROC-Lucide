@@ -63,16 +63,13 @@ void SettingsDlg::doDialog()
 
 static void setZoomCombo( HWND combo, SHORT cbind, double zoom )
 {
-    if ( cbind != -1 )
-    {
+    if ( cbind != -1 ) {
         char buf[ 255 ] = "";
-        WinSendMsg( combo, LM_QUERYITEMTEXT,
-                    MPFROM2SHORT( cbind, sizeof( buf ) ), MPFROMP( buf ) );
+        WinQueryLboxItemText( combo, cbind, buf, sizeof( buf ) );
         WinSetWindowText( combo, buf );
     }
 
-    if ( zoom != 0 )
-    {
+    if ( zoom != 0 ) {
         std::string z = str( zoom * 100.0 ) + "%";
         WinSetWindowText( combo, z.c_str() );
     }
@@ -105,10 +102,8 @@ MRESULT EXPENTRY SettingsDlg::settingsDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
             HWND hLayout = WinWindowFromID( hwnd, IDC_DEFPGLAYOUT );
             std::string spage = getLocalizedString( SD_SINGLE_PAGE );
             std::string cont = getLocalizedString( SD_CONTINUOUS );
-            WinSendMsg( hLayout, LM_INSERTITEM, MPFROMSHORT(LIT_END),
-                        MPFROMP( spage.c_str() ) );
-            WinSendMsg( hLayout, LM_INSERTITEM, MPFROMSHORT(LIT_END),
-                        MPFROMP( cont.c_str() ) );
+            WinInsertLboxItem( hLayout, LIT_END, spage.c_str() );
+            WinInsertLboxItem( hLayout, LIT_END, cont.c_str() );
             if ( _this->settings->layout == SinglePage ) {
                 WinSetWindowText( hLayout, spage.c_str() );
             } else if ( _this->settings->layout = Continuous ) {
