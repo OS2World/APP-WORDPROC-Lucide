@@ -2,6 +2,7 @@ Beta-4:
   - Added 'Zoom In/Out' button to zoom in/out with mouse click/ctrl+click.
   - Replace ligatures when converting text from unicode to system 
     codepage (closed ticket #45).
+  - Poppler (pdf rendering) library updated to version 0.5.4.
   - Lucide's internationalization now respects 'territory' modifier.
   - Fixed crash on PDF load during fonts enumeration on font files which
     FreeType doesn't understand (closed ticket #83).
