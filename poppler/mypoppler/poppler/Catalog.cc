@@ -440,8 +440,16 @@ NameTree::NameTree(void)
 
 NameTree::Entry::Entry(Array *array, int index) {
     GooString n;
-    if (!array->getString(index, &n) || !array->getNF(index + 1, &value))
-	error(-1, "Invalid page tree");
+    if (!array->getString(index, &n) || !array->getNF(index + 1, &value)) {
+      Object aux;
+      array->get(index, &aux);
+      if (aux.isString() && array->getNF(index + 1, &value) )
+      {
+        n.append(aux.getString());
+      }
+      else
+        error(-1, "Invalid page tree");
+    }
     name = new UGooString(n);
 }
 
@@ -487,6 +495,7 @@ void NameTree::parse(Object *tree) {
       addEntry(entry);
     }
   }
+  names.free();
 
   // root or intermediate node
   if (tree->dictLookup("Kids", &kids)->isArray()) {

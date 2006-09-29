@@ -483,7 +483,6 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict,
   // initialize
   out = outA;
   state = new GfxState(72, 72, box, 0, gFalse);
-  out->updateAll(state);
   fontChanged = gFalse;
   clip = clipNone;
   ignoreUndef = 0;
@@ -1212,8 +1211,8 @@ void Gfx::opCloseStroke(Object args[], int numArgs) {
     //error(getPos(), "No path in closepath/stroke");
     return;
   }
+  state->closePath();
   if (state->isPath()) {
-    state->closePath();
     out->stroke(state);
   }
   doEndPath();

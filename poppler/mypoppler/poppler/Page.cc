@@ -349,7 +349,6 @@ Gfx *Page::createGfx(OutputDev *out, double hDPI, double vDPI,
   return gfx;
 }
 
-
 void Page::displaySlice(OutputDev *out, double hDPI, double vDPI,
 			int rotate, GBool useMediaBox, GBool crop,
 			int sliceX, int sliceY, int sliceW, int sliceH,

@@ -58,6 +58,7 @@ CairoOutputDev::CairoOutputDev() {
   fill_opacity = 1.0;
   textClipPath = NULL;
   cairo = NULL;
+  currentFont = NULL;
 }
 
 CairoOutputDev::~CairoOutputDev() {
@@ -124,9 +125,32 @@ void CairoOutputDev::updateAll(GfxState *state) {
   needFontUpdate = gTrue;
 }
 
+void CairoOutputDev::setDefaultCTM(double *ctm) {
+  cairo_matrix_t matrix;
+  matrix.xx = ctm[0];
+  matrix.yx = ctm[1];
+  matrix.xy = ctm[2];
+  matrix.yy = ctm[3];
+  matrix.x0 = ctm[4];
+  matrix.y0 = ctm[5];
+
+  cairo_set_matrix (cairo, &matrix);
+
+  OutputDev::setDefaultCTM(ctm);
+}
+
 void CairoOutputDev::updateCTM(GfxState *state, double m11, double m12,
 				double m21, double m22,
 				double m31, double m32) {
+  cairo_matrix_t matrix;
+  matrix.xx = m11;
+  matrix.yx = m12;
+  matrix.xy = m21;
+  matrix.yy = m22;
+  matrix.x0 = m31;
+  matrix.y0 = m32;
+
+  cairo_transform (cairo, &matrix);
   updateLineDash(state);
   updateLineJoin(state);
   updateLineCap(state);
@@ -137,20 +161,9 @@ void CairoOutputDev::updateLineDash(GfxState *state) {
   double *dashPattern;
   int dashLength;
   double dashStart;
-  double *transformedDash;
-  double transformedStart;
-  int i;
 
   state->getLineDash(&dashPattern, &dashLength, &dashStart);
-
-  transformedDash = new double[dashLength];
-  
-  for (i = 0; i < dashLength; ++i) {
-    transformedDash[i] =  state->transformWidth(dashPattern[i]);
-  }
-  transformedStart = state->transformWidth(dashStart);
-  cairo_set_dash (cairo, transformedDash, dashLength, transformedStart);
-  delete [] transformedDash;
+  cairo_set_dash (cairo, dashPattern, dashLength, dashStart);
 }
 
 void CairoOutputDev::updateFlatness(GfxState *state) {
@@ -190,11 +203,11 @@ void CairoOutputDev::updateMiterLimit(GfxState *state) {
 }
 
 void CairoOutputDev::updateLineWidth(GfxState *state) {
-  LOG(printf ("line width: %f\n", state->getTransformedLineWidth()));
-  if (state->getTransformedLineWidth() == 0.0) {
+  LOG(printf ("line width: %f\n", state->getLineWidth()));
+  if (state->getLineWidth() == 0.0) {
       cairo_set_line_width (cairo, 72.0/300.0);
   } else {
-      cairo_set_line_width (cairo, state->getTransformedLineWidth());
+      cairo_set_line_width (cairo, state->getLineWidth());
   }
 }
 
@@ -273,11 +286,13 @@ void CairoOutputDev::updateFont(GfxState *state) {
   
   font_face = currentFont->getFontFace();
   cairo_set_font_face (cairo, font_face);
-
-  matrix.xx = m11;
-  matrix.xy = -m21;
-  matrix.yx = m12;
-  matrix.yy = -m22;
+ 
+  double fontSize = state->getFontSize();
+  double *m = state->getTextMat();
+  matrix.xx = m[0] * fontSize;
+  matrix.yx = m[1] * fontSize;
+  matrix.xy = -m[2] * fontSize;
+  matrix.yy = -m[3] * fontSize;
   matrix.x0 = 0;
   matrix.y0 = 0;
   cairo_set_font_matrix (cairo, &matrix);
@@ -285,31 +300,22 @@ void CairoOutputDev::updateFont(GfxState *state) {
 
 void CairoOutputDev::doPath(GfxState *state, GfxPath *path) {
   GfxSubpath *subpath;
-  double x1, y1, x2, y2, x3, y3;
   int i, j;
-
   for (i = 0; i < path->getNumSubpaths(); ++i) {
     subpath = path->getSubpath(i);
     if (subpath->getNumPoints() > 0) {
-      state->transform(subpath->getX(0), subpath->getY(0), &x1, &y1);
-      cairo_move_to (cairo, x1, y1);
-      LOG (printf ("move_to %f, %f\n", x1, y1));
-      j = 1;
+      cairo_move_to (cairo, subpath->getX(0), subpath->getY(0));
+         j = 1;
       while (j < subpath->getNumPoints()) {
 	if (subpath->getCurve(j)) {
-	  state->transform(subpath->getX(j), subpath->getY(j), &x1, &y1);
-	  state->transform(subpath->getX(j+1), subpath->getY(j+1), &x2, &y2);
-	  state->transform(subpath->getX(j+2), subpath->getY(j+2), &x3, &y3);
-	  cairo_curve_to (cairo, 
-			  x1, y1,
-			  x2, y2,
-			  x3, y3);
-	  LOG (printf ("curve_to %f, %f  %f, %f  %f, %f\n", x1, y1, x2, y2, x3, y3));
+	  cairo_curve_to( cairo,
+			  subpath->getX(j), subpath->getY(j),
+			  subpath->getX(j+1), subpath->getY(j+1),
+			  subpath->getX(j+2), subpath->getY(j+2));
+
 	  j += 3;
 	} else {
-	  state->transform(subpath->getX(j), subpath->getY(j), &x1, &y1);
-	  cairo_line_to (cairo, x1, y1);
-	  LOG(printf ("line_to %f, %f\n", x1, y1));
+	  cairo_line_to (cairo, subpath->getX(j), subpath->getY(j));
 	  ++j;
 	}
       }
@@ -374,15 +380,12 @@ void CairoOutputDev::drawChar(GfxState *state, double x, double y,
 			      double originX, double originY,
 			      CharCode code, int nBytes, Unicode *u, int uLen)
 {
-  double tx, ty;
-
   if (!currentFont)
     return;
   
   glyphs[glyphCount].index = currentFont->getGlyph (code, u, uLen);
-  state->transform(x - originX, y - originY, &tx, &ty);
-  glyphs[glyphCount].x = tx;
-  glyphs[glyphCount].y = ty;
+  glyphs[glyphCount].x = x - originX;
+  glyphs[glyphCount].y = y - originY;
   glyphCount++;
 }
 
@@ -392,7 +395,13 @@ void CairoOutputDev::endString(GfxState *state)
 
   if (!currentFont)
     return;
-   
+
+  // endString can be called without a corresponding beginString. If this
+  // happens glyphs will be null so don't draw anything, just return.
+  // XXX: OutputDevs should probably not have to deal with this...
+  if (!glyphs)
+    return;
+
   // ignore empty strings and invisible text -- this is used by
   // Acrobat Capture
   render = state->getRender();
@@ -435,7 +444,7 @@ void CairoOutputDev::endString(GfxState *state)
     textClipPath = cairo_copy_path (cairo);
     cairo_new_path (cairo);
   }
-  
+
   gfree (glyphs);
   glyphs = NULL;
 }
@@ -443,10 +452,24 @@ void CairoOutputDev::endString(GfxState *state)
 GBool CairoOutputDev::beginType3Char(GfxState *state, double x, double y,
 				      double dx, double dy,
 				      CharCode code, Unicode *u, int uLen) {
+
+  cairo_save (cairo);
+  double *ctm;
+  cairo_matrix_t matrix;
+
+  ctm = state->getCTM();
+  matrix.xx = ctm[0];
+  matrix.yx = ctm[1];
+  matrix.xy = ctm[2];
+  matrix.yy = ctm[3];
+  matrix.x0 = ctm[4];
+  matrix.y0 = ctm[5];
+  cairo_set_matrix(cairo, &matrix);
   return gFalse;
 }
 
 void CairoOutputDev::endType3Char(GfxState *state) {
+  cairo_restore (cairo);
 }
 
 void CairoOutputDev::type3D0(GfxState *state, double wx, double wy) {
@@ -478,26 +501,17 @@ void CairoOutputDev::drawImageMask(GfxState *state, Object *ref, Stream *str,
   int x, y;
   ImageStream *imgStr;
   Guchar *pix;
-  double *ctm;
   cairo_matrix_t matrix;
   int invert_bit;
   int row_stride;
 
-  ctm = state->getCTM();
-  LOG (printf ("drawImageMask %dx%d, matrix: %f, %f, %f, %f, %f, %f\n",
-	       width, height, ctm[0], ctm[1], ctm[2], ctm[3], ctm[4], ctm[5]));
-  matrix.xx = ctm[0] / width;
-  matrix.xy = -ctm[2] / height;
-  matrix.yx = ctm[1] / width;
-  matrix.yy = -ctm[3] / height;
-  matrix.x0 = ctm[2] + ctm[4];
-  matrix.y0 = ctm[3] + ctm[5];
+  /* FIXME: Doesn't the image mask support any colorspace? */
+  cairo_set_source (cairo, fill_pattern);
 
   /* work around a cairo bug when scaling 1x1 surfaces */
   if (width == 1 && height == 1) {
     cairo_save (cairo);
-    cairo_set_matrix (cairo, &matrix);
-    cairo_rectangle (cairo, 0., 0., 1., 1.);
+    cairo_rectangle (cairo, 0., 0., width, height);
     cairo_fill (cairo);
     cairo_restore (cairo);
     return;
@@ -540,7 +554,9 @@ void CairoOutputDev::drawImageMask(GfxState *state, Object *ref, Stream *str,
     return;
   }
 
-  cairo_matrix_invert (&matrix);
+  cairo_matrix_init_translate (&matrix, 0, height);
+  cairo_matrix_scale (&matrix, width, -height);
+
   cairo_pattern_set_matrix (pattern, &matrix);
 
   /* we should actually be using CAIRO_FILTER_NEAREST here. However,
@@ -548,8 +564,6 @@ void CairoOutputDev::drawImageMask(GfxState *state, Object *ref, Stream *str,
    * images with CAIRO_FILTER_NEAREST to look really bad */
   cairo_pattern_set_filter (pattern, CAIRO_FILTER_BEST);
 
-  /* FIXME: Doesn't the image mask support any colorspace? */
-  cairo_set_source (cairo, fill_pattern);
   cairo_mask (cairo, pattern);
 
   cairo_pattern_destroy (pattern);
@@ -605,7 +619,6 @@ void CairoOutputDev::drawMaskedImage(GfxState *state, Object *ref,
   ImageStream *imgStr;
   GfxRGB rgb;
   int alpha, i;
-  double *ctm;
   cairo_matrix_t matrix;
   cairo_matrix_t maskMatrix;
   int is_identity_transform;
@@ -644,25 +657,14 @@ void CairoOutputDev::drawMaskedImage(GfxState *state, Object *ref,
     return;
   }
 
-  ctm = state->getCTM();
-  LOG (printf ("drawImageMask %dx%d, matrix: %f, %f, %f, %f, %f, %f\n",
-	       width, height, ctm[0], ctm[1], ctm[2], ctm[3], ctm[4], ctm[5]));
-  matrix.xx = ctm[0] / width;
-  matrix.xy = -ctm[2] / height;
-  matrix.yx = ctm[1] / width;
-  matrix.yy = -ctm[3] / height;
-  matrix.x0 = ctm[2] + ctm[4];
-  matrix.y0 = ctm[3] + ctm[5];
+  LOG (printf ("drawMaskedImage %dx%d\n", width, height));
 
-  maskMatrix.xx = ctm[0] / maskWidth;
-  maskMatrix.xy = -ctm[2] / maskHeight;
-  maskMatrix.yx = ctm[1] / maskWidth;
-  maskMatrix.yy = -ctm[3] / maskHeight;
-  maskMatrix.x0 = ctm[2] + ctm[4];
-  maskMatrix.y0 = ctm[3] + ctm[5];
+  cairo_matrix_init_translate (&matrix, 0, height);
+  cairo_matrix_scale (&matrix, width, -height);
 
-  cairo_matrix_invert (&matrix);
-  cairo_matrix_invert (&maskMatrix);
+  cairo_matrix_init_translate (&maskMatrix, 0, maskHeight);
+  cairo_matrix_scale (&maskMatrix, maskWidth, -maskHeight);
+
 
   cairo_pattern_set_matrix (pattern, &matrix);
   cairo_pattern_set_matrix (maskPattern, &maskMatrix);
@@ -720,7 +722,6 @@ void CairoOutputDev::drawSoftMaskedImage(GfxState *state, Object *ref, Stream *s
   ImageStream *imgStr;
   GfxRGB rgb;
   int alpha, i;
-  double *ctm;
   cairo_matrix_t matrix;
   cairo_matrix_t maskMatrix;
   int is_identity_transform;
@@ -759,25 +760,13 @@ void CairoOutputDev::drawSoftMaskedImage(GfxState *state, Object *ref, Stream *s
     return;
   }
 
-  ctm = state->getCTM();
-  LOG (printf ("drawImageMask %dx%d, matrix: %f, %f, %f, %f, %f, %f\n",
-	       width, height, ctm[0], ctm[1], ctm[2], ctm[3], ctm[4], ctm[5]));
-  matrix.xx = ctm[0] / width;
-  matrix.xy = -ctm[2] / height;
-  matrix.yx = ctm[1] / width;
-  matrix.yy = -ctm[3] / height;
-  matrix.x0 = ctm[2] + ctm[4];
-  matrix.y0 = ctm[3] + ctm[5];
+  LOG (printf ("drawSoftMaskedImage %dx%d\n", width, height));
 
-  maskMatrix.xx = ctm[0] / maskWidth;
-  maskMatrix.xy = -ctm[2] / maskHeight;
-  maskMatrix.yx = ctm[1] / maskWidth;
-  maskMatrix.yy = -ctm[3] / maskHeight;
-  maskMatrix.x0 = ctm[2] + ctm[4];
-  maskMatrix.y0 = ctm[3] + ctm[5];
+  cairo_matrix_init_translate (&matrix, 0, height);
+  cairo_matrix_scale (&matrix, width, -height);
 
-  cairo_matrix_invert (&matrix);
-  cairo_matrix_invert (&maskMatrix);
+  cairo_matrix_init_translate (&maskMatrix, 0, maskHeight);
+  cairo_matrix_scale (&maskMatrix, maskWidth, -maskHeight);
 
   cairo_pattern_set_matrix (pattern, &matrix);
   cairo_pattern_set_matrix (maskPattern, &maskMatrix);
@@ -808,7 +797,6 @@ void CairoOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
   Guchar *pix;
   GfxRGB rgb;
   int alpha, i;
-  double *ctm;
   cairo_matrix_t matrix;
   int is_identity_transform;
   
@@ -870,17 +858,11 @@ void CairoOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
     return;
   }
 
-  ctm = state->getCTM();
-  LOG (printf ("drawImageMask %dx%d, matrix: %f, %f, %f, %f, %f, %f\n",
-	       width, height, ctm[0], ctm[1], ctm[2], ctm[3], ctm[4], ctm[5]));
-  matrix.xx = ctm[0] / width;
-  matrix.xy = -ctm[2] / height;
-  matrix.yx = ctm[1] / width;
-  matrix.yy = -ctm[3] / height;
-  matrix.x0 = ctm[2] + ctm[4];
-  matrix.y0 = ctm[3] + ctm[5];
+  LOG (printf ("drawImageMask %dx%d\n", width, height));
+  
+  cairo_matrix_init_translate (&matrix, 0, height);
+  cairo_matrix_scale (&matrix, width, -height);
 
-  cairo_matrix_invert (&matrix);
   cairo_pattern_set_matrix (pattern, &matrix);
 
   cairo_pattern_set_filter (pattern, CAIRO_FILTER_BILINEAR);

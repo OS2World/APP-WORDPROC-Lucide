@@ -62,10 +62,12 @@ void Matrix::transform(double x, double y, double *tx, double *ty)
 
 //------------------------------------------------------------------------
 
-static struct {
- char *name;
- GfxBlendMode mode;
-} gfxBlendModeNames[] = {
+struct gfxBlendModeName {
+  char *name;
+  GfxBlendMode mode;
+};
+
+static gfxBlendModeName gfxBlendModeNames[] = {
   { "Normal",     gfxBlendNormal },
   { "Compatible", gfxBlendNormal },
   { "Multiply",   gfxBlendMultiply },
@@ -86,7 +88,7 @@ static struct {
 };
 
 #define nGfxBlendModeNames \
-          ((int)((sizeof(gfxBlendModeNames) / sizeof(char *))))
+          ((int)((sizeof(gfxBlendModeNames) / sizeof(gfxBlendModeName))))
 	 
 //------------------------------------------------------------------------
 // 
@@ -3369,6 +3371,10 @@ GfxImageColorMap::GfxImageColorMap(int bitsA, Object *decode,
   obj.free();
  err1:
   ok = gFalse;
+  for (k = 0; k < gfxColorMaxComps; ++k) {
+    lookup[k] = NULL;
+  }
+  byte_lookup = NULL;
 }
 
 GfxImageColorMap::GfxImageColorMap(GfxImageColorMap *colorMap) {
