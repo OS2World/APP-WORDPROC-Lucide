@@ -1,0 +1,195 @@
+#
+# Lucide language file, DK
+#
+
+#
+# Main menu
+#
+MENU_DOCUMENT=~Dokument
+MENU_OPEN=~èben...\tCtrl+O
+MENU_SAVE_AS=~Gem som...
+MENU_PAGE_SETUP=~Side opsëtning...
+MENU_PRINT=~Print...
+MENU_DOCUMENT_INFO=~Dokument info...
+MENU_FONTS_INFO=Font ~info...
+MENU_PLUGINS_LIST=Plugins ~list...
+MENU_EXIT=A~fslut\tCtrl+X
+MENU_EDIT=~Ret
+MENU_COPY=~Kopier\tCtrl+Insert
+MENU_SELECT_ALL=Vëlg ~alle\tCtrl+/
+MENU_FIND=~Find...\tCtrl+F
+MENU_FINDAGAIN=Find i~gen\tCtrl+G
+MENU_SETTINGS=~Settings
+MENU_FIRST_PAGE=~First page
+MENU_PREV_PAGE=~Forrige side\t-
+MENU_NEXT_PAGE=~Nëste side\t+
+MENU_LAST_PAGE=~Sidste side
+MENU_GO_TO_PAGE=~GÜ til side...\tCtrl+N
+MENU_VIEW=~Kig
+MENU_FIT_WINDOW=~Tilpas vindue
+MENU_ACTUAL_SIZE=~Aktual stõrrelse
+MENU_FIT_WIDTH=Tilpas ~bredde
+MENU_ROTATE_CW=~Drej 90¯ Med Uret
+MENU_ROTATE_CCW=Drej 90¯ ~Mod Uret
+MENU_SHOW_NAV_PANE=~Vis navigations panel
+MENU_SINGLE_PAGE=~Single page
+MENU_CONTINUOUS=K~ontinuerlig
+MENU_WINDOW=~Vindue
+MENU_MAXVIEW=~Maximeret vindue\tF11
+MENU_FULLSCREEN=~Fuldskërm\tCtrl+L
+MENU_HELP=~Hjëlp
+MENU_PRODUCT_INFORMATION=~Produkt Information
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=èben dokument...
+TBHINT_PRINT=Print...
+TBHINT_SHOW_NAV_PANE=Vis/skjul navigations panel
+TBHINT_FIRST_PAGE=Fõrste side
+TBHINT_PREV_PAGE=Forige side
+TBHINT_NEXT_PAGE=Nëste side
+TBHINT_LAST_PAGE=Sidste side
+TBHINT_ACTUAL_SIZE=Faktisk stõrelse
+TBHINT_FIT_WINDOW=Tilpas til vinduets hõjde
+TBHINT_FIT_WIDTH=Tilpas til vinduets bredde
+TBHINT_FIND=Find...
+TBHINT_FINDAGAIN=Find igen
+# toolbar's page number
+TB_PAGENUM=af %d
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=%APPNAME% - Dokument Fremviser
+MSGS_NO_SUIT_PLUG=%APPNAME% understõtter ikke denne dokument type
+MSGS_FILE_LOAD_ERROR=Fejl under indlësning af dokumentet!
+MSGS_LOADING_DOCUMENT=Dokumentet indlëses...hold pÜ hatten...
+MSGS_WARNING=ADVARSEL!
+MSGS_OVERWRITE_FILE=Dokumentet findes allerede.ùnsker du det overskrevet?
+MSGS_FILE_SAVE_ERROR=Der opstod en fejl, da filen skulle gemmes!
+MSGS_PAGE=Side
+
+#
+# "Plugins list" dialog
+#
+PLUGLIST_PLUGINS_LIST=Plugin liste
+PLUGLIST_CLOSE=~Luk
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Plugin navn
+PLUGLIST_SUPP_EXTS=Understõttede udviddelser
+PLUGLIST_PLUGIN_DESC=Plugin beskrivelser
+
+#
+# "Font info" dialog
+#
+FONTINFO_FONTINFO=Font information
+FONTINFO_CLOSE=~Luk
+FONTINFO_ENUMERATING=Smõlfer fontene, tag en slapper...
+# List columns titles
+FONTINFO_NAME=Navn
+FONTINFO_TYPE=Type
+FONTINFO_EMBEDDED=Embedded???
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=Not embedded ???
+FONTINFO_EMBED_EMBEDDED=Embedded???
+FONTINFO_EMBED_EMBEDDED_SUBSET=Embedded subset???
+
+#
+# "Document info" dialog
+#
+DOCINFO_DOCUMENT_INFO=Dokument info
+DOCINFO_CLOSE=~Luk
+# Document info keys
+DOCINFO_TITLE=Titel:
+DOCINFO_FORMAT=Format:
+DOCINFO_AUTHOR=Fortatter:
+DOCINFO_SUBJECT=Emne:
+DOCINFO_KEYWORDS=Nõgleord:
+DOCINFO_CREATOR=Kreatõr:.
+DOCINFO_PRODUCER=Producent:
+DOCINFO_CREATION_DATE=Dato:
+DOCINFO_MOD_DATE=índret:
+
+#
+# "Find" dialog
+#
+FIND_FIND=Find
+FIND_FIND_WHAT=~Hvad kunne du tënke dig at finde
+FIND_MATCH_CASE=~Skal STORE/smÜ passe ?
+FIND_OK=~OK
+FIND_CANCEL=~Afbryd
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=Sõger i side %d af %d...
+FIND_NOT_FOUND=Ikke fundet!
+
+#
+# "Progress" dialog
+#
+PDLG_PROGRESS=Progress
+PDLG_CANCEL=~Afbryd
+
+#
+# About dialog
+#
+AD_ABOUT=About
+AD_DESCRIPTION=Plugin-baseret dokument fremviser med understõttelse for mange forskellige formater
+AD_COPYRIGHTS=(c) Eugene Romanenko, netlabs.org in co-operation with Serenity Systems International
+AD_TRANSLATION=Translation for this nice language is done by Allan Holm (Yoda_Lucide@warpspeed.dk) aka Yoda on IRC
+AD_OK=~OK
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Indstillinger
+SD_DEFAULT_PAGE_LAYOUT=Standdard ~Side Udlëg
+SD_DEFAULT_ZOOM=Standard ~Zoom
+SD_SINGLE_PAGE=Enkelt side
+SD_CONTINUOUS=Kontinuerlig
+SD_OK=~OK
+SD_CANCEL=~Afbryd
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=GÜ til side
+GTP_PAGE=Side
+GTP_OF=af %d
+GTP_OK=~OK
+GTP_CANCEL=~Afbryd
+
+#
+# Print dialog
+#
+PD_TITLE=Print
+PD_PRINTER=Printer
+PD_NAME_LABEL=~Navn
+PD_JOB_PROPERTIES=~Job indstillinger
+PD_DRIVER_LABEL=Driver
+PD_PRINT_RANGE=Print ~range
+PD_RANGE_ALL=~Alle
+PD_RANGE_CURRENT_PAGE=N~uvërende side
+PD_RANGE_PAGES=~Sider
+PD_FROM=~Fra
+PD_TO=~Til
+PD_PRINT_TYPE=Print type
+PD_TYPE_POSTSCRIPT=Post~script
+PD_TYPE_ASIMAGE=As ~billede
+PD_HIGHER_IMAGE_QUALITY=~Hõj billed oplõsning (langsomt, og krëver mere hukommelse)
+PD_PAGE_ORIENTATION=Side orientering
+PD_PORTRAIT=Portrët
+PD_LANDSCAPE=Landskab
+PD_MARGINS=Marginer (mm)
+PD_MLEFT=Venstre
+PD_MRIGHT=Hõjre
+PD_MTOP=Top
+PD_MBOTTOM=Bottom
+PD_SELECTED_FORM=Selected form
+PD_BTNPRINT=~Print
+PD_BTNCANCEL=~Afbryd
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=Printer side %d af %d...
+PRINT_GENERATING_POSTSCRIPT=Genererer en postscript fil...
+PRINT_SPOOLING_POSTSCRIPT=Sender postscript data i kõ...
+PRINT_FAILED=Udskrivningen gik rablende galt!
+

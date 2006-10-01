@@ -13,7 +13,7 @@ Beta-4:
   - Added small executor (lcd.exe) to set beginlibpath and then execute 
     Lucide.exe.
   - Internal fixes.
-  - Added NLS-files: Spanish, Traditional Chinese (Taiwan).
+  - Added NLS-files: Spanish, Traditional Chinese (Taiwan), Danish.
   - Updated NLS-files: Dutch, German, Swedish.
 
 
