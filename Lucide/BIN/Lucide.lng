@@ -64,7 +64,7 @@ TB_PAGENUM=of %d
 #
 # Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=Lucide - Document Viewer
+MSGS_MAIN_WIN_TITLE=%APPNAME% - Document Viewer
 MSGS_NO_SUIT_PLUG=Can't find suitable plugin for specified document!
 MSGS_FILE_LOAD_ERROR=File load error!
 MSGS_LOADING_DOCUMENT=Loading document, please wait...

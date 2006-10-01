@@ -61,7 +61,7 @@ TB_PAGENUM=之 %d
 #
 # Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=Lucide - 文件檢視器
+MSGS_MAIN_WIN_TITLE=%APPNAME% - 文件檢視器
 MSGS_NO_SUIT_PLUG=無法找到適合此文件的 Plugin!
 MSGS_FILE_LOAD_ERROR=檔案載入錯誤!
 MSGS_LOADING_DOCUMENT=載入文件中，請稍候...

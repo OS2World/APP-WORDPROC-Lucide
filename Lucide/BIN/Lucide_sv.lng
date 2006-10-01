@@ -61,7 +61,7 @@ TB_PAGENUM=av %d
 #
 # Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=Lucide - Dokumentvisare
+MSGS_MAIN_WIN_TITLE=%APPNAME% - Dokumentvisare
 MSGS_NO_SUIT_PLUG=Kan inte hitta n†gon l„mplig plugin f”r specificerat dokument!
 MSGS_FILE_LOAD_ERROR=Filladdningsfel!
 MSGS_LOADING_DOCUMENT=Laddar dokument, var v„nlig v„nta...

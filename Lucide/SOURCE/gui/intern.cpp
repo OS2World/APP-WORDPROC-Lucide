@@ -57,18 +57,20 @@ static bool langLoaded = false;
 static map<string,string> *langDefault = NULL;
 static map<string,string> *langCurrent = NULL;
 
-#define NUM_ESCAPES     2
-static const char *escapes[NUM_ESCAPES][2] = { { "\\t", "\t" }, { "\\r", "\r" } };
+
+#define NUM_ESCAPES 3
+static const char *escapes[NUM_ESCAPES][2] = {
+    { "\\t", "\t" }, { "\\r", "\r" }, { "%APPNAME%", appName } };
 
 static string unescapeControls( const char *s )
 {
     string r = s;
     for ( int i = 0; i < NUM_ESCAPES; i++ )
     {
-        int startpos = 0;
-        int findpos = -1;
-        while ( ( findpos = r.find( escapes[i][0], startpos ) ) != -1 ) {
-            r.replace( findpos, 2, escapes[i][1] );
+        string::size_type startpos = 0;
+        string::size_type findpos = string::npos;
+        while ( ( findpos = r.find( escapes[i][0], startpos ) ) != string::npos ) {
+            r.replace( findpos, strlen( escapes[i][0] ), escapes[i][1] );
             startpos = findpos + 1;
         }
     }

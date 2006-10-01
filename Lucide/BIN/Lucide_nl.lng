@@ -61,7 +61,7 @@ TB_PAGENUM=van %d
 #
 # Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=Lucide - Document Bekijker
+MSGS_MAIN_WIN_TITLE=%APPNAME% - Document Bekijker
 MSGS_NO_SUIT_PLUG=Kan geen passende plug-in vinden voor opgegeven document!
 MSGS_FILE_LOAD_ERROR=Bestand inleesfout!
 MSGS_LOADING_DOCUMENT=Inlezen document, even geduld a.u.b
