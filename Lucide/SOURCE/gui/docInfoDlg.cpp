@@ -39,6 +39,7 @@
 
 #include <ludoc.xh>
 
+#include "globals.h"
 #include "luutils.h"
 #include "docInfoDlg.h"
 #include "Lucide_res.h"
@@ -58,7 +59,7 @@ DocInfoDlg::~DocInfoDlg()
 void DocInfoDlg::doDialog()
 {
     WinDlgBox( HWND_DESKTOP, hFrame, docInfoDlgProc,
-               NULLHANDLE, IDD_DOCINFO, this );
+               _hmod, IDD_DOCINFO, this );
     delete this;
 }
 

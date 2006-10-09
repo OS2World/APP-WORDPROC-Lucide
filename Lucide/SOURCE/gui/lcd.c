@@ -44,11 +44,21 @@
 //
 
 char lucideDir[ CCHMAXPATH ] = "";
-char lucideExe[ CCHMAXPATH ] = "";
+
+typedef APIRET (APIENTRY *LMain)(int argc, char **argv);
 
 int main( int argc, char *argv[] )
 {
+    int result = 1;
     char *last_slash;
+    HMODULE hmod = NULLHANDLE;
+
+#ifdef __TEST__
+    PPIB pib;
+    PTIB tib;
+    DosGetInfoBlocks(&tib, &pib);
+    pib->pib_ultype = 3;
+#endif
 
     // fill lucide dir
     strcpy( lucideDir, argv[0] );
@@ -58,16 +68,21 @@ int main( int argc, char *argv[] )
     else {
         *last_slash = 0;
     }
-    // fill lucide exe
-    strcpy( lucideExe, lucideDir );
-    strcat( lucideExe, "\\Lucide.exe" );
 
     // set beginlibpath
     DosSetExtLIBPATH( lucideDir, BEGIN_LIBPATH );
 
-    // execute lucide
-    execvp( lucideExe, (char const **)argv );
+    if ( DosLoadModule( NULL, 0, "Lucide", &hmod ) == 0 )
+    {
+        PFN pfn = NULL;
+        if ( DosQueryProcAddr( hmod, 0, "LucideMain", &pfn ) == 0 )
+        {
+            LMain LucideMain = (LMain)pfn;
+            result = LucideMain( argc, argv );
+        }
+        DosFreeModule (hmod);
+    }
 
-    return 0;
+    return result;
 }
 

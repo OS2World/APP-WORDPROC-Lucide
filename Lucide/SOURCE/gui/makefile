@@ -19,16 +19,16 @@ EXEDIR = ..\..\BIN
 
 
 .CPP.OBJ:
-     WPP386 @make.cfg -fo$@ $<
+     WPP386 @make.cfg -xs -fo$@ $<
 
 .C.OBJ:
-     WCC386 -zq -zp=4 -bm -sg -fo$@ $<
+     WCC386 @make.cfg -fo$@ $<
 
 .idl.xh:
     sc -c -s"xc;xih;xh" ..\plugins\ludoc $<
 
 
-all: make.cfg Lucide.exe lcd.exe
+all: make.cfg lucide.dll Lucide.exe
    DEL MAKE.CFG
 
 OBJS = Lucide.obj luutils.obj clipbrd.obj pmsplitter.obj pmtoolbar.obj \
@@ -38,13 +38,13 @@ OBJS = Lucide.obj luutils.obj clipbrd.obj pmsplitter.obj pmtoolbar.obj \
        aboutDlg.obj settingsDlg.obj lusettings.obj printDlg.obj \
        print.obj stbrowser.obj
 
-Lucide.exe: $(OBJS) Lucide.res
+lucide.dll: $(OBJS) lucide.res
   copy &&|
 option quiet
-system $(BMODE)
-option map=$(OBJDIR)\lucide
+system os2v2 dll initinstance terminstance
+option map=$(OBJDIR)\lucide_dll
 option statics
-file $(OBJDIR)\Lucide.obj
+file $(OBJDIR)\lucide.obj
 file $(OBJDIR)\luutils.obj
 file $(OBJDIR)\clipbrd.obj
 file $(OBJDIR)\pmsplitter.obj
@@ -68,26 +68,27 @@ file $(OBJDIR)\wwbtn.obj
 file $(OBJDIR)\intern.obj
 file $(OBJDIR)\messages.obj
 file $(OBJDIR)\stbrowser.obj
-name $(EXEDIR)\Lucide
+name $(EXEDIR)\lucide
 lib ..\plugins\ludoc\ludoc
 lib somtk
+export LucideMain
 | tmpmake.lnk >NUL
     wlink @tmpmake.lnk
-    RC -n $(OBJDIR)\Lucide.res $(EXEDIR)\Lucide.exe >NUL
+    RC -n $(OBJDIR)\lucide.res $(EXEDIR)\lucide.dll >NUL
     del tmpmake.lnk
 
 
-lcd.exe: lcd.obj lcd.res
+Lucide.exe: lcd.obj lcd.res
   copy &&|
 option quiet
-system os2v2_pm
-option map=$(OBJDIR)\lcd
+system $(BMODE)
+option map=$(OBJDIR)\lucide
 option statics
 file $(OBJDIR)\lcd.obj
-name $(EXEDIR)\lcd
+name $(EXEDIR)\Lucide
 | tmpmake.lnk >NUL
     wlink @tmpmake.lnk
-    RC -n $(OBJDIR)\lcd.res $(EXEDIR)\lcd.exe >NUL
+    RC -n $(OBJDIR)\lcd.res $(EXEDIR)\Lucide.exe >NUL
     del tmpmake.lnk
 
 
@@ -100,7 +101,7 @@ lcd.res: lcd.rc
 
 Lucide.cpp: ..\plugins\ludoc\ludoc.xh
 
-Lucide.obj:         Lucide.cpp         makefile
+Lucide.obj:         Lucide.cpp
 luutils.obj:        luutils.cpp
 clipbrd.obj:        clipbrd.cpp
 pmsplitter.obj:     pmsplitter.cpp
@@ -124,7 +125,7 @@ messages.obj:       messages.cpp
 linklab.obj:        linklab.c
 wwbtn.obj:          wwbtn.c
 stbrowser.obj:      stbrowser.c
-lcd.obj:            lcd.c
+lcd.obj:            lcd.c               makefile
 
 
 MAKE.CFG: makefile
@@ -132,7 +133,6 @@ MAKE.CFG: makefile
 -zq
 -zp=4
 -bm
--xs
 -sg
 -DVERSION="$(VERSION)"  
 !if $(TEST)==1

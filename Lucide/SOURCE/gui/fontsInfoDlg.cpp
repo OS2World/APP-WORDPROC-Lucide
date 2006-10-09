@@ -73,7 +73,7 @@ FontsInfoDlg::~FontsInfoDlg()
 void FontsInfoDlg::doDialog()
 {
     WinDlgBox( HWND_DESKTOP, hFrame, fontsInfoDlgProc,
-               NULLHANDLE, IDD_FONTINFO, this );
+               _hmod, IDD_FONTINFO, this );
     delete this;
 }
 

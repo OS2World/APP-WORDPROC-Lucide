@@ -159,7 +159,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_OPEN;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -171,7 +171,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_PRINT;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -185,7 +185,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_NAVPANE;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -199,7 +199,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_FIRSTPAGE;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -211,7 +211,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_PREVPAGE;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -252,7 +252,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_NEXTPAGE;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -264,7 +264,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_LASTPAGE;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -278,7 +278,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_100PERC;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -290,7 +290,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_FITPAGE;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -302,7 +302,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_FITWIDTH;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -328,7 +328,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_FIND;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -340,7 +340,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_FINDAGAIN;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;
@@ -354,7 +354,7 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_MGLASS;
-    bs.pictHmod = NULLHANDLE;
+    bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;
     bs.checked = FALSE;

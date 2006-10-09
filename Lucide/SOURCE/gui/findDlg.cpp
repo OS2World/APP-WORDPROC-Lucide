@@ -37,6 +37,7 @@
 
 #include <stdio.h>
 
+#include "globals.h"
 #include "findDlg.h"
 #include "Lucide_res.h"
 #include "luutils.h"
@@ -59,7 +60,7 @@ FindDlg::~FindDlg()
 ULONG FindDlg::showDialog()
 {
     return WinDlgBox( HWND_DESKTOP, hFrame, findDlgProc,
-                      NULLHANDLE, IDD_FIND, this );
+                      _hmod, IDD_FIND, this );
 }
 
 
@@ -136,7 +137,7 @@ GotoDlg::~GotoDlg()
 ULONG GotoDlg::showDialog()
 {
     return WinDlgBox( HWND_DESKTOP, hFrame, gotoDlgProc,
-                      NULLHANDLE, IDD_GOTOPAGE, this );
+                      _hmod, IDD_GOTOPAGE, this );
 }
 
 

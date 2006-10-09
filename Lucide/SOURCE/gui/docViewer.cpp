@@ -125,9 +125,9 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     // links
     haveLinks = false;
     links = NULL;
-    handPtr = WinLoadPointer( HWND_DESKTOP, NULLHANDLE, IDP_HAND );
-    zoomInPtr = WinLoadPointer( HWND_DESKTOP, NULLHANDLE, IDP_ZOOM_IN );
-    zoomOutPtr = WinLoadPointer( HWND_DESKTOP, NULLHANDLE, IDP_ZOOM_OUT );
+    handPtr = WinLoadPointer( HWND_DESKTOP, _hmod, IDP_HAND );
+    zoomInPtr = WinLoadPointer( HWND_DESKTOP, _hmod, IDP_ZOOM_IN );
+    zoomOutPtr = WinLoadPointer( HWND_DESKTOP, _hmod, IDP_ZOOM_OUT );
     // search
     foundrects = NULL;
     searchString = NULL;
@@ -136,7 +136,7 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     // create windows
     ULONG dfFlags = FCF_VERTSCROLL | FCF_HORZSCROLL | FCF_NOBYTEALIGN;
     hWndDocFrame = WinCreateStdWindow( hWndFrame, WS_VISIBLE, &dfFlags, NULL, NULL,
-                                       WS_VISIBLE, NULLHANDLE, 0, NULL );
+                                       WS_VISIBLE, _hmod, 0, NULL );
     WinSetWindowULong( hWndDocFrame, QWL_USER, (ULONG)this );
     oldFrameProc = WinSubclassWindow( hWndDocFrame, docFrameProc );
 

@@ -57,7 +57,7 @@ SettingsDlg::~SettingsDlg()
 void SettingsDlg::doDialog()
 {
     WinDlgBox( HWND_DESKTOP, hFrame, settingsDlgProc,
-               NULLHANDLE, IDD_SETTINGS, this );
+               _hmod, IDD_SETTINGS, this );
     delete this;
 }
 

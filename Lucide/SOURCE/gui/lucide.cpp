@@ -107,6 +107,19 @@ ProgressDlg *Lucide::loadProgressDlg               = NULL;
 bool         Lucide::docLoaded                     = false;;
 char        *Lucide::loadError                     = NULL;
 
+HMODULE _hmod = NULLHANDLE;
+
+unsigned APIENTRY LibMain( unsigned hmod, unsigned termination )
+{
+    if ( termination ) {
+        /* DLL is detaching from process */
+    } else {
+        /* DLL is attaching to process */
+        _hmod = hmod;
+    }
+    return( 1 );
+}
+
 
 PFNWP pOldSplProc;
 
@@ -804,15 +817,8 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 char deffont[] = "9.WarpSans";
 int deffontlen = sizeof( deffont );
 
-int main( int argc, char **argv )
+extern "C" APIRET APIENTRY LucideMain( int argc, char *argv[] )
 {
-#ifdef __TEST__
-    PPIB pib;
-    PTIB tib;
-    DosGetInfoBlocks(&tib, &pib);
-    pib->pib_ultype = 3;
-#endif
-
     HMQ   hmq;
     QMSG  qmsg;
     hab = WinInitialize( 0 );
@@ -832,12 +838,12 @@ int main( int argc, char **argv )
                          FCF_MINMAX | FCF_TASKLIST | FCF_NOBYTEALIGN | FCF_ICON;
     title = newstrdupL( MSGS_MAIN_WIN_TITLE );
     hWndFrame = WinCreateStdWindow( HWND_DESKTOP, 0, &ulFrameFlags, NULL, title,
-                                    WS_SYNCPAINT|WS_VISIBLE, NULLHANDLE, IDI_MAIN_ICON, NULL );
+                                    WS_SYNCPAINT|WS_VISIBLE, _hmod, IDI_MAIN_ICON, NULL );
     hFrameSysmenu  = WinWindowFromID( hWndFrame, FID_SYSMENU );
     hFrameTitlebar = WinWindowFromID( hWndFrame, FID_TITLEBAR );
     hFrameMinMax   = WinWindowFromID( hWndFrame, FID_MINMAX );
-    WinSetAccelTable( hab, WinLoadAccelTable( hab, NULLHANDLE, IDA_MAINACCEL ), hWndFrame );
-    hWndMenu = WinLoadMenu( hWndFrame, NULLHANDLE, IDM_MAINMENU );
+    WinSetAccelTable( hab, WinLoadAccelTable( hab, _hmod, IDA_MAINACCEL ), hWndFrame );
+    hWndMenu = WinLoadMenu( hWndFrame, _hmod, IDM_MAINMENU );
     localizeMenu( hWndMenu );
     WinSetWindowUShort( hWndMenu, QWS_ID, FID_MENU );
 

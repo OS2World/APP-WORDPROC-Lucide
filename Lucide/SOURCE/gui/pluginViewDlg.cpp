@@ -35,6 +35,7 @@
 #define INCL_WIN
 #include <os2.h>
 
+#include "globals.h"
 #include "luutils.h"
 #include "pluginViewDlg.h"
 #include "Lucide_res.h"
@@ -60,7 +61,7 @@ PluginViewDlg::~PluginViewDlg()
 void PluginViewDlg::doDialog()
 {
     WinDlgBox( HWND_DESKTOP, hFrame, pluginViewDlgProc,
-               NULLHANDLE, IDD_VIEWPLUGINS, this );
+               _hmod, IDD_VIEWPLUGINS, this );
     delete this;
 }
 

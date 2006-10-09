@@ -70,7 +70,7 @@ PrintDlg::~PrintDlg()
 ULONG PrintDlg::showDialog()
 {
     return WinDlgBox( HWND_DESKTOP, hFrame, printDlgProc,
-                      NULLHANDLE, IDD_PRINT, this );
+                      _hmod, IDD_PRINT, this );
 }
 
 void PrintDlg::getPrintSetup( PrintSetup *p ) {

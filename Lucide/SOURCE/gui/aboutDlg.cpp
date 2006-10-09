@@ -99,7 +99,7 @@ void logoImageCreate( HWND hwnd )
     ld->oldLogoProc = WinSubclassWindow( hwnd, LogoProc );
     WinSetWindowULong( hwnd, QWL_USER, (ULONG)ld );
     HPS hps = WinGetPS( hwnd );
-    ld->image = GpiLoadBitmap( hps, NULLHANDLE, IDB_LOGO, 0, 0 );
+    ld->image = GpiLoadBitmap( hps, _hmod, IDB_LOGO, 0, 0 );
     WinReleasePS( hps );
     WinInvalidateRect( hwnd, NULL, FALSE );
 }
@@ -120,7 +120,7 @@ static MRESULT EXPENTRY AboutProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 
                 snprintf( buf, sizeof buf, "%s %s", appName, appVersion );
                 WinSetDlgItemText( hwnd, IDT_LUCIDEVERSION, buf );
 
-                HPOINTER p = WinLoadPointer( HWND_DESKTOP, NULLHANDLE, IDP_HAND );
+                HPOINTER p = WinLoadPointer( HWND_DESKTOP, _hmod, IDP_HAND );
                 setLinkPointer( p );
 
                 toLink( WinWindowFromID( hwnd, IDC_NETLABSURL ) );
@@ -142,7 +142,7 @@ void AboutBox( HWND _hWndFrame )
 {
     hWndFrame = _hWndFrame;
     WinDlgBox( HWND_DESKTOP, hWndFrame, AboutProc,
-               NULLHANDLE, IDD_ABOUT, NULL );
+               _hmod, IDD_ABOUT, NULL );
 }
 
 

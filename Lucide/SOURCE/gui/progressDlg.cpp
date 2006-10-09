@@ -39,6 +39,7 @@
 #include <process.h>
 #include <stdio.h>
 
+#include "globals.h"
 #include "luutils.h"
 #include "progressDlg.h"
 #include "Lucide_res.h"
@@ -71,7 +72,7 @@ void ProgressDlg::show( progressThreadFn _threadFn, void *_threadData )
     threadFn = _threadFn;
     threadData = _threadData;
     WinDlgBox( HWND_DESKTOP, hFrame, progressDlgProc,
-               NULLHANDLE, IDD_PROGRESS, this );
+               _hmod, IDD_PROGRESS, this );
 }
 
 void ProgressDlg::hide()
