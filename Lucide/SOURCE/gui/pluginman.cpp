@@ -55,12 +55,15 @@ PluginManager::PluginManager()
     strcpy( buffer, path );
     strcat( buffer, "LU*.DLL" );
 
-    // enum plugins, except for LUDOC.DLL, which is 'null' plugin
+    // enum plugins, (LU*.DLL) except for LUDOC.DLL, which is 'null' plugin
+    // and Lucide.dll, which isn't plugin.
     struct find_t ffblk;
     unsigned done = _dos_findfirst( buffer, _A_RDONLY | _A_NORMAL, &ffblk );
     while ( done == 0 )
     {
-        if ( stricmp( ffblk.name, "LUDOC.DLL" ) != 0 ) {
+        if ( ( stricmp( ffblk.name, "LUDOC.DLL" ) != 0 ) &&
+             ( stricmp( ffblk.name, "LUCIDE.DLL" ) != 0 ) )
+        {
             loadPlugin( path, ffblk.name );
         }
         done = _dos_findnext( &ffblk );
