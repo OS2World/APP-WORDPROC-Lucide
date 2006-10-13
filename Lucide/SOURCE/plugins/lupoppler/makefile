@@ -33,10 +33,8 @@ lib ..\..\..\..\libjpeg\libjpeg.lib
 lib ..\ludoc\ludoc
 lib somtk 
 export LuPopplerDocumentNewClass
-export _LuPopplerDocumentClassData
-export _LuPopplerDocumentCClassData
-export LuPopplerDocumentClassData=_LuPopplerDocumentClassData
-export LuPopplerDocumentCClassData=_LuPopplerDocumentCClassData
+export LuPopplerDocumentClassData
+export LuPopplerDocumentCClassData
 export createObject
 export getSupportedExtensions
 export getDescription

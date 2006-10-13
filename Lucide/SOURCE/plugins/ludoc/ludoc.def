@@ -2,18 +2,12 @@ LIBRARY     LUDOC.DLL
 
 EXPORTS
     LuDocumentNewClass
-    _LuDocumentClassData
-    _LuDocumentCClassData
     LuDocumentClassData
     LuDocumentCClassData
     LuPixbufNewClass
-    _LuPixbufClassData
-    _LuPixbufCClassData
     LuPixbufClassData
     LuPixbufCClassData
     LuIndexNodeNewClass
-    _LuIndexNodeClassData
-    _LuIndexNodeCClassData
     LuIndexNodeClassData
     LuIndexNodeCClassData
     cnvUniToUTF8

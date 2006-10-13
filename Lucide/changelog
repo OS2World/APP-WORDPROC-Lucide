@@ -10,8 +10,9 @@ Beta-4:
   - In single-page view pressing PgUp/PgDn if already at top/bottom of page
     moves to previous/next page (closed ticket #73).
   - Enable printing in reverse order (closed ticket #88).
-  - Added small executor (lcd.exe) to set beginlibpath and then execute 
-    Lucide.exe.
+  - Lucide.exe loads needed DLLs from install path (closed ticket #78).
+  - WarpIn installation optionally sets Lucide as default program for
+    PDF files (closed tickets #74, #79).
   - Internal fixes.
   - Added NLS-files: Spanish, Traditional Chinese (Taiwan), Danish.
   - Updated NLS-files: Dutch, German, Swedish.

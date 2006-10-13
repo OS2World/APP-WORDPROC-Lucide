@@ -33,10 +33,8 @@ lib ..\..\..\..\libjpeg\libjpeg.lib
 lib ..\ludoc\ludoc
 lib somtk 
 export LuJpegDocumentNewClass
-export _LuJpegDocumentClassData
-export _LuJpegDocumentCClassData
-export LuJpegDocumentClassData=_LuJpegDocumentClassData
-export LuJpegDocumentCClassData=_LuJpegDocumentCClassData
+export LuJpegDocumentClassData
+export LuJpegDocumentCClassData
 export createObject
 export getSupportedExtensions
 export getDescription
