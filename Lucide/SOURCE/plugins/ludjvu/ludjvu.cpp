@@ -79,7 +79,7 @@ extern "C" char * _System getSupportedExtensions()
 
 extern "C" char * _System getDescription()
 {
-    return "DjVu plugin, based on DjVuLibre.";
+    return "DjVu plugin, based on DjVuLibre v3.5.17";
 }
 
 

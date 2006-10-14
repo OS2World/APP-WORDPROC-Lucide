@@ -86,7 +86,7 @@ extern "C" char * _System getSupportedExtensions()
 
 extern "C" char * _System getDescription()
 {
-    return "PDF plugin, based on poppler library.";
+    return "PDF plugin, based on poppler library v0.5.4";
 }
 
 

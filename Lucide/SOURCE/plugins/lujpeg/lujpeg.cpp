@@ -85,7 +85,7 @@ extern "C" char * _System getSupportedExtensions()
 
 extern "C" char * _System getDescription()
 {
-    return "Jpeg plugin, based on IJG JPEG Library.";
+    return "Jpeg plugin, based on IJG JPEG Library v6b";
 }
 
 
