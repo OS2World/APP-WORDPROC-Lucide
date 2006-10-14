@@ -4,12 +4,18 @@ EXPORTS
     LuDocumentNewClass
     LuDocumentClassData
     LuDocumentCClassData
+    _LuDocumentClassData
+    _LuDocumentCClassData
     LuPixbufNewClass
     LuPixbufClassData
     LuPixbufCClassData
+    _LuPixbufClassData
+    _LuPixbufCClassData
     LuIndexNodeNewClass
     LuIndexNodeClassData
     LuIndexNodeCClassData
+    _LuIndexNodeClassData
+    _LuIndexNodeCClassData
     cnvUniToUTF8
     cnvUniBEToUTF8
     cnvUTF8ToUni
