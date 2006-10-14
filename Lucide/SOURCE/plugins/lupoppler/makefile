@@ -52,6 +52,7 @@ MAKE.CFG: makefile
 -zq 
 -zp=4
 -bm
+-ot
 -ox
 -xs
 -xr

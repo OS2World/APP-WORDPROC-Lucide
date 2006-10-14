@@ -2,7 +2,7 @@
 
 CC=wcl386
 
-CFLAGS=-zq -zp=4 -bm -ox -sg -I..\include -DOS2
+CFLAGS=-zq -zp=4 -bm -ot -ox -sg -I..\include -DOS2
 
 LIBS=ft2lib.lib
 

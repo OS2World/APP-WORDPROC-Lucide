@@ -132,6 +132,8 @@ MAKE.CFG: makefile
   copy &&|
 -zq
 -zp=4
+-ot
+-ox
 -bm
 -sg
 -DVERSION="$(VERSION)"  
