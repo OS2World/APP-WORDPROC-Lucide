@@ -9,6 +9,7 @@ MENU_DOCUMENT=~Archivo
 
 MENU_OPEN=~Abrir...\tCtrl+O
 MENU_SAVE_AS=~Guardar como...
+# MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=~Preferencias de p gina...
 MENU_PRINT=~Imprimir...
 MENU_PLUGINS_LIST=~Lista de plugins...
@@ -25,6 +26,7 @@ MENU_VIEW=~Ver
 MENU_FIT_WINDOW=Ajustar a la ~ventana
 MENU_ACTUAL_SIZE=~Tama¤o real
 MENU_FIT_WIDTH=Ajustar al ~ancho
+MENU_ZOOM_IN_OUT=Aumentar/Reducir ~zoom
 MENU_FIRST_PAGE=~Primera p gina
 MENU_PREV_PAGE=P gina anterior\t-
 MENU_NEXT_PAGE=P gina ~siguiente\t+
@@ -60,6 +62,7 @@ TBHINT_FIT_WINDOW=Ajustar alto de las p ginas a la ventana
 TBHINT_FIT_WIDTH=Ajustar ancho de las p ginas a la ventana
 TBHINT_FIND=Buscar...
 TBHINT_FINDAGAIN=Buscar siguiente
+TBHINT_ZOOM_IN_OUT=Aumentar/reducir tama¤o
 # toolbar's page number
 TB_PAGENUM=de %d
 
@@ -74,6 +77,7 @@ MSGS_WARNING=­Atenci¢n!
 MSGS_OVERWRITE_FILE=El archivo ya existe. ¨Desea sustituirlo?
 MSGS_FILE_SAVE_ERROR=­Error guardando el archivo!
 MSGS_PAGE=P gina
+MSGS_ERROR_STARTING_BROWSER=­Error iniciando el navegador!
 
 #
 # "Plugins list" dialog
