@@ -2016,7 +2016,6 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
             break;
 
         case WM_MOUSEMOVE:
-            somPrintf( "mousemove! %x\n", mp1 );
             if ( _this->wmMouseMove( hwnd, SHORT1FROMMP( mp1 ), SHORT2FROMMP( mp1 ) ) ) {
                 return (MRESULT)TRUE;
             }

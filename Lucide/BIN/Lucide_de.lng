@@ -1,5 +1,6 @@
 #
 # Lucide language file, DE
+# (for Beta 3)
 
 #
 # Main menu
@@ -28,7 +29,6 @@ MENU_VIEW=~Anzeige
 MENU_FIT_WINDOW=~Ganze Seite
 MENU_ACTUAL_SIZE=~Originalgr”áe
 MENU_FIT_WIDTH=Seiten~breite
-MENU_ZOOM_IN_OUT=~Zoom-Modus (gr”sser/kleiner)
 MENU_ROTATE_CW=90ø im UZS ~drehen
 MENU_ROTATE_CCW=90ø gegen ~UZS drehen
 MENU_SHOW_NAV_PANE=~Navigator anzeigen
@@ -55,7 +55,6 @@ TBHINT_FIT_WINDOW=Ganze Seite
 TBHINT_FIT_WIDTH=Seitenbreite
 TBHINT_FIND=Suchen...
 TBHINT_FINDAGAIN=Weitersuchen
-TBHINT_ZOOM_IN_OUT=Zoom-Modus (gr”sser/kleiner)
 # toolbar's page number
 TB_PAGENUM=von %d
 
@@ -166,7 +165,7 @@ PD_PRINTER=Drucker
 PD_NAME_LABEL=~Name
 PD_JOB_PROPERTIES=~Job-Eigenschaften
 PD_DRIVER_LABEL=Treiber
-PD_PRINT_RANGE_AND_COPIES=Dr~uckbereich und Kopien
+PD_PRINT_RANGE_AND_COPIES=D~uckbereich und Kopien
 PD_RANGE_ALL=A~lles
 PD_RANGE_CURRENT_PAGE=A~ktuelle Seite
 PD_RANGE_PAGES=Sei~ten
