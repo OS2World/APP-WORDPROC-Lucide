@@ -1,0 +1,2 @@
+My change - in \include\freetype\config\ftconfig.h add FT_INT64 definition
+for Watcom.
