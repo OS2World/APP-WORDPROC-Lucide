@@ -37,6 +37,19 @@ If you encounter any bugs register them in the TRAC as well, see:
 Please make sure you select the correct version and component for your ticket.
 
 
+:: Pipe commands ::
+
+First instance of Lucide will create named pipe \PIPE\LUCIDE. You may
+send following commands to pipe:
+
+$prev              - will switch to previous page
+$next              - will switch to next page
+$switchfullscreen  - will switch to fullscreen (even if minimized)
+$minimize          - will mimimize Lucide (even if fullscreen)
+
+This may be useful for presentations with remote control.
+
+
 :: License ::
 
 Lucide is licensed for use with eComStation only. You are not allowed to

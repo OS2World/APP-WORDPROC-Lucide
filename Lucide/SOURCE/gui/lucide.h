@@ -93,6 +93,8 @@ class Lucide
         static void toggleMaxview();
         static void toggleFullscreen();
         static void focusDocview();
+        static void cmdMinimize();
+        static void cmdSwitchToFullscreen();
 };
 
 #endif // __LUCIDE_H

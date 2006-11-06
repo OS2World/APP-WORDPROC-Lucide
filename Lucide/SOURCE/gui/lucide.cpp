@@ -74,6 +74,8 @@ const char *showind    = "ShowIndex";
 
 HWND createToolbar( HWND hwnd );
 void AboutBox( HWND hWndFrame );
+void initPipeMon( HWND hWndFrame );
+void unInitPipeMon();
 
 HAB   hab            = NULLHANDLE;
 HWND  hWndFrame      = NULLHANDLE;
@@ -613,6 +615,29 @@ void Lucide::toggleZoom()
     }
 }
 
+void Lucide::cmdMinimize()
+{
+    if ( isFullscreen ) {
+        toggleFullscreen();
+    }
+    WinSetWindowPos( hWndFrame, HWND_TOP, 0, 0, 0, 0, SWP_MINIMIZE );
+}
+
+void Lucide::cmdSwitchToFullscreen()
+{
+    if ( !isFullscreen )
+    {
+        SWP pos = {0};
+        WinQueryWindowPos( hWndFrame, &pos );
+
+        if ( pos.fl & SWP_MINIMIZE ) {
+            WinSetWindowPos( hWndFrame, HWND_TOP, 0, 0, 0, 0,
+                    SWP_SHOW | SWP_ACTIVATE | SWP_RESTORE | SWP_ZORDER );
+        }
+        toggleFullscreen();
+    }
+}
+
 static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
     switch ( msg )
@@ -806,6 +831,13 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     AboutBox( hWndFrame );
                     return (MRESULT)FALSE;
 
+                case CM_MINIMIZE:
+                    Lucide::cmdMinimize();
+                    return (MRESULT)FALSE;
+
+                case CM_TOFULLSCREEN:
+                    Lucide::cmdSwitchToFullscreen();
+                    return (MRESULT)FALSE;
             }
         }
         break;
@@ -901,6 +933,7 @@ extern "C" APIRET APIENTRY LucideMain( int argc, char *argv[] )
     }
 
     Lucide::checkNavpane();
+    initPipeMon( hWndFrame );
 
     // Messsage loop
     while ( WinGetMsg( hab, &qmsg, 0, 0, 0 ) ) {
@@ -929,6 +962,7 @@ extern "C" APIRET APIENTRY LucideMain( int argc, char *argv[] )
     delete findDlg;
     delete title;
     delete settings;
+    unInitPipeMon();
 
     WinDestroyMsgQueue( hmq );
     WinTerminate( hab );

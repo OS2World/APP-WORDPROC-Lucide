@@ -94,6 +94,10 @@
 
 #define CM_PRODINFO     601
 
+// No menuitems for this commands
+#define CM_MINIMIZE     701
+#define CM_TOFULLSCREEN 702
+
 #define TBID_PAGENUM    1
 #define TBID_OFPAGES    2
 #define TBID_ZOOM       3
