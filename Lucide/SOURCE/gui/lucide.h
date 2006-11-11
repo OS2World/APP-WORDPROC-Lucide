@@ -70,6 +70,9 @@ class Lucide
         static void enableZoomMenus();
         static void setZoomChecks( SHORT cmd, SHORT cbind, double zoom );
         static void loadthread( void *p );
+        
+        static void *thumbnailData;
+        static int thumbnailDataLen;
 
     public:
 		static char docFileName[ CCHMAXPATHCOMP ];
@@ -78,6 +81,7 @@ class Lucide
         static bool showIndex;
         
         static void openDocument();
+        static void closeDocument();
         static void loadDocument( const char *fn );
         static void saveDocumentAs();
         static void setDocument( LuDocument *_doc );
@@ -95,6 +99,9 @@ class Lucide
         static void focusDocview();
         static void cmdMinimize();
         static void cmdSwitchToFullscreen();
+        static void createThumbnail( LuDocument *_doc );
+        static bool isThumbNeeded( const char *fn );
+        static void writeThumbnail( const char *fn );
 };
 
 #endif // __LUCIDE_H

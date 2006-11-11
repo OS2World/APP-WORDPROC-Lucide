@@ -32,6 +32,7 @@ interface LuDjvuDocument : LuDocument
         isPostScriptExportable: override;
         exportToPostScript: override;
         isFixedImage: override;
+        isCreateFileThumbnail: override;
 
         somDefaultInit: override, init;
         somDestruct: override;

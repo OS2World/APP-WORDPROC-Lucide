@@ -304,12 +304,8 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     double pwidth = ( (double)( curForm.cx - mLeft - mRight ) / 25.4 ) * 72.0;
     double pheight = ( (double)( curForm.cy - mTop - mBottom ) / 25.4 ) * 72.0;
 
-    char tmpps[ CCHMAXPATHCOMP ] = "";
-    char *tmpenv = getenv( "TMP" );
-    strcpy( tmpps, ( tmpenv == NULL ) ? ".\\" : tmpenv );
-    if ( tmpps[ strlen( tmpps ) - 1 ] != '\\' ) {
-        strcat( tmpps, "\\" );
-    }
+    char tmpps[ CCHMAXPATH ] = "";
+    getTmpDir( tmpps );
     strcat( tmpps, "TMPLUCID.PS" );
 
     boolean rcexp = doc->exportToPostScript( ev, tmpps, psetup->pgfrom-1, psetup->pgto-1,

@@ -108,6 +108,9 @@ char         Lucide::docFileName[ CCHMAXPATHCOMP ] = "";
 ProgressDlg *Lucide::loadProgressDlg               = NULL;
 bool         Lucide::docLoaded                     = false;;
 char        *Lucide::loadError                     = NULL;
+void        *Lucide::thumbnailData                 = NULL;
+int          Lucide::thumbnailDataLen              = 0;
+
 
 HMODULE _hmod = NULLHANDLE;
 
@@ -336,12 +339,33 @@ void Lucide::setPageLayout( PgLayout layout )
 }
 
 
+void Lucide::closeDocument()
+{
+    docViewer->close();
+    delete doc;
+    doc = NULL;
+    WinSetWindowText( hWndFrame, title );
+
+    if ( thumbnailData != NULL ) {
+        writeThumbnail( docFullName );
+        delete thumbnailData;
+        thumbnailData = NULL;
+        thumbnailDataLen = 0;
+    }
+}
+
 void Lucide::loadthread( void *p )
 {
     HAB thab = WinInitialize( 0 );
     HMQ thmq = WinCreateMsgQueue( thab, 0 );
 
     docLoaded = doc->loadFile( ev, docFullName, NULL, &loadError );
+    if ( docLoaded ) {
+        if ( doc->isCreateFileThumbnail( ev ) && isThumbNeeded( docFullName ) ) {
+            loadProgressDlg->setText( getLocalizedString( MSGS_CREATING_THUMBNAIL ).c_str() );
+            createThumbnail( doc );
+        }
+    }
     loadProgressDlg->hide();
 
     WinDestroyMsgQueue( thmq );
@@ -369,10 +393,7 @@ void Lucide::loadDocument( const char *fn )
         }
         else
         {
-            docViewer->close();
-            delete doc;
-            doc = NULL;
-            WinSetWindowText( hWndFrame, title );
+            closeDocument();
 
             doc = pluginMan->createDocumentForExt( ext + 1, false );
             if ( doc == NULL ) {
@@ -952,10 +973,10 @@ extern "C" APIRET APIENTRY LucideMain( int argc, char *argv[] )
 
     WinDestroyWindow( hWndFrame );
 
+    Lucide::closeDocument();
     delete docViewer;
     delete indexWin;
-    // must be freed _before_ plugin manager
-    delete doc;
+
     // must be freed _after_ document
     delete pluginMan;
 

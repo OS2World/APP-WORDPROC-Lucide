@@ -41,6 +41,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <strstrea.h>
+#include <stdlib.h>
 #include <string>
 
 #include "luutils.h"
@@ -505,4 +506,14 @@ double convZoom( SHORT v )
         case 13:  z = 16;     break;
     }
     return z;
+}
+
+char *getTmpDir( char *buf )
+{
+    char *tmpenv = getenv( "TMP" );
+    strcpy( buf, ( tmpenv == NULL ) ? ".\\" : tmpenv );
+    if ( buf[ strlen( buf ) - 1 ] != '\\' ) {
+        strcat( buf, "\\" );
+    }
+    return buf;
 }

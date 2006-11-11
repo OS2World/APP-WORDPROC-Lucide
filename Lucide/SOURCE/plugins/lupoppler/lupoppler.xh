@@ -191,6 +191,8 @@ typedef LuDocument_LuRectSequence*   SOMLINK somTP_LuPopplerDocument_searchText(
 		string text, 
 		boolean caseSensitive);
 typedef somTP_LuPopplerDocument_searchText *somTD_LuPopplerDocument_searchText;
+typedef boolean   SOMLINK somTP_LuPopplerDocument_isCreateFileThumbnail(LuPopplerDocument *somSelf, Environment *ev);
+typedef somTP_LuPopplerDocument_isCreateFileThumbnail *somTD_LuPopplerDocument_isCreateFileThumbnail;
 typedef void   SOMLINK somTP_LuPopplerDocument_somDefaultInit(LuPopplerDocument *somSelf, 
 		som3InitCtrl* ctrl);
 typedef somTP_LuPopplerDocument_somDefaultInit *somTD_LuPopplerDocument_somDefaultInit;
@@ -697,6 +699,14 @@ LuDocument_LuRectSequence*   searchText(Environment *ev,
 {
    return SOM_ResolveD(this,LuPopplerDocument,LuDocument,searchText)
 	(this, ev,pagenum,text,caseSensitive);
+}
+
+
+/* method: isCreateFileThumbnail */
+boolean   isCreateFileThumbnail(Environment *ev)
+{
+   return SOM_ResolveD(this,LuPopplerDocument,LuDocument,isCreateFileThumbnail)
+	(this, ev);
 }
 
 

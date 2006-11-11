@@ -389,6 +389,13 @@ SOM_Scope boolean  SOMLINK isFixedImage(LuDjvuDocument *somSelf,
 }
 
 
+SOM_Scope boolean  SOMLINK isCreateFileThumbnail(LuDjvuDocument *somSelf, 
+                                                  Environment *ev)
+{
+    return TRUE;
+}
+
+
 SOM_Scope void SOMLINK somDefaultInit(LuDjvuDocument *somSelf,
                                       som3InitCtrl* ctrl)
 {

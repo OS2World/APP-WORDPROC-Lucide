@@ -109,6 +109,7 @@ typedef LuDjvuDocumentData* (SOMLINK * somTD_LuDjvuDocument_DataThunk)(void*);
   #define _getThumbnailSize somSelf->getThumbnailSize
   #define _getThumbnail somSelf->getThumbnail
   #define _searchText somSelf->searchText
+  #define _isCreateFileThumbnail somSelf->isCreateFileThumbnail
   #define _somDefaultInit somSelf->somDefaultInit
   #define _somDestruct somSelf->somDestruct
   #define _somDefaultCopyInit somSelf->somDefaultCopyInit
@@ -152,6 +153,7 @@ typedef LuDjvuDocumentData* (SOMLINK * somTD_LuDjvuDocument_DataThunk)(void*);
   #define _isPostScriptExportable somSelf->isPostScriptExportable
   #define _exportToPostScript somSelf->exportToPostScript
   #define _isFixedImage somSelf->isFixedImage
+  #define _isCreateFileThumbnail somSelf->isCreateFileThumbnail
   #define _somDefaultInit somSelf->somDefaultInit
   #define _somDestruct somSelf->somDestruct
 #endif
@@ -730,6 +732,45 @@ static somMethodProc* LuDjvuDocument_parent_LuDocument_isFixedImage_resolved;
    LuDjvuDocument_parent_LuDocument_isFixedImage(somSelf,ev))
 
 /*
+ * Overridden method: isCreateFileThumbnail
+ */
+SOM_Scope boolean  SOMLINK isCreateFileThumbnail(LuDjvuDocument *somSelf, Environment *ev);
+static char *somMN_LuDjvuDocumentisCreateFileThumbnail = "LuDocument::isCreateFileThumbnail";
+static somId somId_LuDjvuDocumentisCreateFileThumbnail = &somMN_LuDjvuDocumentisCreateFileThumbnail;
+#ifdef somId_isCreateFileThumbnail
+#undef somId_isCreateFileThumbnail
+#else
+#define somId_isCreateFileThumbnail somId_LuDjvuDocumentisCreateFileThumbnail
+#endif
+typedef boolean   SOMLINK somTP_xih_LuDjvuDocument_isCreateFileThumbnail(LuDjvuDocument *somSelf, Environment *ev);
+typedef somTP_xih_LuDjvuDocument_isCreateFileThumbnail *somTD_xih_LuDjvuDocument_isCreateFileThumbnail;
+/* define the parent method call macro */
+static somMethodProc* LuDjvuDocument_parent_LuDocument_isCreateFileThumbnail_resolved;
+#define LuDjvuDocument_parent_LuDocument_isCreateFileThumbnail(somSelf,ev) \
+  ((( somTD_xih_LuDjvuDocument_isCreateFileThumbnail ) \
+      LuDjvuDocument_parent_LuDocument_isCreateFileThumbnail_resolved) \
+	(somSelf,ev))
+/* define a variety of (possibly ambiguous) short forms */
+#ifndef SOMGD_pmc_parent_isCreateFileThumbnail
+  #ifdef parent_isCreateFileThumbnail
+    #define SOMGD_pmc_parent_isCreateFileThumbnail
+    #undef parent_isCreateFileThumbnail
+  #else
+#define parent_isCreateFileThumbnail LuDjvuDocument_parent_LuDocument_isCreateFileThumbnail
+  #endif
+#endif
+#ifndef SOMGD_pmc_parent_LuDocument_isCreateFileThumbnail
+  #ifdef parent_LuDocument_isCreateFileThumbnail
+    #define SOMGD_pmc_parent_LuDocument_isCreateFileThumbnail
+    #undef parent_LuDocument_isCreateFileThumbnail
+  #else
+    #define parent_LuDocument_isCreateFileThumbnail LuDjvuDocument_parent_LuDocument_isCreateFileThumbnail
+  #endif
+#endif
+#define LuDjvuDocument_parents_isCreateFileThumbnail(somSelf,ev) (\
+   LuDjvuDocument_parent_LuDocument_isCreateFileThumbnail(somSelf,ev))
+
+/*
  * Overridden method: somDefaultInit
  */
 SOM_Scope void  SOMLINK somDefaultInit(LuDjvuDocument *somSelf,
@@ -791,6 +832,8 @@ static somOverrideMethod_t LuDjvuDocumentOM[] = {
          (somMethodProc *) exportToPostScript  },
     {    &somId_LuDjvuDocumentisFixedImage,
          (somMethodProc *) isFixedImage  },
+    {    &somId_LuDjvuDocumentisCreateFileThumbnail,
+         (somMethodProc *) isCreateFileThumbnail  },
     {    &somId_LuDjvuDocumentsomDefaultInit,
          (somMethodProc *) somDefaultInit  },
     {    &somId_LuDjvuDocumentsomDestruct,
@@ -809,7 +852,7 @@ static somId somPCLuDjvuDocument[] = {
 };
 
 static somStaticClassInfo LuDjvuDocumentSCI = {
-    4, 0, 15, 0, 0, 0, /* layout version 4 */ 
+    4, 0, 16, 0, 0, 0, /* layout version 4 */ 
     LuDjvuDocument_MajorVersion, LuDjvuDocument_MinorVersion,
     sizeof(LuDjvuDocumentData), LuDjvuDocument_MaxNoMethods, 1,
     &somCN_LuDjvuDocument,
@@ -855,6 +898,8 @@ SOMClass * SOMLINK LuDjvuDocumentNewClass (integer4 somtmajorVersion,
           return ((SOMClass*)((void*)_LuDjvuDocument));
     LuDocumentNewClass(LuDocument_MajorVersion,LuDocument_MinorVersion);	/* static reference */
     result = (SOMClass*)((void*)somBuildClass(0xFFFFFFFF,&LuDjvuDocumentSCI, somtmajorVersion, somtminorVersion));
+    LuDjvuDocument_parent_LuDocument_isCreateFileThumbnail_resolved = 
+	somParentNumResolve(LuDjvuDocumentCClassData.parentMtab, 1, LuDocumentClassData.isCreateFileThumbnail);
     LuDjvuDocument_parent_LuDocument_isFixedImage_resolved = 
 	somParentNumResolve(LuDjvuDocumentCClassData.parentMtab, 1, LuDocumentClassData.isFixedImage);
     LuDjvuDocument_parent_LuDocument_exportToPostScript_resolved = 

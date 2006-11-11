@@ -191,6 +191,8 @@ typedef LuDocument_LuRectSequence*   SOMLINK somTP_LuDjvuDocument_searchText(LuD
 		string text, 
 		boolean caseSensitive);
 typedef somTP_LuDjvuDocument_searchText *somTD_LuDjvuDocument_searchText;
+typedef boolean   SOMLINK somTP_LuDjvuDocument_isCreateFileThumbnail(LuDjvuDocument *somSelf, Environment *ev);
+typedef somTP_LuDjvuDocument_isCreateFileThumbnail *somTD_LuDjvuDocument_isCreateFileThumbnail;
 typedef void   SOMLINK somTP_LuDjvuDocument_somDefaultInit(LuDjvuDocument *somSelf, 
 		som3InitCtrl* ctrl);
 typedef somTP_LuDjvuDocument_somDefaultInit *somTD_LuDjvuDocument_somDefaultInit;
@@ -697,6 +699,14 @@ LuDocument_LuRectSequence*   searchText(Environment *ev,
 {
    return SOM_ResolveD(this,LuDjvuDocument,LuDocument,searchText)
 	(this, ev,pagenum,text,caseSensitive);
+}
+
+
+/* method: isCreateFileThumbnail */
+boolean   isCreateFileThumbnail(Environment *ev)
+{
+   return SOM_ResolveD(this,LuDjvuDocument,LuDocument,isCreateFileThumbnail)
+	(this, ev);
 }
 
 

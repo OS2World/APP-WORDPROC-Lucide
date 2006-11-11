@@ -22,7 +22,7 @@ interface LuDocument : SOMObject
     typedef sequence <LuRectangle> LuRectSequence;
     typedef sequence <LuLinkMapping> LuLinkMapSequence;
     typedef sequence <LuFontInfo> LuFontInfoSequence;
-	typedef somMToken asynchCallbackFn;
+    typedef somMToken asynchCallbackFn;
 
     /**
      * loadFile
@@ -65,7 +65,7 @@ interface LuDocument : SOMObject
 
     /**
      * isFixedImage
-     * 
+     *
      * Determines if upscaling doesn't improve image quality.
      * Must return TRUE for fixed-size images/bitmaps.
      * Must return FALSE for documents which renders fonts/vector images,
@@ -157,10 +157,10 @@ interface LuDocument : SOMObject
      * Note: you must implement renderPageToPixbuf() also, as
      *       it used during printing.
      **/
-    void renderPageToPixbufAsynch( in long pagenum, in long src_x, 
-    			   in long src_y, in long src_width, in long src_height,
-                   in double scale, in long rotation, in LuPixbuf pixbuf, 
-                   in asynchCallbackFn fnd, in asynchCallbackFn fna, 
+    void renderPageToPixbufAsynch( in long pagenum, in long src_x,
+                   in long src_y, in long src_width, in long src_height,
+                   in double scale, in long rotation, in LuPixbuf pixbuf,
+                   in asynchCallbackFn fnd, in asynchCallbackFn fna,
                    in somToken fndata );
 
 
@@ -172,14 +172,14 @@ interface LuDocument : SOMObject
      * Return value: TRUE if document will render directly into
      *               presentation space using renderPageToPS().
      *
-     * Note: You may not implement renderPageToPixbuf() if 
+     * Note: You may not implement renderPageToPixbuf() if
      *       isRenderIntoPS() is TRUE.
      *
      * Default return value: FALSE
      **/
     boolean isRenderIntoPS();
-    
-    
+
+
     /**
      * renderPageToPS
      * pagenum: the page to render from
@@ -201,7 +201,7 @@ interface LuDocument : SOMObject
      **/
     void renderPageToPS( in long pagenum, in long src_x, in long src_y,
                    in long src_width, in long src_height,
-                   in double scale, in long rotation, 
+                   in double scale, in long rotation,
                    in unsigned long hps, in somMToken rect );
 
 
@@ -211,7 +211,7 @@ interface LuDocument : SOMObject
      * See getSelectionRectangles(), searchText()
      *
      * Return value: TRUE if document contains text, which
-     *               can be selected by user, searched, etc, 
+     *               can be selected by user, searched, etc,
      *               FALSE otherwise.
      * Default return value: FALSE
      **/
@@ -348,14 +348,14 @@ interface LuDocument : SOMObject
      *        generated PostScript)
      * brkExport: pointer to boolean variable which must be checked
      *            during generating postscript, if it's TRUE - interrupt
-     *            generation process. 
+     *            generation process.
      *
      * Create a new postscript file and render document to.
      * Return value: TRUE if PS document was generated successfully or
      *               generation was interrupted, FALSE otherwise.
      * Default return value: FALSE
      **/
-    boolean exportToPostScript( in string filename, 
+    boolean exportToPostScript( in string filename,
                      in long first_page, in long last_page,
                      in double width, in double height,
                      inout boolean brkExport );
@@ -513,22 +513,33 @@ interface LuDocument : SOMObject
     LuRectSequence *searchText( in long pagenum, in string text, in boolean caseSensitive );
 
 
+    /**
+     * isCreateFileThumbnail
+     *
+     * If this method returns TRUE, then GUI may create thumbnail for
+     * this file and write it into EAs.
+     *
+     * Default return value: FALSE
+     **/
+    boolean isCreateFileThumbnail();
+
+
 #ifdef __SOMIDL__
 
     implementation
     {
-        releaseorder: loadFile, getBpp, isScalable, isRotable, 
-                      getPageCount, getPageSize, renderPageToPixbuf, 
+        releaseorder: loadFile, getBpp, isScalable, isRotable,
+                      getPageCount, getPageSize, renderPageToPixbuf,
                       isAsynchRenderingSupported, renderPageToPixbufAsynch,
                       isRenderIntoPS, renderPageToPS,
                       isHaveText, getSelectionRectangles, freeRectangles,
                       getText, isHaveLinks, getLinkMapping, freeLinkMapping,
-                      isSaveable, saveAs, 
+                      isSaveable, saveAs,
                       isPostScriptExportable, exportToPostScript,
                       isHaveFontInfo, getFontInfo, freeFontInfo,
                       isHaveIndex, getIndex, getDocumentInfo,
                       freeDocumentInfo, getThumbnailSize, getThumbnail,
-                      searchText, isFixedImage;
+                      searchText, isFixedImage, isCreateFileThumbnail;
 
 
         somDefaultInit: override, init;

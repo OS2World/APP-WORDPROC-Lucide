@@ -5,6 +5,7 @@
  *     SOM incremental update: 2.24
  */
 
+
 /*
  * Copyright (c) 2006, Eugene Romanenko, netlabs.org
  *
@@ -1308,6 +1309,13 @@ SOM_Scope boolean  SOMLINK isFixedImage(LuPopplerDocument *somSelf,
                                          Environment *ev)
 {
     return FALSE;
+}
+
+
+SOM_Scope boolean  SOMLINK isCreateFileThumbnail(LuPopplerDocument *somSelf, 
+                                                  Environment *ev)
+{
+    return TRUE;
 }
 
 

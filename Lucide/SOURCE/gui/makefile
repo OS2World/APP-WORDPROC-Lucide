@@ -1,6 +1,6 @@
 .autodepend
 
-TEST=0
+TEST=1
 VERSION=Beta 5
 
 !if $(TEST)==1
@@ -36,7 +36,7 @@ OBJS = Lucide.obj luutils.obj clipbrd.obj pmsplitter.obj pmtoolbar.obj \
        linklab.obj wwbtn.obj intern.obj messages.obj indexWindow.obj \
        fontsInfoDlg.obj docInfoDlg.obj findDlg.obj progressDlg.obj \
        aboutDlg.obj settingsDlg.obj lusettings.obj printDlg.obj \
-       print.obj stbrowser.obj pipemon.obj
+       print.obj stbrowser.obj pipemon.obj lucidethumbs.obj
 
 lucide.dll: $(OBJS) lucide.res
   copy &&|
@@ -69,6 +69,7 @@ file $(OBJDIR)\intern.obj
 file $(OBJDIR)\messages.obj
 file $(OBJDIR)\stbrowser.obj
 file $(OBJDIR)\pipemon.obj
+file $(OBJDIR)\lucidethumbs.obj
 name $(EXEDIR)\lucide
 lib ..\plugins\ludoc\ludoc
 lib somtk
@@ -124,6 +125,7 @@ indexWindow.obj:    indexWindow.cpp
 intern.obj:         intern.cpp
 messages.obj:       messages.cpp
 pipemon.obj:        pipemon.cpp
+lucidethumbs.obj:   lucidethumbs.cpp
 linklab.obj:        linklab.c
 wwbtn.obj:          wwbtn.c
 stbrowser.obj:      stbrowser.c

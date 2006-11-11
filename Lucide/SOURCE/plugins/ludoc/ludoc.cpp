@@ -429,6 +429,13 @@ SOM_Scope LuDocument_LuRectSequence*  SOMLINK searchText(LuDocument *somSelf,
 }
 
 
+SOM_Scope boolean  SOMLINK isCreateFileThumbnail(LuDocument *somSelf, 
+                                                  Environment *ev)
+{
+    return FALSE;
+}
+
+
 SOM_Scope void SOMLINK somDefaultInit(LuDocument *somSelf, som3InitCtrl* ctrl)
 {
     somInitCtrl globalCtrl;

@@ -71,6 +71,7 @@ double convZoom( SHORT v );
 
 
 char *newstrdup( const char *s );
+char *getTmpDir( char *buf );
 
 // Internationalization/Localization
 void loadLang();
