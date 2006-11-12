@@ -61,6 +61,7 @@ class Lucide
 		static ProgressDlg *loadProgressDlg;
 		static char docFullName[ CCHMAXPATH ];
 		static bool docLoaded;
+		static long loadErrorCode;
 		static char *loadError;
 		static bool isMaxview;
 		static bool isFullscreen;

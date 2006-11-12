@@ -112,15 +112,24 @@ METHODDEF(void) lujpeg_error_exit( j_common_ptr cinfo )
 }
 
 
+
 SOM_Scope boolean  SOMLINK loadFile(LuJpegDocument *somSelf,
                                      Environment *ev, string filename,
-                                    string password, string* error)
+                                    string password, long* errorCode,
+                                    string* error)
 {
+    if ( errorCode != NULL ) {
+        *errorCode = LU_LDERR_NO_ERROR;
+    }
+
     LuJpegDocumentData *somThis = LuJpegDocumentGetData(somSelf);
     JpegDocument *d = (JpegDocument *)somThis->data;
 
     FILE *infile = NULL;
     if ( ( infile = fopen( filename, "rb" ) ) == NULL ) {
+        if ( errorCode != NULL ) {
+            *errorCode = LU_LDERR_OPEN_ERROR;
+        }
         return FALSE;
     }
 
@@ -133,6 +142,9 @@ SOM_Scope boolean  SOMLINK loadFile(LuJpegDocument *somSelf,
         // If we get here, the JPEG code has signaled an error.
         jpeg_destroy_decompress( &cinfo );
         fclose( infile );
+        if ( errorCode != NULL ) {
+            *errorCode = LU_LDERR_WRONG_FORMAT;
+        }
         return FALSE;
     }
 
@@ -210,13 +222,20 @@ SOM_Scope void  SOMLINK getPageSize(LuJpegDocument *somSelf,
 }
 
 
-SOM_Scope void  SOMLINK renderPageToPixbuf(LuJpegDocument *somSelf,
-                                            Environment *ev,
-                                           long pagenum, long src_x,
-                                           long src_y, long src_width,
-                                           long src_height, double scale,
-                                           long rotation, LuPixbuf* pixbuf)
+SOM_Scope boolean  SOMLINK renderPageToPixbuf(LuJpegDocument *somSelf,
+                                               Environment *ev,
+                                              long pagenum, long src_x,
+                                              long src_y, long src_width,
+                                              long src_height,
+                                              double scale, long rotation,
+                                              LuPixbuf* pixbuf,
+                                              long* errorCode,
+                                              string* error)
 {
+    if ( errorCode != NULL ) {
+        *errorCode = LU_RERR_NO_ERROR;
+    }
+
     LuJpegDocumentData *somThis = LuJpegDocumentGetData(somSelf);
     JpegDocument *d = (JpegDocument *)somThis->data;
 
@@ -237,6 +256,8 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuJpegDocument *somSelf,
         dst = pixbuf_data + (i * pixbuf_rowstride);
         memcpy( dst, src, src_width * bpp );
     }
+
+    return TRUE;
 }
 
 

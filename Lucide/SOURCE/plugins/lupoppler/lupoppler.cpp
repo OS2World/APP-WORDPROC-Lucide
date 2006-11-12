@@ -264,19 +264,26 @@ static void copy_page_to_pixbuf( Environment *ev, SplashBitmap *bitmap, LuPixbuf
 }
 
 
-SOM_Scope void  SOMLINK renderPageToPixbuf(LuPopplerDocument *somSelf,
-                                            Environment *ev,
-                                           long pagenum, long src_x,
-                                           long src_y, long src_width,
-                                           long src_height, double scale,
-                                           long rotation, LuPixbuf* pixbuf)
+SOM_Scope boolean  SOMLINK renderPageToPixbuf(LuPopplerDocument *somSelf,
+                                               Environment *ev,
+                                              long pagenum, long src_x,
+                                              long src_y, long src_width,
+                                              long src_height,
+                                              double scale, long rotation,
+                                              LuPixbuf* pixbuf,
+                                              long* errorCode,
+                                              string* error)
 {
+    if ( errorCode != NULL ) {
+        *errorCode = LU_RERR_NO_ERROR;
+    }
+
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
     PopplerDocument *document = (PopplerDocument *)somThis->data;
     Page *page = document->pages[ pagenum ].page;
 
     if ( ( scale < 0.0 ) || ( pixbuf == NULL ) ) {
-        return;
+        return FALSE;
     }
 
     DosRequestMutexSem( document->mutex, SEM_INDEFINITE_WAIT );
@@ -294,6 +301,8 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuPopplerDocument *somSelf,
     DosReleaseMutexSem( document->mutex );
 
     copy_page_to_pixbuf( ev, document->output_dev->getBitmap(), pixbuf );
+
+    return TRUE;
 }
 
 
@@ -337,6 +346,7 @@ static GBool abortCheckCbk( void *data )
     return (GBool)cd->fna( cd->fndata );
 }
 
+
 SOM_Scope void  SOMLINK renderPageToPixbufAsynch(LuPopplerDocument *somSelf,
                                                   Environment *ev,
                                                  long pagenum,
@@ -349,8 +359,14 @@ SOM_Scope void  SOMLINK renderPageToPixbufAsynch(LuPopplerDocument *somSelf,
                                                  LuPixbuf* pixbuf,
                                                  LuDocument_asynchCallbackFn fnd,
                                                  LuDocument_asynchCallbackFn fna,
-                                                 somToken fndata)
+                                                 somToken fndata,
+                                                 long* errorCode,
+                                                 string* error)
 {
+    if ( errorCode != NULL ) {
+        *errorCode = LU_RERR_NO_ERROR;
+    }
+
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
     PopplerDocument *document = (PopplerDocument *)somThis->data;
     Page *page = document->pages[ pagenum ].page;
@@ -1312,7 +1328,7 @@ SOM_Scope boolean  SOMLINK isFixedImage(LuPopplerDocument *somSelf,
 }
 
 
-SOM_Scope boolean  SOMLINK isCreateFileThumbnail(LuPopplerDocument *somSelf, 
+SOM_Scope boolean  SOMLINK isCreateFileThumbnail(LuPopplerDocument *somSelf,
                                                   Environment *ev)
 {
     return TRUE;
@@ -1352,9 +1368,14 @@ static void set_error( char **error, const char *fmt, ... )
 
 
 SOM_Scope boolean  SOMLINK loadFile(LuPopplerDocument *somSelf,
-                                    Environment *ev, string filename,
-                                    string password, string* error)
+                                     Environment *ev, string filename,
+                                    string password, long* errorCode,
+                                    string* error)
 {
+    if ( errorCode != NULL ) {
+        *errorCode = LU_LDERR_NO_ERROR;
+    }
+
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData( somSelf );
 
     PDFDoc *newDoc;
@@ -1382,10 +1403,28 @@ SOM_Scope boolean  SOMLINK loadFile(LuPopplerDocument *somSelf,
         err = newDoc->getErrorCode();
         delete newDoc;
 
-        if (err == errEncrypted) {
-            set_error(error, "Document is encrypted.");
-        } else {
-            set_error(error, "Failed to load document (error %d) '%s'\n", err, filename );
+        if ( errorCode != NULL )
+        {
+            switch ( err )
+            {
+                case errOpenFile:
+                    *errorCode = LU_LDERR_OPEN_ERROR;
+                    break;
+                case errBadCatalog:
+                case errDamaged:
+                    *errorCode = LU_LDERR_DAMAGED;
+                    break;
+                case errEncrypted:
+                    *errorCode = LU_LDERR_ENCRYPTED;
+                    break;
+                case errFileIO:
+                    *errorCode = LU_LDERR_READ_ERROR;
+                    break;
+                default:
+                    *errorCode = LU_LDERR_CUSTOM;
+                    set_error( error, "(error %d)", err );
+                    break;
+            }
         }
 
         return FALSE;

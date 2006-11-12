@@ -75,6 +75,18 @@ MSGS_FILE_SAVE_ERROR=Error saving file!
 MSGS_PAGE=Page
 MSGS_ERROR_STARTING_BROWSER=Error starting browser!
 
+MSGS_LDERR=File load error: %s!
+MSGS_LDERR_OUT_OF_MEMORY=Out of memory
+MSGS_LDERR_OPEN_ERROR=Open error
+MSGS_LDERR_READ_ERROR=Read error
+MSGS_LDERR_DAMAGED=File damaged
+MSGS_LDERR_WRONG_FORMAT=Wrong format
+MSGS_LDERR_ENCRYPTED=File is encrypted
+
+MSGS_RERR_OUT_OF_MEMORY=Out of memory
+MSGS_RERR_CORRUPTED_PAGE_DATA=Corrupted page data
+MSGS_RERR_FONT_NOT_FOUND=Font %s not found
+
 #
 # "Plugins list" dialog
 #

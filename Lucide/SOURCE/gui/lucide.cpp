@@ -108,6 +108,7 @@ char         Lucide::docFileName[ CCHMAXPATHCOMP ] = "";
 ProgressDlg *Lucide::loadProgressDlg               = NULL;
 bool         Lucide::docLoaded                     = false;;
 char        *Lucide::loadError                     = NULL;
+long         Lucide::loadErrorCode                 = LU_LDERR_NO_ERROR;
 void        *Lucide::thumbnailData                 = NULL;
 int          Lucide::thumbnailDataLen              = 0;
 
@@ -359,7 +360,7 @@ void Lucide::loadthread( void *p )
     HAB thab = WinInitialize( 0 );
     HMQ thmq = WinCreateMsgQueue( thab, 0 );
 
-    docLoaded = doc->loadFile( ev, docFullName, NULL, &loadError );
+    docLoaded = doc->loadFile( ev, docFullName, NULL, &loadErrorCode, &loadError );
     if ( docLoaded ) {
         if ( doc->isCreateFileThumbnail( ev ) && isThumbNeeded( docFullName ) ) {
             loadProgressDlg->setText( getLocalizedString( MSGS_CREATING_THUMBNAIL ).c_str() );
@@ -429,7 +430,7 @@ void Lucide::loadDocument( const char *fn )
                 }
                 else
                 {
-                    if ( loadError == NULL )
+                    if ( loadErrorCode == LU_LDERR_NO_ERROR )
                     {
                         char *m = newstrdupL( MSGS_FILE_LOAD_ERROR );
                         WinMessageBox( HWND_DESKTOP, hWndFrame, m,
@@ -438,9 +439,51 @@ void Lucide::loadDocument( const char *fn )
                     }
                     else
                     {
-                        WinMessageBox( HWND_DESKTOP, hWndFrame, loadError,
+                        std::string msgTempl = getLocalizedString( MSGS_LDERR );
+
+                        const int errmsgLen = 1024;
+                        char *errmsg = new char[ errmsgLen ];
+                        memset( errmsg, 0, errmsgLen );
+
+                        if ( loadErrorCode == LU_LDERR_CUSTOM )
+                        {
+                            snprintf( errmsg, errmsgLen, msgTempl.c_str(), loadError );
+                            SOMFree( loadError );
+                        }
+                        else
+                        {
+                            const char *lmsg = NULL;
+                            switch ( loadErrorCode )
+                            {
+                                case LU_LDERR_OUT_OF_MEMORY:
+                                    lmsg = MSGS_LDERR_OUT_OF_MEMORY;
+                                    break;
+                                case LU_LDERR_OPEN_ERROR:
+                                    lmsg = MSGS_LDERR_OPEN_ERROR;
+                                    break;
+                                case LU_LDERR_READ_ERROR:
+                                    lmsg = MSGS_LDERR_READ_ERROR;
+                                    break;
+                                case LU_LDERR_DAMAGED:
+                                    lmsg = MSGS_LDERR_DAMAGED;
+                                    break;
+                                case LU_LDERR_WRONG_FORMAT:
+                                    lmsg = MSGS_LDERR_WRONG_FORMAT;
+                                    break;
+                                case LU_LDERR_ENCRYPTED:
+                                    lmsg = MSGS_LDERR_ENCRYPTED;
+                                    break;
+                            }
+
+                            if ( lmsg != NULL ) {
+                                snprintf( errmsg, errmsgLen, msgTempl.c_str(),
+                                          getLocalizedString( lmsg ).c_str() );
+                            }
+                        }
+
+                        WinMessageBox( HWND_DESKTOP, hWndFrame, errmsg,
                                        NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
-                        SOMFree( loadError );
+                        delete errmsg;
                     }
 
                     delete doc;

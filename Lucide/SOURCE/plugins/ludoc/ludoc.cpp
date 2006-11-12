@@ -129,14 +129,21 @@ SOM_Scope void  SOMLINK getPageSize(LuDocument *somSelf,  Environment *ev,
 }
 
 
-SOM_Scope void  SOMLINK renderPageToPixbuf(LuDocument *somSelf,
-                                            Environment *ev,
-                                           long pagenum, long src_x,
-                                           long src_y, long src_width,
-                                           long src_height, double scale,
-                                           long rotation, LuPixbuf* pixbuf)
+SOM_Scope boolean  SOMLINK renderPageToPixbuf(LuDocument *somSelf, 
+                                               Environment *ev, 
+                                              long pagenum, long src_x, 
+                                              long src_y, long src_width, 
+                                              long src_height, 
+                                              double scale, long rotation, 
+                                              LuPixbuf* pixbuf, 
+                                              long* errorCode, 
+                                              string* error)
 {
     // Abstract method does nothing
+    if ( errorCode != NULL ) {
+        *errorCode = LU_LDERR_NO_ERROR;
+    }
+    return FALSE;
 }
 
 
@@ -145,6 +152,7 @@ SOM_Scope boolean  SOMLINK isAsynchRenderingSupported(LuDocument *somSelf,
 {
     return FALSE;
 }
+
 
 
 SOM_Scope void  SOMLINK renderPageToPixbufAsynch(LuDocument *somSelf, 
@@ -159,9 +167,14 @@ SOM_Scope void  SOMLINK renderPageToPixbufAsynch(LuDocument *somSelf,
                                                  LuPixbuf* pixbuf, 
                                                  LuDocument_asynchCallbackFn fnd, 
                                                  LuDocument_asynchCallbackFn fna, 
-                                                 somToken fndata)
+                                                 somToken fndata, 
+                                                 long* errorCode, 
+                                                 string* error)
 {
     // Abstract method does nothing
+    if ( errorCode != NULL ) {
+        *errorCode = LU_RERR_NO_ERROR;
+    }
 }
 
 
@@ -171,14 +184,21 @@ SOM_Scope boolean  SOMLINK isRenderIntoPS(LuDocument *somSelf,
     return FALSE;
 }
 
-SOM_Scope void  SOMLINK renderPageToPS(LuDocument *somSelf,  Environment *ev, 
-                                       long pagenum, long src_x, 
-                                       long src_y, long src_width, 
-                                       long src_height, double scale, 
-                                       long rotation, unsigned long hps, 
-                                       somMToken rect)
+
+SOM_Scope boolean  SOMLINK renderPageToPS(LuDocument *somSelf, 
+                                           Environment *ev, long pagenum, 
+                                          long src_x, long src_y, 
+                                          long src_width, long src_height, 
+                                          double scale, long rotation, 
+                                          unsigned long hps, 
+                                          somMToken rect, long* errorCode, 
+                                          string* error)
 {
     // Abstract method does nothing
+    if ( errorCode != NULL ) {
+        *errorCode = LU_LDERR_NO_ERROR;
+    }
+    return FALSE;
 }
 
 
@@ -445,11 +465,14 @@ SOM_Scope void SOMLINK somDefaultInit(LuDocument *somSelf, som3InitCtrl* ctrl)
 }
 
 
-SOM_Scope boolean  SOMLINK loadFile(LuDocument *somSelf,  Environment *ev,
-                                    string filename, string password,
-                                    string* error)
+SOM_Scope boolean  SOMLINK loadFile(LuDocument *somSelf,  Environment *ev, 
+                                    string filename, string password, 
+                                    long* errorCode, string* error)
 {
     // Abstract method does nothing
+    if ( errorCode != NULL ) {
+        *errorCode = LU_LDERR_NO_ERROR;
+    }
     return FALSE;
 }
 

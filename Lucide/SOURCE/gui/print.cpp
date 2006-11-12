@@ -251,9 +251,11 @@ void LucidePrinting::printPagePm( long page, HPS hpsPrinter, PHCINFO pcurForm )
 
     LONG rclx = w;
     LONG rcly = h;
+
     if ( doc->isRenderIntoPS( ev ) )
     {
-        doc->renderPageToPS( ev, page, 0, 0, rclx, rcly, zoom, 0, hpsPrinter, &rclDraw );
+        doc->renderPageToPS( ev, page, 0, 0, rclx, rcly, zoom, 0, hpsPrinter, &rclDraw,
+                             NULL, NULL );
     }
     else
     {
@@ -262,7 +264,8 @@ void LucidePrinting::printPagePm( long page, HPS hpsPrinter, PHCINFO pcurForm )
                                rclDraw.xRight-1, rclDraw.yTop-1,
                                0, 0, rclx, rcly };
 
-        doc->renderPageToPixbuf( ev, page, 0, 0, rclx, rcly, zoom, 0, pixbuf );
+        doc->renderPageToPixbuf( ev, page, 0, 0, rclx, rcly, zoom, 0, pixbuf,
+                                 NULL, NULL );
 
         LONG lRop = ROP_SRCCOPY;
         BITMAPINFO2 pbmi;

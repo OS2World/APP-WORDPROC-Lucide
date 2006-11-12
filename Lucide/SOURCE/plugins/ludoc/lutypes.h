@@ -157,4 +157,22 @@ typedef long (_System *_asynchCallbackFn)( void *data );
 //typedef _asynchCallbackFn *asynchCallbackFn;
 #endif
 
+// Load errors
+#define LU_LDERR_NO_ERROR       0
+#define LU_LDERR_CUSTOM         1
+#define LU_LDERR_OUT_OF_MEMORY  2
+#define LU_LDERR_OPEN_ERROR     3
+#define LU_LDERR_READ_ERROR     4
+#define LU_LDERR_DAMAGED        5
+#define LU_LDERR_WRONG_FORMAT   6
+#define LU_LDERR_ENCRYPTED      7
+
+// Render errors/warnings
+#define LU_RERR_NO_ERROR              0
+#define LU_RERR_CUSTOM                1
+#define LU_RERR_OUT_OF_MEMORY         2
+#define LU_RERR_CORRUPTED_PAGE_DATA   3
+#define LU_RERR_FONT_NOT_FOUND        4
+
+
 #endif // lutypes_h

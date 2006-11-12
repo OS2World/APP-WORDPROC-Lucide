@@ -280,8 +280,10 @@ void Lucide::createThumbnail( LuDocument *doc )
     long rx = width * zoom;
     long ry = height * zoom;
     LuPixbuf *pixbuf = new LuPixbuf( ev, rx, ry, bpp );
-    // TODO: analyze return value
-    doc->renderPageToPixbuf( ev, 0, 0, 0, rx, ry, zoom, 0, pixbuf );
+    if ( !doc->renderPageToPixbuf( ev, 0, 0, 0, rx, ry, zoom, 0, pixbuf, NULL, NULL ) ) {
+        delete pixbuf;
+        return;
+    }
 
     char *tmpgif = new char[ CCHMAXPATH ];
     getTmpDir( tmpgif );

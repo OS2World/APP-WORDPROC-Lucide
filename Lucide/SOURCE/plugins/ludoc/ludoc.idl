@@ -28,6 +28,7 @@ interface LuDocument : SOMObject
      * loadFile
      * filename: filename of the file to load
      * password: password to unlock the file with, or NULL
+     * errorCode: Return location for an error code, or NULL
      * error: Return location for an error, or NULL
      *
      * Loads the specified file.
@@ -39,7 +40,7 @@ interface LuDocument : SOMObject
      *       use SOMFree() to free.
      **/
     boolean loadFile( in string filename, in string password,
-                      inout string error );
+                      out long errorCode, inout string error );
 
     /**
      * getBpp
@@ -125,14 +126,18 @@ interface LuDocument : SOMObject
      *           allowed values is 0, 90, 180, 270
      *        (if isRotable() is FALSE, rotation ignored and assumed 0)
      * pixbuf: pixbuf to render into
+     * errorCode: Return location for an error/warning code, or NULL
+     * error: Return location for an error/warning, or NULL
      *
      * First scale the document to match the specified pixels per point,
      * then render the rectangle given by the upper left corner at
      * (src_x, src_y) and src_width and src_height.
      **/
-    void renderPageToPixbuf( in long pagenum, in long src_x, in long src_y,
-                   in long src_width, in long src_height,
-                   in double scale, in long rotation, in LuPixbuf pixbuf );
+    boolean renderPageToPixbuf( in long pagenum, in long src_x, in long src_y,
+                                in long src_width, in long src_height,
+                                in double scale, in long rotation, 
+                                in LuPixbuf pixbuf,  
+                                out long errorCode, inout string error );
 
 
     /**
@@ -153,6 +158,8 @@ interface LuDocument : SOMObject
      * draw function, abort function and functions data.
      * Callback functions must be defined as
      * long _System *asynchCallbackFn( void *data );
+     * errorCode: Return location for an error/warning code, or NULL
+     * error: Return location for an error/warning, or NULL
      *
      * Note: you must implement renderPageToPixbuf() also, as
      *       it used during printing.
@@ -161,7 +168,8 @@ interface LuDocument : SOMObject
                    in long src_y, in long src_width, in long src_height,
                    in double scale, in long rotation, in LuPixbuf pixbuf,
                    in asynchCallbackFn fnd, in asynchCallbackFn fna,
-                   in somToken fndata );
+                   in somToken fndata, 
+                   out long errorCode, inout string error );
 
 
     /**
@@ -194,15 +202,18 @@ interface LuDocument : SOMObject
      *        (if isRotable() is FALSE, rotation ignored and assumed 0)
      * hps: handle of presentation space to render into
      * rect: pointer to RECTL structure, defines render area on HPS
+     * errorCode: Return location for an error/warning code, or NULL
+     * error: Return location for an error/warning, or NULL
      *
      * First scale the document to match the specified pixels per point,
      * then render the rectangle given by the upper left corner at
      * (src_x, src_y) and src_width and src_height.
      **/
-    void renderPageToPS( in long pagenum, in long src_x, in long src_y,
+    boolean renderPageToPS( in long pagenum, in long src_x, in long src_y,
                    in long src_width, in long src_height,
                    in double scale, in long rotation,
-                   in unsigned long hps, in somMToken rect );
+                   in unsigned long hps, in somMToken rect,  
+                   out long errorCode, inout string error );
 
 
     /**

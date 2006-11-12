@@ -176,6 +176,7 @@ SOMEXTERN struct LuDjvuDocumentCClassDataStructure SOMDLINK LuDjvuDocumentCClass
 SOM_Scope boolean  SOMLINK loadFile(LuDjvuDocument *somSelf, Environment *ev,
 		string filename,
 		string password,
+		long* errorCode,
 		string* error);
 static char *somMN_LuDjvuDocumentloadFile = "LuDocument::loadFile";
 static somId somId_LuDjvuDocumentloadFile = &somMN_LuDjvuDocumentloadFile;
@@ -187,14 +188,15 @@ static somId somId_LuDjvuDocumentloadFile = &somMN_LuDjvuDocumentloadFile;
 typedef boolean   SOMLINK somTP_xih_LuDjvuDocument_loadFile(LuDjvuDocument *somSelf, Environment *ev, 
 		string filename, 
 		string password, 
+		long* errorCode, 
 		string* error);
 typedef somTP_xih_LuDjvuDocument_loadFile *somTD_xih_LuDjvuDocument_loadFile;
 /* define the parent method call macro */
 static somMethodProc* LuDjvuDocument_parent_LuDocument_loadFile_resolved;
-#define LuDjvuDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,error) \
+#define LuDjvuDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,errorCode,error) \
   ((( somTD_xih_LuDjvuDocument_loadFile ) \
       LuDjvuDocument_parent_LuDocument_loadFile_resolved) \
-	(somSelf,ev,filename,password,error))
+	(somSelf,ev,filename,password,errorCode,error))
 /* define a variety of (possibly ambiguous) short forms */
 #ifndef SOMGD_pmc_parent_loadFile
   #ifdef parent_loadFile
@@ -212,8 +214,8 @@ static somMethodProc* LuDjvuDocument_parent_LuDocument_loadFile_resolved;
     #define parent_LuDocument_loadFile LuDjvuDocument_parent_LuDocument_loadFile
   #endif
 #endif
-#define LuDjvuDocument_parents_loadFile(somSelf,ev,filename,password,error) (\
-   LuDjvuDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,error))
+#define LuDjvuDocument_parents_loadFile(somSelf,ev,filename,password,errorCode,error) (\
+   LuDjvuDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,errorCode,error))
 
 /*
  * Overridden method: getBpp
@@ -380,7 +382,7 @@ static somMethodProc* LuDjvuDocument_parent_LuDocument_getPageSize_resolved;
 /*
  * Overridden method: renderPageToPixbuf
  */
-SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf, Environment *ev,
+SOM_Scope boolean  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf, Environment *ev,
 		long pagenum,
 		long src_x,
 		long src_y,
@@ -388,7 +390,9 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf, Environment 
 		long src_height,
 		double scale,
 		long rotation,
-		LuPixbuf* pixbuf);
+		LuPixbuf* pixbuf,
+		long* errorCode,
+		string* error);
 static char *somMN_LuDjvuDocumentrenderPageToPixbuf = "LuDocument::renderPageToPixbuf";
 static somId somId_LuDjvuDocumentrenderPageToPixbuf = &somMN_LuDjvuDocumentrenderPageToPixbuf;
 #ifdef somId_renderPageToPixbuf
@@ -396,7 +400,7 @@ static somId somId_LuDjvuDocumentrenderPageToPixbuf = &somMN_LuDjvuDocumentrende
 #else
 #define somId_renderPageToPixbuf somId_LuDjvuDocumentrenderPageToPixbuf
 #endif
-typedef void   SOMLINK somTP_xih_LuDjvuDocument_renderPageToPixbuf(LuDjvuDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_xih_LuDjvuDocument_renderPageToPixbuf(LuDjvuDocument *somSelf, Environment *ev, 
 		long pagenum, 
 		long src_x, 
 		long src_y, 
@@ -404,14 +408,16 @@ typedef void   SOMLINK somTP_xih_LuDjvuDocument_renderPageToPixbuf(LuDjvuDocumen
 		long src_height, 
 		double scale, 
 		long rotation, 
-		LuPixbuf* pixbuf);
+		LuPixbuf* pixbuf, 
+		long* errorCode, 
+		string* error);
 typedef somTP_xih_LuDjvuDocument_renderPageToPixbuf *somTD_xih_LuDjvuDocument_renderPageToPixbuf;
 /* define the parent method call macro */
 static somMethodProc* LuDjvuDocument_parent_LuDocument_renderPageToPixbuf_resolved;
-#define LuDjvuDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf) \
+#define LuDjvuDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error) \
   ((( somTD_xih_LuDjvuDocument_renderPageToPixbuf ) \
       LuDjvuDocument_parent_LuDocument_renderPageToPixbuf_resolved) \
-	(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf))
+	(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error))
 /* define a variety of (possibly ambiguous) short forms */
 #ifndef SOMGD_pmc_parent_renderPageToPixbuf
   #ifdef parent_renderPageToPixbuf
@@ -429,8 +435,8 @@ static somMethodProc* LuDjvuDocument_parent_LuDocument_renderPageToPixbuf_resolv
     #define parent_LuDocument_renderPageToPixbuf LuDjvuDocument_parent_LuDocument_renderPageToPixbuf
   #endif
 #endif
-#define LuDjvuDocument_parents_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf) (\
-   LuDjvuDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf))
+#define LuDjvuDocument_parents_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error) (\
+   LuDjvuDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error))
 
 /*
  * Overridden method: getThumbnailSize

@@ -855,6 +855,9 @@ void DocumentViewer::drawthread( void *p )
                   _this->drawareaIndex < _this->drawareas->size();
                   _this->drawareaIndex++ )
             {
+                long renderErrorCode = LU_RERR_NO_ERROR;
+                char *renderError = NULL;
+
                 PageDrawArea *pda = &(*_this->drawareas)[ _this->drawareaIndex ];
 
                 LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
@@ -863,12 +866,24 @@ void DocumentViewer::drawthread( void *p )
                 _this->doc->renderPageToPixbufAsynch( ev, pda->pagenum,
                        pda->startpos.x, pda->startpos.y, rclx, rcly, _this->realzoom,
                        _this->rotation, _this->pixbuf,
-                       asynchCallbackFnDraw, asynchCallbackFnAbort, p );
+                       asynchCallbackFnDraw, asynchCallbackFnAbort, p,
+                       &renderErrorCode, &renderError );
                 delete _this->pixbuf;
                 _this->pixbuf = NULL;
 
+                if ( renderErrorCode != LU_RERR_NO_ERROR )
+                {
+                    // TODO: display error/warning (renderErrorCode, renderError)
+
+                    // ...
+
+                    if ( renderError != NULL ) {
+                        SOMFree( renderError );
+                    }
+                }
+
                 if ( _this->abortAsynch ) {
-                    break;  // TODO: remove completed areas from drawareas
+                    break;  // TODO: remove completed areas from drawareas (?)
                 }
             }
 
@@ -1085,10 +1100,14 @@ void DocumentViewer::wmPaint( HWND hwnd )
             LONG rclx = rclDraw.xRight - rclDraw.xLeft;
             LONG rcly = rclDraw.yTop - rclDraw.yBottom;
 
+            long renderErrorCode = LU_RERR_NO_ERROR;
+            char *renderError = NULL;
+
             if ( drawPS )
             {
                 doc->renderPageToPS( ev, currentpage, spos_x, spos_y, rclx, rcly,
-                                     realzoom, rotation, hpsBuffer, &rclDraw );
+                                     realzoom, rotation, hpsBuffer, &rclDraw,
+                                     &renderErrorCode, &renderError );
             }
             else
             {
@@ -1098,7 +1117,8 @@ void DocumentViewer::wmPaint( HWND hwnd )
                                        0, 0, rclx, rcly };
 
                 doc->renderPageToPixbuf( ev, currentpage, spos_x, spos_y,
-                                         rclx, rcly, realzoom, rotation, pixbuf );
+                                         rclx, rcly, realzoom, rotation, pixbuf,
+                                         &renderErrorCode, &renderError );
                 LONG lRop = ROP_SRCCOPY;
                 BITMAPINFO2 pbmi;
                 pbmi.cbFix = 16L;
@@ -1110,6 +1130,17 @@ void DocumentViewer::wmPaint( HWND hwnd )
                              aptlPoints, lRop, BBO_IGNORE );
                 delete pixbuf;
                 pixbuf = NULL;
+            }
+
+            if ( renderErrorCode != LU_RERR_NO_ERROR )
+            {
+                // TODO: display error/warning (renderErrorCode, renderError)
+
+                // ...
+
+                if ( renderError != NULL ) {
+                    SOMFree( renderError );
+                }
             }
 
             drawSelection( currentpage, hpsBuffer, &rclDraw );
@@ -1250,10 +1281,14 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
             LONG rclx = pda->drawrect.xRight - pda->drawrect.xLeft;
             LONG rcly = pda->drawrect.yTop - pda->drawrect.yBottom;
 
+            long renderErrorCode = LU_RERR_NO_ERROR;
+            char *renderError = NULL;
+
             if ( drawPS )
             {
                 doc->renderPageToPS( ev, pda->pagenum, spos_x, spos_y, rclx, rcly,
-                                     realzoom, rotation, hpsBuffer, &(pda->drawrect) );
+                                     realzoom, rotation, hpsBuffer, &(pda->drawrect),
+                                     &renderErrorCode, &renderError );
             }
             else
             {
@@ -1262,7 +1297,8 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
                                        pda->drawrect.xRight-1, pda->drawrect.yTop-1,
                                        0, 0, rclx, rcly };
                 doc->renderPageToPixbuf( ev, pda->pagenum, spos_x, spos_y,
-                                         rclx, rcly, realzoom, rotation, pixbuf );
+                                         rclx, rcly, realzoom, rotation, pixbuf,
+                                         &renderErrorCode, &renderError );
                 LONG lRop = ROP_SRCCOPY;
                 BITMAPINFO2 pbmi;
                 pbmi.cbFix = 16L;
@@ -1274,6 +1310,17 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
                              aptlPoints, lRop, BBO_IGNORE );
                 delete pixbuf;
                 pixbuf = NULL;
+            }
+
+            if ( renderErrorCode != LU_RERR_NO_ERROR )
+            {
+                // TODO: display error/warning (renderErrorCode, renderError)
+
+                // ...
+
+                if ( renderError != NULL ) {
+                    SOMFree( renderError );
+                }
             }
 
             drawSelection( pda->pagenum, hpsBuffer, &pda->drawrect );

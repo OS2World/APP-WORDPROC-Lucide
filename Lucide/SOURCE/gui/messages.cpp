@@ -54,16 +54,29 @@ const char *TB_PAGENUM           = "TB_PAGENUM";
 
 
 // Lucide messages
-const char *MSGS_MAIN_WIN_TITLE     = "MSGS_MAIN_WIN_TITLE";
-const char *MSGS_NO_SUIT_PLUG       = "MSGS_NO_SUIT_PLUG";
-const char *MSGS_FILE_LOAD_ERROR    = "MSGS_FILE_LOAD_ERROR";
-const char *MSGS_LOADING_DOCUMENT   = "MSGS_LOADING_DOCUMENT";
-const char *MSGS_CREATING_THUMBNAIL = "MSGS_CREATING_THUMBNAIL";
-const char *MSGS_WARNING            = "MSGS_WARNING";
-const char *MSGS_OVERWRITE_FILE     = "MSGS_OVERWRITE_FILE";
-const char *MSGS_FILE_SAVE_ERROR    = "MSGS_FILE_SAVE_ERROR";
-const char *MSGS_PAGE               = "MSGS_PAGE";
-const char *MSGS_ERROR_STARTING_BROWSER = "MSGS_ERROR_STARTING_BROWSER";
+const char *MSGS_MAIN_WIN_TITLE           = "MSGS_MAIN_WIN_TITLE";
+const char *MSGS_NO_SUIT_PLUG             = "MSGS_NO_SUIT_PLUG";
+const char *MSGS_FILE_LOAD_ERROR          = "MSGS_FILE_LOAD_ERROR";
+const char *MSGS_LOADING_DOCUMENT         = "MSGS_LOADING_DOCUMENT";
+const char *MSGS_CREATING_THUMBNAIL       = "MSGS_CREATING_THUMBNAIL";
+const char *MSGS_WARNING                  = "MSGS_WARNING";
+const char *MSGS_OVERWRITE_FILE           = "MSGS_OVERWRITE_FILE";
+const char *MSGS_FILE_SAVE_ERROR          = "MSGS_FILE_SAVE_ERROR";
+const char *MSGS_PAGE                     = "MSGS_PAGE";
+const char *MSGS_ERROR_STARTING_BROWSER   = "MSGS_ERROR_STARTING_BROWSER";
+
+const char *MSGS_LDERR                    = "MSGS_LDERR";
+const char *MSGS_LDERR_OUT_OF_MEMORY      = "MSGS_LDERR_OUT_OF_MEMORY";
+const char *MSGS_LDERR_OPEN_ERROR         = "MSGS_LDERR_OPEN_ERROR";
+const char *MSGS_LDERR_READ_ERROR         = "MSGS_LDERR_READ_ERROR";
+const char *MSGS_LDERR_DAMAGED            = "MSGS_LDERR_DAMAGED";
+const char *MSGS_LDERR_WRONG_FORMAT       = "MSGS_LDERR_WRONG_FORMAT";
+const char *MSGS_LDERR_ENCRYPTED          = "MSGS_LDERR_ENCRYPTED";
+
+const char *MSGS_RERR_OUT_OF_MEMORY       = "MSGS_RERR_OUT_OF_MEMORY";
+const char *MSGS_RERR_CORRUPTED_PAGE_DATA = "MSGS_RERR_CORRUPTED_PAGE_DATA";
+const char *MSGS_RERR_FONT_NOT_FOUND      = "MSGS_RERR_FONT_NOT_FOUND";
+
 
 // Settings dialog
 const char *SD_SINGLE_PAGE = "SD_SINGLE_PAGE";

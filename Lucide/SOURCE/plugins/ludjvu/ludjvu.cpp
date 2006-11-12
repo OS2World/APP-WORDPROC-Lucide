@@ -108,8 +108,13 @@ static void djvu_handle_events( ddjvu_context_t *ctx )
 
 SOM_Scope boolean  SOMLINK loadFile(LuDjvuDocument *somSelf,
                                      Environment *ev, string filename,
-                                    string password, string* error)
+                                    string password, long* errorCode,
+                                    string* error)
 {
+    if ( errorCode != NULL ) {
+        *errorCode = LU_LDERR_NO_ERROR;
+    }
+
     LuDjvuDocumentData *somThis = LuDjvuDocumentGetData(somSelf);
     DjvuDocument *d = (DjvuDocument *)somThis->data;
     ddjvu_document_t *doc;
@@ -178,13 +183,20 @@ SOM_Scope void  SOMLINK getPageSize(LuDjvuDocument *somSelf,
 }
 
 
-SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
-                                            Environment *ev,
-                                           long pagenum, long src_x,
-                                           long src_y, long src_width,
-                                           long src_height, double scale,
-                                           long rotation, LuPixbuf* pixbuf)
+SOM_Scope boolean  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
+                                               Environment *ev,
+                                              long pagenum, long src_x,
+                                              long src_y, long src_width,
+                                              long src_height,
+                                              double scale, long rotation,
+                                              LuPixbuf* pixbuf,
+                                              long* errorCode,
+                                              string* error)
 {
+    if ( errorCode != NULL ) {
+        *errorCode = LU_RERR_NO_ERROR;
+    }
+
     LuDjvuDocumentData *somThis = LuDjvuDocumentGetData(somSelf);
     DjvuDocument *d = (DjvuDocument *)somThis->data;
 
@@ -239,6 +251,8 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
         memcpy( dst, src, rowsize );
     }
     delete pb;
+
+    return TRUE;
 }
 
 
@@ -382,14 +396,14 @@ SOM_Scope boolean  SOMLINK exportToPostScript(LuDjvuDocument *somSelf,
 }
 
 
-SOM_Scope boolean  SOMLINK isFixedImage(LuDjvuDocument *somSelf, 
+SOM_Scope boolean  SOMLINK isFixedImage(LuDjvuDocument *somSelf,
                                          Environment *ev)
 {
     return FALSE;
 }
 
 
-SOM_Scope boolean  SOMLINK isCreateFileThumbnail(LuDjvuDocument *somSelf, 
+SOM_Scope boolean  SOMLINK isCreateFileThumbnail(LuDjvuDocument *somSelf,
                                                   Environment *ev)
 {
     return TRUE;

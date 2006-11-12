@@ -69,6 +69,7 @@ SOMEXTERN {
 typedef boolean   SOMLINK somTP_LuDjvuDocument_loadFile(LuDjvuDocument *somSelf, Environment *ev, 
 		string filename, 
 		string password, 
+		long* errorCode, 
 		string* error);
 typedef somTP_LuDjvuDocument_loadFile *somTD_LuDjvuDocument_loadFile;
 typedef short   SOMLINK somTP_LuDjvuDocument_getBpp(LuDjvuDocument *somSelf, Environment *ev);
@@ -86,7 +87,7 @@ typedef void   SOMLINK somTP_LuDjvuDocument_getPageSize(LuDjvuDocument *somSelf,
 		double* width, 
 		double* height);
 typedef somTP_LuDjvuDocument_getPageSize *somTD_LuDjvuDocument_getPageSize;
-typedef void   SOMLINK somTP_LuDjvuDocument_renderPageToPixbuf(LuDjvuDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_LuDjvuDocument_renderPageToPixbuf(LuDjvuDocument *somSelf, Environment *ev, 
 		long pagenum, 
 		long src_x, 
 		long src_y, 
@@ -94,7 +95,9 @@ typedef void   SOMLINK somTP_LuDjvuDocument_renderPageToPixbuf(LuDjvuDocument *s
 		long src_height, 
 		double scale, 
 		long rotation, 
-		LuPixbuf* pixbuf);
+		LuPixbuf* pixbuf, 
+		long* errorCode, 
+		string* error);
 typedef somTP_LuDjvuDocument_renderPageToPixbuf *somTD_LuDjvuDocument_renderPageToPixbuf;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_isAsynchRenderingSupported(LuDjvuDocument *somSelf, Environment *ev);
 typedef somTP_LuDjvuDocument_isAsynchRenderingSupported *somTD_LuDjvuDocument_isAsynchRenderingSupported;
@@ -109,11 +112,13 @@ typedef void   SOMLINK somTP_LuDjvuDocument_renderPageToPixbufAsynch(LuDjvuDocum
 		LuPixbuf* pixbuf, 
 		LuDocument_asynchCallbackFn fnd, 
 		LuDocument_asynchCallbackFn fna, 
-		somToken fndata);
+		somToken fndata, 
+		long* errorCode, 
+		string* error);
 typedef somTP_LuDjvuDocument_renderPageToPixbufAsynch *somTD_LuDjvuDocument_renderPageToPixbufAsynch;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_isRenderIntoPS(LuDjvuDocument *somSelf, Environment *ev);
 typedef somTP_LuDjvuDocument_isRenderIntoPS *somTD_LuDjvuDocument_isRenderIntoPS;
-typedef void   SOMLINK somTP_LuDjvuDocument_renderPageToPS(LuDjvuDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_LuDjvuDocument_renderPageToPS(LuDjvuDocument *somSelf, Environment *ev, 
 		long pagenum, 
 		long src_x, 
 		long src_y, 
@@ -122,7 +127,9 @@ typedef void   SOMLINK somTP_LuDjvuDocument_renderPageToPS(LuDjvuDocument *somSe
 		double scale, 
 		long rotation, 
 		unsigned long hps, 
-		somMToken rect);
+		somMToken rect, 
+		long* errorCode, 
+		string* error);
 typedef somTP_LuDjvuDocument_renderPageToPS *somTD_LuDjvuDocument_renderPageToPS;
 typedef boolean   SOMLINK somTP_LuDjvuDocument_isHaveText(LuDjvuDocument *somSelf, Environment *ev);
 typedef somTP_LuDjvuDocument_isHaveText *somTD_LuDjvuDocument_isHaveText;
@@ -383,10 +390,11 @@ LuDjvuDocument(const LuDjvuDocument* fromObj)
 boolean   loadFile(Environment *ev, 
 		string filename, 
 		string password, 
+		long* errorCode, 
 		string* error)
 {
    return SOM_ResolveD(this,LuDjvuDocument,LuDocument,loadFile)
-	(this, ev,filename,password,error);
+	(this, ev,filename,password,errorCode,error);
 }
 
 
@@ -442,7 +450,7 @@ void   getPageSize(Environment *ev,
 
 
 /* method: renderPageToPixbuf */
-void   renderPageToPixbuf(Environment *ev, 
+boolean   renderPageToPixbuf(Environment *ev, 
 		long pagenum, 
 		long src_x, 
 		long src_y, 
@@ -450,10 +458,12 @@ void   renderPageToPixbuf(Environment *ev,
 		long src_height, 
 		double scale, 
 		long rotation, 
-		LuPixbuf* pixbuf)
+		LuPixbuf* pixbuf, 
+		long* errorCode, 
+		string* error)
 {
-   SOM_ResolveD(this,LuDjvuDocument,LuDocument,renderPageToPixbuf)
-	(this, ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf);
+   return SOM_ResolveD(this,LuDjvuDocument,LuDocument,renderPageToPixbuf)
+	(this, ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error);
 }
 
 
@@ -477,10 +487,12 @@ void   renderPageToPixbufAsynch(Environment *ev,
 		LuPixbuf* pixbuf, 
 		LuDocument_asynchCallbackFn fnd, 
 		LuDocument_asynchCallbackFn fna, 
-		somToken fndata)
+		somToken fndata, 
+		long* errorCode, 
+		string* error)
 {
    SOM_ResolveD(this,LuDjvuDocument,LuDocument,renderPageToPixbufAsynch)
-	(this, ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,fnd,fna,fndata);
+	(this, ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,fnd,fna,fndata,errorCode,error);
 }
 
 
@@ -493,7 +505,7 @@ boolean   isRenderIntoPS(Environment *ev)
 
 
 /* method: renderPageToPS */
-void   renderPageToPS(Environment *ev, 
+boolean   renderPageToPS(Environment *ev, 
 		long pagenum, 
 		long src_x, 
 		long src_y, 
@@ -502,10 +514,12 @@ void   renderPageToPS(Environment *ev,
 		double scale, 
 		long rotation, 
 		unsigned long hps, 
-		somMToken rect)
+		somMToken rect, 
+		long* errorCode, 
+		string* error)
 {
-   SOM_ResolveD(this,LuDjvuDocument,LuDocument,renderPageToPS)
-	(this, ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,hps,rect);
+   return SOM_ResolveD(this,LuDjvuDocument,LuDocument,renderPageToPS)
+	(this, ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,hps,rect,errorCode,error);
 }
 
 

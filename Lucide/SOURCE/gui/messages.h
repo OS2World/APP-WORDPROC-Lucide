@@ -65,6 +65,19 @@ extern const char *MSGS_FILE_SAVE_ERROR;
 extern const char *MSGS_PAGE;
 extern const char *MSGS_ERROR_STARTING_BROWSER;
 
+extern const char *MSGS_LDERR;
+extern const char *MSGS_LDERR_OUT_OF_MEMORY;
+extern const char *MSGS_LDERR_OPEN_ERROR;
+extern const char *MSGS_LDERR_READ_ERROR;
+extern const char *MSGS_LDERR_DAMAGED;
+extern const char *MSGS_LDERR_WRONG_FORMAT;
+extern const char *MSGS_LDERR_ENCRYPTED;
+
+extern const char *MSGS_RERR_OUT_OF_MEMORY;
+extern const char *MSGS_RERR_CORRUPTED_PAGE_DATA;
+extern const char *MSGS_RERR_FONT_NOT_FOUND;
+
+
 // Settings dialog
 extern const char *SD_SINGLE_PAGE;
 extern const char *SD_CONTINUOUS;

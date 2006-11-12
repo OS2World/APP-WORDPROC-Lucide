@@ -109,6 +109,7 @@ typedef LuJpegDocumentData* (SOMLINK * somTD_LuJpegDocument_DataThunk)(void*);
   #define _getThumbnailSize somSelf->getThumbnailSize
   #define _getThumbnail somSelf->getThumbnail
   #define _searchText somSelf->searchText
+  #define _isCreateFileThumbnail somSelf->isCreateFileThumbnail
   #define _somDefaultInit somSelf->somDefaultInit
   #define _somDestruct somSelf->somDestruct
   #define _somDefaultCopyInit somSelf->somDefaultCopyInit
@@ -166,6 +167,7 @@ SOMEXTERN struct LuJpegDocumentCClassDataStructure SOMDLINK LuJpegDocumentCClass
 SOM_Scope boolean  SOMLINK loadFile(LuJpegDocument *somSelf, Environment *ev,
 		string filename,
 		string password,
+		long* errorCode,
 		string* error);
 static char *somMN_LuJpegDocumentloadFile = "LuDocument::loadFile";
 static somId somId_LuJpegDocumentloadFile = &somMN_LuJpegDocumentloadFile;
@@ -177,14 +179,15 @@ static somId somId_LuJpegDocumentloadFile = &somMN_LuJpegDocumentloadFile;
 typedef boolean   SOMLINK somTP_xih_LuJpegDocument_loadFile(LuJpegDocument *somSelf, Environment *ev, 
 		string filename, 
 		string password, 
+		long* errorCode, 
 		string* error);
 typedef somTP_xih_LuJpegDocument_loadFile *somTD_xih_LuJpegDocument_loadFile;
 /* define the parent method call macro */
 static somMethodProc* LuJpegDocument_parent_LuDocument_loadFile_resolved;
-#define LuJpegDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,error) \
+#define LuJpegDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,errorCode,error) \
   ((( somTD_xih_LuJpegDocument_loadFile ) \
       LuJpegDocument_parent_LuDocument_loadFile_resolved) \
-	(somSelf,ev,filename,password,error))
+	(somSelf,ev,filename,password,errorCode,error))
 /* define a variety of (possibly ambiguous) short forms */
 #ifndef SOMGD_pmc_parent_loadFile
   #ifdef parent_loadFile
@@ -202,8 +205,8 @@ static somMethodProc* LuJpegDocument_parent_LuDocument_loadFile_resolved;
     #define parent_LuDocument_loadFile LuJpegDocument_parent_LuDocument_loadFile
   #endif
 #endif
-#define LuJpegDocument_parents_loadFile(somSelf,ev,filename,password,error) (\
-   LuJpegDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,error))
+#define LuJpegDocument_parents_loadFile(somSelf,ev,filename,password,errorCode,error) (\
+   LuJpegDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,errorCode,error))
 
 /*
  * Overridden method: getBpp
@@ -331,7 +334,7 @@ static somMethodProc* LuJpegDocument_parent_LuDocument_getPageSize_resolved;
 /*
  * Overridden method: renderPageToPixbuf
  */
-SOM_Scope void  SOMLINK renderPageToPixbuf(LuJpegDocument *somSelf, Environment *ev,
+SOM_Scope boolean  SOMLINK renderPageToPixbuf(LuJpegDocument *somSelf, Environment *ev,
 		long pagenum,
 		long src_x,
 		long src_y,
@@ -339,7 +342,9 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuJpegDocument *somSelf, Environment 
 		long src_height,
 		double scale,
 		long rotation,
-		LuPixbuf* pixbuf);
+		LuPixbuf* pixbuf,
+		long* errorCode,
+		string* error);
 static char *somMN_LuJpegDocumentrenderPageToPixbuf = "LuDocument::renderPageToPixbuf";
 static somId somId_LuJpegDocumentrenderPageToPixbuf = &somMN_LuJpegDocumentrenderPageToPixbuf;
 #ifdef somId_renderPageToPixbuf
@@ -347,7 +352,7 @@ static somId somId_LuJpegDocumentrenderPageToPixbuf = &somMN_LuJpegDocumentrende
 #else
 #define somId_renderPageToPixbuf somId_LuJpegDocumentrenderPageToPixbuf
 #endif
-typedef void   SOMLINK somTP_xih_LuJpegDocument_renderPageToPixbuf(LuJpegDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_xih_LuJpegDocument_renderPageToPixbuf(LuJpegDocument *somSelf, Environment *ev, 
 		long pagenum, 
 		long src_x, 
 		long src_y, 
@@ -355,14 +360,16 @@ typedef void   SOMLINK somTP_xih_LuJpegDocument_renderPageToPixbuf(LuJpegDocumen
 		long src_height, 
 		double scale, 
 		long rotation, 
-		LuPixbuf* pixbuf);
+		LuPixbuf* pixbuf, 
+		long* errorCode, 
+		string* error);
 typedef somTP_xih_LuJpegDocument_renderPageToPixbuf *somTD_xih_LuJpegDocument_renderPageToPixbuf;
 /* define the parent method call macro */
 static somMethodProc* LuJpegDocument_parent_LuDocument_renderPageToPixbuf_resolved;
-#define LuJpegDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf) \
+#define LuJpegDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error) \
   ((( somTD_xih_LuJpegDocument_renderPageToPixbuf ) \
       LuJpegDocument_parent_LuDocument_renderPageToPixbuf_resolved) \
-	(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf))
+	(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error))
 /* define a variety of (possibly ambiguous) short forms */
 #ifndef SOMGD_pmc_parent_renderPageToPixbuf
   #ifdef parent_renderPageToPixbuf
@@ -380,8 +387,8 @@ static somMethodProc* LuJpegDocument_parent_LuDocument_renderPageToPixbuf_resolv
     #define parent_LuDocument_renderPageToPixbuf LuJpegDocument_parent_LuDocument_renderPageToPixbuf
   #endif
 #endif
-#define LuJpegDocument_parents_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf) (\
-   LuJpegDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf))
+#define LuJpegDocument_parents_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error) (\
+   LuJpegDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error))
 
 /*
  * Overridden method: somDefaultInit

@@ -190,6 +190,7 @@ SOMEXTERN struct LuPopplerDocumentCClassDataStructure SOMDLINK LuPopplerDocument
 SOM_Scope boolean  SOMLINK loadFile(LuPopplerDocument *somSelf, Environment *ev,
 		string filename,
 		string password,
+		long* errorCode,
 		string* error);
 static char *somMN_LuPopplerDocumentloadFile = "LuDocument::loadFile";
 static somId somId_LuPopplerDocumentloadFile = &somMN_LuPopplerDocumentloadFile;
@@ -201,14 +202,15 @@ static somId somId_LuPopplerDocumentloadFile = &somMN_LuPopplerDocumentloadFile;
 typedef boolean   SOMLINK somTP_xih_LuPopplerDocument_loadFile(LuPopplerDocument *somSelf, Environment *ev, 
 		string filename, 
 		string password, 
+		long* errorCode, 
 		string* error);
 typedef somTP_xih_LuPopplerDocument_loadFile *somTD_xih_LuPopplerDocument_loadFile;
 /* define the parent method call macro */
 static somMethodProc* LuPopplerDocument_parent_LuDocument_loadFile_resolved;
-#define LuPopplerDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,error) \
+#define LuPopplerDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,errorCode,error) \
   ((( somTD_xih_LuPopplerDocument_loadFile ) \
       LuPopplerDocument_parent_LuDocument_loadFile_resolved) \
-	(somSelf,ev,filename,password,error))
+	(somSelf,ev,filename,password,errorCode,error))
 /* define a variety of (possibly ambiguous) short forms */
 #ifndef SOMGD_pmc_parent_loadFile
   #ifdef parent_loadFile
@@ -226,8 +228,8 @@ static somMethodProc* LuPopplerDocument_parent_LuDocument_loadFile_resolved;
     #define parent_LuDocument_loadFile LuPopplerDocument_parent_LuDocument_loadFile
   #endif
 #endif
-#define LuPopplerDocument_parents_loadFile(somSelf,ev,filename,password,error) (\
-   LuPopplerDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,error))
+#define LuPopplerDocument_parents_loadFile(somSelf,ev,filename,password,errorCode,error) (\
+   LuPopplerDocument_parent_LuDocument_loadFile(somSelf,ev,filename,password,errorCode,error))
 
 /*
  * Overridden method: getBpp
@@ -433,7 +435,7 @@ static somMethodProc* LuPopplerDocument_parent_LuDocument_getPageSize_resolved;
 /*
  * Overridden method: renderPageToPixbuf
  */
-SOM_Scope void  SOMLINK renderPageToPixbuf(LuPopplerDocument *somSelf, Environment *ev,
+SOM_Scope boolean  SOMLINK renderPageToPixbuf(LuPopplerDocument *somSelf, Environment *ev,
 		long pagenum,
 		long src_x,
 		long src_y,
@@ -441,7 +443,9 @@ SOM_Scope void  SOMLINK renderPageToPixbuf(LuPopplerDocument *somSelf, Environme
 		long src_height,
 		double scale,
 		long rotation,
-		LuPixbuf* pixbuf);
+		LuPixbuf* pixbuf,
+		long* errorCode,
+		string* error);
 static char *somMN_LuPopplerDocumentrenderPageToPixbuf = "LuDocument::renderPageToPixbuf";
 static somId somId_LuPopplerDocumentrenderPageToPixbuf = &somMN_LuPopplerDocumentrenderPageToPixbuf;
 #ifdef somId_renderPageToPixbuf
@@ -449,7 +453,7 @@ static somId somId_LuPopplerDocumentrenderPageToPixbuf = &somMN_LuPopplerDocumen
 #else
 #define somId_renderPageToPixbuf somId_LuPopplerDocumentrenderPageToPixbuf
 #endif
-typedef void   SOMLINK somTP_xih_LuPopplerDocument_renderPageToPixbuf(LuPopplerDocument *somSelf, Environment *ev, 
+typedef boolean   SOMLINK somTP_xih_LuPopplerDocument_renderPageToPixbuf(LuPopplerDocument *somSelf, Environment *ev, 
 		long pagenum, 
 		long src_x, 
 		long src_y, 
@@ -457,14 +461,16 @@ typedef void   SOMLINK somTP_xih_LuPopplerDocument_renderPageToPixbuf(LuPopplerD
 		long src_height, 
 		double scale, 
 		long rotation, 
-		LuPixbuf* pixbuf);
+		LuPixbuf* pixbuf, 
+		long* errorCode, 
+		string* error);
 typedef somTP_xih_LuPopplerDocument_renderPageToPixbuf *somTD_xih_LuPopplerDocument_renderPageToPixbuf;
 /* define the parent method call macro */
 static somMethodProc* LuPopplerDocument_parent_LuDocument_renderPageToPixbuf_resolved;
-#define LuPopplerDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf) \
+#define LuPopplerDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error) \
   ((( somTD_xih_LuPopplerDocument_renderPageToPixbuf ) \
       LuPopplerDocument_parent_LuDocument_renderPageToPixbuf_resolved) \
-	(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf))
+	(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error))
 /* define a variety of (possibly ambiguous) short forms */
 #ifndef SOMGD_pmc_parent_renderPageToPixbuf
   #ifdef parent_renderPageToPixbuf
@@ -482,8 +488,8 @@ static somMethodProc* LuPopplerDocument_parent_LuDocument_renderPageToPixbuf_res
     #define parent_LuDocument_renderPageToPixbuf LuPopplerDocument_parent_LuDocument_renderPageToPixbuf
   #endif
 #endif
-#define LuPopplerDocument_parents_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf) (\
-   LuPopplerDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf))
+#define LuPopplerDocument_parents_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error) (\
+   LuPopplerDocument_parent_LuDocument_renderPageToPixbuf(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,errorCode,error))
 
 /*
  * Overridden method: isAsynchRenderingSupported
@@ -538,7 +544,9 @@ SOM_Scope void  SOMLINK renderPageToPixbufAsynch(LuPopplerDocument *somSelf, Env
 		LuPixbuf* pixbuf,
 		LuDocument_asynchCallbackFn fnd,
 		LuDocument_asynchCallbackFn fna,
-		somToken fndata);
+		somToken fndata,
+		long* errorCode,
+		string* error);
 static char *somMN_LuPopplerDocumentrenderPageToPixbufAsynch = "LuDocument::renderPageToPixbufAsynch";
 static somId somId_LuPopplerDocumentrenderPageToPixbufAsynch = &somMN_LuPopplerDocumentrenderPageToPixbufAsynch;
 #ifdef somId_renderPageToPixbufAsynch
@@ -557,14 +565,16 @@ typedef void   SOMLINK somTP_xih_LuPopplerDocument_renderPageToPixbufAsynch(LuPo
 		LuPixbuf* pixbuf, 
 		LuDocument_asynchCallbackFn fnd, 
 		LuDocument_asynchCallbackFn fna, 
-		somToken fndata);
+		somToken fndata, 
+		long* errorCode, 
+		string* error);
 typedef somTP_xih_LuPopplerDocument_renderPageToPixbufAsynch *somTD_xih_LuPopplerDocument_renderPageToPixbufAsynch;
 /* define the parent method call macro */
 static somMethodProc* LuPopplerDocument_parent_LuDocument_renderPageToPixbufAsynch_resolved;
-#define LuPopplerDocument_parent_LuDocument_renderPageToPixbufAsynch(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,fnd,fna,fndata) \
+#define LuPopplerDocument_parent_LuDocument_renderPageToPixbufAsynch(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,fnd,fna,fndata,errorCode,error) \
   ((( somTD_xih_LuPopplerDocument_renderPageToPixbufAsynch ) \
       LuPopplerDocument_parent_LuDocument_renderPageToPixbufAsynch_resolved) \
-	(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,fnd,fna,fndata))
+	(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,fnd,fna,fndata,errorCode,error))
 /* define a variety of (possibly ambiguous) short forms */
 #ifndef SOMGD_pmc_parent_renderPageToPixbufAsynch
   #ifdef parent_renderPageToPixbufAsynch
@@ -582,8 +592,8 @@ static somMethodProc* LuPopplerDocument_parent_LuDocument_renderPageToPixbufAsyn
     #define parent_LuDocument_renderPageToPixbufAsynch LuPopplerDocument_parent_LuDocument_renderPageToPixbufAsynch
   #endif
 #endif
-#define LuPopplerDocument_parents_renderPageToPixbufAsynch(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,fnd,fna,fndata) (\
-   LuPopplerDocument_parent_LuDocument_renderPageToPixbufAsynch(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,fnd,fna,fndata))
+#define LuPopplerDocument_parents_renderPageToPixbufAsynch(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,fnd,fna,fndata,errorCode,error) (\
+   LuPopplerDocument_parent_LuDocument_renderPageToPixbufAsynch(somSelf,ev,pagenum,src_x,src_y,src_width,src_height,scale,rotation,pixbuf,fnd,fna,fndata,errorCode,error))
 
 /*
  * Overridden method: getSelectionRectangles
