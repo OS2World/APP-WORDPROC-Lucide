@@ -16,10 +16,6 @@ EXPORTS
     LuIndexNodeCClassData
     _LuIndexNodeClassData
     _LuIndexNodeCClassData
-    cnvUniToUTF8
-    cnvUniBEToUTF8
-    cnvUTF8ToUni
-    cnvUTF8ToSys
-    cnvUniBEToSys
-    cnvUniToSys
-    cnvSysToUCS2
+    uniConvertSpChars
+    uniLigaturesLength
+    uniReplaceLigatures

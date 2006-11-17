@@ -59,6 +59,7 @@
 #include <vector>
 using namespace std;
 #include <time.h>
+#include <uconv.h>
 #include "cpconv.h"
 
 typedef vector<LuRectangle> RectList;
@@ -127,6 +128,10 @@ class PopplerDocument
         char *text;
         HMTX mutex;
 
+        void *objUtf8;
+        void *objUniBe;
+        void *objSys;
+
         PopplerDocument();
         ~PopplerDocument();
 };
@@ -139,6 +144,23 @@ PopplerDocument::PopplerDocument()
     text       = NULL;
     mutex      = NULLHANDLE;
     DosCreateMutexSem( NULL, &mutex, 0, FALSE );
+
+    uconv_attribute_t attr;
+    UniCreateUconvObject( (UniChar *)L"UTF-8", &objUtf8 );
+    UniQueryUconvObject( objUtf8, &attr, sizeof(attr), NULL, NULL, NULL );
+    attr.converttype &= ~(CVTTYPE_CTRL7F | CVTTYPE_PATH);
+    UniSetUconvObject( objUtf8, &attr );
+
+    UniCreateUconvObject( (UniChar *)L"UCS-2@endian=big", &objUniBe );
+    UniQueryUconvObject( objUniBe, &attr, sizeof(attr), NULL, NULL, NULL );
+    attr.converttype &= ~(CVTTYPE_CTRL7F | CVTTYPE_PATH);
+    UniSetUconvObject( objUniBe, &attr );
+
+    UniCreateUconvObject( (UniChar *)L"", &objSys );
+    UniQueryUconvObject( objSys, &attr, sizeof(attr), NULL, NULL, NULL );
+    attr.converttype &= ~(CVTTYPE_CTRL7F | CVTTYPE_PATH);
+    attr.options = UCONV_OPTION_SUBSTITUTE_BOTH;
+    UniSetUconvObject( objSys, &attr );
 }
 
 PopplerDocument::~PopplerDocument()
@@ -148,6 +170,10 @@ PopplerDocument::~PopplerDocument()
     delete output_dev;
     delete text;
     DosCloseMutexSem( mutex );
+
+    UniFreeUconvObject( objUtf8 );
+    UniFreeUconvObject( objUniBe );
+    UniFreeUconvObject( objSys );
 }
 
 
@@ -876,19 +902,41 @@ static char *unicode_to_char( Unicode *unicode, int len )
     return newstrdup( gstr.getCString() );
 }
 
-static char *newstrFromUTF8( const char *s )
+static char *newstrFromUTF8( const char *s, void *objUtf8, void *objSys )
 {
-    unsigned blen = strlen( s ) + 1;
+    size_t cSubs = 0;
+    size_t len = strlen( s ) + 1;
+    size_t unilen = len + 2;
+    UniChar *unibuf = new UniChar[ unilen ];
+    UniChar *tmpuni = unibuf;
+    UniUconvToUcs( objUtf8, (void **)&s, &len, &tmpuni, &unilen, &cSubs );
+    unilen = UniStrlen( unibuf );
+
+    int liglen = uniLigaturesLength( unibuf );
+    if ( liglen > 0 )  // string contain ligature(s)
+    {
+        unsigned ulen_tmp = ( unilen + liglen + 1 ) * sizeof( UniChar );
+        char *uni_tmp = new char[ ulen_tmp ];
+        uniReplaceLigatures( unibuf, (UniChar *)uni_tmp );
+        delete unibuf;
+        unibuf = (UniChar *)uni_tmp;
+        unilen = UniStrlen( unibuf );
+    }
+    uniConvertSpChars( unibuf );
+
+    size_t blen = ( unilen + 1 ) * 2;
     char *b = new char[ blen ];
     memset( b, 0, blen );
     char *bsav = b;
-    const char *from = s;
-    unsigned flen = strlen( s );
-    cnvUTF8ToSys( &from, &flen, &b, &blen );
+    tmpuni = unibuf;
+    cSubs = 0;
+    UniUconvFromUcs( objSys, &tmpuni, &unilen, (void **)&b, &blen, &cSubs );
+    delete unibuf;
     return bsav;
 }
 
-static void add_item( Environment *ev, PDFDoc *doc, LuIndexNode *n, GooList *items )
+static void add_item( Environment *ev, PDFDoc *doc, LuIndexNode *n, GooList *items,
+                      void *objUtf8, void *objSys )
 {
     if ( items == NULL ) {
         return;
@@ -902,7 +950,7 @@ static void add_item( Environment *ev, PDFDoc *doc, LuIndexNode *n, GooList *ite
         LinkAction *link_action = item->getAction();
         LuLink evlink;
         char *t1 = unicode_to_char( item->getTitle(), item->getTitleLength() );
-        char *t2 = newstrFromUTF8( t1 );
+        char *t2 = newstrFromUTF8( t1, objUtf8, objSys );
         build_link( doc, &evlink, t2, link_action );
         delete t2;
         delete t1;
@@ -913,7 +961,7 @@ static void add_item( Environment *ev, PDFDoc *doc, LuIndexNode *n, GooList *ite
         if ( item->hasKids() )
         {
             GooList *citems = item->getKids();
-            add_item( ev, doc, cn, citems );
+            add_item( ev, doc, cn, citems, objUtf8, objSys );
         }
     }
 }
@@ -922,7 +970,8 @@ SOM_Scope LuIndexNode*  SOMLINK getIndex(LuPopplerDocument *somSelf,
                                           Environment *ev)
 {
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
-    PDFDoc *doc = ((PopplerDocument *)somThis->data)->doc;
+    PopplerDocument *document = (PopplerDocument *)somThis->data;
+    PDFDoc *doc = document->doc;
 
     Outline *outline = doc->getOutline();
     if ( outline == NULL ) {
@@ -935,7 +984,7 @@ SOM_Scope LuIndexNode*  SOMLINK getIndex(LuPopplerDocument *somSelf,
     }
 
     LuIndexNode *root = new LuIndexNode( ev, NULL );
-    add_item( ev, doc, root, items );
+    add_item( ev, doc, root, items, document->objUtf8, document->objSys );
 
     return root;
 }
@@ -948,17 +997,39 @@ static bool has_unicode_marker( GooString *string )
 }
 
 // return SOMMalloc'ed string
-static char *propcnv( GooString *s )
+static char *propcnv( GooString *s, void *objUniBe, void *objSys )
 {
     if ( has_unicode_marker( s ) )
     {
-        unsigned blen = s->getLength() * 2;
+        size_t cSubs = 0;
+        size_t unilen = s->getLength() + 1;
+        UniChar *unibuf = new UniChar[ unilen ];
+        UniChar *tmpuni = unibuf;
+        const char *from = s->getCString() + 2;
+        size_t fromlen = s->getLength() * 2;
+        UniUconvToUcs( objUniBe, (void **)&from, &fromlen, &tmpuni, &unilen, &cSubs );
+        unilen = UniStrlen( unibuf );
+
+        int liglen = uniLigaturesLength( unibuf );
+        if ( liglen > 0 )  // string contain ligature(s)
+        {
+            unsigned ulen_tmp = ( unilen + liglen + 1 ) * sizeof( UniChar );
+            char *uni_tmp = new char[ ulen_tmp ];
+            uniReplaceLigatures( unibuf, (UniChar *)uni_tmp );
+            delete unibuf;
+            unibuf = (UniChar *)uni_tmp;
+            unilen = UniStrlen( unibuf );
+        }
+        uniConvertSpChars( unibuf );
+
+        size_t blen = ( unilen + 1 ) * 2;
         char *b = (char *)SOMMalloc( blen );
         memset( b, 0, blen );
         char *bsav = b;
-        const char *from = s->getCString() + 2;
-        unsigned flen = s->getLength() - 2;
-        cnvUniBEToSys( &from, &flen, &b, &blen );
+        tmpuni = unibuf;
+        cSubs = 0;
+        UniUconvFromUcs( objSys, &tmpuni, &unilen, (void **)&b, &blen, &cSubs );
+        delete unibuf;
         return bsav;
     }
 
@@ -1055,7 +1126,8 @@ SOM_Scope LuDocumentInfo*  SOMLINK getDocumentInfo(LuPopplerDocument *somSelf,
                                                     Environment *ev)
 {
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
-    PDFDoc *doc = ((PopplerDocument *)somThis->data)->doc;
+    PopplerDocument *document = (PopplerDocument *)somThis->data;
+    PDFDoc *doc = document->doc;
 
     LuDocumentInfo *info = (LuDocumentInfo *)SOMMalloc( sizeof( LuDocumentInfo ) );
     memset( info, 0, sizeof( LuDocumentInfo ) );
@@ -1068,37 +1140,37 @@ SOM_Scope LuDocumentInfo*  SOMLINK getDocumentInfo(LuPopplerDocument *somSelf,
         Object obj;
 
         if ( d->lookup( "Title", &obj )->isString() ) {
-            info->title = propcnv( obj.getString() );
+            info->title = propcnv( obj.getString(), document->objUniBe, document->objSys );
             info->fields_mask |= LU_DOCUMENT_INFO_TITLE;
         }
         obj.free();
         if ( d->lookup( "Author", &obj )->isString() ) {
-            info->author = propcnv( obj.getString() );
+            info->author = propcnv( obj.getString(), document->objUniBe, document->objSys );
             info->fields_mask |= LU_DOCUMENT_INFO_AUTHOR;
         }
         obj.free();
         if ( d->lookup( "Subject", &obj )->isString() ) {
-            info->subject = propcnv( obj.getString() );
+            info->subject = propcnv( obj.getString(), document->objUniBe, document->objSys );
             info->fields_mask |= LU_DOCUMENT_INFO_SUBJECT;
         }
         obj.free();
         if ( d->lookup( "Keywords", &obj )->isString() ) {
-            info->keywords = propcnv( obj.getString() );
+            info->keywords = propcnv( obj.getString(), document->objUniBe, document->objSys );
             info->fields_mask |= LU_DOCUMENT_INFO_KEYWORDS;
         }
         obj.free();
         if ( d->lookup( "Creator", &obj )->isString() ) {
-            info->creator = propcnv( obj.getString() );
+            info->creator = propcnv( obj.getString(), document->objUniBe, document->objSys );
             info->fields_mask |= LU_DOCUMENT_INFO_CREATOR;
         }
         obj.free();
         if ( d->lookup( "Producer", &obj )->isString() ) {
-            info->producer = propcnv( obj.getString() );
+            info->producer = propcnv( obj.getString(), document->objUniBe, document->objSys );
             info->fields_mask |= LU_DOCUMENT_INFO_PRODUCER;
         }
         obj.free();
         if ( d->lookup( "CreationDate", &obj )->isString() ) {
-            char *d = propcnv( obj.getString() );
+            char *d = propcnv( obj.getString(), document->objUniBe, document->objSys );
             info->creation_date = propToDate( d );
             if ( (long)info->creation_date != -1 ) {
                 info->fields_mask |= LU_DOCUMENT_INFO_CREATION_DATE;
@@ -1107,7 +1179,7 @@ SOM_Scope LuDocumentInfo*  SOMLINK getDocumentInfo(LuPopplerDocument *somSelf,
         }
         obj.free();
         if ( d->lookup( "ModDate", &obj )->isString() ) {
-            char *d = propcnv( obj.getString() );
+            char *d = propcnv( obj.getString(), document->objUniBe, document->objSys );
             info->modified_date = propToDate( d );
             if ( (long)info->modified_date != -1 ) {
                 info->fields_mask |= LU_DOCUMENT_INFO_MOD_DATE;
@@ -1259,13 +1331,15 @@ SOM_Scope LuDocument_LuRectSequence*  SOMLINK searchText(LuPopplerDocument *somS
 
     // Convert string from system encoding to UCS-4
     // first, convert to UCS-2
-    unsigned text_len = strlen( text );
-    unsigned text_len_sav = text_len;
-    unsigned ucs2_len = ( text_len + 1 ) * 2;
+    size_t cSubs = 0;
+    size_t text_len = strlen( text );
+    size_t text_len_sav = text_len;
+    size_t ucs2_len = ( text_len + 1 ) * 2;
     char *ucs2 = new char[ ucs2_len ];
     memset( ucs2, 0, ucs2_len );
     char *ucs2sav = ucs2;
-    cnvSysToUCS2( (const char **)&text, &text_len, &ucs2, &ucs2_len );
+    UniUconvToUcs( document->objSys, (void **)&text, &text_len,
+                   (UniChar **)&ucs2, &ucs2_len, &cSubs );
     // second, convert UCS-2 to UCS-4
     short *uucs2 = (short *)ucs2sav;
     unsigned ucs4_len = ( text_len_sav + 1 ) * 2;

@@ -21,12 +21,12 @@
  * Alternatively, the contents of this file may be used under the terms of
  * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
  * in which case the provisions of the LGPL are applicable instead of those
- * above. If you wish to allow use of your version of this file only under the 
+ * above. If you wish to allow use of your version of this file only under the
  * terms of the LGPL, and not to allow others to use your version of this file
  * under the terms of the CDDL, indicate your decision by deleting the
  * provisions above and replace them with the notice and other provisions
  * required by the LGPL. If you do not delete the provisions above, a recipient
- * may use your version of this file under the terms of any one of the CDDL 
+ * may use your version of this file under the terms of any one of the CDDL
  * or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
@@ -35,6 +35,9 @@
 #define INCL_WIN
 #define INCL_DOS
 #include <os2.h>
+
+#include <uconv.h>
+#include <unidef.h>
 
 #include <string.h>
 #include <malloc.h>
@@ -58,54 +61,87 @@ void initClipbrd()
     RegisterClipboardFormat( kUnicodeMime );
 }
 
+
 void textToClipbrd( HAB hab, const char *text )
 {
+    void *objtouni, *objtosys;
+    int rc = ULS_SUCCESS;
+    rc = UniCreateUconvObject( (UniChar *)L"UTF-8", &objtouni );
+    if ( rc != ULS_SUCCESS ) {
+        return;
+    }
+    rc = UniCreateUconvObject( (UniChar *)L"", &objtosys );
+    if ( rc != ULS_SUCCESS ) {
+        UniFreeUconvObject( objtouni );
+        return;
+    }
+
+    uconv_attribute_t attr;
+    UniQueryUconvObject( objtouni, &attr, sizeof(attr), NULL, NULL, NULL );
+    attr.converttype &= ~(CVTTYPE_CTRL7F | CVTTYPE_PATH);
+    UniSetUconvObject( objtouni, &attr );
+    UniQueryUconvObject( objtosys, &attr, sizeof(attr), NULL, NULL, NULL );
+    attr.options = UCONV_OPTION_SUBSTITUTE_BOTH;
+    UniSetUconvObject( objtosys, &attr );
+
     size_t len = 0;
     size_t olen = 0;
-    const char *tsav = text;
 
     if ( WinOpenClipbrd( hab ) )
     {
         WinEmptyClipbrd( hab );
 
+        size_t cSubs = 0;
         len = strlen( text );
-        olen = (len + 2)*2;
-
-        void *memuni = NULL;
+        olen = ( len + 2 ) * 2;
+        void *shmemuni = NULL;
+        void *shmemsys = NULL;
 
         // place to clipboard as unicode
-        if ( DosAllocSharedMem( &memuni, NULL, olen, fALLOCSHR ) == 0 )
+        if ( DosAllocSharedMem( &shmemuni, NULL, olen, fALLOCSHR ) == 0 )
         {
-            memset( memuni, 0, olen );
-            void *tmem = memuni;
-
-            tsav = text;
-            cnvUTF8ToUni( &text, &len, (char **)&memuni, &olen );
-            text = tsav;
+            memset( shmemuni, 0, olen );
+            size_t unilen = olen / sizeof( UniChar );
+            UniChar *tmpuni = (UniChar *)shmemuni;
+            UniUconvToUcs( objtouni, (void **)&text, &len, &tmpuni, &unilen, &cSubs );
+            unilen = UniStrlen( (UniChar *)shmemuni );
+            void *memuni = (void *)new char[ olen ];
+            memcpy( memuni, shmemuni, olen );
 
             ULONG ulFormatID = RegisterClipboardFormat( kUnicodeMime );
-            WinSetClipbrdData( hab, (ULONG)tmem, ulFormatID, CFI_POINTER );
+            WinSetClipbrdData( hab, (ULONG)shmemuni, ulFormatID, CFI_POINTER );
+
+            int liglen = uniLigaturesLength( (UniChar *)memuni );
+            if ( liglen > 0 )  // string contain ligature(s)
+            {
+                unsigned ulen_tmp = ( unilen + liglen + 1 ) * sizeof( UniChar );
+                char *uni_tmp = new char[ ulen_tmp ];
+                uniReplaceLigatures( (UniChar *)memuni, (UniChar *)uni_tmp );
+                delete memuni;
+                memuni = uni_tmp;
+                unilen = UniStrlen( (UniChar *)memuni );
+            }
+            uniConvertSpChars( (UniChar *)memuni );
+
+            // place to clipboard as current codepage
+            if ( DosAllocSharedMem( &shmemsys, NULL, olen, fALLOCSHR ) == 0 )
+            {
+                memset( shmemsys, 0, olen );
+
+                cSubs = 0;
+                tmpuni = (UniChar *)memuni;
+                void *tmpsys = shmemsys;
+                UniUconvFromUcs( objtosys, &tmpuni, &unilen, &tmpsys, &olen, &cSubs );
+
+                WinSetClipbrdData( hab, (ULONG)shmemsys, CF_TEXT, CFI_POINTER );
+            }
+            delete memuni;
         }
-
-        len = strlen( text );
-        olen = (len + 2)*2;
-        void *memcp = NULL;
-
-        // place to clipboard as current codepage
-        if ( DosAllocSharedMem( &memcp, NULL, olen, fALLOCSHR ) == 0 )
-        {
-            memset( memcp, 0, olen );
-            void *tmem = memcp;
-
-            tsav = text;
-            cnvUTF8ToSys( &text, &len, (char **)&memcp, &olen );
-			text = tsav;
-
-            WinSetClipbrdData( hab, (ULONG)tmem, CF_TEXT, CFI_POINTER );
-        }
-
 
         WinCloseClipbrd( hab );
     }
+
+    UniFreeUconvObject( objtouni );
+    UniFreeUconvObject( objtosys );
 }
 

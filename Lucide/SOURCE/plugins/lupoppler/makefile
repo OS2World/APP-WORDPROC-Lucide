@@ -32,6 +32,8 @@ lib ..\..\..\..\poppler\poppler.lib
 lib ..\..\..\..\libjpeg\libjpeg.lib
 lib ..\ludoc\ludoc
 lib somtk 
+lib libconv
+lib libuls
 export LuPopplerDocumentNewClass
 export LuPopplerDocumentClassData
 export LuPopplerDocumentCClassData

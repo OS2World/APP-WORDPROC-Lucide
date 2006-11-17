@@ -35,28 +35,23 @@
 #ifndef __cpconv_h
 #define __cpconv_h
 
-#ifndef APIENTRY
-#define APIENTRY _System
-#endif
+#include <unidef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-long APIENTRY cnvUniToUTF8( const char **in, unsigned *in_left,
-                            char **out, unsigned *out_left );
-long APIENTRY cnvUniBEToUTF8( const char **in, unsigned *in_left,
-                              char **out, unsigned *out_left );
-long APIENTRY cnvUTF8ToUni( const char **in, unsigned *in_left,
-                            char **out, unsigned *out_left );
-long APIENTRY cnvUTF8ToSys( const char **in, unsigned *in_left,
-                            char **out, unsigned *out_left );
-long APIENTRY cnvUniBEToSys( const char **in, unsigned *in_left,
-                             char **out, unsigned *out_left );
-long APIENTRY cnvUniToSys( const char **in, unsigned *in_left,
-                           char **out, unsigned *out_left );
-long APIENTRY cnvSysToUCS2( const char **in, unsigned *in_left,
-                            char **out, unsigned *out_left );
+// Converts special non-ascii chars to suitable ascii chars
+VOID APIENTRY uniConvertSpChars( UniChar *uni );
+
+// Return number of chars which should be added to string
+// length to fit the string with converted ligatures.
+// If no ligatures in string - returns zero.
+LONG APIENTRY uniLigaturesLength( UniChar *str );
+
+// replaces ligatures in src into dst
+// src remains unchanged
+VOID APIENTRY uniReplaceLigatures( UniChar *src, UniChar *dst );
                             
 #ifdef __cplusplus
 }

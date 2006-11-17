@@ -73,6 +73,8 @@ file $(OBJDIR)\lucidethumbs.obj
 name $(EXEDIR)\lucide
 lib ..\plugins\ludoc\ludoc
 lib somtk
+lib libconv
+lib libuls
 export LucideMain
 | tmpmake.lnk >NUL
     wlink @tmpmake.lnk

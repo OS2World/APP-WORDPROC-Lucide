@@ -51,13 +51,9 @@ export _LuIndexNodeCClassData=LuIndexNodeCClassData
 export createObject
 export getSupportedExtensions
 export getDescription
-export cnvUniToUTF8
-export cnvUniBEToUTF8
-export cnvUTF8ToUni
-export cnvUTF8ToSys
-export cnvUniBEToSys
-export cnvUniToSys
-export cnvSysToUCS2
+export uniConvertSpChars
+export uniLigaturesLength
+export uniReplaceLigatures
 | tmpmake.lnk >NUL
     wlink @tmpmake.lnk
     del tmpmake.lnk
