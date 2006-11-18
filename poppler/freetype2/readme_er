@@ -1,2 +1,6 @@
 My change - in \include\freetype\config\ftconfig.h add FT_INT64 definition
 for Watcom.
+
+Added after
+  /* Watcom doesn't provide 64-bit data types */
+string.
