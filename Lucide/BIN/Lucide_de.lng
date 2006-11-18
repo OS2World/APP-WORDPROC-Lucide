@@ -1,5 +1,6 @@
 #
 # Lucide language file, DE
+#
 
 #
 # Main menu
@@ -9,8 +10,6 @@ MENU_OPEN=~ôffnen...\tStrg+O
 MENU_SAVE_AS=~Sichern unter...
 MENU_PAGE_SETUP=Seitenein~richtung...
 MENU_PRINT=~Drucken...
-MENU_DOCUMENT_INFO=Do~kumentinformationen...
-MENU_FONTS_INFO=Schr~ifteninformation...
 MENU_PLUGINS_LIST=Plugin-~Liste...
 MENU_EXIT=B~eenden\tStrg+X
 MENU_EDIT=~Bearbeiten
@@ -19,21 +18,23 @@ MENU_SELECT_ALL=Alles ~markieren\tStrg+/
 MENU_FIND=~Suchen...\tStrg+F
 MENU_FINDAGAIN=~Weitersuchen\tStrg+G
 MENU_SETTINGS=~Einstellungen...
-MENU_FIRST_PAGE=~Erste Seite
-MENU_PREV_PAGE=~Vorige Seite\t-
-MENU_NEXT_PAGE=~NÑchste Seite\t+
-MENU_LAST_PAGE=~Letzte Seite
-MENU_GO_TO_PAGE=Gehe zu ~Seite...\tStrg+N
 MENU_VIEW=~Anzeige
 MENU_FIT_WINDOW=~Ganze Seite
 MENU_ACTUAL_SIZE=~Originalgrî·e
 MENU_FIT_WIDTH=Seiten~breite
 MENU_ZOOM_IN_OUT=~Zoom-Modus (grîsser/kleiner)
+MENU_FIRST_PAGE=~Erste Seite
+MENU_PREV_PAGE=~Vorige Seite\t-
+MENU_NEXT_PAGE=~NÑchste Seite\t+
+MENU_LAST_PAGE=~Letzte Seite
+MENU_GO_TO_PAGE=Gehe zu ~Seite...\tStrg+N
 MENU_ROTATE_CW=90¯ im UZS ~drehen
 MENU_ROTATE_CCW=90¯ gegen ~UZS drehen
 MENU_SHOW_NAV_PANE=~Navigator anzeigen
 MENU_SINGLE_PAGE=Einzelne Sei~te
 MENU_CONTINUOUS=~Fortlaufend
+MENU_DOCUMENT_INFO=Do~kumentinformationen...
+MENU_FONTS_INFO=Schr~ifteninformation...
 MENU_WINDOW=~Fenster
 MENU_MAXVIEW=~Maximiert\tF11
 MENU_FULLSCREEN=~Vollbild\tStrg+L
@@ -66,10 +67,24 @@ MSGS_MAIN_WIN_TITLE=%APPNAME% - Document Viewer
 MSGS_NO_SUIT_PLUG=Kein passendes Plugin fÅr das Dokument gefunden!
 MSGS_FILE_LOAD_ERROR=Datei kann nicht gelesen werden!
 MSGS_LOADING_DOCUMENT=ôffne Dokument, bitte warten...
+MSGS_CREATING_THUMBNAIL=Erzeuge Vorschaubild fÅr das Dokument, bitte warten...
 MSGS_WARNING=Warnung!
 MSGS_OVERWRITE_FILE=Datei existiert bereits. öberschreiben?
 MSGS_FILE_SAVE_ERROR=Fehler beim Schreiben der Datei!
 MSGS_PAGE=Seite
+MSGS_ERROR_STARTING_BROWSER=Fehler beim Starten des Browsers!
+
+MSGS_LDERR=Lesefehler: %s!
+MSGS_LDERR_OUT_OF_MEMORY=Speichermangel
+MSGS_LDERR_OPEN_ERROR=Fehler beim ôffnen der Datei
+MSGS_LDERR_READ_ERROR=Fehler beim Lesen der Datei
+MSGS_LDERR_DAMAGED=Datei beschÑdigt
+MSGS_LDERR_WRONG_FORMAT=Nicht unterstÅtztes Dateiformat
+MSGS_LDERR_ENCRYPTED=Datei ist verschlÅsselt
+
+MSGS_RERR_OUT_OF_MEMORY=Speichermangel
+MSGS_RERR_CORRUPTED_PAGE_DATA=Seitendaten beschÑdigt
+MSGS_RERR_FONT_NOT_FOUND=Schrift %s nicht gefunden
 
 #
 # "Plugins list" dialog
