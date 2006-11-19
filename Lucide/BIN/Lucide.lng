@@ -6,6 +6,7 @@
 # Main menu
 #
 MENU_DOCUMENT=~Document
+MENU_NEW_WINDOW=~New window
 MENU_OPEN=~Open...\tCtrl+O
 MENU_SAVE_AS=~Save As...
 # MENU_PAGE_SETUP: to delete

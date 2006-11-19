@@ -81,6 +81,7 @@ class Lucide
         static SHORT splitterPos;
         static bool showIndex;
         
+        static void newWindow();
         static void openDocument();
         static void closeDocument();
         static void loadDocument( const char *fn );

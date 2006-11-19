@@ -118,9 +118,9 @@ HMODULE _hmod = NULLHANDLE;
 unsigned APIENTRY LibMain( unsigned hmod, unsigned termination )
 {
     if ( termination ) {
-        /* DLL is detaching from process */
+        // DLL is detaching from process
     } else {
-        /* DLL is attaching to process */
+        // DLL is attaching to process
         _hmod = hmod;
     }
     return( 1 );
@@ -702,6 +702,31 @@ void Lucide::cmdSwitchToFullscreen()
     }
 }
 
+void Lucide::newWindow()
+{
+    PROGDETAILS pd;
+    pd.Length                      = sizeof( PROGDETAILS );
+    pd.progt.progc                 = PROG_DEFAULT;
+    pd.progt.fbVisible             = SHE_VISIBLE;
+    pd.pszTitle                    = NULL;
+    pd.pszExecutable               = __argv[0];
+    pd.pszParameters               = NULL;
+    pd.pszStartupDir               = NULL;
+    pd.pszIcon                     = NULL;
+    pd.pszEnvironment              = NULL;
+    pd.swpInitial.fl               = SWP_ACTIVATE;
+    pd.swpInitial.cy               = 0;
+    pd.swpInitial.cx               = 0;
+    pd.swpInitial.y                = 0;
+    pd.swpInitial.x                = 0;
+    pd.swpInitial.hwndInsertBehind = HWND_TOP;
+    pd.swpInitial.hwnd             = NULLHANDLE;
+    pd.swpInitial.ulReserved1      = 0;
+    pd.swpInitial.ulReserved2      = 0;
+
+    WinStartApp( NULLHANDLE, &pd, NULL, NULL, 0 );
+}
+
 static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
     switch ( msg )
@@ -728,6 +753,10 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
         {
             switch ( SHORT1FROMMP(mp1) )
             {
+                case CM_NEW_WINDOW:
+                    Lucide::newWindow();
+                    return (MRESULT)FALSE;
+
                 case CM_OPEN:
                     Lucide::openDocument();
                     return (MRESULT)FALSE;

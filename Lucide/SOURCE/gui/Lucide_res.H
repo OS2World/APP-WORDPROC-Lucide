@@ -59,11 +59,12 @@
 #define IDM_MAINMENU    100
 #define IDA_MAINACCEL   101
 
-#define CM_OPEN         101
-#define CM_SAVEAS       102
-#define CM_PRINT        103
-#define CM_PLUGINSLIST  104
-#define CM_EXIT         105
+#define CM_NEW_WINDOW   101
+#define CM_OPEN         102
+#define CM_SAVEAS       103
+#define CM_PRINT        104
+#define CM_PLUGINSLIST  105
+#define CM_EXIT         106
 
 #define CM_COPY         201
 #define CM_SELECTALL    202
