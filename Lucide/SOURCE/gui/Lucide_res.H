@@ -149,14 +149,15 @@
 #define IDC_COPIES			20
 #define IDC_TYPE_POSTSCRIPT	21
 #define IDC_TYPE_ASIMAGE	22
-#define IDC_HIGHER_IMAGE_QUALITY	23
-#define IDC_PORTRAIT		24
-#define IDC_LANDSCAPE		25
-#define IDC_MLEFT			26
-#define IDC_MRIGHT			27
-#define IDC_MTOP			28
-#define IDC_MBOTTOM			29
-#define IDC_SELECTED_FORM	30
+#define IDC_PRINT_TO_FILE	23
+#define IDC_HIGHER_IMAGE_QUALITY	24
+#define IDC_PORTRAIT		25
+#define IDC_LANDSCAPE		26
+#define IDC_MLEFT			27
+#define IDC_MRIGHT			28
+#define IDC_MTOP			29
+#define IDC_MBOTTOM			30
+#define IDC_SELECTED_FORM	31
 
 
 #endif // __LUCIDE_RES_H

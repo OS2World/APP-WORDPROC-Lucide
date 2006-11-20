@@ -55,6 +55,7 @@ struct PrintSetup
     long margin_bottom;
     long margin_right;
     int copies;
+    bool psToFile;
 };
 
 class LuDocument;

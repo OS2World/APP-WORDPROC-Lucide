@@ -513,7 +513,9 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                 case IDC_TYPE_POSTSCRIPT:
                 case IDC_TYPE_ASIMAGE:
                 {
+                    BOOL aspsc = WinQueryButtonCheckstate( hwnd, IDC_TYPE_POSTSCRIPT );
                     BOOL asimg = WinQueryButtonCheckstate( hwnd, IDC_TYPE_ASIMAGE );
+                    WinEnableControl( hwnd, IDC_PRINT_TO_FILE, aspsc );
                     WinEnableControl( hwnd, IDC_HIGHER_IMAGE_QUALITY,
                                       asimg && _this->scalable && !_this->fixed );
                 }
@@ -594,6 +596,7 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                             _this->psetup->ptype = TypeAsImage;
                         }
                         _this->psetup->higherQuality = WinQueryButtonCheckstate( hwnd, IDC_HIGHER_IMAGE_QUALITY );
+                        _this->psetup->psToFile = WinQueryButtonCheckstate( hwnd, IDC_PRINT_TO_FILE );
 
                         WinDismissDlg( hwnd, DID_OK );
                     }

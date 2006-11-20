@@ -308,8 +308,34 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     double pheight = ( (double)( curForm.cy - mTop - mBottom ) / 25.4 ) * 72.0;
 
     char tmpps[ CCHMAXPATH ] = "";
-    getTmpDir( tmpps );
-    strcat( tmpps, "TMPLUCID.PS" );
+    if ( psetup->psToFile )
+    {
+        strcpy( tmpps, title );
+        char *pointpos = strrchr( tmpps, '.' );
+        if ( pointpos != NULL ) {
+            *pointpos = 0;
+        }
+        strcat( tmpps, ".ps" );
+
+        PFILEDLG fd = new FILEDLG;
+        memset( fd, 0, sizeof( FILEDLG ) );
+        fd->cbSize = sizeof( FILEDLG );
+        fd->fl = FDS_CENTER | FDS_SAVEAS_DIALOG;
+        strcpy( fd->szFullFile, tmpps );
+        WinFileDlg( HWND_DESKTOP, hFrame, fd );
+        if ( fd->lReturn == DID_OK ) {
+            strcpy( tmpps, fd->szFullFile );
+            delete fd;
+        }
+        else {
+            delete fd;
+            return true;
+        }
+    }
+    else {
+        getTmpDir( tmpps );
+        strcat( tmpps, "TMPLUCID.PS" );
+    }
 
     boolean rcexp = doc->exportToPostScript( ev, tmpps, psetup->pgfrom-1, psetup->pgto-1,
                                              pwidth, pheight, &abortPrinting );
@@ -323,65 +349,68 @@ bool LucidePrinting::doPsPrint( HAB lhab )
         return false;
     }
 
-    char *spooling_ps = newstrdupL( PRINT_SPOOLING_POSTSCRIPT );
-    progressDlg->setText( spooling_ps );
-    delete spooling_ps;
-
-    // build a devopenstruct for the call to DevOpenDC
-    dos.pszLogAddress      = psetup->QueueInfo.pszName;              // 1
-    strcpy( achDriverName, psetup->QueueInfo.pszDriverName );
-    achDriverName[ strcspn( achDriverName, "." ) ] = '\0';
-    dos.pszDriverName      = achDriverName;                          // 2
-    dos.pdriv              = psetup->QueueInfo.pDriverData;          // 3
-    dos.pszDataType        = "PM_Q_RAW";                             // 4
-    dos.pszComment         = (PSZ)appName;                           // 5
-    dos.pszQueueProcName   = NULL;                                   // 6
-    snprintf( achQueueProcParams, sizeof( achQueueProcParams ), "COP=%d", psetup->copies );
-    dos.pszQueueProcParams = achQueueProcParams;                     // 7
-
-    HDC hdcPrinter = DevOpenDC( lhab, OD_QUEUED, "*", 7L, (PDEVOPENDATA)&dos, NULLHANDLE );
-    if ( hdcPrinter == DEV_ERROR ) {
-        unlink( tmpps );
-        return false;
-    }
-
-    // Issue STARTDOC to begin printing
-    LONG rc = DevEscape( hdcPrinter, DEVESC_STARTDOC, strlen(title), (PBYTE)title, NULL, NULL );
-    if ( rc == DEVESC_ERROR ) {
-        DevCloseDC( hdcPrinter );
-        unlink( tmpps );
-        return false;
-    }
-
-    FILE *f = fopen( tmpps, "rb" );
-    if ( f == NULL ) {
-        DevEscape( hdcPrinter, DEVESC_ABORTDOC, 0L, NULL, NULL, NULL );
-        DevCloseDC( hdcPrinter );
-        unlink( tmpps );
-        return false;
-    }
-
-    bool splerr = false;
-    void *buf = malloc( PS_PRINT_BUF_SIZE );
-    int rd = 0;
-    while ( ( rc != DEVESC_ERROR ) && ( rd = fread( buf, 1, PS_PRINT_BUF_SIZE, f ) ) != 0 )
+    if ( !psetup->psToFile )
     {
-        rc = DevEscape( hdcPrinter, DEVESC_RAWDATA, rd, (char *)buf, NULL, NULL );
-        if ( ( rc == DEVESC_ERROR ) || abortPrinting ) {
-            splerr = true;
-            break;
+        char *spooling_ps = newstrdupL( PRINT_SPOOLING_POSTSCRIPT );
+        progressDlg->setText( spooling_ps );
+        delete spooling_ps;
+
+        // build a devopenstruct for the call to DevOpenDC
+        dos.pszLogAddress      = psetup->QueueInfo.pszName;              // 1
+        strcpy( achDriverName, psetup->QueueInfo.pszDriverName );
+        achDriverName[ strcspn( achDriverName, "." ) ] = '\0';
+        dos.pszDriverName      = achDriverName;                          // 2
+        dos.pdriv              = psetup->QueueInfo.pDriverData;          // 3
+        dos.pszDataType        = "PM_Q_RAW";                             // 4
+        dos.pszComment         = (PSZ)appName;                           // 5
+        dos.pszQueueProcName   = NULL;                                   // 6
+        snprintf( achQueueProcParams, sizeof( achQueueProcParams ), "COP=%d", psetup->copies );
+        dos.pszQueueProcParams = achQueueProcParams;                     // 7
+
+        HDC hdcPrinter = DevOpenDC( lhab, OD_QUEUED, "*", 7L, (PDEVOPENDATA)&dos, NULLHANDLE );
+        if ( hdcPrinter == DEV_ERROR ) {
+            unlink( tmpps );
+            return false;
         }
-    }
-    free( buf );
-    fclose( f );
-    unlink( tmpps );
 
-    DevEscape( hdcPrinter, splerr ? DEVESC_ABORTDOC : DEVESC_ENDDOC,
-               0L, NULL, NULL, NULL );
-    DevCloseDC( hdcPrinter );
+        // Issue STARTDOC to begin printing
+        LONG rc = DevEscape( hdcPrinter, DEVESC_STARTDOC, strlen(title), (PBYTE)title, NULL, NULL );
+        if ( rc == DEVESC_ERROR ) {
+            DevCloseDC( hdcPrinter );
+            unlink( tmpps );
+            return false;
+        }
 
-    if ( splerr && !abortPrinting ) {
-        return false;
+        FILE *f = fopen( tmpps, "rb" );
+        if ( f == NULL ) {
+            DevEscape( hdcPrinter, DEVESC_ABORTDOC, 0L, NULL, NULL, NULL );
+            DevCloseDC( hdcPrinter );
+            unlink( tmpps );
+            return false;
+        }
+
+        bool splerr = false;
+        void *buf = malloc( PS_PRINT_BUF_SIZE );
+        int rd = 0;
+        while ( ( rc != DEVESC_ERROR ) && ( rd = fread( buf, 1, PS_PRINT_BUF_SIZE, f ) ) != 0 )
+        {
+            rc = DevEscape( hdcPrinter, DEVESC_RAWDATA, rd, (char *)buf, NULL, NULL );
+            if ( ( rc == DEVESC_ERROR ) || abortPrinting ) {
+                splerr = true;
+                break;
+            }
+        }
+        free( buf );
+        fclose( f );
+        unlink( tmpps );
+
+        DevEscape( hdcPrinter, splerr ? DEVESC_ABORTDOC : DEVESC_ENDDOC,
+                   0L, NULL, NULL, NULL );
+        DevCloseDC( hdcPrinter );
+
+        if ( splerr && !abortPrinting ) {
+            return false;
+        }
     }
 
     return true;
