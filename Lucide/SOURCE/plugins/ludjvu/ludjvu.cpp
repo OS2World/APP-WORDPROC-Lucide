@@ -60,9 +60,9 @@ struct DjvuDocument
 unsigned _System LibMain( unsigned hmod, unsigned termination )
 {
     if ( termination ) {
-        /* DLL is detaching from process */
+        // DLL is detaching from process
     } else {
-        /* DLL is attaching to process */
+        // DLL is attaching to process
     }
     return( 1 );
 }
@@ -98,6 +98,8 @@ static void djvu_handle_events( ddjvu_context_t *ctx )
         {
             case DDJVU_ERROR:
                 // TODO: error message
+                break;
+
             default:
                 break;
         }
@@ -133,6 +135,10 @@ SOM_Scope boolean  SOMLINK loadFile(LuDjvuDocument *somSelf,
 
     while ( !ddjvu_document_decoding_done( d->d_document ) ) {
         djvu_handle_events( d->d_context );
+    }
+
+    if ( ddjvu_document_decoding_error( d->d_document ) ) {
+        return FALSE;
     }
 
     return TRUE;
