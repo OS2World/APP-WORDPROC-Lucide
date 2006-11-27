@@ -43,7 +43,7 @@ class LuDocument;
 class PrintDlg
 {
     public:
-        PrintDlg( HWND hWndFrame, LuDocument *_doc, long _currentpage );
+        PrintDlg( HWND hWndFrame, LuDocument *_doc, const char *fname, long _currentpage );
         virtual ~PrintDlg();
 
         ULONG showDialog();
@@ -66,6 +66,7 @@ class PrintDlg
         LuDocument *doc;
         bool scalable;
         bool fixed;
+        char *filename;
         long currentpage;
         PPRQINFO3 pQueueInfo;
         PHCINFO pcurForm;

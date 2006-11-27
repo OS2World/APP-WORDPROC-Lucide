@@ -308,29 +308,8 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     double pheight = ( (double)( curForm.cy - mTop - mBottom ) / 25.4 ) * 72.0;
 
     char tmpps[ CCHMAXPATH ] = "";
-    if ( psetup->psToFile )
-    {
-        strcpy( tmpps, title );
-        char *pointpos = strrchr( tmpps, '.' );
-        if ( pointpos != NULL ) {
-            *pointpos = 0;
-        }
-        strcat( tmpps, ".ps" );
-
-        PFILEDLG fd = new FILEDLG;
-        memset( fd, 0, sizeof( FILEDLG ) );
-        fd->cbSize = sizeof( FILEDLG );
-        fd->fl = FDS_CENTER | FDS_SAVEAS_DIALOG;
-        strcpy( fd->szFullFile, tmpps );
-        WinFileDlg( HWND_DESKTOP, hFrame, fd );
-        if ( fd->lReturn == DID_OK ) {
-            strcpy( tmpps, fd->szFullFile );
-            delete fd;
-        }
-        else {
-            delete fd;
-            return true;
-        }
+    if ( psetup->psToFile ) {
+        strcpy( tmpps, psetup->psFile );
     }
     else {
         getTmpDir( tmpps );

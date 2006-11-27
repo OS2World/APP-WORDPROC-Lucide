@@ -48,12 +48,13 @@
 #include "messages.h"
 
 
-PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, long _currentpage )
+PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, const char *fname, long _currentpage )
 {
     hFrame      = hWndFrame;
     doc         = _doc;
     scalable    = _doc->isScalable( ev );
     fixed       = _doc->isFixedImage( ev );
+    filename    = newstrdup( fname );
     currentpage = _currentpage;
     pcurForm    = new HCINFO;
     memset( pcurForm, 0, sizeof( HCINFO ) );
@@ -63,6 +64,7 @@ PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, long _currentpage )
 
 PrintDlg::~PrintDlg()
 {
+    delete filename;
     delete pcurForm;
     delete psetup;
 }
@@ -597,6 +599,32 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                         }
                         _this->psetup->higherQuality = WinQueryButtonCheckstate( hwnd, IDC_HIGHER_IMAGE_QUALITY );
                         _this->psetup->psToFile = WinQueryButtonCheckstate( hwnd, IDC_PRINT_TO_FILE );
+
+                        if ( _this->psetup->psToFile )
+                        {
+                            strcpy( _this->psetup->psFile, _this->filename );
+                            char *pointpos = strrchr( _this->psetup->psFile, '.' );
+                            if ( pointpos != NULL ) {
+                                *pointpos = 0;
+                            }
+                            strcat( _this->psetup->psFile, ".ps" );
+
+                            PFILEDLG fd = new FILEDLG;
+                            memset( fd, 0, sizeof( FILEDLG ) );
+                            fd->cbSize = sizeof( FILEDLG );
+                            fd->fl = FDS_CENTER | FDS_SAVEAS_DIALOG;
+                            strcpy( fd->szFullFile, _this->psetup->psFile );
+                            WinFileDlg( HWND_DESKTOP, hwnd, fd );
+                            if ( fd->lReturn == DID_OK ) {
+                                strcpy( _this->psetup->psFile, fd->szFullFile );
+                                delete fd;
+                            }
+                            else {
+                                delete fd;
+                                WinDismissDlg( hwnd, DID_CANCEL );
+                                return (MRESULT)FALSE;
+                            }
+                        }
 
                         WinDismissDlg( hwnd, DID_OK );
                     }

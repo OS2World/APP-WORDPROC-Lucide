@@ -56,6 +56,7 @@ struct PrintSetup
     long margin_right;
     int copies;
     bool psToFile;
+    char psFile[ CCHMAXPATH ];
 };
 
 class LuDocument;

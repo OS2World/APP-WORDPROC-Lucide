@@ -767,8 +767,9 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
                 case CM_PRINT:
                 {
-                    PrintDlg *d = new PrintDlg( hWndFrame, doc, docViewer->getCurrentPage() + 1 );
-                    if ( d->showDialog() == DID_OK ) {
+                    PrintDlg *d = new PrintDlg( hWndFrame, doc, Lucide::docFileName, docViewer->getCurrentPage() + 1 );
+                    if ( d->showDialog() == DID_OK ) 
+                    {
                         // print
                         PrintSetup *p = new PrintSetup;
                         memset( p, 0, sizeof( PrintSetup ) );
