@@ -29,7 +29,7 @@
 
 #include "tterrors.h"
 
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 #include "ttinterp.h"
 #endif
 
@@ -51,7 +51,7 @@
 #define FT_COMPONENT  trace_ttobjs
 
 
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
   /*************************************************************************/
   /*                                                                       */
@@ -83,6 +83,7 @@
       FT_FREE( zone->tags );
       FT_FREE( zone->cur );
       FT_FREE( zone->org );
+      FT_FREE( zone->orus );
 
       zone->max_points   = zone->n_points   = 0;
       zone->max_contours = zone->n_contours = 0;
@@ -126,6 +127,7 @@
 
     if ( FT_NEW_ARRAY( zone->org,      maxPoints   ) ||
          FT_NEW_ARRAY( zone->cur,      maxPoints   ) ||
+         FT_NEW_ARRAY( zone->orus,     maxPoints   ) ||
          FT_NEW_ARRAY( zone->tags,     maxPoints   ) ||
          FT_NEW_ARRAY( zone->contours, maxContours ) )
     {
@@ -139,7 +141,7 @@
 
     return error;
   }
-#endif /* TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#endif /* TT_USE_BYTECODE_INTERPRETER */
 
 
   /*************************************************************************/
@@ -203,7 +205,7 @@
       goto Bad_Format;
     }
 
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
     face->root.face_flags |= FT_FACE_FLAG_HINTER;
 #endif
 
@@ -244,22 +246,57 @@
 
     }
 
-#ifdef TT_CONFIG_OPTION_UNPATENTED_HINTING
-
-    /* Determine whether unpatented hinting is to be used for this face. */
-    face->unpatented_hinting = FT_BOOL
-       ( library->debug_hooks[ FT_DEBUG_HOOK_UNPATENTED_HINTING ] != NULL );
+#if defined( TT_CONFIG_OPTION_UNPATENTED_HINTING    ) && \
+    !defined( TT_CONFIG_OPTION_BYTECODE_INTERPRETER )
 
     {
-      int  i;
+      FT_Bool  unpatented_hinting;
+      int      i;
 
+
+      /* Determine whether unpatented hinting is to be used for this face. */
+      unpatented_hinting = FT_BOOL
+        ( library->debug_hooks[FT_DEBUG_HOOK_UNPATENTED_HINTING] != NULL );
 
       for ( i = 0; i < num_params && !face->unpatented_hinting; i++ )
         if ( params[i].tag == FT_PARAM_TAG_UNPATENTED_HINTING )
-          face->unpatented_hinting = TRUE;
+          unpatented_hinting = TRUE;
+
+      /* Compare the face with a list of well-known `tricky' fonts. */
+      /* This list shall be expanded as we find more of them.       */
+      if ( !unpatented_hinting )
+      {
+        static const char* const  trick_names[] =
+        {
+          "DFKaiSho-SB",     /* dfkaisb.ttf */
+          "DFKai-SB",        /* kaiu.ttf */
+          "HuaTianSongTi?",  /* htst3.ttf */
+          "MingLiU",         /* mingliu.ttf & mingliu.ttc */
+          "PMingLiU",        /* mingliu.ttc */
+          "MingLi43",        /* mingli.ttf */
+          NULL
+        };
+        int  nn;
+
+
+        /* Note that we only check the face name at the moment; it might */
+        /* be worth to do more checks for a few special cases.           */
+        for ( nn = 0; trick_names[nn] != NULL; nn++ )
+        {
+          if ( ttface->family_name                                    &&
+               ft_strcmp( ttface->family_name, trick_names[nn] ) == 0 )
+          {
+            unpatented_hinting = 1;
+            break;
+          }
+        }
+      }
+
+      ttface->internal->ignore_unpatented_hinter = !unpatented_hinting;
     }
 
-#endif /* TT_CONFIG_OPTION_UNPATENTED_HINTING */
+#endif /* TT_CONFIG_OPTION_UNPATENTED_HINTING &&
+          !TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
 
     /* initialize standard glyph loading routines */
     TT_Init_Glyph_Loading( face );
@@ -329,7 +366,7 @@
   /*                                                                       */
   /*************************************************************************/
 
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
   /*************************************************************************/
   /*                                                                       */
@@ -479,7 +516,7 @@
     return error;
   }
 
-#endif /* TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#endif /* TT_USE_BYTECODE_INTERPRETER */
 
 
   /*************************************************************************/
@@ -502,7 +539,7 @@
     TT_Size   size  = (TT_Size)ttsize;
     FT_Error  error = TT_Err_Ok;
 
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
     TT_Face    face   = (TT_Face)size->root.face;
     FT_Memory  memory = face->root.memory;
@@ -587,7 +624,7 @@
     if ( error )
       tt_size_done( ttsize );
 
-#endif /* TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#endif /* TT_USE_BYTECODE_INTERPRETER */
 
     size->ttmetrics.valid = FALSE;
     size->strike_index    = 0xFFFFFFFFUL;
@@ -612,7 +649,7 @@
   {
     TT_Size    size = (TT_Size)ttsize;
 
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
     FT_Memory  memory = size->root.face->memory;
 
@@ -726,7 +763,7 @@
     }
 
 
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
     {
       FT_UInt  i;
@@ -755,7 +792,7 @@
       error = tt_size_run_prep( size );
     }
 
-#endif /* TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#endif /* TT_USE_BYTECODE_INTERPRETER */
 
     if ( !error )
       size->ttmetrics.valid = TRUE;
@@ -782,7 +819,7 @@
   tt_driver_init( FT_Module  ttdriver )     /* TT_Driver */
   {
 
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
     TT_Driver  driver = (TT_Driver)ttdriver;
 
@@ -814,7 +851,7 @@
   FT_LOCAL_DEF( void )
   tt_driver_done( FT_Module  ttdriver )     /* TT_Driver */
   {
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
     TT_Driver  driver = (TT_Driver)ttdriver;
 
 

@@ -78,11 +78,10 @@
   FT_BASE_DEF( FT_Int )
   ft_validator_run( FT_Validator  valid )
   {
-    int  result;
+    /* This function doesn't work!  None should call it. */
+    FT_UNUSED( valid );
 
-
-    result = ft_setjmp( valid->jump_buffer );
-    return result;
+    return -1;
   }
 
 
@@ -90,8 +89,17 @@
   ft_validator_error( FT_Validator  valid,
                       FT_Error      error )
   {
+    /* since the cast below also disables the compiler's */
+    /* type check, we introduce a dummy variable, which  */
+    /* will be optimized away                            */
+    volatile jmp_buf* jump_buffer = &valid->jump_buffer;
+
+
     valid->error = error;
-    ft_longjmp( valid->jump_buffer, 1 );
+
+    /* throw away volatileness; use `jump_buffer' or the  */
+    /* compiler may warn about an unused local variable   */
+    ft_longjmp( *(jmp_buf*) jump_buffer, 1 );
   }
 
 
@@ -541,8 +549,8 @@
     if ( !face || !face->size || !face->glyph )
       return FT_Err_Invalid_Face_Handle;
 
-    if ( glyph_index >= (FT_UInt)face->num_glyphs )
-      return FT_Err_Invalid_Argument;
+    /* The validity test for `glyph_index' is performed by the */
+    /* font drivers.                                           */
 
     slot = face->glyph;
     ft_glyphslot_clear( slot );
@@ -565,22 +573,44 @@
       load_flags &= ~FT_LOAD_RENDER;
     }
 
-    if ( FT_LOAD_TARGET_MODE( load_flags ) == FT_RENDER_MODE_LIGHT )
-      load_flags |= FT_LOAD_FORCE_AUTOHINT;
+    /*
+     * Determine whether we need to auto-hint or not.
+     * The general rules are:
+     *
+     * - Do only auto-hinting if we have a hinter module,
+     *   a scalable font format dealing with outlines,
+     *   and no transforms except simple slants.
+     *
+     * - Then, autohint if FT_LOAD_FORCE_AUTOHINT is set
+     *   or if we don't have a native font hinter.
+     *
+     * - Otherwise, auto-hint for LIGHT hinting mode.
+     *
+     * - Exception: The font requires the unpatented
+     *   bytecode interpreter to load properly.
+     */
 
-    /* auto-hinter is preferred and should be used */
-    if ( ( !FT_DRIVER_HAS_HINTER( driver )         ||
-           ( load_flags & FT_LOAD_FORCE_AUTOHINT ) ) &&
-         !( load_flags & FT_LOAD_NO_HINTING )        &&
-         !( load_flags & FT_LOAD_NO_AUTOHINT )       )
+    autohint = 0;
+    if ( hinter                                    &&
+         ( load_flags & FT_LOAD_NO_HINTING  ) == 0 &&
+         ( load_flags & FT_LOAD_NO_AUTOHINT ) == 0 &&
+         FT_DRIVER_IS_SCALABLE( driver )           &&
+         FT_DRIVER_USES_OUTLINES( driver )         &&
+         face->internal->transform_matrix.yy > 0   &&
+         face->internal->transform_matrix.yx == 0  )
     {
-      /* check whether it works for this face */
-      autohint =
-        FT_BOOL( hinter                                   &&
-                 FT_DRIVER_IS_SCALABLE( driver )          &&
-                 FT_DRIVER_USES_OUTLINES( driver )        &&
-                 face->internal->transform_matrix.yy > 0  &&
-                 face->internal->transform_matrix.yx == 0 );
+      if ( ( load_flags & FT_LOAD_FORCE_AUTOHINT ) != 0 ||
+           !FT_DRIVER_HAS_HINTER( driver )              )
+        autohint = 1;
+      else
+      {
+        FT_Render_Mode  mode = FT_LOAD_TARGET_MODE( load_flags );
+
+
+        if ( mode == FT_RENDER_MODE_LIGHT             ||
+             face->internal->ignore_unpatented_hinter )
+          autohint = 1;
+      }
     }
 
     if ( autohint )
@@ -1531,7 +1561,7 @@
 
       error = IsMacResource( library, stream2, offsets[i],
                              face_index, aface );
-      FT_Stream_Close( stream2 );
+      FT_Stream_Free( stream2, 0 );
 
       FT_TRACE3(( "%s\n", error ? "failed": "successful" ));
 
@@ -2543,6 +2573,9 @@
 
     if ( !face )
       return FT_Err_Invalid_Face_Handle;
+
+    if ( encoding == FT_ENCODING_NONE )
+      return FT_Err_Invalid_Argument;
 
     /* FT_ENCODING_UNICODE is special.  We try to find the `best' Unicode */
     /* charmap available, i.e., one with UCS-4 characters, if possible.   */
@@ -3721,7 +3754,7 @@
     /* Close all modules in the library */
 #if 1
     /* XXX Modules are removed in the reversed order so that  */
-    /* type42 module is removed before truetype module.  This */ 
+    /* type42 module is removed before truetype module.  This */
     /* avoids double free in some occasions.  It is a hack.   */
     while ( library->num_modules > 0 )
       FT_Remove_Module( library,
@@ -3861,7 +3894,7 @@
 
 #endif /* FT_CONFIG_OPTION_OLD_INTERNALS */
 
-  
+
   FT_EXPORT_DEF( FT_Error )
   FT_Get_SubGlyph_Info( FT_GlyphSlot  glyph,
                         FT_UInt       sub_index,
@@ -3872,14 +3905,14 @@
                         FT_Matrix    *p_transform )
   {
     FT_Error  error = FT_Err_Invalid_Argument;
-      
 
-    if ( glyph != NULL                              && 
+
+    if ( glyph != NULL                              &&
          glyph->format == FT_GLYPH_FORMAT_COMPOSITE &&
          sub_index < glyph->num_subglyphs           )
     {
       FT_SubGlyph  subg = glyph->subglyphs + sub_index;
-        
+
 
       *p_index     = subg->index;
       *p_flags     = subg->flags;

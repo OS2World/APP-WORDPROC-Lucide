@@ -334,7 +334,7 @@
   tt_face_load_cvt( TT_Face    face,
                     FT_Stream  stream )
   {
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
     FT_Error   error;
     FT_Memory  memory = stream->memory;
@@ -383,7 +383,7 @@
   Exit:
     return error;
 
-#else /* !TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#else /* !TT_USE_BYTECODE_INTERPRETER */
 
     FT_UNUSED( face   );
     FT_UNUSED( stream );
@@ -415,7 +415,7 @@
   tt_face_load_fpgm( TT_Face    face,
                      FT_Stream  stream )
   {
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
     FT_Error  error;
     FT_ULong  table_len;
@@ -445,7 +445,7 @@
   Exit:
     return error;
 
-#else /* !TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#else /* !TT_USE_BYTECODE_INTERPRETER */
 
     FT_UNUSED( face   );
     FT_UNUSED( stream );
@@ -477,7 +477,7 @@
   tt_face_load_prep( TT_Face    face,
                      FT_Stream  stream )
   {
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
     FT_Error  error;
     FT_ULong  table_len;
@@ -506,7 +506,7 @@
   Exit:
     return error;
 
-#else /* !TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#else /* !TT_USE_BYTECODE_INTERPRETER */
 
     FT_UNUSED( face   );
     FT_UNUSED( stream );
@@ -562,7 +562,23 @@
     num_records = FT_NEXT_USHORT( p );
     record_size = FT_NEXT_ULONG( p );
 
-    if ( version != 0 || num_records > 255 || record_size > 0x40000 )
+    /* The maximum number of bytes in an hdmx device record is the */
+    /* maximum number of glyphs + 2; this is 0xFFFF + 2; this is   */
+    /* the reason why `record_size' is a long (which we read as    */
+    /* unsigned long for convenience).  In practice, two bytes     */
+    /* sufficient to hold the size value.                          */
+    /*                                                             */
+    /* There are at least two fonts, HANNOM-A and HANNOM-B version */
+    /* 2.0 (2005), which get this wrong: The upper two bytes of    */
+    /* the size value are set to 0xFF instead of 0x00.  We catch   */
+    /* and fix this.                                               */
+
+    if ( record_size >= 0xFFFF0000UL )
+      record_size &= 0xFFFFU;
+
+    /* The limit for `num_records' is a heuristic value. */
+
+    if ( version != 0 || num_records > 255 || record_size > 0x10001L )
     {
       error = TT_Err_Invalid_File_Format;
       goto Fail;
@@ -638,12 +654,25 @@
 
     FT_FRAME_EXIT();
 
+    /* The maximum number of bytes in an hdmx device record is the */
+    /* maximum number of glyphs + 2; this is 0xFFFF + 2; this is   */
+    /* the reason why `record_size' is a long.  In practice, two   */
+    /* bytes sufficient to hold the size value.                    */
+    /*                                                             */
+    /* There are at least two fonts, HANNOM-A and HANNOM-B version */
+    /* 2.0 (2005), which get this wrong: The upper two bytes of    */
+    /* the size value are set to 0xFF instead of 0x00.  We catch   */
+    /* and fix this.                                               */
+
+    if ( (FT_ULong)record_size >= 0xFFFF0000UL )
+      record_size = (FT_Long)( (FT_ULong)record_size & 0xFFFFU );
+
     if ( record_size < 0 || num_records < 0 )
       return TT_Err_Invalid_File_Format;
 
     /* Only recognize format 0 */
     if ( hdmx->version != 0 )
-      goto Exit;
+      return TT_Err_Invalid_File_Format;
 
     /* we can't use FT_QNEW_ARRAY here; otherwise tt_face_free_hdmx */
     /* could fail during deallocation                               */

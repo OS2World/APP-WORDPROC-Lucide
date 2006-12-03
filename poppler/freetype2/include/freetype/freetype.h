@@ -913,7 +913,9 @@ FT_BEGIN_HEADER
 
     FT_Generic        generic;
 
-    /*# the following are only relevant to scalable outlines */
+    /*# The following member variables (down to `underline_thickness') */
+    /*# are only relevant to scalable outlines; cf. @FT_Bitmap_Size    */
+    /*# for bitmap fonts.                                              */
     FT_BBox           bbox;
 
     FT_UShort         units_per_EM;
@@ -1269,6 +1271,8 @@ FT_BEGIN_HEADER
   /*    Indeed, the only way to get the exact metrics is to render _all_   */
   /*    glyphs.  As this would be a definite performance hit, it is up to  */
   /*    client applications to perform such computations.                  */
+  /*                                                                       */
+  /*    The FT_Size_Metrics structure is valid for bitmap fonts also.      */
   /*                                                                       */
   typedef struct  FT_Size_Metrics_
   {
@@ -3307,7 +3311,7 @@ FT_BEGIN_HEADER
    */
 #define FREETYPE_MAJOR  2
 #define FREETYPE_MINOR  2
-#define FREETYPE_PATCH  1
+#define FREETYPE_PATCH  2
 
 
   /*************************************************************************/
@@ -3344,7 +3348,6 @@ FT_BEGIN_HEADER
                       FT_Int      *amajor,
                       FT_Int      *aminor,
                       FT_Int      *apatch );
-
 
   /* */
 

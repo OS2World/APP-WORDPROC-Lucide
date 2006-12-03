@@ -1063,24 +1063,6 @@
 #define FT_COMPONENT  trace_cffload
 
 
-  /* read a CFF offset from memory */
-  static FT_ULong
-  cff_get_offset( FT_Byte*  p,
-                  FT_Byte   off_size )
-  {
-    FT_ULong  result;
-
-
-    for ( result = 0; off_size > 0; off_size-- )
-    {
-      result <<= 8;
-      result  |= *p++;
-    }
-
-    return result;
-  }
-
-
   static FT_Error
   cff_new_index( CFF_Index  idx,
                  FT_Stream  stream,
@@ -1101,12 +1083,19 @@
       FT_Byte    offsize;
       FT_ULong   data_size;
       FT_ULong*  poff;
+      FT_Byte*   p_end;
 
 
       /* there is at least one element; read the offset size,           */
       /* then access the offset table to compute the index's total size */
       if ( FT_READ_BYTE( offsize ) )
         goto Exit;
+
+      if ( offsize < 1 || offsize > 4 )
+      {
+        error = FT_Err_Invalid_Table;
+        goto Exit;
+      }
 
       idx->stream   = stream;
       idx->count    = count;
@@ -1117,14 +1106,30 @@
            FT_FRAME_ENTER( data_size )             )
         goto Exit;
 
-      poff = idx->offsets;
-      p    = (FT_Byte*)stream->cursor;
+      poff   = idx->offsets;
+      p      = (FT_Byte*)stream->cursor;
+      p_end  = p + data_size;
 
-      for ( ; (FT_Short)count >= 0; count-- )
+      switch ( offsize )
       {
-        poff[0] = cff_get_offset( p, offsize );
-        poff++;
-        p += offsize;
+      case 1:
+        for ( ; p < p_end; p++, poff++ )
+          poff[0] = p[0];
+        break;
+
+      case 2:
+        for ( ; p < p_end; p += 2, poff++ )
+          poff[0] = FT_PEEK_USHORT( p );
+        break;
+
+      case 3:
+        for ( ; p < p_end; p += 3, poff++ )
+          poff[0] = FT_PEEK_OFF3( p );
+        break;
+
+      default:
+        for ( ; p < p_end; p += 4, poff++ )
+          poff[0] = FT_PEEK_ULONG( p );
       }
 
       FT_FRAME_EXIT();
@@ -1493,6 +1498,46 @@
   /*************************************************************************/
   /*************************************************************************/
 
+  static FT_Error
+  cff_charset_compute_cids( CFF_Charset  charset,
+                            FT_UInt      num_glyphs,
+                            FT_Memory    memory )
+  {
+    FT_Error   error   = FT_Err_Ok;
+    FT_UInt    i;
+    FT_UShort  max_cid = 0;
+
+
+    if ( charset->max_cid > 0 )
+      goto Exit;
+
+    for ( i = 0; i < num_glyphs; i++ )
+      if ( charset->sids[i] > max_cid )
+        max_cid = charset->sids[i];
+    max_cid++;
+
+    if ( FT_NEW_ARRAY( charset->cids, max_cid ) )
+      goto Exit;
+
+    for ( i = 0; i < num_glyphs; i++ )
+      charset->cids[charset->sids[i]] = (FT_UShort)i;
+
+    charset->max_cid = max_cid;
+
+  Exit:
+    return error;
+  }
+
+
+  static void
+  cff_charset_free_cids( CFF_Charset  charset,
+                         FT_Memory    memory )
+  {
+    FT_FREE( charset->cids );
+    charset->max_cid = 0;
+  }
+
+
   static void
   cff_charset_done( CFF_Charset  charset,
                     FT_Stream    stream )
@@ -1500,8 +1545,9 @@
     FT_Memory  memory = stream->memory;
 
 
+    cff_charset_free_cids( charset, memory );
+
     FT_FREE( charset->sids );
-    FT_FREE( charset->cids );
     charset->format = 0;
     charset->offset = 0;
   }
@@ -1672,25 +1718,7 @@
 
     /* we have to invert the `sids' array for subsetted CID-keyed fonts */
     if ( invert )
-    {
-      FT_UInt    i;
-      FT_UShort  max_cid = 0;
-
-
-      for ( i = 0; i < num_glyphs; i++ )
-        if ( charset->sids[i] > max_cid )
-          max_cid = charset->sids[i];
-      max_cid++;
-
-      if ( FT_NEW_ARRAY( charset->cids, max_cid ) )
-        goto Exit;
-      FT_MEM_ZERO( charset->cids, sizeof ( FT_UShort ) * max_cid );
-
-      for ( i = 0; i < num_glyphs; i++ )
-        charset->cids[charset->sids[i]] = (FT_UShort)i;
-
-      charset->max_cid = max_cid;
-    }
+      error = cff_charset_compute_cids( charset, num_glyphs, memory );
 
   Exit:
     /* Clean up if there was an error. */
@@ -1896,9 +1924,6 @@
     }
     else
     {
-      FT_UInt i;
-
-
       /* We take into account the fact a CFF font can use a predefined */
       /* encoding without containing all of the glyphs encoded by this */
       /* encoding (see the note at the end of section 12 in the CFF    */
@@ -1921,32 +1946,31 @@
 
         encoding->count = 0;
 
+        error = cff_charset_compute_cids( charset, num_glyphs,
+                                          stream->memory );
+        if ( error )
+          goto Exit;
+
         for ( j = 0; j < 256; j++ )
         {
-          /* If j is encoded, find the GID for it. */
-          if ( encoding->sids[j] )
+          FT_UInt  sid = encoding->sids[j];
+          FT_UInt  gid = 0;
+
+
+          if ( sid )
+            gid = charset->cids[sid];
+
+          if ( gid != 0 )
           {
-            for ( i = 1; i < num_glyphs; i++ )
-              /* We matched, so break. */
-              if ( charset->sids[i] == encoding->sids[j] )
-                break;
+            encoding->codes[j] = (FT_UShort)gid;
 
-            /* i will be equal to num_glyphs if we exited the above */
-            /* loop without a match.  In this case, we also have to */
-            /* fix the code to SID mapping.                         */
-            if ( i == num_glyphs )
-            {
-              encoding->codes[j] = 0;
-              encoding->sids [j] = 0;
-            }
-            else
-            {
-              encoding->codes[j] = (FT_UShort)i;
-
-              /* update encoding count */
-              if ( encoding->count < j + 1 )
-                encoding->count = j + 1;
-            }
+            if ( encoding->count < j + 1 )
+              encoding->count = j + 1;
+          }
+          else
+          {
+            encoding->codes[j] = 0;
+            encoding->sids [j] = 0;
           }
         }
         break;
@@ -2013,7 +2037,7 @@
 
     if ( error )
       goto Exit;
- 
+
     /* if it is a CID font, we stop there */
     if ( top->cid_registry != 0xFFFFU )
       goto Exit;
@@ -2298,6 +2322,9 @@
     {
       for ( idx = 0; idx < font->num_subfonts; idx++ )
         cff_subfont_done( memory, font->subfonts[idx] );
+
+      /* the subfonts array has been allocated as a single block */
+      FT_FREE( font->subfonts[0] );
     }
 
     cff_encoding_done( &font->encoding );

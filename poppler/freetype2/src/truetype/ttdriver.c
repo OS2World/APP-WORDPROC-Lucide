@@ -243,6 +243,7 @@
   {
     TT_GlyphSlot  slot = (TT_GlyphSlot)ttslot;
     TT_Size       size = (TT_Size)ttsize;
+    FT_Face       face = ttslot->face;
     FT_Error      error;
 
 
@@ -251,6 +252,9 @@
 
     if ( !size )
       return TT_Err_Invalid_Size_Handle;
+
+    if ( !face || glyph_index >= (FT_UInt)face->num_glyphs )
+      return TT_Err_Invalid_Argument;
 
     if ( load_flags & ( FT_LOAD_NO_RECURSE | FT_LOAD_NO_SCALE ) )
     {
@@ -294,7 +298,7 @@
 
   static const FT_Service_TrueTypeEngineRec  tt_service_truetype_engine =
   {
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
 
 #ifdef TT_CONFIG_OPTION_UNPATENTED_HINTING
     FT_TRUETYPE_ENGINE_TYPE_UNPATENTED
@@ -302,11 +306,11 @@
     FT_TRUETYPE_ENGINE_TYPE_PATENTED
 #endif
 
-#else /* !TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#else /* !TT_USE_BYTECODE_INTERPRETER */
 
     FT_TRUETYPE_ENGINE_TYPE_NONE
 
-#endif /* TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#endif /* TT_USE_BYTECODE_INTERPRETER */
   };
 
   static const FT_ServiceDescRec  tt_services[] =
@@ -354,7 +358,7 @@
     {
       FT_MODULE_FONT_DRIVER        |
       FT_MODULE_DRIVER_SCALABLE    |
-#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#ifdef TT_USE_BYTECODE_INTERPRETER
       FT_MODULE_DRIVER_HAS_HINTER,
 #else
       0,

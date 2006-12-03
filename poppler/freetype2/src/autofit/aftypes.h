@@ -54,19 +54,24 @@ FT_BEGIN_HEADER
   /*************************************************************************/
 
 #define xxAF_USE_WARPER  /* only define to use warp hinting */
-#define xxAF_DEBUG
+#define AF_DEBUG
 
 #ifdef AF_DEBUG
 
 #include <stdio.h>
+#define AF_LOG( x )  do { if ( _af_debug ) printf x; } while ( 0 )
 
-#define AF_LOG( x )  printf x
+extern int    _af_debug;
+extern int    _af_debug_disable_horz_hints;
+extern int    _af_debug_disable_vert_hints;
+extern int    _af_debug_disable_blue_hints;
+extern void*  _af_debug_hints;
 
-#else
+#else /* !AF_DEBUG */
 
 #define AF_LOG( x )  do ; while ( 0 )        /* nothing */
 
-#endif /* AF_DEBUG */
+#endif /* !AF_DEBUG */
 
 
   /*************************************************************************/
@@ -118,6 +123,7 @@ FT_BEGIN_HEADER
 #define AF_ANGLE_PI4  ( AF_ANGLE_PI / 4 )
 
 
+#if 0
   /*
    *  compute the angle of a given 2-D vector
    */
@@ -126,7 +132,6 @@ FT_BEGIN_HEADER
                  FT_Pos  dy );
 
 
-#if 0
   /*
    *  compute `angle2 - angle1'; the result is always within
    *  the range [-AF_ANGLE_PI .. AF_ANGLE_PI - 1]
