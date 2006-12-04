@@ -52,13 +52,6 @@
 #include "messages.h"
 
 
-// OpenWatcom headers doesn't have GpiDrawBits() declaration
-extern "C"
-{
-    LONG APIENTRY GpiDrawBits(HPS hps, PVOID pBits, PBITMAPINFO2 pbmiInfoTable,
-                              LONG lCount, PPOINTL aptlPoints, LONG lRop, ULONG flOptions);
-}
-
 typedef LuDocument_LuRectSequence    *PLuRectSequence;
 typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 
