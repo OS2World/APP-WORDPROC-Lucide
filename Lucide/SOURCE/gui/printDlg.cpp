@@ -48,6 +48,9 @@
 #include "messages.h"
 
 
+char PrintDlg::defQueue[] = { 0 };
+
+
 PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, const char *fname, long _currentpage )
 {
     hFrame      = hWndFrame;
@@ -134,8 +137,15 @@ void PrintDlg::enumQueues( HWND hwnd )
         WinSendMsg( list, LM_SETITEMHANDLE,
                     MPFROMSHORT(sEntry), MPFROMP( &(pQueueInfo[i]) ) );
 
-        if ( pQueueInfo[i].fsType & PRQ3_TYPE_APPDEFAULT ) {
-            setCurrentQInfo( hwnd, &( pQueueInfo[i] ) );
+        if ( defQueue[0] == 0 ) {
+            if ( pQueueInfo[i].fsType & PRQ3_TYPE_APPDEFAULT ) {
+                setCurrentQInfo( hwnd, &( pQueueInfo[i] ) );
+            }
+        }
+        else {
+            if ( strcmp( pQueueInfo[i].pszName, defQueue ) == 0 ) {
+                setCurrentQInfo( hwnd, &( pQueueInfo[i] ) );
+            }
         }
     }
 }
@@ -625,6 +635,9 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                                 return (MRESULT)FALSE;
                             }
                         }
+
+                        // save name of selected queue to make it default for session
+                        strcpy( defQueue, _this->psetup->QueueInfo.pszName );
 
                         WinDismissDlg( hwnd, DID_OK );
                     }

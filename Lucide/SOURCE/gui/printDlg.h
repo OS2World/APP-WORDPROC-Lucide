@@ -71,6 +71,8 @@ class PrintDlg
         PPRQINFO3 pQueueInfo;
         PHCINFO pcurForm;
         PrintSetup *psetup;
+        
+        static char defQueue[ 256 ];
 };
 
 
