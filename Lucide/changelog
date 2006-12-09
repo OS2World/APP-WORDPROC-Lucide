@@ -4,6 +4,8 @@ Beta-5:
   - 'New window' menuitem.
   - PDF plugin: freetype library updated to version 2.2.1.
   - Optimized unicode conversion, fixes crash in uconv.dll (closed ticket #97).
+  - Remember last selected printer during session (closed ticket #96)
+  - Added NLS-files: Italian.
   - Updated NLS-files: Spanish, German...
 
 Beta-4:

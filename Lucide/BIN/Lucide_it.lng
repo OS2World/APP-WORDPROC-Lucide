@@ -1,0 +1,200 @@
+#
+# Lucide language file, IT
+#
+
+#
+# Main menu
+#
+MENU_DOCUMENT=~Documento
+MENU_OPEN=~Apri...\tCtrl+O
+MENU_SAVE_AS=~Salva come...
+# MENU_PAGE_SETUP: to delete
+MENU_PAGE_SETUP=Impostazioni pa~gina...
+MENU_PRINT=Stam~pa...
+MENU_PLUGINS_LIST=~Lista plugin
+MENU_EXIT=~Esci\tCtrl+X
+MENU_EDIT=~Modifica
+MENU_COPY=~Copia\tCtrl+Insert
+MENU_SELECT_ALL=Seleziona ~tutto\tCtrl+/
+MENU_FIND=Tro~va...\tCtrl+F
+MENU_FINDAGAIN=Trova ~seguente\tCtrl+G
+MENU_SETTINGS=~Impostazioni
+MENU_VIEW=~Visualizza
+MENU_FIT_WINDOW=~Adatta alla finestra
+MENU_ACTUAL_SIZE=~Dimensione reale
+MENU_FIT_WIDTH=Adatta alla ~larghezza
+MENU_ZOOM_IN_OUT=~Ingrandisci/rimpicciolisci
+MENU_FIRST_PAGE=~Prima pagina
+MENU_PREV_PAGE=Pagina p~recedente\t-
+MENU_NEXT_PAGE=Pagina ~successiva\t+
+MENU_LAST_PAGE=~Ultima pagina
+MENU_GO_TO_PAGE=~Vai a pagina...\tCtrl+N
+MENU_ROTATE_CW=Ruota di 90ø in senso ~orario
+MENU_ROTATE_CCW=Ruota di 90ø in senso a~ntiorario
+MENU_SHOW_NAV_PANE=Mostra il pannello di ~navigazione
+MENU_SINGLE_PAGE=Pagina ~singola
+MENU_CONTINUOUS=Pagina ~continua
+MENU_DOCUMENT_INFO=In~formazioni documento...
+MENU_FONTS_INFO=Informazioni ~tipi di carattere...
+MENU_WINDOW=~Finestra
+MENU_MAXVIEW=Finestra ingrandita al ~massimo\tF11
+MENU_FULLSCREEN=Schermo ~intero\tCtrl+L
+MENU_HELP=A~iuto
+MENU_PRODUCT_INFORMATION=Informazioni sul prodotto
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=Apre un documento
+TBHINT_PRINT=Stampa il documento
+TBHINT_SHOW_NAV_PANE=Mostra/nascondi il pannello di navigazione
+TBHINT_FIRST_PAGE=Prima pagina
+TBHINT_PREV_PAGE=Pagina precedente
+TBHINT_NEXT_PAGE=Pagina successiva
+TBHINT_LAST_PAGE=Ultima pagina
+TBHINT_ACTUAL_SIZE=Dimensione reale
+TBHINT_FIT_WINDOW=Adatta alla finestra
+TBHINT_FIT_WIDTH=Adatta alla larghezza
+TBHINT_FIND=Cerca nel documento
+TBHINT_FINDAGAIN=Cerca ancora
+TBHINT_ZOOM_IN_OUT=Ingrandisci/rimpicciolisci
+# toolbar's page number
+TB_PAGENUM=di %d
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=%APPNAME% - Visualizzatore documenti
+MSGS_NO_SUIT_PLUG=Impossibile trovare un plugin adatto al tipo di documento selezionato!
+MSGS_FILE_LOAD_ERROR=Errore di apertura file!
+MSGS_LOADING_DOCUMENT=Apertura documento, attendere...
+MSGS_WARNING=Attenzione!
+MSGS_OVERWRITE_FILE=Il file esiste gi…. Sovrascrivere?
+MSGS_FILE_SAVE_ERROR=Errore salvataggio file!
+MSGS_PAGE=Pagina
+MSGS_ERROR_STARTING_BROWSER=Errore di scorrimento file!
+
+#
+# "Plugins list" dialog
+#
+PLUGLIST_PLUGINS_LIST=Lista plugin
+PLUGLIST_CLOSE=~Chiudi
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Nome plugin
+PLUGLIST_SUPP_EXTS=Estensioni supportate
+PLUGLIST_PLUGIN_DESC=Descrizione plugin
+
+#
+# "Font info" dialog
+#
+FONTINFO_FONTINFO=Informazioni sui tipi di carattere
+FONTINFO_CLOSE=~Chiudi
+FONTINFO_ENUMERATING=Caricamento font, attendere...
+# List columns titles
+FONTINFO_NAME=Nome
+FONTINFO_TYPE=Tipo
+FONTINFO_EMBEDDED=Incorporato?
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=Non incorporato
+FONTINFO_EMBED_EMBEDDED=Incorporato
+FONTINFO_EMBED_EMBEDDED_SUBSET=Sottoinsieme incorporato
+
+#
+# "Document info" dialog
+#
+DOCINFO_DOCUMENT_INFO=Informazioni documento
+DOCINFO_CLOSE=~Chiudi
+# Document info keys
+DOCINFO_TITLE=Titolo:
+DOCINFO_FORMAT=Formato:
+DOCINFO_AUTHOR=Autore:
+DOCINFO_SUBJECT=Oggetto:
+DOCINFO_KEYWORDS=Codifiche:
+DOCINFO_CREATOR=Creatore:
+DOCINFO_PRODUCER=Prodotto:
+DOCINFO_CREATION_DATE=Creato:
+DOCINFO_MOD_DATE=Modificato:
+
+#
+# "Find" dialog
+#
+FIND_FIND=Trova
+FIND_FIND_WHAT=~Trova
+FIND_MATCH_CASE=~Corrispondenza esatta
+FIND_OK=~OK
+FIND_CANCEL=A~nnulla
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=Ricerca pagina %d di %d...
+FIND_NOT_FOUND=Nessun risultato trovato!
+
+#
+# "Progress" dialog
+#
+PDLG_PROGRESS=In corso...
+PDLG_CANCEL=A~nnulla
+
+#
+# About dialog
+#
+AD_ABOUT=Informazioni sul prodotto
+AD_DESCRIPTION=Visualizzatore di documenti basato su plugin, con supporto per molteplici formati di file
+AD_COPYRIGHTS=(c) Eugene Romanenko, netlabs.org in cooperazione con Serenity Systems International
+AD_OK=~OK
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Impostazioni
+SD_DEFAULT_PAGE_LAYOUT=Im~paginazione predefinita
+SD_DEFAULT_ZOOM=Valore di ~ingrandimento predefinito
+SD_SINGLE_PAGE=Pagina singola
+SD_CONTINUOUS=Continua
+SD_OK=~OK
+SD_CANCEL=A~nnulla
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=Vai alla pagina
+GTP_PAGE=Pagina
+GTP_OF=di %d
+GTP_OK=~OK
+GTP_CANCEL=A~nnulla
+
+#
+# Print dialog
+#
+PD_TITLE=Stampa
+PD_PRINTER=Stampante
+PD_NAME_LABEL=N~ome
+PD_JOB_PROPERTIES=P~ropriet… di stampa
+PD_DRIVER_LABEL=Driver
+PD_PRINT_RANGE_AND_COPIES=~Intervallo di stampa e copie
+PD_RANGE_ALL=~Tutto
+PD_RANGE_CURRENT_PAGE=Pa~gina corrente
+PD_RANGE_PAGES=~Pagine
+PD_FROM=~Da
+PD_TO=~A
+PD_NUMBER_OF_COPIES=Numero di ~copie
+PD_PRINT_TYPE=Tipo di stampa
+PD_TYPE_POSTSCRIPT=Post~script
+PD_TYPE_ASIMAGE=Come ~immagine
+PD_HIGHER_IMAGE_QUALITY=Immagine ad alta ~qualit… (stampa lenta, richiede molta memoria)
+PD_PAGE_ORIENTATION=Orientamento pagina
+PD_PORTRAIT=~Verticale
+PD_LANDSCAPE=~Orizzontale
+PD_MARGINS=Margini (mm)
+PD_MLEFT=Sinistro
+PD_MRIGHT=Destro
+PD_MTOP=Superiore
+PD_MBOTTOM=Inferiore
+PD_SELECTED_FORM=Selezione
+PD_BTNPRINT=~Stampa
+PD_BTNCANCEL=A~nnulla
+PD_WRONG_MARGINS=Margini non validi!
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=Stampa in corso della pagina %d (%d di %d)
+PRINT_GENERATING_POSTSCRIPT=Generazione del file postscript...
+PRINT_SPOOLING_POSTSCRIPT=Coda di stampa dei dati postscript...
+PRINT_FAILED=Stampa fallita!
+
