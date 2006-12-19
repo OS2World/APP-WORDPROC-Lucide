@@ -1,10 +1,14 @@
 Beta-5:
   - Pipe commands, see readme for details.
-  - Writes into EA thumbnail of first page of document.
+  - Writes into EA thumbnail of first page of document (for eSchemes Deluxe).
   - 'New window' menuitem.
-  - PDF plugin: freetype library updated to version 2.2.1.
+  - PDF plugin: freetype library updated to latest cvs version, (closed
+    ticket #76).
+  - DJVU plugin: handle document load errors.
+  - Added 'print to file' option for postscript output.
   - Optimized unicode conversion, fixes crash in uconv.dll (closed ticket #97).
-  - Remember last selected printer during session (closed ticket #96)
+  - Remember last selected printer during session (closed ticket #96).
+  - Plugin API extension: extended error reporting.
   - Added NLS-files: Italian.
   - Updated NLS-files: Spanish, German...
 
