@@ -1,0 +1,200 @@
+#
+# Lucide language file, CZ
+#
+
+#
+# Main menu
+#
+MENU_DOCUMENT=~Dokument
+MENU_OPEN=~Otevý¡t...\tCtrl+O
+MENU_SAVE_AS=~Ulo§it jako...
+# MENU_PAGE_SETUP: smazat
+MENU_PAGE_SETUP=~Nastaven¡ str nky...
+MENU_PRINT=~Tisk...
+MENU_PLUGINS_LIST=~Seznam modul…...
+MENU_EXIT=~Konec\tCtrl+X
+MENU_EDIT=ép~ravy
+MENU_COPY=~Kop¡rovat\tCtrl+Insert
+MENU_SELECT_ALL=Vybrat ~vçe\tCtrl+/
+MENU_FIND=~Naj¡t...\tCtrl+F
+MENU_FINDAGAIN=Naj¡t ~dalç¡\tCtrl+G
+MENU_SETTINGS=Na~staven¡
+MENU_VIEW=~Zobrazen¡
+MENU_FIT_WINDOW=Pýizp…sobit velikosti o~kna
+MENU_ACTUAL_SIZE=~SkuteŸn  velikost
+MENU_FIT_WIDTH=Pýi~zp…sobit ç¡ýce
+MENU_ZOOM_IN_OUT=Z~vØtçit/zmençit
+MENU_FIRST_PAGE=P~rvn¡ strana
+MENU_PREV_PAGE=Pý~edchoz¡ strana\t-
+MENU_NEXT_PAGE=~Dalç¡ strana\t+
+MENU_LAST_PAGE=P~osledn¡ strana
+MENU_GO_TO_PAGE=J¡t ~na stranu...\tCtrl+N
+MENU_ROTATE_CW=~OtoŸit 90ø doprava
+MENU_ROTATE_CCW=O~toŸit 90ø doleva
+MENU_SHOW_NAV_PANE=~Zobrazit navigaŸn¡ liçtu
+MENU_SINGLE_PAGE=~Jedna strana
+MENU_CONTINUOUS=So~uvisle
+MENU_DOCUMENT_INFO=~Informace o dokumentu...
+MENU_FONTS_INFO=In~formace o p¡smech...
+MENU_WINDOW=~Okno
+MENU_MAXVIEW=~Maximalizovat\tF11
+MENU_FULLSCREEN=~Cel  obrazovka\tCtrl+L
+MENU_HELP=~N povØda
+MENU_PRODUCT_INFORMATION=~Informace o programu
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=Otevý¡t dokument...
+TBHINT_PRINT=Tisk...
+TBHINT_SHOW_NAV_PANE=Zobrazit/skrìt navigaŸn¡ panel
+TBHINT_FIRST_PAGE=Prvn¡ strana
+TBHINT_PREV_PAGE=Pýedchoz¡ strana
+TBHINT_NEXT_PAGE=Dalç¡ strana
+TBHINT_LAST_PAGE=Posledn¡ strana
+TBHINT_ACTUAL_SIZE=SkuteŸn  velikost
+TBHINT_FIT_WINDOW=Pýizp…sobit velikosti okna
+TBHINT_FIT_WIDTH=Pýizp…sobit ç¡ýce
+TBHINT_FIND=Naj¡t...
+TBHINT_FINDAGAIN=Naj¡t znovu
+TBHINT_ZOOM_IN_OUT=ZvØtçit/zmençit
+# toolbar's page number
+TB_PAGENUM=z %d
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=%APPNAME% - Prohl¡§eŸ dokument…
+MSGS_NO_SUIT_PLUG=Pro zvolenì dokument nemohu naj¡t odpov¡daj¡c¡ modul!
+MSGS_FILE_LOAD_ERROR=Chyba pýi Ÿten¡ souboru!
+MSGS_LOADING_DOCUMENT=NaŸ¡t m dokument, Ÿekejte pros¡m...
+MSGS_WARNING=UpozornØn¡!
+MSGS_OVERWRITE_FILE=Soubor ji§ existuje. Pýepsat?
+MSGS_FILE_SAVE_ERROR=Chyba pýi ukl d n¡ souboru!
+MSGS_PAGE=Strana
+MSGS_ERROR_STARTING_BROWSER=Chyba pýi spouçten¡ prohl¡§eŸe!
+
+#
+# "Plugins list" dialog
+#
+PLUGLIST_PLUGINS_LIST=Seznam modul…
+PLUGLIST_CLOSE=~Zavý¡t
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Jm‚no modulu
+PLUGLIST_SUPP_EXTS=Podporovan‚ pý¡pony
+PLUGLIST_PLUGIN_DESC=Popis modulu
+
+#
+# "Font info" dialog
+#
+FONTINFO_FONTINFO=Informace o p¡smech
+FONTINFO_CLOSE=~Zavý¡t
+FONTINFO_ENUMERATING=NaŸ¡t m p¡sma, Ÿekejte pros¡m...
+# List columns titles
+FONTINFO_NAME=Jm‚no
+FONTINFO_TYPE=Typ
+FONTINFO_EMBEDDED=Vlo§enì?
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=Nen¡ vlo§enì
+FONTINFO_EMBED_EMBEDDED=Vlo§enì
+FONTINFO_EMBED_EMBEDDED_SUBSET=¬ st vlo§ena
+
+#
+# "Document info" dialog
+#
+DOCINFO_DOCUMENT_INFO=Informace o dokumentu
+DOCINFO_CLOSE=~Zavý¡t
+# Document info keys
+DOCINFO_TITLE=N zev:
+DOCINFO_FORMAT=Form t:
+DOCINFO_AUTHOR=Autor:
+DOCINFO_SUBJECT=PýedmØt:
+DOCINFO_KEYWORDS=Kl¡Ÿov  slova:
+DOCINFO_CREATOR=Tv…rce:
+DOCINFO_PRODUCER=Producent:
+DOCINFO_CREATION_DATE=Vytvoýeno:
+DOCINFO_MOD_DATE=Upraveno:
+
+#
+# "Find" dialog
+#
+FIND_FIND=Naj¡t
+FIND_FIND_WHAT=~Hledanì text
+FIND_MATCH_CASE=~Rozliçovat mal /velk 
+FIND_OK=~OK
+FIND_CANCEL=~Zruçit
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=Prohled v m stranu %d z %d...
+FIND_NOT_FOUND=Nenalezeno!
+
+#
+# "Progress" dialog
+#
+PDLG_PROGRESS=Pr…bØh
+PDLG_CANCEL=~Zruçit
+
+#
+# About dialog
+#
+AD_ABOUT=O programu
+AD_DESCRIPTION=Modul rn¡ prohl¡§eŸ dokument… podporuj¡c¡ r…zn‚ form ty soubor…
+AD_COPYRIGHTS=(c) Eugene Romanenko, netlabs.org ve spolupr ci se Serenity Systems International
+AD_OK=~OK
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Nastaven¡
+SD_DEFAULT_PAGE_LAYOUT=Standardn¡ rozlo§en¡ ~str nky
+SD_DEFAULT_ZOOM=Standardn¡ ~velikost
+SD_SINGLE_PAGE=Jedna strana
+SD_CONTINUOUS=Souvisle
+SD_OK=~OK
+SD_CANCEL=~Zruçit
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=J¡t na stranu
+GTP_PAGE=Strana
+GTP_OF=z %d
+GTP_OK=~OK
+GTP_CANCEL=~Zruçit
+
+#
+# Print dialog
+#
+PD_TITLE=Tisk
+PD_PRINTER=Tisk rna
+PD_NAME_LABEL=~Jm‚no
+PD_JOB_PROPERTIES=~Vlastnosti £lohy
+PD_DRIVER_LABEL=OvladaŸ
+PD_PRINT_RANGE_AND_COPIES=TiçtØnì ~rozsah a poŸet kopi¡
+PD_RANGE_ALL=~Vçe
+PD_RANGE_CURRENT_PAGE=~Aktu ln¡ strana
+PD_RANGE_PAGES=~Strany
+PD_FROM=~Od
+PD_TO=~Do
+PD_NUMBER_OF_COPIES=~PoŸet kopi¡
+PD_PRINT_TYPE=Typ tisku
+PD_TYPE_POSTSCRIPT=Post~Script
+PD_TYPE_ASIMAGE=Jako ~obr zek
+PD_HIGHER_IMAGE_QUALITY=~KvalitnØjç¡ obraz (pomalejç¡ a vyçç¡ pamØœov‚ n roky)
+PD_PAGE_ORIENTATION=Orientace str nky
+PD_PORTRAIT=Portr‚t
+PD_LANDSCAPE=Krajina
+PD_MARGINS=Okraje (mm)
+PD_MLEFT=Levì
+PD_MRIGHT=Pravì
+PD_MTOP=Horn¡
+PD_MBOTTOM=Spodn¡
+PD_SELECTED_FORM=Vybranì formul ý
+PD_BTNPRINT=~Tisk
+PD_BTNCANCEL=~Zruçit
+PD_WRONG_MARGINS=Chybn‚ okraje!
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=Tisknu stranu %d (%d z %d)...
+PRINT_GENERATING_POSTSCRIPT=Generuji soubor ve form tu PostScript...
+PRINT_SPOOLING_POSTSCRIPT=Pýed v m data pro PostScript...
+PRINT_FAILED=Chyba pýi tisku!
+

@@ -9,7 +9,7 @@ Beta-5:
   - Optimized unicode conversion, fixes crash in uconv.dll (closed ticket #97).
   - Remember last selected printer during session (closed ticket #96).
   - Plugin API extension: extended error reporting.
-  - Added NLS-files: Italian.
+  - Added NLS-files: Italian, Czech.
   - Updated NLS-files: Spanish, German...
 
 Beta-4:
