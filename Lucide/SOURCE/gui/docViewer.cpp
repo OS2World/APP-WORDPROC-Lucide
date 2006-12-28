@@ -52,6 +52,9 @@
 #include "messages.h"
 
 
+// ASYNCH_RENDER_ENABLE, normally must be defined
+#define ASYNCH_RENDER_ENABLE
+
 typedef LuDocument_LuRectSequence    *PLuRectSequence;
 typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 
@@ -219,7 +222,11 @@ void DocumentViewer::setDocument( LuDocument *_doc )
             enableAsynchDraw = false;
         }
         else {
+#ifdef ASYNCH_RENDER_ENABLE
             enableAsynchDraw = doc->isAsynchRenderingSupported( ev );
+#else
+            enableAsynchDraw = false;
+#endif
         }
         goToPage( 0 );
     }

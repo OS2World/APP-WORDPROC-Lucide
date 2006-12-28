@@ -54,15 +54,6 @@
 #include "lupixbuf.xih"
 
 
-
-/*
- * SOM_Scope void SOMLINK LuPixbufInit(LuPixbuf *somSelf,  Environment *ev,
- *                                     somInitCtrl* ctrl, long w, long h)
- */
-
-/*
- * The prototype for LuPixbufInit was replaced by the following prototype:
- */
 SOM_Scope void SOMLINK LuPixbufInit(LuPixbuf *somSelf,  Environment *ev, 
                                     somInitCtrl* ctrl, long w, 
                                     long h, short bpp)
