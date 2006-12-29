@@ -24,6 +24,32 @@
 
 // NEUQUANT Neural-Net quantization algorithm by Anthony Dekker
 
+#define FI_RGBA_RED             2
+#define FI_RGBA_GREEN           1
+#define FI_RGBA_BLUE            0
+
+// ----------------------------------------------------------------
+// Constant definitions
+// ----------------------------------------------------------------
+
+#define netbiasshift    4
+#define ncycles         100
+#define intbiasshift    16
+#define intbias         (((int)1) << intbiasshift)
+#define gammashift      10
+#define betashift       10
+#define beta            (intbias >> betashift)
+#define betagamma       (intbias << (gammashift-betashift))
+#define radiusbiasshift 6
+#define radiusbias      (((int)1) << radiusbiasshift)
+#define radiusdec       30
+#define alphabiasshift  10
+#define initalpha       (((int)1) << alphabiasshift)
+#define radbiasshift    8
+#define radbias         (((int)1) << radbiasshift)
+#define alpharadbshift  (alphabiasshift+radbiasshift)
+#define alpharadbias    (((int)1) << alpharadbshift)
+
 
 class LuPixbuf;
 
@@ -100,5 +126,25 @@ class NeuQuantizer
             return network;
         }
 };
+
+/**
+ Get a pixel sample at position pos. Handle 4-byte boundary alignment.
+ @param pos pixel position in a WxHxbpp pixel buffer
+ @param b blue pixel component
+ @param g green pixel component
+ @param r red pixel component
+*/
+inline void NeuQuantizer::getSample(long pos, int *b, int *g, int *r)
+{
+    // get equivalent pixel coordinates
+    int x = pos % img_line;
+    int y = pos / img_line;
+
+    unsigned char *bpos = pixbits + ( ( y * img_line_len ) + x );
+
+    *b = bpos[FI_RGBA_BLUE] << netbiasshift;
+    *g = bpos[FI_RGBA_GREEN] << netbiasshift;
+    *r = bpos[FI_RGBA_RED] << netbiasshift;
+}
 
 #endif // __NEUQUANT_H

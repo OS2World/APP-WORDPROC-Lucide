@@ -25,32 +25,6 @@
 #include "neuquant.h"
 #include "globals.h"
 
-#define FI_RGBA_RED             2
-#define FI_RGBA_GREEN           1
-#define FI_RGBA_BLUE            0
-
-// ----------------------------------------------------------------
-// Constant definitions
-// ----------------------------------------------------------------
-
-static const int netbiasshift = 4;
-static const int ncycles = 100;
-static const int intbiasshift = 16;
-static const int intbias = (((int)1) << intbiasshift);
-static const int gammashift = 10;
-static const int betashift = 10;
-static const int beta = (intbias >> betashift);
-static const int betagamma = (intbias << (gammashift-betashift));
-static const int radiusbiasshift = 6;
-static const int radiusbias = (((int)1) << radiusbiasshift);
-static const int radiusdec = 30;
-static const int alphabiasshift = 10;
-static const int initalpha = (((int)1) << alphabiasshift);
-static const int radbiasshift = 8;
-static const int radbias = (((int)1) << radbiasshift);
-static const int alpharadbshift = (alphabiasshift+radbiasshift);
-static const int alpharadbias = (((int)1) << alpharadbshift);
-
 
 // Four primes near 500 - assume no image has a length so large
 // that it is divisible by all four primes
@@ -370,26 +344,6 @@ void NeuQuantizer::alterneigh(int rad, int i, int b, int g, int r)
 /////////////////////
 // Main Learning Loop
 // ------------------
-
-/**
- Get a pixel sample at position pos. Handle 4-byte boundary alignment.
- @param pos pixel position in a WxHxbpp pixel buffer
- @param b blue pixel component
- @param g green pixel component
- @param r red pixel component
-*/
-void NeuQuantizer::getSample(long pos, int *b, int *g, int *r)
-{
-    // get equivalent pixel coordinates
-    int x = pos % img_line;
-    int y = pos / img_line;
-
-    unsigned char *bpos = pixbits + ( ( y * img_line_len ) + x );
-
-    *b = bpos[FI_RGBA_BLUE] << netbiasshift;
-    *g = bpos[FI_RGBA_GREEN] << netbiasshift;
-    *r = bpos[FI_RGBA_RED] << netbiasshift;
-}
 
 void NeuQuantizer::learn(int sampling_factor)
 {
