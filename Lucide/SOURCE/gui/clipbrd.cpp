@@ -45,7 +45,8 @@
 #include "cpconv.h"
 
 
-#define kUnicodeMime "text/unicode"
+#define kUnicodeMimeMozilla "text/unicode"
+#define kUnicodeMimeOdin    "Odin32 UnicodeText"
 
 inline ULONG RegisterClipboardFormat(PCSZ pcszFormat)
 {
@@ -58,7 +59,8 @@ inline ULONG RegisterClipboardFormat(PCSZ pcszFormat)
 
 void initClipbrd()
 {
-    RegisterClipboardFormat( kUnicodeMime );
+    RegisterClipboardFormat( kUnicodeMimeMozilla );
+    RegisterClipboardFormat( kUnicodeMimeOdin );
 }
 
 
@@ -97,7 +99,7 @@ void textToClipbrd( HAB hab, const char *text )
         void *shmemuni = NULL;
         void *shmemsys = NULL;
 
-        // place to clipboard as unicode
+        // place to clipboard as unicode for Odin
         if ( DosAllocSharedMem( &shmemuni, NULL, olen, fALLOCSHR ) == 0 )
         {
             memset( shmemuni, 0, olen );
@@ -108,8 +110,16 @@ void textToClipbrd( HAB hab, const char *text )
             void *memuni = (void *)new char[ olen ];
             memcpy( memuni, shmemuni, olen );
 
-            ULONG ulFormatID = RegisterClipboardFormat( kUnicodeMime );
+            ULONG ulFormatID = RegisterClipboardFormat( kUnicodeMimeOdin );
             WinSetClipbrdData( hab, (ULONG)shmemuni, ulFormatID, CFI_POINTER );
+
+            // place to clipboard as unicode for Mozilla
+            if ( DosAllocSharedMem( &shmemuni, NULL, olen, fALLOCSHR ) == 0 )
+            {
+                memcpy( shmemuni, memuni, olen );
+                ulFormatID = RegisterClipboardFormat( kUnicodeMimeMozilla );
+                WinSetClipbrdData( hab, (ULONG)shmemuni, ulFormatID, CFI_POINTER );
+            }
 
             int liglen = uniLigaturesLength( (UniChar *)memuni );
             if ( liglen > 0 )  // string contain ligature(s)
