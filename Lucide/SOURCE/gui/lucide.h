@@ -60,6 +60,7 @@ class Lucide
     
 		static ProgressDlg *loadProgressDlg;
 		static char docFullName[ CCHMAXPATH ];
+		static char *password;
 		static bool docLoaded;
 		static long loadErrorCode;
 		static char *loadError;

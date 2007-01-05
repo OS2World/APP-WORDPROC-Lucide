@@ -214,3 +214,10 @@ PRINT_GENERATING_POSTSCRIPT=Генерация postscript-файла...
 PRINT_SPOOLING_POSTSCRIPT=Отправка postscript-данных...
 PRINT_FAILED=Ошибка печати!
 
+#
+# Password dialog
+#
+PSW_TITLE=Документ зашифрован!
+PSW_PASSWORD=~Пароль
+PSW_OK=ОК
+PSW_CANCEL=Отказ

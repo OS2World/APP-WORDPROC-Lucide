@@ -159,5 +159,8 @@
 #define IDC_MBOTTOM			30
 #define IDC_SELECTED_FORM	31
 
+#define IDD_PASSWORD        1009
+#define IDC_PASSWORD        10
+
 
 #endif // __LUCIDE_RES_H

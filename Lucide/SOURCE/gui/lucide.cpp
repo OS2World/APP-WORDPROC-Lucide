@@ -54,6 +54,7 @@
 #include "printDlg.h"
 #include "progressDlg.h"
 #include "settingsDlg.h"
+#include "passwordDlg.h"
 #include "docViewer.h"
 #include "indexWindow.h"
 #include "lusettings.h"
@@ -104,6 +105,7 @@ bool         Lucide::isFullscreen                  = false;
 LuWindowPos  Lucide::winPos                        = {0};
 char         Lucide::docFullName[ CCHMAXPATH ]     = "";
 char         Lucide::docFileName[ CCHMAXPATHCOMP ] = "";
+char        *Lucide::password                      = NULL;
 // static data for asynch loading document
 ProgressDlg *Lucide::loadProgressDlg               = NULL;
 bool         Lucide::docLoaded                     = false;;
@@ -355,12 +357,12 @@ void Lucide::closeDocument()
     }
 }
 
-void Lucide::loadthread( void *p )
+void Lucide::loadthread( void* )
 {
     HAB thab = WinInitialize( 0 );
     HMQ thmq = WinCreateMsgQueue( thab, 0 );
 
-    docLoaded = doc->loadFile( ev, docFullName, NULL, &loadErrorCode, &loadError );
+    docLoaded = doc->loadFile( ev, docFullName, password, &loadErrorCode, &loadError );
     if ( docLoaded ) {
         if ( doc->isCreateFileThumbnail( ev ) && isThumbNeeded( docFullName ) ) {
             loadProgressDlg->setText( getLocalizedString( MSGS_CREATING_THUMBNAIL ).c_str() );
@@ -380,7 +382,8 @@ void Lucide::loadDocument( const char *fn )
 
     // find extension
     char *ext = strrchr( fn, '.' );
-    if ( ext == NULL ) {
+    if ( ext == NULL )
+    {
         WinMessageBox( HWND_DESKTOP, hWndFrame, msg,
                        NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
     }
@@ -397,103 +400,129 @@ void Lucide::loadDocument( const char *fn )
             closeDocument();
 
             doc = pluginMan->createDocumentForExt( ext + 1, false );
-            if ( doc == NULL ) {
+            if ( doc == NULL )
+            {
                 WinMessageBox( HWND_DESKTOP, hWndFrame, msg,
                                NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
             }
             else
             {
                 strcpy( docFullName, fn );
-                docLoaded = false;;
-                loadError = NULL;
-
-                // Load document asynchronously
-                loadProgressDlg = new ProgressDlg( hWndFrame );
-                char *ldmsg = newstrdupL( MSGS_LOADING_DOCUMENT );
-                loadProgressDlg->setText( ldmsg );
-                delete ldmsg;
-                loadProgressDlg->show( loadthread, NULL ); // doc will be loaded
-                delete loadProgressDlg;
-
-                if ( docLoaded )
-                {
-                    char *t = new char[ 2048 ];
-                    char _fn[ _MAX_FNAME ];
-                    char _ex[ _MAX_EXT ];
-                    _splitpath( fn, NULL, NULL, _fn, _ex );
-                    strcpy( docFileName, _fn );
-                    strcat( docFileName, _ex );
-                    snprintf( t, 2048, "%s - %s", docFileName, title );
-                    WinSetWindowText( hWndFrame, t );
-                    delete t;
-                    setDocument( doc );
+                if ( password != NULL ) {
+                    delete password;
+                    password = NULL;
                 }
-                else
+                bool once = true;
+                while ( once || ( password != NULL ) )
                 {
-                    if ( loadErrorCode == LU_LDERR_NO_ERROR )
+                    once = false;
+                    docLoaded = false;
+                    loadError = NULL;
+
+                    // Load document asynchronously
+                    loadProgressDlg = new ProgressDlg( hWndFrame );
+                    char *ldmsg = newstrdupL( MSGS_LOADING_DOCUMENT );
+                    loadProgressDlg->setText( ldmsg );
+                    delete ldmsg;
+                    loadProgressDlg->show( loadthread, NULL ); // doc will be loaded
+                    delete loadProgressDlg;
+
+                    if ( password != NULL ) {
+                        delete password;
+                        password = NULL;
+                    }
+
+                    if ( docLoaded )
                     {
-                        char *m = newstrdupL( MSGS_FILE_LOAD_ERROR );
-                        WinMessageBox( HWND_DESKTOP, hWndFrame, m,
-                                       NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
-                        delete m;
+                        char *t = new char[ 2048 ];
+                        char _fn[ _MAX_FNAME ];
+                        char _ex[ _MAX_EXT ];
+                        _splitpath( fn, NULL, NULL, _fn, _ex );
+                        strcpy( docFileName, _fn );
+                        strcat( docFileName, _ex );
+                        snprintf( t, 2048, "%s - %s", docFileName, title );
+                        WinSetWindowText( hWndFrame, t );
+                        delete t;
+                        setDocument( doc );
                     }
                     else
                     {
-                        std::string msgTempl = getLocalizedString( MSGS_LDERR );
-
-                        const int errmsgLen = 1024;
-                        char *errmsg = new char[ errmsgLen ];
-                        memset( errmsg, 0, errmsgLen );
-
-                        if ( loadErrorCode == LU_LDERR_CUSTOM )
+                        if ( loadErrorCode == LU_LDERR_NO_ERROR )
                         {
-                            snprintf( errmsg, errmsgLen, msgTempl.c_str(), loadError );
-                            SOMFree( loadError );
+                            char *m = newstrdupL( MSGS_FILE_LOAD_ERROR );
+                            WinMessageBox( HWND_DESKTOP, hWndFrame, m,
+                                           NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
+                            delete m;
                         }
                         else
                         {
-                            const char *lmsg = NULL;
-                            switch ( loadErrorCode )
+                            std::string msgTempl = getLocalizedString( MSGS_LDERR );
+
+                            const int errmsgLen = 1024;
+                            char *errmsg = new char[ errmsgLen ];
+                            memset( errmsg, 0, errmsgLen );
+
+                            if ( loadErrorCode == LU_LDERR_CUSTOM )
                             {
-                                case LU_LDERR_OUT_OF_MEMORY:
-                                    lmsg = MSGS_LDERR_OUT_OF_MEMORY;
-                                    break;
-                                case LU_LDERR_OPEN_ERROR:
-                                    lmsg = MSGS_LDERR_OPEN_ERROR;
-                                    break;
-                                case LU_LDERR_READ_ERROR:
-                                    lmsg = MSGS_LDERR_READ_ERROR;
-                                    break;
-                                case LU_LDERR_DAMAGED:
-                                    lmsg = MSGS_LDERR_DAMAGED;
-                                    break;
-                                case LU_LDERR_WRONG_FORMAT:
-                                    lmsg = MSGS_LDERR_WRONG_FORMAT;
-                                    break;
-                                case LU_LDERR_ENCRYPTED:
-                                    lmsg = MSGS_LDERR_ENCRYPTED;
-                                    break;
+                                snprintf( errmsg, errmsgLen, msgTempl.c_str(), loadError );
+                                SOMFree( loadError );
+                            }
+                            else
+                            {
+                                const char *lmsg = NULL;
+                                switch ( loadErrorCode )
+                                {
+                                    case LU_LDERR_OUT_OF_MEMORY:
+                                        lmsg = MSGS_LDERR_OUT_OF_MEMORY;
+                                        break;
+                                    case LU_LDERR_OPEN_ERROR:
+                                        lmsg = MSGS_LDERR_OPEN_ERROR;
+                                        break;
+                                    case LU_LDERR_READ_ERROR:
+                                        lmsg = MSGS_LDERR_READ_ERROR;
+                                        break;
+                                    case LU_LDERR_DAMAGED:
+                                        lmsg = MSGS_LDERR_DAMAGED;
+                                        break;
+                                    case LU_LDERR_WRONG_FORMAT:
+                                        lmsg = MSGS_LDERR_WRONG_FORMAT;
+                                        break;
+                                    case LU_LDERR_ENCRYPTED:
+                                        {
+                                            lmsg = MSGS_LDERR_ENCRYPTED;
+
+                                            PasswordDlg *pd = new PasswordDlg( hWndFrame );
+                                            if ( pd->showDialog() == DID_OK ) {
+                                                password = newstrdup( pd->getPassword() );
+                                            }
+                                            delete pd;
+                                        }
+                                        break;
+                                }
+
+                                if ( lmsg != NULL ) {
+                                    snprintf( errmsg, errmsgLen, msgTempl.c_str(),
+                                              getLocalizedString( lmsg ).c_str() );
+                                }
                             }
 
-                            if ( lmsg != NULL ) {
-                                snprintf( errmsg, errmsgLen, msgTempl.c_str(),
-                                          getLocalizedString( lmsg ).c_str() );
+                            if ( password == NULL )
+                            {
+                                WinMessageBox( HWND_DESKTOP, hWndFrame, errmsg, NULL, 0,
+                                               MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
                             }
+                            delete errmsg;
+                        } // ( loadErrorCode == LU_LDERR_NO_ERROR )
+
+                        if ( password == NULL ) {
+                            delete doc;
+                            doc = NULL;
                         }
-
-                        WinMessageBox( HWND_DESKTOP, hWndFrame, errmsg,
-                                       NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
-                        delete errmsg;
-                    }
-
-                    delete doc;
-                    doc = NULL;
-                }
-            }
-
-        }
-
-    }
+                    } // ( docLoaded )
+                } // while ( once || ( password != NULL ) )
+            } // ( doc == NULL )
+        } // ( pluginMan->createDocumentForExt( ext + 1, true ) == NULL )
+    } // ( ext == NULL )
     delete msg;
 }
 
@@ -768,7 +797,7 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                 case CM_PRINT:
                 {
                     PrintDlg *d = new PrintDlg( hWndFrame, doc, Lucide::docFileName, docViewer->getCurrentPage() + 1 );
-                    if ( d->showDialog() == DID_OK ) 
+                    if ( d->showDialog() == DID_OK )
                     {
                         // print
                         PrintSetup *p = new PrintSetup;

@@ -213,3 +213,10 @@ PRINT_GENERATING_POSTSCRIPT=Generating postscript file...
 PRINT_SPOOLING_POSTSCRIPT=Spooling postscript data...
 PRINT_FAILED=Print failed!
 
+#
+# Password dialog
+#
+PSW_TITLE=Document is encrypted!
+PSW_PASSWORD=~Password
+PSW_OK=~OK
+PSW_CANCEL=~Cancel

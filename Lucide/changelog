@@ -8,6 +8,7 @@ Beta-5:
   - Added 'print to file' option for postscript output.
   - Optimized unicode conversion, fixes crash in uconv.dll (closed ticket #97).
   - Remember last selected printer during session (closed ticket #96).
+  - Ask for password, if document password-protected.
   - Plugin API extension: extended error reporting.
   - Copy unicode text to clipboard in OpenOffice.org compatible format.
   - Added NLS-files: Italian, Czech, Russian.
