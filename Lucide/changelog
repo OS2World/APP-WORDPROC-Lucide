@@ -11,8 +11,9 @@ Beta-5:
   - Ask for password, if document password-protected.
   - Plugin API extension: extended error reporting.
   - Copy unicode text to clipboard in OpenOffice.org compatible format.
+  - Speedup for 'As Image' printing.
   - Added NLS-files: Italian, Czech, Russian.
-  - Updated NLS-files: Spanish, German...
+  - Updated NLS-files: Spanish, German, French.
 
 Beta-4:
   - Added 'Zoom In/Out' button to zoom in/out with mouse click/ctrl+click.

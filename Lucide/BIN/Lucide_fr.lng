@@ -1,116 +1,133 @@
 #
-# Lucide language file, EN
+# Lucide language file, FR
+# Fichier de langue de Lucide, FR
 #
 
 #
 # Main menu
 #
 MENU_DOCUMENT=~Document
-MENU_OPEN=Ouvrir...\tCtrl+O
-MENU_SAVE_AS=Enregistrer sous...
-MENU_PAGE_SETUP=Mise en page...
-MENU_PRINT=Imprimer...
-MENU_DOCUMENT_INFO=Info. sur le document...
-MENU_FONTS_INFO=Info. sur les polices...
-MENU_PLUGINS_LIST=Composants enfichables...
-MENU_EXIT=Quitter\tCtrl+X
+MENU_OPEN=~Ouvrir...\tCtrl+O
+MENU_SAVE_AS=~Enregistrer sous...
+MENU_EXPORT_TO_PS=E~xporter en PostScript...
+MENU_PAGE_SETUP=Mise en ~page...
+MENU_PRINT=~Imprimer...
+MENU_PLUGINS_LIST=~Composants enfichables...
+MENU_EXIT=~Quitter\tCtrl+X
 MENU_EDIT=~êdition
-MENU_COPY=Copier\tCtrl+Insert
-MENU_SELECT_ALL=SÇlectionner tout\tCtrl+/
-MENU_FIND=Rechercher...\tCtrl+F
-MENU_FINDAGAIN=Poursuivre la recherche\tCtrl+G
-MENU_FIRST_PAGE=Premiäre page
-MENU_PREV_PAGE=Page prÇcÇdente\t-
-MENU_NEXT_PAGE=Page suivante\t+
-MENU_LAST_PAGE=Derniäre page
-MENU_GO_TO_PAGE=Aller Ö la page...\tCtrl+N
+MENU_COPY=~Copier\tCtrl+Insert
+MENU_SELECT_ALL=~SÇlectionner tout\tCtrl+/
+MENU_FIND=~Rechercher...\tCtrl+F
+MENU_FINDAGAIN=~Poursuivre la recherche\tCtrl+G
+MENU_SETTINGS=Para~mätres
 MENU_VIEW=~Affichage
-MENU_FIT_WINDOW=Adapter Ö la fenàtre
-MENU_ACTUAL_SIZE=Taille rÇelle
-MENU_FIT_WIDTH=Largeur de la page
-MENU_ROTATE_CW=Rotation de 90¯ vers la droite
-MENU_ROTATE_CCW=Rotation de 90¯ vers la gauche
-MENU_SINGLE_PAGE=Page simple
-MENU_CONTINUOUS=Continu
+MENU_FIT_WINDOW=Adapter Ö la ~fenàtre
+MENU_ACTUAL_SIZE=~Taille rÇelle
+MENU_FIT_WIDTH=~Largeur de la page
+MENU_ZOOM_IN_OUT=~Zoom +/-
+MENU_FIRST_PAGE=~Premiäre page
+MENU_PREV_PAGE=Page p~rÇcÇdente\t-
+MENU_NEXT_PAGE=Page ~suivante\t+
+MENU_LAST_PAGE=~Derniäre page
+MENU_GO_TO_PAGE=~Aller Ö la page...\tCtrl+N
+MENU_ROTATE_CW=Rotation de 90¯ vers la dr~oite
+MENU_ROTATE_CCW=Rotation de 90¯ vers la ~gauche
+MENU_SHOW_NAV_PANE=Afficher le panneau de ~navigation
+MENU_SINGLE_PAGE=Page ~simple
+MENU_CONTINUOUS=En ~continu
+MENU_DOCUMENT_INFO=~Info. sur le document...
+MENU_FONTS_INFO=I~nfo. sur les ~polices...
 MENU_WINDOW=~Fenàtres
-MENU_SHOW_NAV_PANE=Afficher le panneau de navigation
-MENU_FULLSCREEN=Plein Çcran\tCtrl+L
+MENU_MAXVIEW=~Agrandissement\tF11
+MENU_FULLSCREEN=~Plein Çcran\tCtrl+L
 MENU_HELP=~Aide
-MENU_PRODUCT_INFORMATION=Info. produit
+MENU_PRODUCT_INFORMATION=Info. ~produit
 
 #
 # Toolbar hints
 #
-TBHINT_OPEN=Ouverture d'un document...
-TBHINT_PRINT=Impression...
+TBHINT_OPEN=Ouverture d'un document
+TBHINT_PRINT=Lancement des options d'impression
 TBHINT_SHOW_NAV_PANE=Affichage/Masquage du panneau de navigation
-TBHINT_FIRST_PAGE=Premiäre page
-TBHINT_PREV_PAGE=Page prÇcÇdente
-TBHINT_NEXT_PAGE=Page suivante
-TBHINT_LAST_PAGE=Derniäre page
-TBHINT_ACTUAL_SIZE=Taille rÇelle
-TBHINT_FIT_WINDOW=Adaptation Ö la fenàtre
-TBHINT_FIT_WIDTH=Adaptation Ö la largeur
-TBHINT_FIND=Recherche...
-#? TBHINT_FINDAGAIN=Find again
+TBHINT_FIRST_PAGE=DÇplacement jusqu'Ö la premiäre page
+TBHINT_PREV_PAGE=Retour Ö la page prÇcÇdente
+TBHINT_NEXT_PAGE=Passage Ö la page suivante
+TBHINT_LAST_PAGE=DÇplacement jusqu'Ö la derniäre page
+TBHINT_ACTUAL_SIZE=Page en taille rÇelle
+TBHINT_FIT_WINDOW=Adaptation de la page Ö la fenàtre
+TBHINT_FIT_WIDTH=Adaptation de la page Ö la largeur
+TBHINT_FIND=Lancement de la recherche...
+TBHINT_FINDAGAIN=Poursuite de la recherche
+TBHINT_ZOOM_IN_OUT=Agrandissement/diminution de la vue
 # toolbar's page number
 TB_PAGENUM=sur %d
 
 #
 # Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=%APPNAME% - Afficheur de document
-MSGS_NO_SUIT_PLUG=Composant enfichable introuvable pour le document indiquÇ ! 
+MSGS_MAIN_WIN_TITLE=Lucide - Afficheur de document
+MSGS_NO_SUIT_PLUG=Composant enfichable introuvable pour le document indiquÇ !
 MSGS_FILE_LOAD_ERROR=Erreur de chargement de fichier ! 
+MSGS_LOADING_DOCUMENT=Chargement du document en cours, veuillez patienter...
+MSGS_WARNING=Avertissement ! 
+MSGS_OVERWRITE_FILE=Le fichier existe dÇjÖ. RÇÇcrire ?
+MSGS_FILE_SAVE_ERROR=Erreur Ö la sauvegarde du fichier !
+MSGS_PAGE=Page
+MSGS_ERROR_STARTING_BROWSER=Erreur au lancement du navigateur ! 
 
 #
 # "Plugins list" dialog
 #
 PLUGLIST_PLUGINS_LIST=Liste des composants enfichables
-PLUGLIST_CLOSE=Fermer
+PLUGLIST_CLOSE=~Fermer
 # List columns titles
-PLUGLIST_PLUGIN_NAME=Nom du composant
-PLUGLIST_SUPP_EXTS=Extensions prises en charge
-PLUGLIST_PLUGIN_DESC=Description du composant
+PLUGLIST_PLUGIN_NAME=Nom
+PLUGLIST_SUPP_EXTS=Extensions
+PLUGLIST_PLUGIN_DESC=Description
 
 #
 # "Font info" dialog
 #
 FONTINFO_FONTINFO=Information sur les polices
-FONTINFO_CLOSE=Fermer
+FONTINFO_CLOSE=~Fermer
 FONTINFO_ENUMERATING=ênumÇration des polices, veuillez patienter...
 # List columns titles
 FONTINFO_NAME=Nom
 FONTINFO_TYPE=Type
-FONTINFO_EMBEDDED=EmbarquÇe ?
+FONTINFO_EMBEDDED=IntrÇgrÇe ? 
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=Non
+FONTINFO_EMBED_EMBEDDED=Oui
+FONTINFO_EMBED_EMBEDDED_SUBSET=Sous-ensemble
 
 #
 # "Document info" dialog
 #
 DOCINFO_DOCUMENT_INFO=Informations sur le document
-DOCINFO_CLOSE=Fermer
+DOCINFO_CLOSE=~Fermer
 # Document info keys
-DOCINFO_TITLE=Titre : 
-DOCINFO_FORMAT=Format : 
-DOCINFO_AUTHOR=Auteur : 
-DOCINFO_SUBJECT=Sujet : 
-DOCINFO_KEYWORDS=Mots-clÇs : 
-DOCINFO_CREATOR=Createur : 
-DOCINFO_PRODUCER=Producter : 
-DOCINFO_CREATION_DATE=CrÇÇ le : 
-DOCINFO_MOD_DATE=ModifiÇ le : 
+DOCINFO_TITLE=Titre :
+DOCINFO_FORMAT=Format :
+DOCINFO_AUTHOR=Auteur :
+DOCINFO_SUBJECT=Sujet :
+DOCINFO_KEYWORDS=Mots-clÇs :
+DOCINFO_CREATOR=Createur :
+DOCINFO_PRODUCER=Producteur :
+DOCINFO_CREATION_DATE=CrÇÇ le :
+DOCINFO_MOD_DATE=ModifiÇ le :
 
 #
 # "Find" dialog
 #
 FIND_FIND=Recherche
-FIND_FIND_WHAT=~Quoi chercher
+FIND_FIND_WHAT=~Quoi chercher :
 FIND_MATCH_CASE=~Respecter la casse
 FIND_OK=~OK
 FIND_CANCEL=~Annuler
 # other 'find'-related messages
 FIND_SEARCH_PAGE_OF=Recherche : page %d sur %d...
-FIND_NOT_FOUND=Non trouvÇ ! 
+FIND_NOT_FOUND=Non trouvÇ !
+
 
 #
 # "Progress" dialog
@@ -118,8 +135,69 @@ FIND_NOT_FOUND=Non trouvÇ !
 PDLG_PROGRESS=êtat d'avancement
 PDLG_CANCEL=~Annuler
 
+
 #
 # About dialog
 #
-AD_ABOUT=Infos produit
-AD_OK=OK
+AD_ABOUT=Informations sur le produit
+AD_DESCRIPTION=Afficheur de documents basÇ sur des composants enfichables prenant en charge divers formats de fichiers
+AD_COPYRIGHTS=(c) par Eugene Romanenko, netlabs.org en coopÇration avec Serenity Systems International
+AD_OK=~OK
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Paramätres
+SD_DEFAULT_PAGE_LAYOUT=Mise en ~page par dÇfaut
+SD_DEFAULT_ZOOM=~Zoom par dÇfaut
+SD_SINGLE_PAGE=Page simple
+SD_CONTINUOUS=En continu
+SD_OK=~OK
+SD_CANCEL=~Annuler
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=Aller Ö la page
+GTP_PAGE=Page
+GTP_OF=sur %d
+GTP_OK=~OK
+GTP_CANCEL=~Annuler
+
+#
+# Print dialog
+#
+PD_TITLE=Impression
+PD_PRINTER=Imprimante
+PD_NAME_LABEL=~Nom
+PD_JOB_PROPERTIES=Paramätre du ~travail
+PD_DRIVER_LABEL=Pilote
+PD_PRINT_RANGE_AND_COPIES=ê~tendue et nombre de copies
+PD_RANGE_ALL=T~outes
+PD_RANGE_CURRENT_PAGE=Page en co~urs
+PD_RANGE_PAGES=Pa~ges
+PD_FROM=~De
+PD_TO=~Ö
+PD_NUMBER_OF_COPIES=Nombre de ~copies
+PD_PRINT_TYPE=Type d'imprimante
+PD_TYPE_POSTSCRIPT=Post~script
+PD_TYPE_ASIMAGE=Comme ~image
+PD_HIGHER_IMAGE_QUALITY=Image en ~haute qualitÇ (plus lent et nÇcessite plus de mÇmoire)
+PD_PAGE_ORIENTATION=Orientation de la page
+PD_PORTRAIT=Portrait
+PD_LANDSCAPE=Paysage
+PD_MARGINS=Marges (mm)
+PD_MLEFT=Gauche
+PD_MRIGHT=Droite
+PD_MTOP=Haut
+PD_MBOTTOM=Bas
+PD_SELECTED_FORM=SÇlection du formulaire
+PD_BTNPRINT=Im~primer
+PD_BTNCANCEL=~Annuler
+PD_WRONG_MARGINS=Marges icorrectes ! 
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=Impression de la page %d (%d sur %d)...
+PRINT_GENERATING_POSTSCRIPT=GÇnÇration du fichier postscript...
+PRINT_SPOOLING_POSTSCRIPT=Mise en file des donnÇes postscript...
+PRINT_FAILED=êchec Ö l'impression ! 
+
