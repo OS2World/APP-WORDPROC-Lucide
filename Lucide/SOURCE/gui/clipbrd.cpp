@@ -44,24 +44,7 @@
 #include <stdio.h>
 #include "cpconv.h"
 
-
-#define kUnicodeMimeMozilla "text/unicode"
-#define kUnicodeMimeOdin    "Odin32 UnicodeText"
-
-inline ULONG RegisterClipboardFormat(PCSZ pcszFormat)
-{
-    ATOM atom = WinFindAtom(WinQuerySystemAtomTable(), pcszFormat);
-    if (!atom) {
-        atom = WinAddAtom(WinQuerySystemAtomTable(), pcszFormat);
-    }
-    return atom;
-}
-
-void initClipbrd()
-{
-    RegisterClipboardFormat( kUnicodeMimeMozilla );
-    RegisterClipboardFormat( kUnicodeMimeOdin );
-}
+#include "UClip.h"
 
 
 void textToClipbrd( HAB hab, const char *text )
@@ -89,9 +72,9 @@ void textToClipbrd( HAB hab, const char *text )
     size_t len = 0;
     size_t olen = 0;
 
-    if ( WinOpenClipbrd( hab ) )
+    if ( UWinOpenClipbrd( hab ) )
     {
-        WinEmptyClipbrd( hab );
+        UWinEmptyClipbrd( hab );
 
         size_t cSubs = 0;
         len = strlen( text );
@@ -110,16 +93,7 @@ void textToClipbrd( HAB hab, const char *text )
             void *memuni = (void *)new char[ olen ];
             memcpy( memuni, shmemuni, olen );
 
-            ULONG ulFormatID = RegisterClipboardFormat( kUnicodeMimeOdin );
-            WinSetClipbrdData( hab, (ULONG)shmemuni, ulFormatID, CFI_POINTER );
-
-            // place to clipboard as unicode for Mozilla
-            if ( DosAllocSharedMem( &shmemuni, NULL, olen, fALLOCSHR ) == 0 )
-            {
-                memcpy( shmemuni, memuni, olen );
-                ulFormatID = RegisterClipboardFormat( kUnicodeMimeMozilla );
-                WinSetClipbrdData( hab, (ULONG)shmemuni, ulFormatID, CFI_POINTER );
-            }
+            UWinSetClipbrdData( hab, (ULONG)shmemuni, UCLIP_CF_UNICODETEXT, CFI_POINTER );
 
             int liglen = uniLigaturesLength( (UniChar *)memuni );
             if ( liglen > 0 )  // string contain ligature(s)
@@ -143,12 +117,12 @@ void textToClipbrd( HAB hab, const char *text )
                 void *tmpsys = shmemsys;
                 UniUconvFromUcs( objtosys, &tmpuni, &unilen, &tmpsys, &olen, &cSubs );
 
-                WinSetClipbrdData( hab, (ULONG)shmemsys, CF_TEXT, CFI_POINTER );
+                UWinSetClipbrdData( hab, (ULONG)shmemsys, UCLIP_CF_TEXT, CFI_POINTER );
             }
             delete memuni;
         }
 
-        WinCloseClipbrd( hab );
+        UWinCloseClipbrd( hab );
     }
 
     UniFreeUconvObject( objtouni );
