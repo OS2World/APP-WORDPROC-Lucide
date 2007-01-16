@@ -53,7 +53,6 @@
 #include "print.h"
 #include "luutils.h"
 #include "messages.h"
-#include "neuquant.h"
 
 
 #ifndef DEVESC_ERROR
@@ -64,8 +63,6 @@
 #define STD_IMAGE_ZOOM      2.0
 #define HIGH_IMAGE_ZOOM     3.0
 #define PS_PRINT_BUF_SIZE   32768
-
-void rgb_to_pal8( LuPixbuf *dst, LuPixbuf *src, int width, int height, BYTE *p_pal );
 
 
 class LucidePrinting
@@ -78,7 +75,7 @@ class LucidePrinting
 
     private:
         bool queryCurrentForm( HAB lhab, PHCINFO pcurForm );
-        void printPagePm( long page, HPS hpsPrinter, PHCINFO pcurForm, bool reduceColors );
+        void printPagePm( long page, HPS hpsPrinter, PHCINFO pcurForm );
         bool doPmPrint( HAB lhab );
         bool doPsPrint( HAB lhab );
 
@@ -145,7 +142,7 @@ bool LucidePrinting::doPmPrint( HAB lhab )
     achDriverName[ strcspn( achDriverName, "." ) ] = '\0';
     dos.pszDriverName      = achDriverName;                          // 2
     dos.pdriv              = psetup->QueueInfo.pDriverData;          // 3
-    dos.pszDataType        = "PM_Q_STD";                             // 4
+    dos.pszDataType        = "PM_Q_RAW";                             // 4
     dos.pszComment         = (PSZ)appName;                           // 5
     dos.pszQueueProcName   = NULL;                                   // 6
     snprintf( achQueueProcParams, sizeof( achQueueProcParams ), "COP=%d", psetup->copies );
@@ -178,7 +175,7 @@ bool LucidePrinting::doPmPrint( HAB lhab )
         delete fmt;
         delete buf;
 
-        printPagePm( pg - 1, hpsPrinter, &curForm, ( totalpages > 1 ) );
+        printPagePm( pg - 1, hpsPrinter, &curForm );
 
         if ( pg != psetup->pgto ) {
             DevEscape( hdcPrinter, DEVESC_NEWFRAME, 0L, NULL, NULL, NULL );
@@ -203,8 +200,7 @@ bool LucidePrinting::doPmPrint( HAB lhab )
 }
 
 
-void LucidePrinting::printPagePm( long page, HPS hpsPrinter,
-                                  PHCINFO pcurForm, bool reduceColors )
+void LucidePrinting::printPagePm( long page, HPS hpsPrinter, PHCINFO pcurForm )
 {
     long bpp = doc->getBpp( ev );
     double w = 0, h = 0;
@@ -267,52 +263,14 @@ void LucidePrinting::printPagePm( long page, HPS hpsPrinter,
                                  NULL, NULL );
 
         LONG lRop = ROP_SRCCOPY;
-        if ( reduceColors )
-        {
-            LONG bhsz = sizeof( BITMAPINFOHEADER2 ) + ( sizeof( RGB2 ) * 256 );
-            BITMAPINFO2 *pbmi = (BITMAPINFO2 *)malloc( bhsz );
-            memset( pbmi, 0, bhsz );
-            pbmi->cbFix = sizeof( BITMAPINFOHEADER2 );
-            pbmi->cx = rclx;
-            pbmi->cy = rcly;
-            pbmi->cPlanes = 1;
-            pbmi->cBitCount = 8;
-            pbmi->ulCompression = BCA_UNCOMP;
-            pbmi->cbImage = 0;
-            pbmi->cxResolution = 0;
-            pbmi->cyResolution = 0;
-            pbmi->cclrUsed = 0;
-            pbmi->cclrImportant = 0;
-            pbmi->usUnits = BRU_METRIC;
-            pbmi->usReserved = 0;
-            pbmi->usRecording = BRA_BOTTOMUP;
-            pbmi->usRendering = BRH_NOTHALFTONED;
-            pbmi->cSize1 = 0;
-            pbmi->cSize2 = 0;
-            pbmi->ulColorEncoding = BCE_RGB;
-            pbmi->ulIdentifier = 0;
-
-            PBYTE pal = ((PBYTE)pbmi) + sizeof( BITMAPINFOHEADER2 );
-            LuPixbuf *p = new LuPixbuf( ev, rclx, rcly, 1 );
-
-            rgb_to_pal8( p, pixbuf, rclx, rcly, pal );
-
-            GpiDrawBits( hpsPrinter, p->getDataPtr( ev ), pbmi, 4L,
-                         aptlPoints, lRop, BBO_IGNORE );
-            delete p;
-            free( pbmi );
-        }
-        else
-        {
-            BITMAPINFO2 pbmi;
-            pbmi.cbFix = 16L;
-            pbmi.cx = rclx;
-            pbmi.cy = rcly;
-            pbmi.cPlanes = 1;
-            pbmi.cBitCount = bpp * 8;
-            GpiDrawBits( hpsPrinter, pixbuf->getDataPtr( ev ), &pbmi, 4L,
-                         aptlPoints, lRop, BBO_IGNORE );
-        }
+        BITMAPINFO2 pbmi;
+        pbmi.cbFix = 16L;
+        pbmi.cx = rclx;
+        pbmi.cy = rcly;
+        pbmi.cPlanes = 1;
+        pbmi.cBitCount = bpp * 8;
+        GpiDrawBits( hpsPrinter, pixbuf->getDataPtr( ev ), &pbmi, 4L,
+                     aptlPoints, lRop, BBO_IGNORE );
         delete pixbuf;
     }
 }
@@ -513,43 +471,5 @@ void LucidePrinting::printthread( void *p )
     _endthread();
 
     delete _this;
-}
-
-
-// Convert RGB 24/32 bit pixbuf into 8 bit palettized
-static void rgb_to_pal8( LuPixbuf *dst, LuPixbuf *src, int width, int height, BYTE *p_pal )
-{
-    NeuQuantizer *nq = new NeuQuantizer( src, 256 );
-
-    nq->initnet();
-    nq->learn( 10 );
-    nq->unbiasnet();
-
-    int *palette = (int *)nq->getNetwork();
-    for ( int i = 0; i < ( 256 * 4 ); i++ ) {
-        p_pal[ i ] = palette[ i ];
-    }
-    nq->inxbuild();
-
-    unsigned char *p_src = (unsigned char *)src->getDataPtr( ev );
-    unsigned char *p_dst = (unsigned char *)dst->getDataPtr( ev );
-    long rowsize_src = src->getRowSize( ev );
-    long rowsize_dst = dst->getRowSize( ev );
-    long x = src->getWidth( ev );
-    long y = src->getHeight( ev );
-    long bpp = src->getBpp( ev );
-
-    for ( long py = 0; py < y; py++ )
-    {
-        BYTE *row_src = p_src + ( rowsize_src * py );
-        long row_dst = rowsize_dst * py;
-        for ( long px = 0; px < x; px++ )
-        {
-            BYTE *pix = row_src + ( px * bpp );
-            p_dst[ row_dst + px ] = nq->inxsearch( pix[0], pix[1], pix[2] );
-        }
-    }
-
-    delete nq;
 }
 
