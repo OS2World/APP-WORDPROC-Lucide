@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Type 1 font loader (body).                                           */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -355,8 +355,9 @@
                         blend->num_axis );
 
       for ( i = 0; i < mmaster.num_axis; ++i )
-        mmvar->axis[i].def = mm_axis_unmap( &blend->design_map[i],
-                                            axiscoords[i] );
+        mmvar->axis[i].def =
+          FT_INT_TO_FIXED( mm_axis_unmap( &blend->design_map[i],
+                                          axiscoords[i] ) );
     }
 
     *master = mmvar;
@@ -1014,15 +1015,6 @@
 
 
   static int
-  is_space( FT_Byte  c )
-  {
-    return ( c == ' '  || c == '\t'              ||
-             c == '\r' || c == '\n' || c == '\f' ||
-             c == '\0'                           );
-  }
-
-
-  static int
   read_binary_data( T1_Parser  parser,
                     FT_Long*   size,
                     FT_Byte**  base )
@@ -1205,9 +1197,9 @@
         /* we stop when we encounter a `def' or `]' */
         if ( *cur == 'd' && cur + 3 < limit )
         {
-          if ( cur[1] == 'e'      &&
-               cur[2] == 'f'      &&
-               is_space( cur[3] ) )
+          if ( cur[1] == 'e'         &&
+               cur[2] == 'f'         &&
+               IS_PS_DELIM( cur[3] ) )
           {
             FT_TRACE6(( "encoding end\n" ));
             cur += 3;
@@ -1487,7 +1479,7 @@
         break;
 
       /* we stop when we find a `def' or `end' keyword */
-      if ( cur + 3 < limit && is_space( cur[3] ) )
+      if ( cur + 3 < limit && IS_PS_DELIM( cur[3] ) )
       {
         if ( cur[0] == 'd' &&
              cur[1] == 'e' &&

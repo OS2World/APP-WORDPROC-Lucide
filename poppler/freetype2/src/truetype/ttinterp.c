@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType bytecode interpreter (body).                                */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -510,15 +510,16 @@
   Update_Max( FT_Memory  memory,
               FT_ULong*  size,
               FT_Long    multiplier,
-              void**     buff,
+              void*      _pbuff,
               FT_ULong   new_max )
   {
     FT_Error  error;
+    void**    pbuff = (void**)_pbuff;
 
 
     if ( *size < new_max )
     {
-      if ( FT_REALLOC( *buff, *size * multiplier, new_max * multiplier ) )
+      if ( FT_REALLOC( *pbuff, *size * multiplier, new_max * multiplier ) )
         return error;
       *size = new_max;
     }
@@ -599,7 +600,7 @@
     error = Update_Max( exec->memory,
                         &tmp,
                         sizeof ( FT_F26Dot6 ),
-                        (void**)&exec->stack,
+                        (void*)&exec->stack,
                         maxp->maxStackElements + 32 );
     exec->stackSize = (FT_UInt)tmp;
     if ( error )
@@ -609,7 +610,7 @@
     error = Update_Max( exec->memory,
                         &tmp,
                         sizeof ( FT_Byte ),
-                        (void**)&exec->glyphIns,
+                        (void*)&exec->glyphIns,
                         maxp->maxSizeOfInstructions );
     exec->glyphSize = (FT_UShort)tmp;
     if ( error )
@@ -5248,6 +5249,7 @@
     {
       if ( CUR.pedantic_hinting )
         CUR.error = TT_Err_Invalid_Reference;
+      *refp = 0;
       return FAILURE;
     }
 
@@ -5415,7 +5417,8 @@
       first_point = (FT_UShort)( CUR.pts.contours[contour - 1] + 1 -
                                  CUR.pts.first_point );
 
-    last_point = CUR.pts.contours[contour] - CUR.pts.first_point;
+    last_point = (FT_UShort)( CUR.pts.contours[contour] -
+                              CUR.pts.first_point );
 
     /* XXX: this is probably wrong... at least it prevents memory */
     /*      corruption when zp2 is the twilight zone              */

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Objects manager (body).                                              */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -292,7 +292,8 @@
         }
       }
 
-      ttface->internal->ignore_unpatented_hinter = !unpatented_hinting;
+      ttface->internal->ignore_unpatented_hinter =
+        FT_BOOL( !unpatented_hinting );
     }
 
 #endif /* TT_CONFIG_OPTION_UNPATENTED_HINTING &&
@@ -519,35 +520,66 @@
 #endif /* TT_USE_BYTECODE_INTERPRETER */
 
 
-  /*************************************************************************/
-  /*                                                                       */
-  /* <Function>                                                            */
-  /*    tt_size_init                                                       */
-  /*                                                                       */
-  /* <Description>                                                         */
-  /*    Initialize a new TrueType size object.                             */
-  /*                                                                       */
-  /* <InOut>                                                               */
-  /*    size :: A handle to the size object.                               */
-  /*                                                                       */
-  /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
-  /*                                                                       */
-  FT_LOCAL_DEF( FT_Error )
-  tt_size_init( FT_Size  ttsize )           /* TT_Size */
-  {
-    TT_Size   size  = (TT_Size)ttsize;
-    FT_Error  error = TT_Err_Ok;
-
 #ifdef TT_USE_BYTECODE_INTERPRETER
 
-    TT_Face    face   = (TT_Face)size->root.face;
+  static void
+  tt_size_done_bytecode( FT_Size  ftsize )
+  {
+    TT_Size    size   = (TT_Size)ftsize;
+    TT_Face    face   = (TT_Face)ftsize->face;
+    FT_Memory  memory = face->root.memory;
+
+
+    if ( size->debug )
+    {
+      /* the debug context must be deleted by the debugger itself */
+      size->context = NULL;
+      size->debug   = FALSE;
+    }
+
+    FT_FREE( size->cvt );
+    size->cvt_size = 0;
+
+    /* free storage area */
+    FT_FREE( size->storage );
+    size->storage_size = 0;
+
+    /* twilight zone */
+    tt_glyphzone_done( &size->twilight );
+
+    FT_FREE( size->function_defs );
+    FT_FREE( size->instruction_defs );
+
+    size->num_function_defs    = 0;
+    size->max_function_defs    = 0;
+    size->num_instruction_defs = 0;
+    size->max_instruction_defs = 0;
+
+    size->max_func = 0;
+    size->max_ins  = 0;
+
+    size->bytecode_ready = 0;
+    size->cvt_ready      = 0;
+  }
+
+
+  /* Initialize bytecode-related fields in the size object.       */
+  /* We do this only if bytecode interpretation is really needed. */
+  static FT_Error
+  tt_size_init_bytecode( FT_Size  ftsize )
+  {
+    FT_Error   error;
+    TT_Size    size = (TT_Size)ftsize;
+    TT_Face    face = (TT_Face)ftsize->face;
     FT_Memory  memory = face->root.memory;
     FT_Int     i;
 
     FT_UShort       n_twilight;
     TT_MaxProfile*  maxp = &face->max_profile;
 
+
+    size->bytecode_ready = 1;
+    size->cvt_ready      = 0;
 
     size->max_function_defs    = maxp->maxFunctionDefs;
     size->max_instruction_defs = maxp->maxInstructionDefs;
@@ -583,11 +615,7 @@
          FT_NEW_ARRAY( size->instruction_defs, size->max_instruction_defs ) ||
          FT_NEW_ARRAY( size->cvt,              size->cvt_size             ) ||
          FT_NEW_ARRAY( size->storage,          size->storage_size         ) )
-    {
-      tt_size_done( ttsize );
-
-      return error;
-    }
+      goto Exit;
 
     /* reserve twilight zone */
     n_twilight = maxp->maxTwilightPoints;
@@ -597,11 +625,7 @@
 
     error = tt_glyphzone_new( memory, n_twilight, 0, &size->twilight );
     if ( error )
-    {
-      tt_size_done( ttsize );
-
-      return error;
-    }
+      goto Exit;
 
     size->twilight.n_points = n_twilight;
 
@@ -621,10 +645,96 @@
     /* Fine, now run the font program! */
     error = tt_size_run_fpgm( size );
 
+  Exit:
     if ( error )
-      tt_size_done( ttsize );
+      tt_size_done_bytecode( ftsize );
 
-#endif /* TT_USE_BYTECODE_INTERPRETER */
+    return error;
+  }
+
+
+  FT_LOCAL_DEF( FT_Error )
+  tt_size_ready_bytecode( TT_Size  size )
+  {
+    FT_Error  error = TT_Err_Ok;
+
+
+    if ( !size->bytecode_ready )
+    {
+      error = tt_size_init_bytecode( (FT_Size)size );
+      if ( error )
+        goto Exit;
+    }
+
+    /* rescale CVT when needed */
+    if ( !size->cvt_ready )
+    {
+      FT_UInt  i;
+      TT_Face  face = (TT_Face) size->root.face;
+
+
+      /* Scale the cvt values to the new ppem.          */
+      /* We use by default the y ppem to scale the CVT. */
+      for ( i = 0; i < size->cvt_size; i++ )
+        size->cvt[i] = FT_MulFix( face->cvt[i], size->ttmetrics.scale );
+
+      /* all twilight points are originally zero */
+      for ( i = 0; i < (FT_UInt)size->twilight.n_points; i++ )
+      {
+        size->twilight.org[i].x = 0;
+        size->twilight.org[i].y = 0;
+        size->twilight.cur[i].x = 0;
+        size->twilight.cur[i].y = 0;
+      }
+
+      /* clear storage area */
+      for ( i = 0; i < (FT_UInt)size->storage_size; i++ )
+        size->storage[i] = 0;
+
+      size->GS = tt_default_graphics_state;
+
+      error = tt_size_run_prep( size );
+    }
+  Exit:
+    return error;
+  }
+
+#else /* !TT_USE_BYTECODE_INTERPRETER */
+
+  FT_LOCAL_DEF( FT_Error )
+  tt_size_ready_bytecode( TT_Size  size )
+  {
+    FT_UNUSED( ftsize );
+    return 0;
+  }
+
+#endif /* !TT_USE_BYTECODE_INTERPRETER */
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Function>                                                            */
+  /*    tt_size_init                                                       */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    Initialize a new TrueType size object.                             */
+  /*                                                                       */
+  /* <InOut>                                                               */
+  /*    size :: A handle to the size object.                               */
+  /*                                                                       */
+  /* <Return>                                                              */
+  /*    FreeType error code.  0 means success.                             */
+  /*                                                                       */
+  FT_LOCAL_DEF( FT_Error )
+  tt_size_init( FT_Size  ttsize )           /* TT_Size */
+  {
+    TT_Size   size  = (TT_Size)ttsize;
+    FT_Error  error = TT_Err_Ok;
+
+#ifdef TT_USE_BYTECODE_INTERPRETER
+    size->bytecode_ready = 0;
+    size->cvt_ready      = 0;
+#endif
 
     size->ttmetrics.valid = FALSE;
     size->strike_index    = 0xFFFFFFFFUL;
@@ -647,41 +757,12 @@
   FT_LOCAL_DEF( void )
   tt_size_done( FT_Size  ttsize )           /* TT_Size */
   {
-    TT_Size    size = (TT_Size)ttsize;
+    TT_Size  size = (TT_Size)ttsize;
+
 
 #ifdef TT_USE_BYTECODE_INTERPRETER
-
-    FT_Memory  memory = size->root.face->memory;
-
-
-    if ( size->debug )
-    {
-      /* the debug context must be deleted by the debugger itself */
-      size->context = NULL;
-      size->debug   = FALSE;
-    }
-
-    FT_FREE( size->cvt );
-    size->cvt_size = 0;
-
-    /* free storage area */
-    FT_FREE( size->storage );
-    size->storage_size = 0;
-
-    /* twilight zone */
-    tt_glyphzone_done( &size->twilight );
-
-    FT_FREE( size->function_defs );
-    FT_FREE( size->instruction_defs );
-
-    size->num_function_defs    = 0;
-    size->max_function_defs    = 0;
-    size->num_instruction_defs = 0;
-    size->max_instruction_defs = 0;
-
-    size->max_func = 0;
-    size->max_ins  = 0;
-
+    if ( size->bytecode_ready )
+      tt_size_done_bytecode( ttsize );
 #endif
 
     size->ttmetrics.valid = FALSE;
@@ -762,36 +843,8 @@
       size->ttmetrics.y_ratio = 0x10000L;
     }
 
-
 #ifdef TT_USE_BYTECODE_INTERPRETER
-
-    {
-      FT_UInt  i;
-
-
-      /* Scale the cvt values to the new ppem.          */
-      /* We use by default the y ppem to scale the CVT. */
-      for ( i = 0; i < size->cvt_size; i++ )
-        size->cvt[i] = FT_MulFix( face->cvt[i], size->ttmetrics.scale );
-
-      /* All twilight points are originally zero */
-      for ( i = 0; i < (FT_UInt)size->twilight.n_points; i++ )
-      {
-        size->twilight.org[i].x = 0;
-        size->twilight.org[i].y = 0;
-        size->twilight.cur[i].x = 0;
-        size->twilight.cur[i].y = 0;
-      }
-
-      /* clear storage area */
-      for ( i = 0; i < (FT_UInt)size->storage_size; i++ )
-        size->storage[i] = 0;
-
-      size->GS = tt_default_graphics_state;
-
-      error = tt_size_run_prep( size );
-    }
-
+    size->cvt_ready = 0;
 #endif /* TT_USE_BYTECODE_INTERPRETER */
 
     if ( !error )

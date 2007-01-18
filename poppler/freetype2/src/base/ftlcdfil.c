@@ -272,6 +272,8 @@
   {
     static const FT_Byte  light_filter[5] =
                             { 0, 85, 86, 85, 0 };
+    /* the values here sum up to a value larger than 256, */
+    /* providing a cheap gamma correction                 */
     static const FT_Byte  default_filter[5] =
                             { 0x10, 0x40, 0x70, 0x40, 0x10 };
 
@@ -294,7 +296,7 @@
 
 #elif defined( FT_FORCE_LIGHT_LCD_FILTER )
 
-      memcpy( library->lcd_weights, default_filter, 5 );
+      memcpy( library->lcd_weights, light_filter, 5 );
       library->lcd_filter_func = _ft_lcd_filter_fir;
       library->lcd_extra       = 2;
 

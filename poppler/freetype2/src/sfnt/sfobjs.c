@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    SFNT object management (base).                                       */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -225,7 +225,15 @@
         /* all Unicode strings are encoded using UTF-16BE */
       case TT_MS_ID_UNICODE_CS:
       case TT_MS_ID_SYMBOL_CS:
+        convert = tt_name_entry_ascii_from_utf16;
+        break;
+
       case TT_MS_ID_UCS_4:
+        /* Apparently, if this value is found in a name table entry, it is */
+        /* documented as `full Unicode repertoire'.  Experience with the   */
+        /* MsGothic font shipped with Windows Vista shows that this really */
+        /* means UTF-16 encoded names (UCS-4 values are only used within   */
+        /* charmaps).                                                      */
         convert = tt_name_entry_ascii_from_utf16;
         break;
 
@@ -893,7 +901,7 @@
         FT_UInt  i, count;
 
 
-#if defined FT_OPTIMIZE_MEMORY && !defined FT_CONFIG_OPTION_OLD_INTERNALS
+#if !defined FT_CONFIG_OPTION_OLD_INTERNALS
         count = face->sbit_num_strikes;
 #else
         count = (FT_UInt)face->num_sbit_strikes;
@@ -1000,7 +1008,7 @@
     }
 
     /* freeing the horizontal metrics */
-#if defined FT_OPTIMIZE_MEMORY && !defined FT_CONFIG_OPTION_OLD_INTERNALS
+#if !defined FT_CONFIG_OPTION_OLD_INTERNALS
     {
       FT_Stream  stream = FT_FACE_STREAM( face );
 

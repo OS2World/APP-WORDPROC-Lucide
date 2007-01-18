@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    PostScript hinting algorithm (body).                                 */
 /*                                                                         */
-/*  Copyright 2001, 2002, 2003, 2004, 2005, 2006 by                        */
+/*  Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007 by                  */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used        */
@@ -1032,7 +1032,7 @@
 
         orient_prev = psh_corner_orientation( in_x, in_y, out_x, out_y );
 
-      } while ( orient_prev != 0 );
+      } while ( orient_prev == 0 );
 
       first = start;
       in_x  = out_x;
@@ -1866,7 +1866,7 @@
       FT_Error  error;
 
 
-      if ( !FT_NEW_ARRAY( strongs, num_strongs ) )
+      if ( FT_NEW_ARRAY( strongs, num_strongs ) )
         return;
     }
 

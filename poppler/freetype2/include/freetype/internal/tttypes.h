@@ -5,7 +5,7 @@
 /*    Basic SFNT/TrueType type definitions and interface (specification    */
 /*    only).                                                               */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2004, 2005, 2006 by                         */
+/*  Copyright 1996-2001, 2002, 2004, 2005, 2006, 2007 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -1395,7 +1395,6 @@ FT_BEGIN_HEADER
 
     /* since version 2.2 */
 
-#ifdef FT_OPTIMIZE_MEMORY
     FT_Byte*              horz_metrics;
     FT_ULong              horz_metrics_size;
 
@@ -1420,11 +1419,14 @@ FT_BEGIN_HEADER
     FT_UInt               num_kern_tables;
     FT_UInt32             kern_avail_bits;
     FT_UInt32             kern_order_bits;
-#endif
 
 #ifdef TT_CONFIG_OPTION_BDF
     TT_BDFRec             bdf;
 #endif /* TT_CONFIG_OPTION_BDF */
+
+    /* since 2.3.0 */
+    FT_ULong              horz_metrics_offset;
+    FT_ULong              vert_metrics_offset;
 
   } TT_FaceRec;
 

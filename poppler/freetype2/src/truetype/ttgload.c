@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType Glyph Loader (body).                                        */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -643,8 +643,8 @@
       loader->exec->is_composite = is_composite;
       loader->exec->pts          = *zone;
 
-      debug = !( loader->load_flags & FT_LOAD_NO_SCALE ) &&
-              ( (TT_Size)loader->size )->debug;
+      debug = FT_BOOL( !( loader->load_flags & FT_LOAD_NO_SCALE ) &&
+                       ((TT_Size)loader->size)->debug             );
 
       error = TT_Run_Context( loader->exec, debug );
       if ( error && loader->exec->pedantic_hinting )
@@ -1718,10 +1718,18 @@
 #ifdef TT_USE_BYTECODE_INTERPRETER
 
     /* load execution context */
+    if ( IS_HINTED( load_flags ) )
     {
       TT_ExecContext  exec;
       FT_Bool         grayscale;
 
+
+      if ( !size->cvt_ready )
+      {
+        FT_Error  error = tt_size_ready_bytecode( size );
+        if ( error )
+          return error;
+      }
 
       /* query new execution context */
       exec = size->debug ? size->context

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType high-level API and common types (specification only).       */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -1799,6 +1799,9 @@ FT_BEGIN_HEADER
   /* <Return>                                                              */
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
+  /* <Note>                                                                */
+  /*    You must not deallocate the memory before calling @FT_Done_Face.   */
+  /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_New_Memory_Face( FT_Library      library,
                       const FT_Byte*  file_base,
@@ -3310,8 +3313,8 @@ FT_BEGIN_HEADER
    *    macros.
    */
 #define FREETYPE_MAJOR  2
-#define FREETYPE_MINOR  2
-#define FREETYPE_PATCH  2
+#define FREETYPE_MINOR  3
+#define FREETYPE_PATCH  0
 
 
   /*************************************************************************/

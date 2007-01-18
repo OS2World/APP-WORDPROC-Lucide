@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    The FreeType private base classes (body).                            */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -1371,6 +1371,7 @@
     FT_Long    flag_offset;
     FT_Long    rlen;
     int        is_cff;
+    FT_Long    face_index_in_resource = 0;
 
 
     if ( face_index == -1 )
@@ -1402,7 +1403,7 @@
     error = open_face_from_buffer( library,
                                    sfnt_data,
                                    rlen,
-                                   face_index,
+                                   face_index_in_resource,
                                    is_cff ? "cff" : "truetype",
                                    aface );
 
@@ -1444,6 +1445,9 @@
       error = Mac_Read_POST_Resource( library, stream, data_offsets, count,
                                       face_index, aface );
       FT_FREE( data_offsets );
+      /* POST exists in an LWFN providing a single face */
+      if ( !error )
+        (*aface)->num_faces = 1;
       return error;
     }
 
@@ -1453,9 +1457,14 @@
                                         &data_offsets, &count );
     if ( !error )
     {
+      FT_Long  face_index_internal = face_index % count;
+
+
       error = Mac_Read_sfnt_Resource( library, stream, data_offsets, count,
-                                      face_index, aface );
+                                      face_index_internal, aface );
       FT_FREE( data_offsets );
+      if ( !error )
+        (*aface)->num_faces = count;
     }
 
     return error;
@@ -2080,7 +2089,7 @@
   FT_Match_Size( FT_Face          face,
                  FT_Size_Request  req,
                  FT_Bool          ignore_width,
-                 FT_ULong*        index )
+                 FT_ULong*        size_index )
   {
     FT_Int   i;
     FT_Long  w, h;
@@ -2114,8 +2123,8 @@
 
       if ( w == FT_PIX_ROUND( bsize->x_ppem ) || ignore_width )
       {
-        if ( index )
-          *index = (FT_ULong)i;
+        if ( size_index )
+          *size_index = (FT_ULong)i;
 
         return FT_Err_Ok;
       }
@@ -3751,7 +3760,35 @@
     if ( library->generic.finalizer )
       library->generic.finalizer( library );
 
-    /* Close all modules in the library */
+    /* Close all faces in the library.  If we don't do
+     * this, we can have some subtle memory leaks.
+     * Example:
+     *
+     *  - the cff font driver uses the pshinter module in cff_size_done
+     *  - if the pshinter module is destroyed before the cff font driver,
+     *    opened FT_Face objects managed by the driver are not properly
+     *    destroyed, resulting in a memory leak
+     */
+    {
+      FT_UInt  n;
+
+
+      for ( n = 0; n < library->num_modules; n++ )
+      {
+        FT_Module  module = library->modules[n];
+        FT_List    faces;
+
+
+        if ( ( module->clazz->module_flags & FT_MODULE_FONT_DRIVER ) == 0 )
+          continue;
+
+        faces = &FT_DRIVER(module)->faces_list;
+        while ( faces->head )
+          FT_Done_Face( FT_FACE( faces->head->data ) );
+      }
+    }
+
+    /* Close all other modules in the library */
 #if 1
     /* XXX Modules are removed in the reversed order so that  */
     /* type42 module is removed before truetype module.  This */

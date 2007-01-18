@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Objects manager (specification).                                     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -358,6 +358,9 @@ FT_BEGIN_HEADER
     FT_Bool            debug;
     TT_ExecContext     context;
 
+    FT_Bool            bytecode_ready;
+    FT_Bool            cvt_ready;
+
 #endif /* TT_USE_BYTECODE_INTERPRETER */
 
   } TT_SizeRec;
@@ -424,6 +427,9 @@ FT_BEGIN_HEADER
 
   FT_LOCAL( FT_Error )
   tt_size_reset( TT_Size  size );
+
+  FT_LOCAL( FT_Error )
+  tt_size_ready_bytecode( TT_Size  size );
 
 
   /*************************************************************************/
