@@ -124,6 +124,28 @@ void LucidePrinting::doPrint()
     progressDlg->show( printthread, this );
 }
 
+static bool isPrintPageNum( PrintOddEven oddeven, long page )
+{
+    if ( oddeven == OEOdd ) {
+        return ( ( page % 2 ) != 0 );
+    }
+    else if ( oddeven == OEEven ) {
+        return ( ( page % 2 ) == 0 );
+    }
+    return true;
+}
+
+static long countPagesToPrint( PrintOddEven oddeven, long pgfrom, long pgto )
+{
+    long r = 0;
+    for ( long i = pgfrom; i <= pgto; i++ ) {
+        if ( isPrintPageNum( oddeven, i ) ) {
+            r++;
+        }
+    }
+    return r;
+}
+
 bool LucidePrinting::doPmPrint( HAB lhab )
 {
     CHAR         achDriverName[ DRIVERNAME_LENGTH ] = "";
@@ -163,22 +185,32 @@ bool LucidePrinting::doPmPrint( HAB lhab )
     // Issue STARTDOC to begin printing
     DevEscape( hdcPrinter, DEVESC_STARTDOC, strlen(title), (PBYTE)title, NULL, NULL );
 
+    long pgfrom = psetup->pgfrom;
+    long pgto = psetup->pgto;
+    if ( pgfrom > pgto ) {
+        long tmp = pgfrom;
+        pgfrom = pgto;
+        pgto = tmp;
+    }
 
-    long totalpages = abs( psetup->pgto - psetup->pgfrom ) + 1;
+    long pagestoprint = countPagesToPrint( psetup->oddeven, pgfrom, pgto );
     long pg = psetup->pgfrom;
-    for ( long i = 0; i < totalpages; i++ )
+    for ( long i = pgfrom, j = 1; i <= pgto; i++ )
     {
-        char *fmt = newstrdupL( PRINT_PRINTING_PAGE_OF );
-        char *buf = new char[ 255 ];
-        snprintf( buf, 255, fmt, pg, i + 1, totalpages );
-        progressDlg->setText( buf );
-        delete fmt;
-        delete buf;
+        if ( isPrintPageNum( psetup->oddeven, pg ) )
+        {
+            char *fmt = newstrdupL( PRINT_PRINTING_PAGE_OF );
+            char *buf = new char[ 255 ];
+            snprintf( buf, 255, fmt, pg, j++, pagestoprint );
+            progressDlg->setText( buf );
+            delete fmt;
+            delete buf;
 
-        printPagePm( pg - 1, hpsPrinter, &curForm );
+            printPagePm( pg - 1, hpsPrinter, &curForm );
 
-        if ( pg != psetup->pgto ) {
-            DevEscape( hdcPrinter, DEVESC_NEWFRAME, 0L, NULL, NULL, NULL );
+            if ( pg != psetup->pgto ) {
+                DevEscape( hdcPrinter, DEVESC_NEWFRAME, 0L, NULL, NULL, NULL );
+            }
         }
 
         if ( abortPrinting ) {

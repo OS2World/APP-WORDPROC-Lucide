@@ -1004,9 +1004,10 @@ static char *propcnv( GooString *s, void *objUniBe, void *objSys )
         size_t cSubs = 0;
         size_t unilen = s->getLength() + 1;
         UniChar *unibuf = new UniChar[ unilen ];
+        memset( unibuf, 0, unilen * sizeof( UniChar ) );
         UniChar *tmpuni = unibuf;
         const char *from = s->getCString() + 2;
-        size_t fromlen = s->getLength() * 2;
+        size_t fromlen = s->getLength() - 2;
         UniUconvToUcs( objUniBe, (void **)&from, &fromlen, &tmpuni, &unilen, &cSubs );
         unilen = UniStrlen( unibuf );
 

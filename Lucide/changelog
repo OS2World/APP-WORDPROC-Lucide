@@ -1,17 +1,17 @@
 Beta-5:
-  - Pipe commands, see readme for details.
-  - Writes into EA thumbnail of first page of document (for eSchemes Deluxe).
-  - 'New window' menuitem.
-  - PDF plugin: freetype library updated to latest cvs version, (closed
-    ticket #76).
-  - DJVU plugin: handle document load errors.
-  - Added 'print to file' option for postscript output.
-  - Optimized unicode conversion, fixes crash in uconv.dll (closed ticket #97).
-  - Remember last selected printer during session (closed ticket #96).
   - Ask for password, if document password-protected.
-  - Plugin API extension: extended error reporting.
+  - Pipe commands, see readme for details.
+  - 'New window' menuitem.
+  - Writes into EA thumbnail of first page of document (for eSchemes Deluxe).
+  - Added 'print to file' option for postscript output.
+  - Remember last selected printer during session (closed ticket #96).
   - Copy unicode text to clipboard in OpenOffice.org compatible format.
-  - Speedup for 'As Image' printing.
+  - Optimized unicode conversion, fixes crash in uconv.dll (closed ticket #97).
+  - Speedup for 'As Image' printing, fixed crash (closed ticket #94).
+  - Odd/Even printing for 'As Image' printing.
+  - Plugin API extension: extended error reporting.
+  - PDF plugin: freetype library updated to release 2.3.0 (closed ticket #76).
+  - DJVU plugin: handle document load errors.
   - Added NLS-files: Italian, Czech, Russian.
   - Updated NLS-files: Spanish, German, French.
 

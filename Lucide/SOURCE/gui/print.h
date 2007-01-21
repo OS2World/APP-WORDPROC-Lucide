@@ -41,6 +41,7 @@
 
 enum PrintRange { RangeAll = 0, RangeCurrent = 1, RangePages = 2 };
 enum PrintType { TypePostScript = 0, TypeAsImage = 1 };
+enum PrintOddEven { OEOddEven = 0, OEOdd = 1, OEEven = 2 };
 
 struct PrintSetup
 {
@@ -57,6 +58,7 @@ struct PrintSetup
     int copies;
     bool psToFile;
     char psFile[ CCHMAXPATH ];
+    PrintOddEven oddeven;
 };
 
 class LuDocument;

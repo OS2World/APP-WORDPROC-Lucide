@@ -39,6 +39,8 @@
 #define INCL_SPLDOSPRINT
 #include <os2.h>
 
+#include <string>
+
 #include <ludoc.xh>
 
 #include "globals.h"
@@ -475,6 +477,16 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
             // Enum printer queues
             _this->enumQueues( hwnd );
 
+            USHORT sEntry;
+            HWND reo = WinWindowFromID( hwnd, IDC_RANGE_EVEN_ODD );
+            WinSetWindowText( reo, getLocalizedString( PD_RANGE_EVEN_ODD ).c_str() );
+            sEntry = (SHORT)WinInsertLboxItem( reo, LIT_END, getLocalizedString( PD_RANGE_EVEN_ODD ).c_str() );
+            WinSendMsg( reo, LM_SETITEMHANDLE, MPFROMSHORT(sEntry), MPFROMLONG( OEOddEven ) );
+            sEntry = (SHORT)WinInsertLboxItem( reo, LIT_END, getLocalizedString( PD_RANGE_ODD ).c_str() );
+            WinSendMsg( reo, LM_SETITEMHANDLE, MPFROMSHORT(sEntry), MPFROMLONG( OEOdd ) );
+            sEntry = (SHORT)WinInsertLboxItem( reo, LIT_END, getLocalizedString( PD_RANGE_EVEN ).c_str() );
+            WinSendMsg( reo, LM_SETITEMHANDLE, MPFROMSHORT(sEntry), MPFROMLONG( OEEven ) );
+
             HWND spin = WinWindowFromID( hwnd, IDC_MLEFT );
             PFNWP proc = WinSubclassWindow( spin, spinProc );
             WinSetWindowULong( spin, QWL_USER, (ULONG)proc );
@@ -530,6 +542,8 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                     WinEnableControl( hwnd, IDC_PRINT_TO_FILE, aspsc );
                     WinEnableControl( hwnd, IDC_HIGHER_IMAGE_QUALITY,
                                       asimg && _this->scalable && !_this->fixed );
+                    WinEnableControl( hwnd, IDC_RANGE_EVEN_ODD_LABEL, asimg );
+                    WinEnableControl( hwnd, IDC_RANGE_EVEN_ODD, asimg );
                 }
                 break;
 
@@ -608,9 +622,23 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                             _this->psetup->ptype = TypeAsImage;
                         }
                         _this->psetup->higherQuality = WinQueryButtonCheckstate( hwnd, IDC_HIGHER_IMAGE_QUALITY );
+
+                        _this->psetup->oddeven = OEOddEven;
+                        if ( _this->psetup->ptype == TypeAsImage )
+                        {
+                            SHORT rc = (SHORT)WinSendDlgItemMsg( hwnd, IDC_RANGE_EVEN_ODD, LM_QUERYSELECTION,
+                                                             MPFROMSHORT( LIT_CURSOR ), MPVOID );
+                            if ( rc != LIT_NONE ) {
+                                MRESULT r = WinSendDlgItemMsg( hwnd, IDC_RANGE_EVEN_ODD, LM_QUERYITEMHANDLE,
+                                                           MPFROMSHORT( rc ), MPVOID );
+                                _this->psetup->oddeven = (PrintOddEven)(int)r;
+                            }
+                        }
+
                         _this->psetup->psToFile = WinQueryButtonCheckstate( hwnd, IDC_PRINT_TO_FILE );
 
-                        if ( _this->psetup->psToFile )
+                        if ( ( _this->psetup->ptype == TypePostScript ) &&
+                             _this->psetup->psToFile )
                         {
                             strcpy( _this->psetup->psFile, _this->filename );
                             char *pointpos = strrchr( _this->psetup->psFile, '.' );
