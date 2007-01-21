@@ -89,6 +89,7 @@ MRESULT EXPENTRY FindDlg::findDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
             WinSendDlgItemMsg( hwnd, IDC_FINDFIELD, EM_SETTEXTLIMIT,
                                MPFROMSHORT( MAXSEARCHLENGTH ), MPVOID );
             WinSetDlgItemText( hwnd, IDC_FINDFIELD, _this->searchString );
+            WinSendDlgItemMsg( hwnd, IDC_FINDFIELD, EM_SETSEL, MPFROM2SHORT( 0, MAXSEARCHLENGTH ), MPVOID );
             WinCheckButton( hwnd, IDC_FINDMATCHCASE, _this->caseSensitive );
 
             return (MRESULT)FALSE;
