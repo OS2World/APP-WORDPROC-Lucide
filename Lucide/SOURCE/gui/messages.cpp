@@ -119,8 +119,8 @@ const char *GTP_OF = "GTP_OF";
 const char *PD_RANGE_EVEN_ODD           = "PD_RANGE_EVEN_ODD";
 const char *PD_RANGE_ODD                = "PD_RANGE_ODD";
 const char *PD_RANGE_EVEN               = "PD_RANGE_EVEN";
-const char *PD_WRONG_MARGINS            = "PD_WRONG_MARGINS";
 // Printing, other 'print'-related messages
+const char *PD_WRONG_MARGINS            = "PD_WRONG_MARGINS";
 const char *PRINT_PRINTING_PAGE_OF      = "PRINT_PRINTING_PAGE_OF";
 const char *PRINT_GENERATING_POSTSCRIPT = "PRINT_GENERATING_POSTSCRIPT";
 const char *PRINT_SPOOLING_POSTSCRIPT   = "PRINT_SPOOLING_POSTSCRIPT";

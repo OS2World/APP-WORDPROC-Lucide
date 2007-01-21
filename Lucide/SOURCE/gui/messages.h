@@ -119,7 +119,6 @@ extern const char *GTP_OF;
 extern const char *PD_RANGE_EVEN_ODD;
 extern const char *PD_RANGE_ODD;
 extern const char *PD_RANGE_EVEN;
-extern const char *PD_WRONG_MARGINS;
 // Printing, other 'print'-related messages
 extern const char *PD_WRONG_MARGINS;
 extern const char *PRINT_PRINTING_PAGE_OF;
