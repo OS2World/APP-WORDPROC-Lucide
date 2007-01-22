@@ -1,4 +1,4 @@
-Beta-5:
+1.0 RC1:
   - Ask for password, if document password-protected.
   - Pipe commands, see readme for details.
   - 'New window' menuitem.
@@ -6,7 +6,7 @@ Beta-5:
   - Added 'print to file' option for postscript output.
   - Remember last selected printer during session (closed ticket #96).
   - Copy unicode text to clipboard in OpenOffice.org compatible format.
-  - Optimized unicode conversion, fixes crash in uconv.dll (closed ticket #97).
+  - Optimized unicode conversion, fixed crash in uconv.dll (closed ticket #97).
   - Speedup for 'As Image' printing, fixed crash (closed ticket #94).
   - Odd/Even printing for 'As Image' printing.
   - Plugin API extension: extended error reporting.

@@ -111,12 +111,12 @@ Return WirexxGetEnv('plug_djvu')
 Return WirexxGetEnv('plug_jpeg')
 </REXX>
 <PCK INDEX=1
-     PACKAGEID="netlabs.org\Lucide\Lucide core\0\9\4"
+     PACKAGEID="netlabs.org\Lucide\Lucide core\0\9\5"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
      BASE
      TITLE="=("title")"
      CREATEOBJECT='WPFolder|=("folder")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
-     CREATEOBJECT='REPLACE WPProgram|=("prog")|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;'
+     CREATEOBJECT='REPLACE WPProgram|=("prog")|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
      CREATEOBJECT='REPLACE WPProgram|=("readme")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
      CREATEOBJECT='REPLACE WPProgram|=("change")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      WRITEPROFILE="USER\Lucide\Path|$(1)"
@@ -125,7 +125,7 @@ Return WirexxGetEnv('plug_jpeg')
      >=("title").</PCK>
 
 <PCK INDEX=2
-     PACKAGEID="netlabs.org\Lucide\Lucide plugin PDF\0\9\4"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin PDF\0\9\5"
      TARGET="$(1)"
      TITLE="=("plug_pdf")"
      REQUIRES=1
@@ -133,7 +133,7 @@ Return WirexxGetEnv('plug_jpeg')
      >=("plug_pdf")</PCK>
 
 <PCK INDEX=3
-     PACKAGEID="netlabs.org\Lucide\Lucide plugin DJVU\0\9\4"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin DJVU\0\9\5"
      TARGET="$(1)"
      TITLE="=("plug_djvu")"
      REQUIRES=1
@@ -141,7 +141,7 @@ Return WirexxGetEnv('plug_jpeg')
      >=("plug_djvu")</PCK>
 
 <PCK INDEX=4
-     PACKAGEID="netlabs.org\Lucide\Lucide plugin JPEG\0\9\4"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin JPEG\0\9\5"
      TARGET="$(1)"
      TITLE="=("plug_jpeg")"
      REQUIRES=1

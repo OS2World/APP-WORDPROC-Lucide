@@ -19,9 +19,12 @@ facilmente ulteriori plugins.
          JPG                   -
   --------------------------------------------------------------------------
 
-L' estensione plugin DJVU richiede Innotek LIBC:
+This program requires UClip package (enhanced OS/2 clipboard support)
+and Innotek LIBC:
 
-    ftp://ftp.netlabs.org/pub/gcc/libc-0.6.1-csd1.zip
+  - http://hobbes.nmsu.edu/cgi-bin/h-search?key=UClip
+  - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.1-csd1.zip
+
 
 La stampa PostScript richiede una stampante abilitata alla gestione di dati PostScript (pscript.drv).
 

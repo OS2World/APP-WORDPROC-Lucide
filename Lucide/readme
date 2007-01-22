@@ -40,6 +40,22 @@ If you encounter any bugs register them in the TRAC as well, see:
 Please make sure you select the correct version and component for your ticket.
 
 
+:: Known problems/limitations ::
+
+General: even/odd printing unavailable for postscript printing.
+
+General: currently, Lucide determine document type by extension, so files
+         without extensions doesn't supported yet.
+
+General: files with more than one dot in filename doesn't displayed in
+         Open File dialog. It's not a Lucide problem, but problem
+         of standard Open File dialog.
+
+PDF plugin: text selection in multicolumn documents may work incorrectly
+            and Lucide may even crash. It's a problem of poppler PDF rendering
+            library.
+
+
 :: Pipe commands ::
 
 First instance of Lucide will create named pipe \PIPE\LUCIDE. You may

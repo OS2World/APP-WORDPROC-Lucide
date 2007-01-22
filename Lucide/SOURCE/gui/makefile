@@ -1,7 +1,7 @@
 .autodepend
 
 TEST=0
-VERSION=Beta 5
+VERSION=1.0 RC1
 
 !if $(TEST)==1
 	BMODE=os2v2
@@ -108,7 +108,7 @@ lcd.res: lcd.rc
 
 Lucide.cpp: ..\plugins\ludoc\ludoc.xh
 
-Lucide.obj:         Lucide.cpp
+Lucide.obj:         Lucide.cpp       makefile
 luutils.obj:        luutils.cpp
 clipbrd.obj:        clipbrd.cpp
 pmsplitter.obj:     pmsplitter.cpp
