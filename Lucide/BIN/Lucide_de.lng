@@ -6,6 +6,7 @@
 # Main menu
 #
 MENU_DOCUMENT=~Dokument
+MENU_NEW_WINDOW=~Neues Fenster
 MENU_OPEN=~ôffnen...\tStrg+O
 MENU_SAVE_AS=~Sichern unter...
 MENU_PAGE_SETUP=Seitenein~richtung...
@@ -188,8 +189,13 @@ PD_RANGE_PAGES=Sei~ten
 PD_FROM=~Von
 PD_TO=B~is
 PD_NUMBER_OF_COPIES=An~zahl Kopien
+PD_RANGE_EVEN_ODD_LABEL=Seitenauswahl
+PD_RANGE_EVEN_ODD=Gerade und ungerade Seiten
+PD_RANGE_ODD=Nur ungerade Seiten
+PD_RANGE_EVEN=Nur gerade Seiten
 PD_PRINT_TYPE=Druckformat
 PD_TYPE_POSTSCRIPT=Post~script
+PD_PRINT_TO_FILE=Ausdruck in Datei
 PD_TYPE_ASIMAGE=Als ~Bild
 PD_HIGHER_IMAGE_QUALITY=~Hîhere BildqualitÑt (langsamer, benîtigt mehr Speicher)
 PD_PAGE_ORIENTATION=Seitenausrichtung
@@ -210,3 +216,11 @@ PRINT_GENERATING_POSTSCRIPT=Erzeuge Postscript-Datei...
 PRINT_SPOOLING_POSTSCRIPT=Sende Postscript-Daten...
 PRINT_FAILED=Drucken fehlgeschlagen!
 
+#
+# Password dialog
+#
+PSW_TITLE=Dokument ist verschlÅsselt!
+PSW_PASSWORD=~Passwort
+PSW_OK=~OK
+PSW_CANCEL=~Abbruch
+ 
