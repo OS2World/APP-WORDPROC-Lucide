@@ -1,3 +1,6 @@
+1.0:
+  - Updated NLS-files: German.
+
 1.0 RC1:
   - Ask for password, if document password-protected.
   - Pipe commands, see readme for details.

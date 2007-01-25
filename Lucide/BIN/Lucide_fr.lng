@@ -7,9 +7,11 @@
 # Main menu
 #
 MENU_DOCUMENT=~Document
+MENU_NEW_WINDOW=~Nouvelle fenàtre
 MENU_OPEN=~Ouvrir...\tCtrl+O
 MENU_SAVE_AS=~Enregistrer sous...
-MENU_EXPORT_TO_PS=E~xporter en PostScript...
+# MENU_EXPORT_TO_PS=E~xporter en PostScript...
+# MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Mise en ~page...
 MENU_PRINT=~Imprimer...
 MENU_PLUGINS_LIST=~Composants enfichables...
@@ -32,12 +34,12 @@ MENU_LAST_PAGE=~Derniäre page
 MENU_GO_TO_PAGE=~Aller Ö la page...\tCtrl+N
 MENU_ROTATE_CW=Rotation de 90¯ vers la dr~oite
 MENU_ROTATE_CCW=Rotation de 90¯ vers la ~gauche
-MENU_SHOW_NAV_PANE=Afficher le panneau de ~navigation
 MENU_SINGLE_PAGE=Page ~simple
 MENU_CONTINUOUS=En ~continu
 MENU_DOCUMENT_INFO=~Info. sur le document...
 MENU_FONTS_INFO=I~nfo. sur les ~polices...
 MENU_WINDOW=~Fenàtres
+MENU_SHOW_NAV_PANE=Afficher le panneau de ~navigation
 MENU_MAXVIEW=~Agrandissement\tF11
 MENU_FULLSCREEN=~Plein Çcran\tCtrl+L
 MENU_HELP=~Aide
@@ -54,8 +56,8 @@ TBHINT_PREV_PAGE=Retour Ö la page prÇcÇdente
 TBHINT_NEXT_PAGE=Passage Ö la page suivante
 TBHINT_LAST_PAGE=DÇplacement jusqu'Ö la derniäre page
 TBHINT_ACTUAL_SIZE=Page en taille rÇelle
-TBHINT_FIT_WINDOW=Adaptation de la page Ö la fenàtre
-TBHINT_FIT_WIDTH=Adaptation de la page Ö la largeur
+TBHINT_FIT_WINDOW=Adapter la page Ö la fenàtre
+TBHINT_FIT_WIDTH=Adapter la page Ö la largeur
 TBHINT_FIND=Lancement de la recherche...
 TBHINT_FINDAGAIN=Poursuite de la recherche
 TBHINT_ZOOM_IN_OUT=Agrandissement/diminution de la vue
@@ -69,11 +71,24 @@ MSGS_MAIN_WIN_TITLE=Lucide - Afficheur de document
 MSGS_NO_SUIT_PLUG=Composant enfichable introuvable pour le document indiquÇ !
 MSGS_FILE_LOAD_ERROR=Erreur de chargement de fichier ! 
 MSGS_LOADING_DOCUMENT=Chargement du document en cours, veuillez patienter...
+MSGS_CREATING_THUMBNAIL=CrÇation des vignettes pour le document, veuillez patienter...
 MSGS_WARNING=Avertissement ! 
 MSGS_OVERWRITE_FILE=Le fichier existe dÇjÖ. RÇÇcrire ?
 MSGS_FILE_SAVE_ERROR=Erreur Ö la sauvegarde du fichier !
 MSGS_PAGE=Page
 MSGS_ERROR_STARTING_BROWSER=Erreur au lancement du navigateur ! 
+
+MSGS_LDERR=Erruer de chargement de fichier : %s !
+MSGS_LDERR_OUT_OF_MEMORY=Hors mÇmoire
+MSGS_LDERR_OPEN_ERROR=Erreur d'ouverture
+MSGS_LDERR_READ_ERROR=Erreur de lecture
+MSGS_LDERR_DAMAGED=Fichier endommagÇ
+MSGS_LDERR_WRONG_FORMAT=Format incorrect
+MSGS_LDERR_ENCRYPTED=Le fichier est chiffrÇ
+
+MSGS_RERR_OUT_OF_MEMORY=Hors mÇmoire
+MSGS_RERR_CORRUPTED_PAGE_DATA=DonnÇes de page corrompues
+MSGS_RERR_FONT_NOT_FOUND=Police %s non trouvÇe
 
 #
 # "Plugins list" dialog
@@ -179,18 +194,23 @@ PD_RANGE_PAGES=Pa~ges
 PD_FROM=~De
 PD_TO=~Ö
 PD_NUMBER_OF_COPIES=Nombre de ~copies
+PD_RANGE_EVEN_ODD_LABEL=êtendue de l'impression
+PD_RANGE_EVEN_ODD=Pages paires et impaires
+PD_RANGE_ODD=Pages impaires uniquement
+PD_RANGE_EVEN=Pages paires uniquement
 PD_PRINT_TYPE=Type d'imprimante
 PD_TYPE_POSTSCRIPT=Post~script
+PD_PRINT_TO_FILE=Impression vers un ~fichier
 PD_TYPE_ASIMAGE=Comme ~image
 PD_HIGHER_IMAGE_QUALITY=Image en ~haute qualitÇ (plus lent et nÇcessite plus de mÇmoire)
 PD_PAGE_ORIENTATION=Orientation de la page
-PD_PORTRAIT=Portrait
-PD_LANDSCAPE=Paysage
+PD_PORTRAIT=Po~rtrait
+PD_LANDSCAPE=Pa~ysage
 PD_MARGINS=Marges (mm)
-PD_MLEFT=Gauche
-PD_MRIGHT=Droite
-PD_MTOP=Haut
-PD_MBOTTOM=Bas
+PD_MLEFT=~Gauche
+PD_MRIGHT=~Droite
+PD_MTOP=~Haut
+PD_MBOTTOM=~Bas
 PD_SELECTED_FORM=SÇlection du formulaire
 PD_BTNPRINT=Im~primer
 PD_BTNCANCEL=~Annuler
@@ -201,3 +221,10 @@ PRINT_GENERATING_POSTSCRIPT=GÇnÇration du fichier postscript...
 PRINT_SPOOLING_POSTSCRIPT=Mise en file des donnÇes postscript...
 PRINT_FAILED=êchec Ö l'impression ! 
 
+#
+# Password dialog
+#
+PSW_TITLE=Document chiffrÇ !
+PSW_PASSWORD=~Mot de passe
+PSW_OK=~OK
+PSW_CANCEL=~Annuler
