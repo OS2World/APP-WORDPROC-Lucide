@@ -59,6 +59,8 @@ class PrintDlg
         bool isPortraitOrientation();
         void setPortraitOrientation( bool portrait, HWND hwnd );
         bool queryCurrentForm();
+        int queryCopies();
+        void setCopies( int copies );
         void applyForm( HWND hwnd );
         static MRESULT EXPENTRY printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
 

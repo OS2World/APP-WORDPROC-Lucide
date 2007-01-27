@@ -107,6 +107,8 @@ void PrintDlg::setCurrentQInfo( HWND hwnd, PPRQINFO3 q )
                 MPFROMHWND( WinWindowFromID( hwnd, IDC_TYPE_POSTSCRIPT ) ) );
 
     WinCheckButton( hwnd, isPortraitOrientation() ? IDC_PORTRAIT : IDC_LANDSCAPE, TRUE );
+    WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_SETCURRENTVALUE,
+                       MPFROMLONG( queryCopies() ), MPVOID );
 
     applyForm( hwnd );
 }
@@ -190,6 +192,9 @@ void PrintDlg::showJobProperties( HWND hwnd )
                         achDeviceName, psetup->QueueInfo.pszPrinters, DPDM_POSTJOBPROP );
 
     WinCheckButton( hwnd, isPortraitOrientation() ? IDC_PORTRAIT : IDC_LANDSCAPE, TRUE );
+    WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_SETCURRENTVALUE,
+                       MPFROMLONG( queryCopies() ), MPVOID );
+
     applyForm( hwnd );
 }
 
@@ -241,6 +246,7 @@ typedef struct _djpItem
 #define DJP_CURRENT             2L
 #define DJP_NONE                0L
 #define DJP_SJ_ORIENTATION      1L
+#define DJP_SJ_COPIES           16L
 
 #define DJP_ORI_PORTRAIT        1L
 #define DJP_ORI_LANDSCAPE       2L
@@ -295,7 +301,6 @@ bool PrintDlg::isPortraitOrientation()
     return rVal;
 }
 
-
 void PrintDlg::setPortraitOrientation( bool portrait, HWND hwnd )
 {
     HDC hdcPrinterInfo = getInfoDC();
@@ -327,6 +332,71 @@ void PrintDlg::setPortraitOrientation( bool portrait, HWND hwnd )
     }
 }
 
+int PrintDlg::queryCopies()
+{
+    int rVal = 1;
+
+    HDC hdcPrinterInfo = getInfoDC();
+    if ( hdcPrinterInfo != DEV_ERROR )
+    {
+        DJP_ITEM djp[ 2 ] = { { 0 } };
+
+        // Get number of copies from Job Properties
+        djp[0].cb = sizeof( DJP_ITEM );
+        djp[0].ulProperty = DJP_SJ_COPIES;
+        djp[0].lType = DJP_CURRENT;
+        djp[0].ulNumReturned = 1;
+        djp[0].ulValue = 1;
+
+        djp[1].cb = sizeof( DJP_ITEM );
+        djp[1].ulProperty = 0;
+        djp[1].lType = DJP_NONE;
+        djp[1].ulNumReturned = 1;
+        djp[1].ulValue = 0;
+
+        LONG outSz = psetup->QueueInfo.pDriverData->cb;
+        LONG rc = DevEscape( hdcPrinterInfo, DEVESC_QUERYJOBPROPERTIES,
+                             sizeof( DJP_ITEM ) * 2, (PCHAR)djp,
+                             &outSz, (PCHAR)psetup->QueueInfo.pDriverData );
+
+        if ( ( rc == DEV_OK ) || ( rc == DEV_WARNING ) ) {
+            rVal = djp[0].ulValue;
+        }
+
+        DevCloseDC( hdcPrinterInfo );
+    }
+
+    return rVal;
+}
+
+void PrintDlg::setCopies( int copies )
+{
+    HDC hdcPrinterInfo = getInfoDC();
+    if ( hdcPrinterInfo != DEV_ERROR )
+    {
+        DJP_ITEM djp[ 2 ] = { { 0 } };
+
+        // Set number of copies
+        djp[0].cb = sizeof( DJP_ITEM );
+        djp[0].ulProperty = DJP_SJ_COPIES;
+        djp[0].lType = DJP_CURRENT;
+        djp[0].ulNumReturned = 1;
+        djp[0].ulValue = copies;
+
+        djp[1].cb = sizeof( DJP_ITEM );
+        djp[1].ulProperty = 0;
+        djp[1].lType = DJP_NONE;
+        djp[1].ulNumReturned = 1;
+        djp[1].ulValue = 0;
+
+        LONG outSz = psetup->QueueInfo.pDriverData->cb;
+        DevEscape( hdcPrinterInfo, DEVESC_SETJOBPROPERTIES,
+                   sizeof( DJP_ITEM ) * 2, (PCHAR)djp,
+                   &outSz, (PCHAR)psetup->QueueInfo.pDriverData );
+
+        DevCloseDC( hdcPrinterInfo );
+    }
+}
 
 bool PrintDlg::queryCurrentForm()
 {
@@ -468,14 +538,14 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
             WinSendDlgItemMsg( hwnd, IDC_PGTO, SPBM_SETCURRENTVALUE,
                                MPFROMLONG( pages ), MPVOID );
 
+            // Enum printer queues
+            _this->enumQueues( hwnd );
+
             // Number of copies
             WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_SETLIMITS,
                                MPFROMLONG( 999 ), MPFROMLONG( 1 ) );
             WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_SETCURRENTVALUE,
                                MPFROMLONG( 1 ), MPVOID );
-
-            // Enum printer queues
-            _this->enumQueues( hwnd );
 
             USHORT sEntry;
             HWND reo = WinWindowFromID( hwnd, IDC_RANGE_EVEN_ODD );
@@ -555,6 +625,17 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                 }
                 break;
 
+                case IDC_COPIES:
+                {
+                    if ( SHORT2FROMMP(mp1) == SPBN_CHANGE )
+                    {
+                        LONG cp = 0;
+                        WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_QUERYVALUE,
+                                           MPFROMP( &cp ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                        _this->setCopies( cp );
+                    }
+                }
+                break;
             }
         }
         break;
