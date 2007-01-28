@@ -6,12 +6,12 @@
 # Main menu
 #
 MENU_DOCUMENT=~Dokument
-MENU_NEW_WINDOW=~Nytt f”nster
 MENU_OPEN=™ppna...\tCtrl+O
 MENU_SAVE_AS=Spara som...
-# MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Sida inst„llningar...
 MENU_PRINT=Skriv ut...
+MENU_DOCUMENT_INFO=Dokumentinfo...
+MENU_FONTS_INFO=Fonter info...
 MENU_PLUGINS_LIST=Pluginlista...
 MENU_EXIT=Avsluta\tCtrl+X
 MENU_EDIT=~Redigera
@@ -20,22 +20,19 @@ MENU_SELECT_ALL=V„lj allt\tCtrl+/
 MENU_FIND=Finn...\tCtrl+F
 MENU_FINDAGAIN=Finn igen\tCtrl+G
 MENU_SETTINGS=~Inst„llningar
-MENU_VIEW=~Visa
-MENU_FIT_WINDOW=Passa f”nster
-MENU_ACTUAL_SIZE=Verklig storlek
-MENU_FIT_WIDTH=Passa bredd
-MENU_ZOOM_IN_OUT=~Zooma in/ut
 MENU_FIRST_PAGE=F”rsta sidan
 MENU_PREV_PAGE=F”reg†ende sida\t-
 MENU_NEXT_PAGE=N„sta sida\t+
 MENU_LAST_PAGE=Sista sidan
 MENU_GO_TO_PAGE=G† till sidan...\tCtrl+N
+MENU_VIEW=~Visa
+MENU_FIT_WINDOW=Passa f”nster
+MENU_ACTUAL_SIZE=Verklig storlek
+MENU_FIT_WIDTH=Passa bredd
 MENU_ROTATE_CW=Rotera 90ø CW
 MENU_ROTATE_CCW=Rotera 90ø CCW
 MENU_SINGLE_PAGE=Enstaka sida
 MENU_CONTINUOUS=Kontinuerlig
-MENU_DOCUMENT_INFO=~Dokumentinfo...
-MENU_FONTS_INFO=Font~info...
 MENU_WINDOW=~F”nster
 MENU_SHOW_NAV_PANE=Visa navigationspanel
 MENU_MAXVIEW=~Maximerad visning\tF11
@@ -58,7 +55,6 @@ TBHINT_FIT_WINDOW=Passa f”nster
 TBHINT_FIT_WIDTH=Passa bredd
 TBHINT_FIND=Finn...
 TBHINT_FINDAGAIN=Finn igen
-TBHINT_ZOOM_IN_OUT=Zooma in/ut
 # toolbar's page number
 TB_PAGENUM=av %d
 
@@ -69,24 +65,10 @@ MSGS_MAIN_WIN_TITLE=%APPNAME% - Dokumentvisare
 MSGS_NO_SUIT_PLUG=Kan inte hitta n†gon l„mplig plugin f”r specificerat dokument!
 MSGS_FILE_LOAD_ERROR=Filladdningsfel!
 MSGS_LOADING_DOCUMENT=Laddar dokument, var v„nlig v„nta...
-MSGS_CREATING_THUMBNAIL=Skapar tumnagel f”r dokument, var v„nlig v„nta...
 MSGS_WARNING=Varning!
 MSGS_OVERWRITE_FILE=Filen existerar redan. Skriv ”ver?
 MSGS_FILE_SAVE_ERROR=Fel vid sparande av fil!
 MSGS_PAGE=Sida
-MSGS_ERROR_STARTING_BROWSER=Fel vid start av browser!
-
-MSGS_LDERR=Filladdningsfel: %s!
-MSGS_LDERR_OUT_OF_MEMORY=Slut p† minne
-MSGS_LDERR_OPEN_ERROR=™ppningsfel
-MSGS_LDERR_READ_ERROR=L„sfel
-MSGS_LDERR_DAMAGED=Filen skadad
-MSGS_LDERR_WRONG_FORMAT=Fel format
-MSGS_LDERR_ENCRYPTED=Filen „r krypterad
-
-MSGS_RERR_OUT_OF_MEMORY=Slut p† minne
-MSGS_RERR_CORRUPTED_PAGE_DATA=Korrupt sidodata
-MSGS_RERR_FONT_NOT_FOUND=Font %s hittades inte
 
 #
 # "Plugins list" dialog
@@ -190,13 +172,8 @@ PD_RANGE_PAGES=Si~dor
 PD_FROM=~Fr†n
 PD_TO=~Till
 PD_NUMBER_OF_COPIES=~Antal kopior
-PD_RANGE_EVEN_ODD_LABEL=Utskriftsomr†de
-PD_RANGE_EVEN_ODD=J„mna och udda sidor
-PD_RANGE_ODD=Endast udda sidor
-PD_RANGE_EVEN=Endast j„mna sidor
 PD_PRINT_TYPE=Utskriftstyp
 PD_TYPE_POSTSCRIPT=Post~script
-PD_PRINT_TO_FILE=Skriv ut till fil
 PD_TYPE_ASIMAGE=Som b~ild
 PD_HIGHER_IMAGE_QUALITY=~H”gre bildkvalit‚ (l†ngsammare och kr„ver mer minne)
 PD_PAGE_ORIENTATION=Sidorientering
@@ -216,11 +193,3 @@ PRINT_PRINTING_PAGE_OF=Skriver ut sidan %d (%d av %d)...
 PRINT_GENERATING_POSTSCRIPT=Skapar postscriptfil...
 PRINT_SPOOLING_POSTSCRIPT=Spoolar postscriptdata...
 PRINT_FAILED=Utskrift misslyckades!
-
-#
-# Password dialog
-#
-PSW_TITLE=Dokumentet „r krypterat!
-PSW_PASSWORD=~L”senord
-PSW_OK=~OK
-PSW_CANCEL=~Avbryt

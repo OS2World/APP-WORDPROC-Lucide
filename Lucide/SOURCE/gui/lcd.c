@@ -33,10 +33,8 @@
 
 
 #define INCL_DOS
-#define INCL_WIN
 #include <os2.h>
 
-#include <stdio.h>
 #include <string.h>
 #include <process.h>
 
@@ -53,9 +51,7 @@ int main( int argc, char *argv[] )
 {
     int result = 1;
     char *last_slash;
-    CHAR modName[ CCHMAXPATH ] = { 0 };
     HMODULE hmod = NULLHANDLE;
-    APIRET rc = 0;
 
 #ifdef __TEST__
     PPIB pib;
@@ -76,8 +72,7 @@ int main( int argc, char *argv[] )
     // set beginlibpath
     DosSetExtLIBPATH( lucideDir, BEGIN_LIBPATH );
 
-    rc = DosLoadModule( modName, sizeof( modName ), "Lucide", &hmod );
-    if ( rc == 0 )
+    if ( DosLoadModule( NULL, 0, "Lucide", &hmod ) == 0 )
     {
         PFN pfn = NULL;
         if ( DosQueryProcAddr( hmod, 0, "LucideMain", &pfn ) == 0 )
@@ -85,29 +80,7 @@ int main( int argc, char *argv[] )
             LMain LucideMain = (LMain)pfn;
             result = LucideMain( argc, argv );
         }
-        DosFreeModule( hmod );
-    }
-    else
-    {
-        HAB hab;
-        HMQ hmq;
-        char msg[ 256 ];
-
-        hab = WinInitialize( 0 );
-        hmq = WinCreateMsgQueue( hab, 0 );
-
-        if ( modName[0] == 0 ) { // No modulename
-            snprintf( msg, sizeof( msg ), "Error loading Lucide.dll: SYS%04u", rc );
-        }
-        else {
-            snprintf( msg, sizeof( msg ),
-                      "Error loading Lucide.dll: can't find module '%s' (SYS%04u)",
-                      modName, rc );
-        }
-        WinMessageBox( HWND_DESKTOP, NULLHANDLE, msg, NULL, 1, MB_OK | MB_MOVEABLE );
-
-        WinDestroyMsgQueue( hmq );
-        WinTerminate( hab );
+        DosFreeModule (hmod);
     }
 
     return result;

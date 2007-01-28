@@ -6,35 +6,33 @@
 # Main menu
 #
 MENU_DOCUMENT=~Dokument
-MENU_NEW_WINDOW=~Nyt vindue
 MENU_OPEN=~èben...\tCtrl+O
 MENU_SAVE_AS=~Gem som...
 MENU_PAGE_SETUP=~Side opsëtning...
 MENU_PRINT=~Print...
+MENU_DOCUMENT_INFO=~Dokument info...
+MENU_FONTS_INFO=Font ~info...
 MENU_PLUGINS_LIST=Plugins ~list...
-MENU_EXIT=~Afslut\tCtrl+X
+MENU_EXIT=A~fslut\tCtrl+X
 MENU_EDIT=~Ret
 MENU_COPY=~Kopier\tCtrl+Insert
 MENU_SELECT_ALL=Vëlg ~alle\tCtrl+/
 MENU_FIND=~Find...\tCtrl+F
 MENU_FINDAGAIN=Find i~gen\tCtrl+G
-MENU_SETTINGS=~Indstillinger
-MENU_VIEW=~Kig
-MENU_FIT_WINDOW=~Tilpas vindue
-MENU_ACTUAL_SIZE=~Aktual stõrrelse
-MENU_FIT_WIDTH=Tilpas ~bredde
-MENU_ZOOM_IN_OUT=~Zoom ind/ud
-MENU_FIRST_PAGE=F~õrste side
+MENU_SETTINGS=~Settings
+MENU_FIRST_PAGE=~First page
 MENU_PREV_PAGE=~Forrige side\t-
 MENU_NEXT_PAGE=~Nëste side\t+
 MENU_LAST_PAGE=~Sidste side
 MENU_GO_TO_PAGE=~GÜ til side...\tCtrl+N
-MENU_ROTATE_CW=Drej ~90¯ Med Uret
+MENU_VIEW=~Kig
+MENU_FIT_WINDOW=~Tilpas vindue
+MENU_ACTUAL_SIZE=~Aktual stõrrelse
+MENU_FIT_WIDTH=Tilpas ~bredde
+MENU_ROTATE_CW=~Drej 90¯ Med Uret
 MENU_ROTATE_CCW=Drej 90¯ ~Mod Uret
-MENU_SINGLE_PAGE=~Enkelt side
-MENU_CONTINUOUS=~Kontinuerlig
-MENU_DOCUMENT_INFO=~Dokument info...
-MENU_FONTS_INFO=Font ~info...
+MENU_SINGLE_PAGE=~Single page
+MENU_CONTINUOUS=K~ontinuerlig
 MENU_WINDOW=~Vindue
 MENU_SHOW_NAV_PANE=~Vis navigations panel
 MENU_MAXVIEW=~Maximeret vindue\tF11
@@ -49,15 +47,14 @@ TBHINT_OPEN=èben dokument...
 TBHINT_PRINT=Print...
 TBHINT_SHOW_NAV_PANE=Vis/skjul navigations panel
 TBHINT_FIRST_PAGE=Fõrste side
-TBHINT_PREV_PAGE=Forrige side
+TBHINT_PREV_PAGE=Forige side
 TBHINT_NEXT_PAGE=Nëste side
 TBHINT_LAST_PAGE=Sidste side
-TBHINT_ACTUAL_SIZE=Faktisk stõrrelse
+TBHINT_ACTUAL_SIZE=Faktisk stõrelse
 TBHINT_FIT_WINDOW=Tilpas til vinduets hõjde
 TBHINT_FIT_WIDTH=Tilpas til vinduets bredde
 TBHINT_FIND=Find...
 TBHINT_FINDAGAIN=Find igen
-TBHINT_ZOOM_IN_OUT=Zoom ind/ud
 # toolbar's page number
 TB_PAGENUM=af %d
 
@@ -68,24 +65,10 @@ MSGS_MAIN_WIN_TITLE=%APPNAME% - Dokument Fremviser
 MSGS_NO_SUIT_PLUG=%APPNAME% understõtter ikke denne dokument type
 MSGS_FILE_LOAD_ERROR=Fejl under indlësning af dokumentet!
 MSGS_LOADING_DOCUMENT=Dokumentet indlëses...hold pÜ hatten...
-MSGS_CREATING_THUMBNAIL=Tilfõjer thumbnail til dokumentet, vent et õjeblik...
 MSGS_WARNING=ADVARSEL!
 MSGS_OVERWRITE_FILE=Dokumentet findes allerede.ùnsker du det overskrevet?
 MSGS_FILE_SAVE_ERROR=Der opstod en fejl, da filen skulle gemmes!
 MSGS_PAGE=Side
-MSGS_ERROR_STARTING_BROWSER=Fejl ved start af browser!
-
-MSGS_LDERR=Fejl ved indlësning af fil: %s!
-MSGS_LDERR_OUT_OF_MEMORY=Ikke mere RAM
-MSGS_LDERR_OPEN_ERROR=Fejl ved Übning
-MSGS_LDERR_READ_ERROR=Fejl ved lësning
-MSGS_LDERR_DAMAGED=Fil beskadiget
-MSGS_LDERR_WRONG_FORMAT=Forkert format
-MSGS_LDERR_ENCRYPTED=Filen er krypteret
-
-MSGS_RERR_OUT_OF_MEMORY=Ikke mere RAM
-MSGS_RERR_CORRUPTED_PAGE_DATA=Beskadiget information pÜ siden
-MSGS_RERR_FONT_NOT_FOUND=Fonten %s kunne ikke findes
 
 #
 # "Plugins list" dialog
@@ -106,11 +89,11 @@ FONTINFO_ENUMERATING=Smõlfer fontene, tag en slapper...
 # List columns titles
 FONTINFO_NAME=Navn
 FONTINFO_TYPE=Type
-FONTINFO_EMBEDDED=Indbygget?
+FONTINFO_EMBEDDED=Embedded???
 # Embedded types
-FONTINFO_EMBED_NOT_EMBEDDED=Nej
-FONTINFO_EMBED_EMBEDDED=Ja
-FONTINFO_EMBED_EMBEDDED_SUBSET=Delvis
+FONTINFO_EMBED_NOT_EMBEDDED=Not embedded ???
+FONTINFO_EMBED_EMBEDDED=Embedded???
+FONTINFO_EMBED_EMBEDDED_SUBSET=Embedded subset???
 
 #
 # "Document info" dialog
@@ -143,22 +126,23 @@ FIND_NOT_FOUND=Ikke fundet!
 #
 # "Progress" dialog
 #
-PDLG_PROGRESS=Fremskridt
+PDLG_PROGRESS=Progress
 PDLG_CANCEL=~Afbryd
 
 #
 # About dialog
 #
-AD_ABOUT=Om
+AD_ABOUT=About
 AD_DESCRIPTION=Plugin-baseret dokument fremviser med understõttelse for mange forskellige formater
 AD_COPYRIGHTS=(c) Eugene Romanenko, netlabs.org in co-operation with Serenity Systems International
+AD_TRANSLATION=Translation for this nice language is done by Allan Holm (Yoda_Lucide@warpspeed.dk) aka Yoda on IRC
 AD_OK=~OK
 
 #
 # Settings dialog
 #
 SD_SETTINGS=Indstillinger
-SD_DEFAULT_PAGE_LAYOUT=Standard ~Side Udlëg
+SD_DEFAULT_PAGE_LAYOUT=Standdard ~Side Udlëg
 SD_DEFAULT_ZOOM=Standard ~Zoom
 SD_SINGLE_PAGE=Enkelt side
 SD_CONTINUOUS=Kontinuerlig
@@ -182,21 +166,15 @@ PD_PRINTER=Printer
 PD_NAME_LABEL=~Navn
 PD_JOB_PROPERTIES=~Job indstillinger
 PD_DRIVER_LABEL=Driver
-PD_PRINT_RANGE_AND_COPIES=Print ~fõlgende sider
-PD_RANGE_ALL=A~lle
+PD_PRINT_RANGE=Print ~range
+PD_RANGE_ALL=~Alle
 PD_RANGE_CURRENT_PAGE=N~uvërende side
-PD_RANGE_PAGES=S~ider
+PD_RANGE_PAGES=~Sider
 PD_FROM=~Fra
 PD_TO=~Til
-PD_NUMBER_OF_COPIES=Antal ~kopier
-PD_RANGE_EVEN_ODD_LABEL=Print fõlgende
-PD_RANGE_EVEN_ODD=Lige og ulige sider
-PD_RANGE_ODD=Kun ulige sider
-PD_RANGE_EVEN=Kun lige sider
 PD_PRINT_TYPE=Print type
-PD_TYPE_POSTSCRIPT=P~ostscript
-PD_PRINT_TO_FILE=Print til en fil
-PD_TYPE_ASIMAGE=Som ~billede
+PD_TYPE_POSTSCRIPT=Post~script
+PD_TYPE_ASIMAGE=As ~billede
 PD_HIGHER_IMAGE_QUALITY=~Hõj billed oplõsning (langsomt, og krëver mere hukommelse)
 PD_PAGE_ORIENTATION=Side orientering
 PD_PORTRAIT=Portrët
@@ -204,22 +182,14 @@ PD_LANDSCAPE=Landskab
 PD_MARGINS=Marginer (mm)
 PD_MLEFT=Venstre
 PD_MRIGHT=Hõjre
-PD_MTOP=ùverst
-PD_MBOTTOM=Nederst
-PD_SELECTED_FORM=Valgt format
+PD_MTOP=Top
+PD_MBOTTOM=Bottom
+PD_SELECTED_FORM=Selected form
 PD_BTNPRINT=~Print
 PD_BTNCANCEL=~Afbryd
-PD_WRONG_MARGINS=Forkerte marginer!
 # other 'print'-related messages
 PRINT_PRINTING_PAGE_OF=Printer side %d af %d...
 PRINT_GENERATING_POSTSCRIPT=Genererer en postscript fil...
 PRINT_SPOOLING_POSTSCRIPT=Sender postscript data i kõ...
 PRINT_FAILED=Udskrivningen gik rablende galt!
 
-#
-# Password dialog
-#
-PSW_TITLE=Dokumentet er krypteret!
-PSW_PASSWORD=~Kodeord
-PSW_OK=~OK
-PSW_CANCEL=~Afbryd
