@@ -1,6 +1,6 @@
 1.0:
   - Show message with missed modulename if Lucide.dll cannot be loaded.
-  - Updated NLS-files: German, French, Swedish.
+  - Updated NLS-files: German, French, Swedish, Danish.
 
 1.0 RC1:
   - Ask for password, if document password-protected.
