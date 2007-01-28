@@ -111,8 +111,9 @@ Return WirexxGetEnv('plug_djvu')
 Return WirexxGetEnv('plug_jpeg')
 </REXX>
 <PCK INDEX=1
-     PACKAGEID="netlabs.org\Lucide\Lucide core\0\9\5"
+     PACKAGEID="netlabs.org\Lucide\Lucide core\1\0\0"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
+     REQUIRES="netlabs.org\UClip\Binaries\0\2\1\0"     
      BASE
      TITLE="=("title")"
      CREATEOBJECT='WPFolder|=("folder")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
@@ -125,7 +126,7 @@ Return WirexxGetEnv('plug_jpeg')
      >=("title").</PCK>
 
 <PCK INDEX=2
-     PACKAGEID="netlabs.org\Lucide\Lucide plugin PDF\0\9\5"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin PDF\1\0\0"
      TARGET="$(1)"
      TITLE="=("plug_pdf")"
      REQUIRES=1
@@ -133,7 +134,7 @@ Return WirexxGetEnv('plug_jpeg')
      >=("plug_pdf")</PCK>
 
 <PCK INDEX=3
-     PACKAGEID="netlabs.org\Lucide\Lucide plugin DJVU\0\9\5"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin DJVU\1\0\0"
      TARGET="$(1)"
      TITLE="=("plug_djvu")"
      REQUIRES=1
@@ -141,7 +142,7 @@ Return WirexxGetEnv('plug_jpeg')
      >=("plug_djvu")</PCK>
 
 <PCK INDEX=4
-     PACKAGEID="netlabs.org\Lucide\Lucide plugin JPEG\0\9\5"
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin JPEG\1\0\0"
      TARGET="$(1)"
      TITLE="=("plug_jpeg")"
      REQUIRES=1
