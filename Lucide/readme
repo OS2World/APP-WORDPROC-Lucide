@@ -43,17 +43,22 @@ Please make sure you select the correct version and component for your ticket.
 :: Known problems/limitations ::
 
 General: even/odd printing unavailable for postscript printing.
+          ( http://svn.netlabs.org/lucide/ticket/87#comment:4 )
 
 General: currently, Lucide determines the document type by extension, so
          files without extensions are not supported yet.
+          ( http://svn.netlabs.org/lucide/ticket/43 )
 
 General: files with more than one dot in the filename are not displayed in
          the Open File dialog. This is not a Lucide problem, but a problem
          of the standard Open File dialog.
+          ( http://svn.netlabs.org/lucide/ticket/86#comment:1 )
 
 PDF plugin: text selection in multicolumn documents may work incorrectly
             and Lucide may even crash. It's a problem of poppler PDF rendering
             library.
+             ( http://svn.netlabs.org/lucide/ticket/98 )
+             ( https://bugs.freedesktop.org/show_bug.cgi?id=4006#c1 )
 
 
 :: Pipe commands ::
