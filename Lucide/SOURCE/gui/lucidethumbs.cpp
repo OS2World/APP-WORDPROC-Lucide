@@ -210,8 +210,21 @@ static BOOL set_ea( const char *file_name, const char *ea_name,
 
     *((long*)databuf) = databufp-databuf; // Size of all that stuff
 
+    // HPFS386 workaround
+    // Save timestamp (setting EA drops timestamp on HPFS386)
+    APIRET qpirc = 0;
+    FILESTATUS3 fs = { 0 };
+    qpirc = DosQueryPathInfo( file_name, FIL_STANDARD, &fs, sizeof( fs ) );
+
+    // Write EA
     rc = DosSetPathInfo( file_name, FIL_QUERYEASIZE, &op, sizeof(op), 0);
     delete databuf;
+
+    // Restore timestamp
+    if ( qpirc == 0 ) {
+        DosSetPathInfo( file_name, FIL_STANDARD, &fs, sizeof( fs ), DSPI_WRTTHRU );
+    }
+
     if ( rc != 0 ) {
         return FALSE;
     }
