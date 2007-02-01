@@ -107,8 +107,10 @@ void PrintDlg::setCurrentQInfo( HWND hwnd, PPRQINFO3 q )
                 MPFROMHWND( WinWindowFromID( hwnd, IDC_TYPE_POSTSCRIPT ) ) );
 
     WinCheckButton( hwnd, isPortraitOrientation() ? IDC_PORTRAIT : IDC_LANDSCAPE, TRUE );
-    WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_SETCURRENTVALUE,
-                       MPFROMLONG( queryCopies() ), MPVOID );
+
+    // removed (copies to job props)
+    //WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_SETCURRENTVALUE,
+    //                   MPFROMLONG( queryCopies() ), MPVOID );
 
     applyForm( hwnd );
 }
@@ -192,8 +194,10 @@ void PrintDlg::showJobProperties( HWND hwnd )
                         achDeviceName, psetup->QueueInfo.pszPrinters, DPDM_POSTJOBPROP );
 
     WinCheckButton( hwnd, isPortraitOrientation() ? IDC_PORTRAIT : IDC_LANDSCAPE, TRUE );
-    WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_SETCURRENTVALUE,
-                       MPFROMLONG( queryCopies() ), MPVOID );
+
+    // removed (copies to job props)
+    //WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_SETCURRENTVALUE,
+    //                   MPFROMLONG( queryCopies() ), MPVOID );
 
     applyForm( hwnd );
 }
@@ -332,7 +336,7 @@ void PrintDlg::setPortraitOrientation( bool portrait, HWND hwnd )
     }
 }
 
-int PrintDlg::queryCopies()
+int PrintDlg::queryCopies() // currently unused
 {
     int rVal = 1;
 
@@ -369,7 +373,7 @@ int PrintDlg::queryCopies()
     return rVal;
 }
 
-void PrintDlg::setCopies( int copies )
+void PrintDlg::setCopies( int copies )  // currently unused
 {
     HDC hdcPrinterInfo = getInfoDC();
     if ( hdcPrinterInfo != DEV_ERROR )
@@ -625,17 +629,18 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                 }
                 break;
 
-                case IDC_COPIES:
-                {
-                    if ( SHORT2FROMMP(mp1) == SPBN_CHANGE )
-                    {
-                        LONG cp = 0;
-                        WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_QUERYVALUE,
-                                           MPFROMP( &cp ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
-                        _this->setCopies( cp );
-                    }
-                }
-                break;
+                // removed (copies to job props)
+                //case IDC_COPIES:
+                //{
+                //    if ( SHORT2FROMMP(mp1) == SPBN_CHANGE )
+                //    {
+                //        LONG cp = 0;
+                //        WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_QUERYVALUE,
+                //                           MPFROMP( &cp ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                //        _this->setCopies( cp );
+                //    }
+                //}
+                //break;
             }
         }
         break;

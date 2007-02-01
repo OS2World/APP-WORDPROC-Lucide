@@ -1,6 +1,6 @@
 1.0:
   - Show message with missed modulename if Lucide.dll cannot be loaded.
-  - Fixed printing multiple copies.
+  - Minor fixes.
   - Updated NLS-files: German, French, Swedish, Danish.
 
 1.0 RC1:
