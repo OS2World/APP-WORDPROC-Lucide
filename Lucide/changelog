@@ -1,5 +1,6 @@
 1.0:
   - Show message with missed modulename if Lucide.dll cannot be loaded.
+  - PDF plugin: freetype library updated to release 2.3.1.
   - Minor fixes.
   - Updated NLS-files: German, French, Swedish, Danish.
 
