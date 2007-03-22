@@ -6,6 +6,7 @@
 # Main menu
 #
 MENU_DOCUMENT=~Dokument
+MENU_NEW_WINDOW=~Nov‚ okno
 MENU_OPEN=~Otevý¡t...\tCtrl+O
 MENU_SAVE_AS=~Ulo§it jako...
 # MENU_PAGE_SETUP: smazat

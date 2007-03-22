@@ -10,7 +10,6 @@ MENU_DOCUMENT=~Document
 MENU_NEW_WINDOW=~Nouvelle fenàtre
 MENU_OPEN=~Ouvrir...\tCtrl+O
 MENU_SAVE_AS=~Enregistrer sous...
-# MENU_EXPORT_TO_PS=E~xporter en PostScript...
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Mise en ~page...
 MENU_PRINT=~Imprimer...
@@ -49,7 +48,7 @@ MENU_PRODUCT_INFORMATION=Info. ~produit
 # Toolbar hints
 #
 TBHINT_OPEN=Ouverture d'un document
-TBHINT_PRINT=Lancement des options d'impression
+TBHINT_PRINT=Ouverture du panneau d'options pour l'impression
 TBHINT_SHOW_NAV_PANE=Affichage/Masquage du panneau de navigation
 TBHINT_FIRST_PAGE=DÇplacement jusqu'Ö la premiäre page
 TBHINT_PREV_PAGE=Retour Ö la page prÇcÇdente
@@ -78,7 +77,7 @@ MSGS_FILE_SAVE_ERROR=Erreur Ö la sauvegarde du fichier !
 MSGS_PAGE=Page
 MSGS_ERROR_STARTING_BROWSER=Erreur au lancement du navigateur ! 
 
-MSGS_LDERR=Erruer de chargement de fichier : %s !
+MSGS_LDERR=Erreur de chargement de fichier : %s !
 MSGS_LDERR_OUT_OF_MEMORY=Hors mÇmoire
 MSGS_LDERR_OPEN_ERROR=Erreur d'ouverture
 MSGS_LDERR_READ_ERROR=Erreur de lecture
@@ -126,7 +125,7 @@ DOCINFO_FORMAT=Format :
 DOCINFO_AUTHOR=Auteur :
 DOCINFO_SUBJECT=Sujet :
 DOCINFO_KEYWORDS=Mots-clÇs :
-DOCINFO_CREATOR=Createur :
+DOCINFO_CREATOR=CrÇateur :
 DOCINFO_PRODUCER=Producteur :
 DOCINFO_CREATION_DATE=CrÇÇ le :
 DOCINFO_MOD_DATE=ModifiÇ le :
@@ -185,7 +184,7 @@ GTP_CANCEL=~Annuler
 PD_TITLE=Impression
 PD_PRINTER=Imprimante
 PD_NAME_LABEL=~Nom
-PD_JOB_PROPERTIES=Paramätre du ~travail
+PD_JOB_PROPERTIES=Paramätres du ~travail
 PD_DRIVER_LABEL=Pilote
 PD_PRINT_RANGE_AND_COPIES=ê~tendue et nombre de copies
 PD_RANGE_ALL=T~outes

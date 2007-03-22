@@ -1,17 +1,17 @@
 #
-# Lucide language file, NL (demo3)
+# Lucide language file, NL (1.0)
 #
 
 #
 # Main menu
 #
-MENU_DOCUMENT=~Document
+MENU_DOCUMENT=~Bestand
+MENU_NEW_WINDOW=~Nieuw venster
 MENU_OPEN=~Openen...\tCtrl+O
 MENU_SAVE_AS=Op~slaan als...
+# MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=~Pagina-instelling
 MENU_PRINT=Af~drukken...
-MENU_DOCUMENT_INFO=~Document informatie
-MENU_FONTS_INFO=Lettert~ype informatie
 MENU_PLUGINS_LIST=P~lug-in lijst...
 MENU_EXIT=E~inde\tCtrl+X
 MENU_EDIT=B~ewerken
@@ -20,19 +20,22 @@ MENU_SELECT_ALL=~Alles selecteren\tCtrl+/
 MENU_FIND=~Zoeken...\tCtrl+F
 MENU_FINDAGAIN=O~pnieuw zoeken\tCtrl+G
 MENU_SETTINGS=In~stellingen
+MENU_VIEW=Weerga~ve
+MENU_FIT_WINDOW=Ven~stergrootte
+MENU_ACTUAL_SIZE=~Ware grootte
+MENU_FIT_WIDTH=Venster~breedte
+MENU_ZOOM_IN_OUT=~Zoom in/uit
 MENU_FIRST_PAGE=~Eerste pagina
 MENU_PREV_PAGE=Vo~rige pagina\t-
 MENU_NEXT_PAGE=~Volgende pagina\t+
 MENU_LAST_PAGE=~Laatste pagina
 MENU_GO_TO_PAGE=~Ga naar pagina...\tCtrl+N
-MENU_VIEW=Weerga~ve
-MENU_FIT_WINDOW=Ven~stergrootte
-MENU_ACTUAL_SIZE=~Ware grootte
-MENU_FIT_WIDTH=Venster~breedte
 MENU_ROTATE_CW=Roteer 90ø ~met de klok mee
 MENU_ROTATE_CCW=Roteer 90ø ~tegen de klok in
 MENU_SINGLE_PAGE=Enkele p~agina
 MENU_CONTINUOUS=D~oorlopend
+MENU_DOCUMENT_INFO=~Document informatie
+MENU_FONTS_INFO=Lettert~ype informatie
 MENU_WINDOW=Ve~nster
 MENU_SHOW_NAV_PANE=~Tonen navigatie paneel
 MENU_MAXVIEW=~Maximale weergave\tF11
@@ -52,9 +55,10 @@ TBHINT_NEXT_PAGE=Volgende pagina
 TBHINT_LAST_PAGE=Laatste pagina
 TBHINT_ACTUAL_SIZE=Ware grootte
 TBHINT_FIT_WINDOW=Passend in het venster
-TBHINT_FIT_WIDTH=Passende breedte
+TBHINT_FIT_WIDTH=Passend in de breedte
 TBHINT_FIND=Zoeken...
 TBHINT_FINDAGAIN=Opnieuw zoeken
+TBHINT_ZOOM_IN_OUT=Zoom in/ uit
 # toolbar's page number
 TB_PAGENUM=van %d
 
@@ -64,11 +68,25 @@ TB_PAGENUM=van %d
 MSGS_MAIN_WIN_TITLE=%APPNAME% - Document Bekijker
 MSGS_NO_SUIT_PLUG=Kan geen passende plug-in vinden voor opgegeven document!
 MSGS_FILE_LOAD_ERROR=Bestand inleesfout!
-MSGS_LOADING_DOCUMENT=Inlezen document, even geduld a.u.b
+MSGS_LOADING_DOCUMENT=Inlezen document, even geduld a.u.b.
+MSGS_CREATING_THUMBNAIL=Miniatuur maken voor document, even geduld a.u.b.
 MSGS_WARNING=Waarschuwing!
 MSGS_OVERWRITE_FILE=Bestand bestaat al. Overschrijven?
 MSGS_FILE_SAVE_ERROR=Fout bij het opslaan van het bestand!
 MSGS_PAGE=Pagina
+MSGS_ERROR_STARTING_BROWSER=Fout bij het opstarten van de browser!
+
+MSGS_LDERR=Bestand inleesfout: %s!
+MSGS_LDERR_OUT_OF_MEMORY=Onvoldoende geheugen
+MSGS_LDERR_OPEN_ERROR=Fout bij openen
+MSGS_LDERR_READ_ERROR=Fout bij lezen
+MSGS_LDERR_DAMAGED=Bestand beschadigd
+MSGS_LDERR_WRONG_FORMAT=Verkeerde indeling
+MSGS_LDERR_ENCRYPTED=Bestand is versleuteld
+
+MSGS_RERR_OUT_OF_MEMORY=Onvoldoende geheugen
+MSGS_RERR_CORRUPTED_PAGE_DATA=Beschadigde paginagegevens
+MSGS_RERR_FONT_NOT_FOUND=Lettertype %s niet gevonden
 
 #
 # "Plugins list" dialog
@@ -93,7 +111,7 @@ FONTINFO_EMBEDDED=Ingebouwd?
 # Embedded types
 FONTINFO_EMBED_NOT_EMBEDDED=Niet ingebouwd
 FONTINFO_EMBED_EMBEDDED=Ingebouwd
-FONTINFO_EMBED_EMBEDDED_SUBSET=Ingebouwd subset
+FONTINFO_EMBED_EMBEDDED_SUBSET=Ingebouwde subset
 
 #
 # "Document info" dialog
@@ -115,7 +133,7 @@ DOCINFO_MOD_DATE=Veranderd op:
 # "Find" dialog
 #
 FIND_FIND=Zoeken
-FIND_FIND_WHAT=Waarop wilt u zoeken?
+FIND_FIND_WHAT=Wat wil u zoeken?
 FIND_MATCH_CASE=Onderscheid ~hoofd-/kleine letters
 FIND_OK=~OK
 FIND_CANCEL=~Annuleren
@@ -164,7 +182,7 @@ PD_TITLE=Afdrukken
 PD_PRINTER=Printer
 PD_NAME_LABEL=~Naam
 PD_JOB_PROPERTIES=Taak ~instellingen
-PD_DRIVER_LABEL=Stuurprogramma
+PD_DRIVER_LABEL=Stuurprog.
 PD_PRINT_RANGE_AND_COPIES=Afdrukgebied en kopie‰n
 PD_RANGE_ALL=A~lles
 PD_RANGE_CURRENT_PAGE=H~uidige pagina
@@ -172,10 +190,15 @@ PD_RANGE_PAGES=Pa~gina's
 PD_FROM=~Van
 PD_TO=~Tot
 PD_NUMBER_OF_COPIES=Aantal ~kopie‰n
+PD_RANGE_EVEN_ODD_LABEL=Afdruk bereik
+PD_RANGE_EVEN_ODD=Even en oneven pagina's
+PD_RANGE_ODD=Alleen oneven pagina's
+PD_RANGE_EVEN=Alleen even pagina's
 PD_PRINT_TYPE=Afdruktype
 PD_TYPE_POSTSCRIPT=Post~script
+PD_PRINT_TO_FILE=Afdrukken naar bestand
 PD_TYPE_ASIMAGE=Als af~beelding
-PD_HIGHER_IMAGE_QUALITY=~Hogeere afbeeldings kwaliteit (langzamer en vraagt meer geheugen)
+PD_HIGHER_IMAGE_QUALITY=~Hogere afbeeldings kwaliteit (is langzamer en heeft meer geheugen nodig)
 PD_PAGE_ORIENTATION=Pagina ori‰ntatie
 PD_PORTRAIT=Staand
 PD_LANDSCAPE=Liggend
@@ -190,7 +213,14 @@ PD_BTNCANCEL=~Annuleren
 PD_WRONG_MARGINS=Verkeerde marge!
 # other 'print'-related messages
 PRINT_PRINTING_PAGE_OF=Afdrukken pagina %d (%d van %d)...
-PRINT_GENERATING_POSTSCRIPT=Genereren van postscript bestand...
+PRINT_GENERATING_POSTSCRIPT=Genereren van postscript-bestand...
 PRINT_SPOOLING_POSTSCRIPT=Postscript gegevens aan het bufferen...
 PRINT_FAILED=Afdrukken is mislukt!
 
+#
+# Password dialog
+#
+PSW_TITLE=Document is versleuteld!
+PSW_PASSWORD=~Wachtwoord
+PSW_OK=~OK
+PSW_CANCEL=~Annuleren
