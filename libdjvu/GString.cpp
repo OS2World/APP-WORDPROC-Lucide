@@ -681,7 +681,9 @@ GBaseString::getUTF82Native( EscapeMode escape ) const
   const size_t slen=length()+1;
   if(slen>1)
   {
+#ifndef OS2  // ER  
     retval=UTF8ToNative(false,escape) ;
+#endif
     if(!retval.length())
     {
       retval=(const char*)*this;

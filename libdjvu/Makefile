@@ -22,7 +22,7 @@ OBJS4 = DjVuErrorList.o DjVuDocEditor.o DjVuToPS.o DjVuDumpHelper.o \
     XMLParser.o XMLTags.o miniexp.o ddjvuapi.o debug.o
 
        
-all: $(LIBS) libdjvu.dll
+all: $(LIBS)
 
 $(LIBS): $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4)
 	rm -f $(LIBS)	
@@ -39,9 +39,9 @@ $(LIBS): $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4)
 #	$(AR) $@ $(OBJS4)
 #	$(RANLIB) $(LIBS)
 
-libdjvu.dll: $(LIBS)
-  g++ -s -Zomf -Zdll -Zmtd ddjvuapi.o ddjvuapi.def -llibdjvu
-  implib ddjvuapi ddjvuapi.dll
+#libdjvu.dll: $(LIBS)
+#  g++ -s -Zomf -Zdll -Zmtd ddjvuapi.o ddjvuapi.def -llibdjvu
+#  implib ddjvuapi ddjvuapi.dll
 
 .cpp.o:
 	$(CC) $(CFLAGS) -c $<
