@@ -4,7 +4,8 @@
 // Copyright (c) 2005  Leon Bottou
 //
 // This software is subject to, and may be distributed under, the
-// GNU General Public License, Version 2. The license should have
+// GNU General Public License, either Version 2 of the license,
+// or (at your option) any later version. The license should have
 // accompanied the software or you may obtain a copy of the license
 // from the Free Software Foundation at http://www.fsf.org .
 //
@@ -14,7 +15,7 @@
 // GNU General Public License for more details.
 // -------------------------------------------------------------------
 */
-/* $Id: miniexp.h,v 1.12 2006/02/21 19:27:41 leonb Exp $ */
+/* $Id: miniexp.h,v 1.14 2007/03/25 20:48:35 leonb Exp $ */
 
 #ifndef MINIEXP_H
 #define MINIEXP_H
@@ -36,7 +37,15 @@ extern "C" {
 /* -------------------------------------------------- */
 
 /* miniexp_t -- 
-   Opaque pointer type representing a lisp expression. */
+   Opaque pointer type representing a lisp expression,
+   also known as s-expression. 
+   S-expressions can be viewed as a simple and powerful 
+   alternative to XML.  DjVu uses s-expressions to handle
+   annotations. Both the decoding api <ddjvuapi.h> and 
+   program <djvused> use s-expressions to describe the 
+   hidden text information and the navigation 
+   information */
+
 
 typedef struct miniexp_s* miniexp_t;
 
@@ -573,7 +582,7 @@ class miniobj_t {
   virtual miniexp_t classof() const = 0;
   /* isa -- tests if this is an instance of <classname>. */
   virtual bool isa(miniexp_t classname) const;
-  
+
   /* --- optional stuff --- */
   /* mark: iterates over miniexps contained by this object
      for garbage collecting purposes. */

@@ -1,11 +1,12 @@
-/*C- 
+//C-  -*- C++ -*-
 //C- -------------------------------------------------------------------
 //C- DjVuLibre-3.5
 //C- Copyright (c) 2002  Leon Bottou and Yann Le Cun.
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -50,9 +52,8 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
-//C- */ 
 
-/* $Id: ddjvuapi.cpp,v 1.55 2006/02/21 16:10:29 docbill Exp $ */
+/* $Id: ddjvuapi.cpp,v 1.85 2007/03/25 20:48:35 leonb Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -104,6 +105,7 @@ using namespace DJVU;
 #include "DjVuImage.h"
 #include "DjVuFileCache.h"
 #include "DjVuDocument.h"
+#include "DjVuDumpHelper.h"
 #include "DjVuMessageLite.h"
 #include "DjVuMessage.h"
 #include "DjVmNav.h"
@@ -111,6 +113,8 @@ using namespace DJVU;
 #include "DjVuAnno.h"
 #include "DjVuToPS.h"
 #include "DjVmDir.h"
+#include "DjVmDir0.h"
+#include "DjVuNavDir.h"
 #include "DjVmDoc.h"
 
 
@@ -168,7 +172,8 @@ struct DJVUNS ddjvu_job_s : public DjVuPort
   void *userdata;
   GP<ddjvu_context_s> myctx;
   GP<ddjvu_document_s> mydoc;
-  virtual ~ddjvu_job_s();
+  bool released;
+  ddjvu_job_s();
   // virtual port functions:
   virtual bool inherits(const GUTF8String&);
   virtual bool notify_error(const DjVuPort*, const GUTF8String&);  
@@ -183,6 +188,7 @@ struct DJVUNS ddjvu_document_s : public ddjvu_job_s
 {
   GP<DjVuDocument> doc;
   GPMap<int,DataPool> streams;
+  GMap<GUTF8String, int> names;
   GPMap<int,ddjvu_thumbnail_p> thumbnails;
   int streamid;
   bool fileflag;
@@ -198,8 +204,9 @@ struct DJVUNS ddjvu_document_s : public ddjvu_job_s
   virtual bool notify_error(const DjVuPort*, const GUTF8String&);  
   virtual bool notify_status(const DjVuPort*, const GUTF8String&);
   virtual void notify_doc_flags_changed(const DjVuDocument*, long, long);
-  virtual void notify_file_flags_changed(const DjVuFile*, long, long);
   virtual GP<DataPool> request_data(const DjVuPort*, const GURL&);
+  static void callback(void *);
+  bool want_pageinfo(void);
 };
 
 struct DJVUNS ddjvu_page_s : public ddjvu_job_s
@@ -384,9 +391,14 @@ msg_push(const ddjvu_message_any_t &head,
          GP<ddjvu_message_p> msg = 0)
 {
   ddjvu_context_t *ctx = head.context;
-  if (! msg) msg = new ddjvu_message_p;
+  if (! msg) 
+    msg = new ddjvu_message_p;
   msg->p.m_any = head; 
   GMonitorLock lock(&ctx->monitor);
+  if ((head.document && head.document->released) ||
+      (head.page && head.page->released) ||
+      (head.job && head.job->released) )
+    return;
   if (ctx->callbackfun) 
     (*ctx->callbackfun)(ctx, ctx->callbackarg);
   ctx->mlist.append(msg);
@@ -542,26 +554,9 @@ ddjvu_cache_clear(ddjvu_context_t *ctx)
 // ----------------------------------------
 // Jobs
 
-ddjvu_job_s::~ddjvu_job_s()
+ddjvu_job_s::ddjvu_job_s()
+  : userdata(0), released(false)
 {
-  G_TRY
-    {
-      ddjvu_context_t *ctx = myctx;
-      if (!ctx) return;
-      GMonitorLock lock(&ctx->monitor);
-      GPosition p = ctx->mlist;
-      while (p) {
-        GPosition s = p; ++p;
-        if (ctx->mlist[s]->p.m_any.job == this ||
-            ctx->mlist[s]->p.m_any.document == this ||
-            ctx->mlist[s]->p.m_any.page == this )
-          ctx->mlist.del(s);
-      }
-    }
-  G_CATCH_ALL
-    {
-    }
-  G_ENDCATCH;
 }
 
 bool
@@ -585,7 +580,6 @@ ddjvu_job_s::notify_status(const DjVuPort *p, const GUTF8String &m)
   return true;
 }
 
-
 void
 ddjvu_job_release(ddjvu_job_t *job)
 {
@@ -595,6 +589,34 @@ ddjvu_job_release(ddjvu_job_t *job)
         return;
       job->release();
       job->userdata = 0;
+      job->released = true;
+      // clean all messages
+      ddjvu_context_t *ctx = job->myctx;
+      if (ctx)
+        {
+          GMonitorLock lock(&ctx->monitor);
+          GPosition p = ctx->mlist;
+          while (p) 
+            {
+              GPosition s = p; ++p;
+              if (ctx->mlist[s]->p.m_any.job == job ||
+                  ctx->mlist[s]->p.m_any.document == job ||
+                  ctx->mlist[s]->p.m_any.page == job )
+                ctx->mlist.del(s);
+            }
+          // cleanup pointers in current message as well.
+          if (ctx->mpeeked)
+            {
+              ddjvu_message_t *m = &ctx->mpeeked->p;
+              if (m->m_any.job == job)       
+                m->m_any.job = 0;
+              if (m->m_any.document == job)
+                m->m_any.document = 0;
+              if (m->m_any.page == job)
+                m->m_any.page = 0;
+            }
+        }
+      // decrement reference counter
       unref(job);
     }
   G_CATCH_ALL
@@ -663,12 +685,14 @@ ddjvu_message_peek(ddjvu_context_t *ctx)
       GMonitorLock lock(&ctx->monitor);
       if (ctx->mpeeked)
         return &ctx->mpeeked->p;        
+      if (! ctx->mlist.size())
+        ctx->monitor.wait(0);
       GPosition p = ctx->mlist;
       if (! p)
         return 0;
       ctx->mpeeked = ctx->mlist[p];
       ctx->mlist.del(p);
-      return &ctx->mpeeked->p;        
+      return &ctx->mpeeked->p;
     }
   G_CATCH_ALL
     {
@@ -743,7 +767,13 @@ ddjvu_document_s::release()
         thumb->pool->del_trigger(ddjvu_thumbnail_p::callback, (void*)thumb);
     }
   for (p = streams; p; ++p)
-    streams[p]->stop();
+    {
+      GP<DataPool> pool = streams[p];
+      if (pool)
+        pool->del_trigger(callback, (void*)this);
+      if (pool && !pool->is_eof())
+        pool->stop();
+    }
 }
 
 ddjvu_status_t
@@ -796,37 +826,48 @@ ddjvu_document_s::notify_doc_flags_changed(const DjVuDocument *, long, long)
   }
 }
 
+
 void 
-ddjvu_document_s::notify_file_flags_changed(const DjVuFile*, long s, long)
+ddjvu_document_s::callback(void *arg)
 {
-  if (pageinfoflag && !fileflag)
-    if (s & DjVuFile::ALL_DATA_PRESENT)
-      msg_push(xhead(DDJVU_PAGEINFO, this));
+  ddjvu_document_t *doc = (ddjvu_document_t *)arg;
+  if (doc && doc->pageinfoflag && !doc->fileflag) 
+    msg_push(xhead(DDJVU_PAGEINFO, doc));
 }
+
 
 GP<DataPool> 
 ddjvu_document_s::request_data(const DjVuPort *p, const GURL &url)
 {
+  // Note: the following line try to restore
+  //       the bytes stored in the djvu file
+  //       despite LT's i18n and gurl classes.
+  GUTF8String name = (const char*)url.fname(); 
   GMonitorLock lock(&monitor);
   GP<DataPool> pool;
-  if (fileflag)
+  if (names.contains(name))
+    {
+      int streamid = names[name];
+      return streams[streamid];
+    }
+  else if (fileflag)
     {
       if (doc && url.is_local_file_url())
         return DataPool::create(url);
     }
   else if (doc)
     {
+      // prepare pool
       if (++streamid > 0)
         streams[streamid] = pool = DataPool::create();
       else
         pool = streams[(streamid = 0)];
+      names[name] = streamid;
+      pool->add_trigger(-1, callback, (void*)this);
       // build message
       GP<ddjvu_message_p> p = new ddjvu_message_p;
       p->p.m_newstream.streamid = streamid;
-      // Note: the following line try to restore
-      //       the bytes stored in the djvu file
-      //       despite LT's i18n and gurl classes.
-      p->tmp1 = (const char*)url.fname(); 
+      p->tmp1 = name;
       p->p.m_newstream.name = (const char*)(p->tmp1);
       p->p.m_newstream.url = 0;
       if (urlflag)
@@ -838,6 +879,50 @@ ddjvu_document_s::request_data(const DjVuPort *p, const GURL &url)
       msg_push(xhead(DDJVU_NEWSTREAM, this), p);
     }
   return pool;
+}
+
+
+bool
+ddjvu_document_s::want_pageinfo()
+{
+  if (doc && docinfoflag && !pageinfoflag)
+    {
+      pageinfoflag = true;
+      int doctype = doc->get_doc_type();
+      if (doctype == DjVuDocument::BUNDLED ||
+          doctype == DjVuDocument::OLD_BUNDLED )
+        {
+          GP<DataPool> pool;
+          {
+            GMonitorLock lock(&monitor);
+            if (streams.contains(0))
+              pool = streams[0];
+          }
+          if (pool && doctype == DjVuDocument::BUNDLED)
+            {
+              GP<DjVmDir> dir = doc->get_djvm_dir();
+              if (dir)
+                for (int i=0; i<dir->get_files_num(); i++)
+                  {
+                    GP<DjVmDir::File> f = dir->pos_to_file(i);
+                    if (! pool->has_data(f->offset, f->size))
+                      pool->add_trigger(f->offset, f->size, callback, (void*)this );
+                  }
+            }
+          else if (pool && doctype == DjVuDocument::OLD_BUNDLED)
+            {
+              GP<DjVmDir0> dir = doc->get_djvm_dir0();
+              if (dir)
+                for (int i=0; i<dir->get_files_num(); i++)
+                  {
+                    GP<DjVmDir0::FileRec> f = dir->get_file(i);
+                    if (! pool->has_data(f->offset, f->size))
+                      pool->add_trigger(f->offset, f->size, callback, (void*)this );
+                  }
+            }
+        }
+    }
+  return pageinfoflag;
 }
 
 
@@ -865,11 +950,11 @@ ddjvu_document_create(ddjvu_context_t *ctx,
       d->pageinfoflag = false;
       d->myctx = ctx;
       d->mydoc = 0;
-      d->userdata = 0;
       d->doc = DjVuDocument::create_noinit();
       if (url)
         {
           GURL gurl = GUTF8String(url);
+          gurl.clear_djvu_cgi_arguments();
           d->urlflag = true;
           d->doc->start_init(gurl, d, xcache);
         }
@@ -914,7 +999,6 @@ ddjvu_document_create_by_filename(ddjvu_context_t *ctx,
       d->docinfoflag = false;
       d->myctx = ctx;
       d->mydoc = 0;
-      d->userdata = 0;
       d->doc = DjVuDocument::create_noinit();
       d->doc->start_init(gurl, d, xcache);
     }
@@ -1030,6 +1114,7 @@ ddjvu_document_get_type(ddjvu_document_t *document)
   return DDJVU_DOCTYPE_UNKNOWN;
 }
 
+
 int
 ddjvu_document_get_pagenum(ddjvu_document_t *document)
 {
@@ -1056,47 +1141,118 @@ ddjvu_document_get_filenum(ddjvu_document_t *document)
       DjVuDocument *doc = document->doc;
       if (! (doc && doc->is_init_ok()))
         return 0;
-      GP<DjVmDir> dir = doc->get_djvm_dir();
-      if (dir)
-        return dir->get_files_num();
+      int doc_type = doc->get_doc_type();
+      if (doc_type == DjVuDocument::BUNDLED ||
+          doc_type == DjVuDocument::INDIRECT )
+        {
+          GP<DjVmDir> dir = doc->get_djvm_dir();
+          return dir->get_files_num();
+        }
+      else if (doc_type == DjVuDocument::OLD_BUNDLED)
+        {
+          GP<DjVmDir0> dir0 = doc->get_djvm_dir0();
+          return dir0->get_files_num();
+        }
+      else 
+        return doc->get_pages_num();
     }
   G_CATCH(ex)
     {
       ERROR1(document,ex);
     }
   G_ENDCATCH;
-  return 1;
+  return 0;
+}
+
+
+#undef ddjvu_document_get_fileinfo
+
+extern "C" DDJVUAPI ddjvu_status_t
+ddjvu_document_get_fileinfo(ddjvu_document_t *d, int f, ddjvu_fileinfo_t *i);
+
+ddjvu_status_t
+ddjvu_document_get_fileinfo(ddjvu_document_t *d, int f, ddjvu_fileinfo_t *i)
+{
+  // for binary backward compatibility with ddjvuapi=17
+  struct info17_s { char t; int p,s; const char *d, *n, *l; };
+  return ddjvu_document_get_fileinfo_imp(d,f,i,sizeof(info17_s));
 }
 
 ddjvu_status_t
-ddjvu_document_get_fileinfo(ddjvu_document_t *document, int fileno, 
-                            ddjvu_fileinfo_t *info)
+ddjvu_document_get_fileinfo_imp(ddjvu_document_t *document, int fileno, 
+                                ddjvu_fileinfo_t *info, 
+                                unsigned int infosz )
 {
   G_TRY
     {
-      memset(info, 0, sizeof(ddjvu_fileinfo_t));
+      ddjvu_fileinfo_t myinfo;
+      memset(info, 0, infosz);
+      if (infosz > sizeof(myinfo))
+        return DDJVU_JOB_FAILED;
       DjVuDocument *doc = document->doc;
       if (! doc)
         return DDJVU_JOB_NOTSTARTED;
       if (! doc->is_init_ok())
         return document->status();
-      GP<DjVmDir> dir = doc->get_djvm_dir();
-      GP<DjVmDir::File> file = dir->pos_to_file(fileno, &info->pageno);
-      if (! file)
-        G_THROW("Illegal file number");
-      if (file->is_page())
-        info->type = 'P';
-      else if (file->is_thumbnails())
-        info->type = 'T';
-      else if (file->is_shared_anno())
-        info->type = 'S';
-      else
-        info->type = 'I';
-      info->size = file->size;
-      info->id = file->get_load_name();
-      info->name = file->get_save_name();
-      info->title = file->get_title();
-      return DDJVU_JOB_OK;
+      int type = doc->get_doc_type();
+      if ( type == DjVuDocument::BUNDLED ||
+           type == DjVuDocument::INDIRECT )
+        {
+          GP<DjVmDir> dir = doc->get_djvm_dir();
+          GP<DjVmDir::File> file = dir->pos_to_file(fileno, &myinfo.pageno);
+          if (! file)
+            G_THROW("Illegal file number");
+          myinfo.type = 'I';
+          if (file->is_page())
+            myinfo.type = 'P';
+          else
+            myinfo.pageno = -1;
+          if (file->is_thumbnails())
+            myinfo.type = 'T';
+          if (file->is_shared_anno())
+            myinfo.type = 'S';
+          myinfo.size = file->size;
+          myinfo.id = file->get_load_name();
+          myinfo.name = file->get_save_name();
+          myinfo.title = file->get_title();
+          memcpy(info, &myinfo, infosz);
+          return DDJVU_JOB_OK;
+        }
+      else if (type == DjVuDocument::OLD_BUNDLED)
+        {
+          GP<DjVmDir0> dir0 = doc->get_djvm_dir0();
+          GP<DjVuNavDir> nav = doc->get_nav_dir();
+          GP<DjVmDir0::FileRec> frec = dir0->get_file(fileno);
+          if (! frec)
+            G_THROW("Illegal file number");
+          myinfo.size = frec->size;
+          myinfo.id = (const char*) frec->name;
+          myinfo.name = myinfo.title = myinfo.id;
+          if (! nav)
+            return DDJVU_JOB_STARTED;
+          else if (nav->name_to_page(frec->name) >= 0)
+            myinfo.type = 'P';
+          else
+            myinfo.type = 'I';
+          memcpy(info, &myinfo, infosz);
+          return DDJVU_JOB_OK;
+        }
+      else 
+        {
+          if (fileno<0 || fileno>=doc->get_pages_num())
+            G_THROW("Illegal file number");
+          myinfo.type = 'P';
+          myinfo.pageno = fileno;
+          myinfo.size = -1;
+          GP<DjVuNavDir> nav = doc->get_nav_dir();
+          myinfo.id = (nav) ? (const char *) nav->page_to_name(fileno) : 0;
+          myinfo.name = myinfo.title = myinfo.id;
+          GP<DjVuFile> file = doc->get_djvu_file(fileno, true);
+          GP<DataPool> pool = (file) ? file->get_init_data_pool() : 0;
+          myinfo.size = (pool) ? pool->get_length() : -1;
+          memcpy(info, &myinfo, infosz);
+          return DDJVU_JOB_OK;
+        }
     }
   G_CATCH(ex)
     {
@@ -1105,6 +1261,7 @@ ddjvu_document_get_fileinfo(ddjvu_document_t *document, int fileno,
   G_ENDCATCH;
   return DDJVU_JOB_FAILED;
 }
+
 
 int
 ddjvu_document_search_pageno(ddjvu_document_t *document, const char *name)
@@ -1124,8 +1281,8 @@ ddjvu_document_search_pageno(ddjvu_document_t *document, const char *name)
             {
               char *edata=0;
               long int p = strtol(name, &edata, 10);
-              if (edata!=name && !*edata && p>=0)
-                file = dir->page_to_file(p);
+              if (edata!=name && !*edata && p>=1)
+                file = dir->page_to_file(p-1);
             }
       if (file)
         {
@@ -1144,21 +1301,32 @@ ddjvu_document_search_pageno(ddjvu_document_t *document, const char *name)
 }
 
 
+
 int 
 ddjvu_document_check_pagedata(ddjvu_document_t *document, int pageno)
 {
   G_TRY
     {
-      document->pageinfoflag = true;
+      document->want_pageinfo();
       DjVuDocument *doc = document->doc;
       if (doc && doc->is_init_ok())
         {
-          GP<DjVuFile> file;
-          if (doc->get_doc_type()==DjVuDocument::INDIRECT)
-            file = doc->get_djvu_file(pageno, true);
-          else
-            file = doc->get_djvu_file(pageno, false);            
-          if (file && file->is_all_data_present())
+          bool dontcreate = false;
+          if (doc->get_doc_type() == DjVuDocument::INDIRECT ||
+              doc->get_doc_type() == DjVuDocument::OLD_INDEXED )
+            {
+              dontcreate = true;
+              GURL url = doc->page_to_url(pageno);
+              if (! url.is_empty())
+                {
+                  GUTF8String name = (const char*)url.fname();
+                  GMonitorLock lock(&document->monitor);
+                  if (document->names.contains(name))
+                    dontcreate = false;
+                }
+            }
+          GP<DjVuFile> file = doc->get_djvu_file(pageno, dontcreate);
+          if (file && file->is_data_present())
             return 1;
         }
     }
@@ -1171,16 +1339,34 @@ ddjvu_document_check_pagedata(ddjvu_document_t *document, int pageno)
 }
 
 
+#undef ddjvu_document_get_pageinfo
+
+extern "C" DDJVUAPI ddjvu_status_t
+ddjvu_document_get_pageinfo(ddjvu_document_t *d, int p, ddjvu_pageinfo_t *i);
+
 ddjvu_status_t
-ddjvu_document_get_pageinfo(ddjvu_document_t *document, int pageno, 
-                            ddjvu_pageinfo_t *pageinfo)
+ddjvu_document_get_pageinfo(ddjvu_document_t *d, int p, ddjvu_pageinfo_t *i)
+{
+  // for binary backward compatibility with ddjvuapi<=17
+  struct info17_s { int w; int h; int d; };
+  return ddjvu_document_get_pageinfo_imp(d,p,i,sizeof(struct info17_s));
+}
+
+ddjvu_status_t
+ddjvu_document_get_pageinfo_imp(ddjvu_document_t *document, int pageno, 
+                                ddjvu_pageinfo_t *pageinfo, 
+                                unsigned int infosz)
 {
   G_TRY
     {
+      ddjvu_pageinfo_t myinfo;
+      memset(pageinfo, 0, infosz);
+      if (infosz > sizeof(myinfo))
+        return DDJVU_JOB_FAILED;
       DjVuDocument *doc = document->doc;
       if (doc)
         {
-          document->pageinfoflag = true;
+          document->want_pageinfo();
           GP<DjVuFile> file = doc->get_djvu_file(pageno);
           if (! file || ! file->is_data_present() )
             return DDJVU_JOB_STARTED;
@@ -1199,14 +1385,12 @@ ddjvu_document_get_pageinfo(ddjvu_document_t *document, int pageno,
                       GP<DjVuInfo> info=DjVuInfo::create();
                       info->decode(*gbs);
                       int rot = info->orientation;
-                      if (pageinfo)
-                        {
-                          pageinfo->width = 
-                            (rot&1) ? info->height : info->width;
-                          pageinfo->height = 
-                            (rot&1) ? info->width : info->height;
-                          pageinfo->dpi = info->dpi;
-                        }
+                      myinfo.rotation = rot;
+                      myinfo.width = (rot&1) ? info->height : info->width;
+                      myinfo.height = (rot&1) ? info->width : info->height;
+                      myinfo.dpi = info->dpi;
+                      myinfo.version = info->version;
+                      memcpy(pageinfo, &myinfo, infosz);
                       return DDJVU_JOB_OK;
                     }
                 }
@@ -1221,19 +1405,18 @@ ddjvu_document_get_pageinfo(ddjvu_document_t *document, int pageno,
                       if (gbs->read8() == 0)
                         {
                           gbs->read8();
-                          gbs->read8();
-                          gbs->read8();
+                          unsigned char vhi = gbs->read8();
+                          unsigned char vlo = gbs->read8();
                           unsigned char xhi = gbs->read8();
                           unsigned char xlo = gbs->read8();
                           unsigned char yhi = gbs->read8();
                           unsigned char ylo = gbs->read8();
-                          if (pageinfo)
-                            {
-                              pageinfo->width = (xhi<<8)+xlo;
-                              pageinfo->height = (yhi<<8)+ylo;
-                              pageinfo->dpi = 100;
-                            }
-                          return DDJVU_JOB_OK;
+                          myinfo.width = (xhi<<8)+xlo;
+                          myinfo.height = (yhi<<8)+ylo;
+                          myinfo.dpi = 100;
+                          myinfo.rotation = 0;
+                          myinfo.version = (vhi<<8)+vlo;
+                          memcpy(pageinfo, &myinfo, infosz);
                         }
                     }
                 }
@@ -1247,6 +1430,83 @@ ddjvu_document_get_pageinfo(ddjvu_document_t *document, int pageno,
   G_ENDCATCH;
   return DDJVU_JOB_FAILED;
 }
+
+
+static char *
+get_file_dump(DjVuFile *file)
+{
+  DjVuDumpHelper dumper;
+  GP<DataPool> pool = file->get_init_data_pool();
+  GP<ByteStream> str = dumper.dump(pool);
+  int size = str->size();
+  char *buffer;
+  if ((size = str->size()) > 0 && (buffer = (char*)malloc(size+1)))
+    {
+      str->seek(0);
+      int len = str->readall(buffer, size);
+      buffer[len] = 0;
+      return buffer;
+    }
+  return 0;
+}
+
+
+char *
+ddjvu_document_get_pagedump(ddjvu_document_t *document, int pageno)
+{
+  G_TRY
+    {
+      DjVuDocument *doc = document->doc;
+      if (doc)
+        {
+          document->want_pageinfo();
+          GP<DjVuFile> file = doc->get_djvu_file(pageno);
+          if (file && file->is_data_present())
+            return get_file_dump(file);
+        }
+    }
+  G_CATCH(ex)
+    {
+      ERROR1(document, ex);
+    }
+  G_ENDCATCH;
+  return 0;
+}
+
+
+char *
+ddjvu_document_get_filedump(ddjvu_document_t *document, int fileno)
+{
+  G_TRY
+    {
+      DjVuDocument *doc = document->doc;
+      document->want_pageinfo();
+      if (doc)
+        {
+          GP<DjVuFile> file;
+          int type = doc->get_doc_type();
+          if ( type != DjVuDocument::BUNDLED &&
+               type != DjVuDocument::INDIRECT )
+            file = doc->get_djvu_file(fileno);
+          else
+            {
+              GP<DjVmDir> dir = doc->get_djvm_dir();
+              GP<DjVmDir::File> fdesc = dir->pos_to_file(fileno);
+              if (fdesc)
+                file = doc->get_djvu_file(fdesc->get_load_name());
+            }
+          if (file && file->is_data_present())
+            return get_file_dump(file);
+        }
+    }
+  G_CATCH(ex)
+    {
+      ERROR1(document, ex);
+    }
+  G_ENDCATCH;
+  return 0;
+}
+
 
 
 // ----------------------------------------
@@ -1266,10 +1526,11 @@ ddjvu_page_create(ddjvu_document_t *document, ddjvu_job_t *job,
       GMonitorLock lock(&p->monitor);
       p->myctx = document->myctx;
       p->mydoc = document;
-      p->userdata = 0;
       p->pageinfoflag = false;
       p->pagedoneflag = false;
-      p->job = job = ((job) ? job : p);
+      if (! job)
+        job = p;
+      p->job = job;
       if (pageid)
         p->img = doc->get_page(GNativeString(pageid), false, job);
       else
@@ -2184,7 +2445,6 @@ ddjvu_thumbnail_p::callback(void *cldata)
           G_CATCH_ALL
             {
               thumb->data.empty();
-              G_RETHROW;
             }
           G_ENDCATCH;
           if (thumb->document->doc)
@@ -2202,28 +2462,31 @@ ddjvu_thumbnail_status(ddjvu_document_t *document, int pagenum, int start)
 {
   G_TRY
     {
-      GMonitorLock lock(&document->monitor);
-      GPosition p = document->thumbnails.contains(pagenum);
       GP<ddjvu_thumbnail_p> thumb;
-      if (p)
+      DjVuDocument* doc = document->doc;
+      if (doc)
         {
-          thumb = document->thumbnails[p];
-        } 
-      else
+          GMonitorLock lock(&document->monitor);
+          GPosition p = document->thumbnails.contains(pagenum);
+          if (p)
+            thumb = document->thumbnails[p];
+        }
+      if (!thumb && doc)
         {
-          DjVuDocument *doc = document->doc;
           GP<DataPool> pool = doc->get_thumbnail(pagenum, !start);
           if (pool)
             {
+              GMonitorLock lock(&document->monitor);
               thumb = new ddjvu_thumbnail_p;
               thumb->document = document;
               thumb->pagenum = pagenum;
               thumb->pool = pool;
               document->thumbnails[pagenum] = thumb;
-              pool->add_trigger(-1, ddjvu_thumbnail_p::callback, 
-                                (void*)(ddjvu_thumbnail_p*)thumb);
             }
-        }
+          if (thumb)
+            pool->add_trigger(-1, ddjvu_thumbnail_p::callback, 
+                              (void*)(ddjvu_thumbnail_p*)thumb);
+        } 
       if (! thumb)
         return DDJVU_JOB_NOTSTARTED;        
       else if (thumb->pool)
@@ -2363,8 +2626,17 @@ ddjvu_runnablejob_s::cbstart(void *arg)
   ddjvu_status_t r;
   G_TRY
     {
-      self->progress(0);
-      r = self->run();
+      G_TRY
+        {
+          self->progress(0);
+          r = self->run();
+        }
+      G_CATCH(ex)
+        {
+          ERROR1(self, ex);
+          G_RETHROW;
+        }
+      G_ENDCATCH;
     }
   G_CATCH_ALL
     {
@@ -2564,9 +2836,9 @@ ddjvu_document_print(ddjvu_document_t *document, FILE *output,
             {
               if (arg == "a" || arg == "auto" )
                 options.set_orientation(DjVuToPS::Options::AUTO);
-              if (arg == "l" || arg == "landscape" )
+              else if (arg == "l" || arg == "landscape" )
                 options.set_orientation(DjVuToPS::Options::LANDSCAPE);
-              if (arg == "p" || arg == "portrait" )
+              else if (arg == "p" || arg == "portrait" )
                 options.set_orientation(DjVuToPS::Options::PORTRAIT);
               else
                 complain(uarg,"Invalid orientation. Use \"auto\", "
@@ -2733,18 +3005,29 @@ ddjvu_document_print(ddjvu_document_t *document, FILE *output,
   return job;
 }
 
+
+
 // ----------------------------------------
-// Saving (insufficiently tested)
+// Saving
 
 struct DJVUNS ddjvu_savejob_s : public ddjvu_runnablejob_s
 {
   GP<ByteStream> obs;
+  GURL           odir;  
+  GUTF8String    oname;
+  GUTF8String    pages;
+  GTArray<char>       comp_flags;
+  GArray<GUTF8String> comp_ids;
+  GPArray<DjVuFile>   comp_files;
+  GMonitor monitor;
+  // thread routine
   virtual ddjvu_status_t run();
   // virtual port functions:
   virtual bool inherits(const GUTF8String&);
   virtual void notify_file_flags_changed(const DjVuFile*, long, long);
-  // data
-  GMonitor monitor;
+  // helpers
+  bool parse_pagespec(const char *s, int npages, bool *flags);
+  void mark_included_files(DjVuFile *file);
 };
 
 bool 
@@ -2755,15 +3038,112 @@ ddjvu_savejob_s::inherits(const GUTF8String &classname)
 }
 
 void
-ddjvu_savejob_s::notify_file_flags_changed(const DjVuFile *file, long mask, long)
+ddjvu_savejob_s::notify_file_flags_changed(const DjVuFile *file, 
+                                           long mask, long)
 {
-  if (mask & (DjVuFile::ALL_DATA_PRESENT ||
-              DjVuFile::DECODE_FAILED || DjVuFile::DECODE_STOPPED ||
-              DjVuFile::STOPPED || DjVuFile::DECODE_STOPPED ))
+  if (mask & (DjVuFile::ALL_DATA_PRESENT | DjVuFile::DATA_PRESENT |
+              DjVuFile::DECODE_FAILED | DjVuFile::DECODE_STOPPED |
+              DjVuFile::STOPPED | DjVuFile::DECODE_STOPPED ))
     {
       GMonitorLock lock(&monitor);
       monitor.signal();
     }
+}
+
+bool
+ddjvu_savejob_s::parse_pagespec(const char *s, int npages, bool *flags)
+{
+  int spec = 0;
+  int both = 1;
+  int start_page = 1;
+  int end_page = npages;
+  int pageno;
+  char *p = (char*)s;
+  while (*p)
+    {
+      spec = 0;
+      while (*p==' ')
+        p += 1;
+      if (! *p)
+        break;
+      if (*p>='0' && *p<='9') {
+        end_page = strtol(p, &p, 10);
+        spec = 1;
+      } else if (*p=='$') {
+        spec = 1;
+        end_page = npages;
+        p += 1;
+      } else if (both) {
+        end_page = 1;
+      } else {
+        end_page = npages;
+      }
+      while (*p==' ')
+        p += 1;
+      if (both) {
+        start_page = end_page;
+        if (*p == '-') {
+          p += 1;
+          both = 0;
+          continue;
+        }
+      }
+      both = 1;
+      while (*p==' ')
+        p += 1;
+      if (*p && *p != ',')
+        return false;
+      if (*p == ',')
+        p += 1;
+      if (! spec)
+        return false;
+      if (end_page < 0)
+        end_page = 0;
+      if (start_page < 0)
+        start_page = 0;
+      if (end_page > npages)
+        end_page = npages;
+      if (start_page > npages)
+        start_page = npages;
+      if (start_page <= end_page)
+        for(pageno=start_page; pageno<=end_page; pageno++)
+          flags[pageno-1] = true;
+      else
+        for(pageno=start_page; pageno>=end_page; pageno--)
+          flags[pageno-1] = true;
+    }
+  if (!spec)
+    return false;
+  return true;
+}
+
+void 
+ddjvu_savejob_s::mark_included_files(DjVuFile *file)
+{
+  GP<DataPool> pool = file->get_init_data_pool();
+  GP<ByteStream> str(pool->get_stream());
+  GP<IFFByteStream> iff(IFFByteStream::create(str));
+  GUTF8String chkid;
+  if (!iff->get_chunk(chkid)) 
+    return;
+  while (iff->get_chunk(chkid))
+    {
+      if (chkid == "INCL")
+        {
+          GP<ByteStream> incl = iff->get_bytestream();
+          GUTF8String fileid;
+          char buffer[1024];
+          int length;
+          while((length=incl->read(buffer, 1024)))
+            fileid += GUTF8String(buffer, length);
+          for (int i=0; i<comp_ids.size(); i++)
+            if (fileid == comp_ids[i] && !comp_flags[i])
+              comp_flags[i] = 1;
+        }
+      iff->close_chunk();
+    }
+  iff->close_chunk();
+  pool->clear_stream();
 }
 
 ddjvu_status_t 
@@ -2771,60 +3151,143 @@ ddjvu_savejob_s::run()
 {
   DjVuDocument *doc = mydoc->doc;
   doc->wait_for_complete_init();
-  // Determine which components to save
-  int ncomp;
-  GArray<GUTF8String> comp_ids;
-  GPArray<DjVuFile> comp_files;
+
+  // Determine which pages to save
+  int npages = doc->get_pages_num();
+  GTArray<bool> page_flags(0, npages-1);
+  if (!pages)
+    {
+      for (int pageno=0; pageno<npages; pageno++)
+        page_flags[pageno] = true;
+    }
+  else
+    {
+      const char *s = pages;
+      while (*s && *s!='=')
+        s += 1;
+      for (int pageno=0; pageno<npages; pageno++)
+        page_flags[pageno] = false;
+      if ((*s != '=') || !parse_pagespec(s+1, npages, (bool*)page_flags))
+        complain(pages,"Illegal page specification");
+      if (doc->get_doc_type()==DjVuDocument::OLD_BUNDLED ||
+          doc->get_doc_type()==DjVuDocument::OLD_INDEXED )
+        complain(pages,"Saving subsets of obsolete formats is not supported");
+    }
+  
+  // Determine which component files to save
+  int ncomps;
   if (doc->get_doc_type()==DjVuDocument::BUNDLED ||
       doc->get_doc_type()==DjVuDocument::INDIRECT)
     {
       GP<DjVmDir> dir = doc->get_djvm_dir();
-      ncomp = dir->get_files_num();
-      comp_ids.resize(ncomp - 1);
-      comp_files.resize(ncomp - 1);
+      ncomps = dir->get_files_num();
+      comp_ids.resize(ncomps - 1);
+      comp_flags.resize(ncomps - 1);
+      comp_files.resize(ncomps - 1);
+      int pageno = 0;
       GPList<DjVmDir::File> flist = dir->get_files_list();
       GPosition pos=flist;
-      for (int comp=0; comp<ncomp; ++pos, ++comp)
-        comp_ids[comp] = flist[pos]->get_load_name();
-    } 
-  else 
-    { 
-      ncomp = doc->get_pages_num();
-      comp_ids.resize(ncomp - 1);
-      comp_files.resize(ncomp - 1);
-      { // extra nesting for windows
-        for (int comp=0; comp<ncomp; comp++)
-          comp_ids[comp] = GUTF8String(comp);
-      }
-    }
-  // Monitoring download progress
-  int lo = 0;
-  int hi = 0;
-  get_portcaster()->add_route(doc, this);
-  while (lo < ncomp && !mystop)
-    {
-      int in_progress = 0;
-      GMonitorLock lock(&monitor);
-      while (lo<hi && comp_files[lo]->is_data_present())
-        lo += 1;
-      { // extra nesting for windows
-        for (int comp=lo; comp<hi; comp++)
-          if (! comp_files[comp]->is_data_present())
-            in_progress += 1;
-      }
-      while (hi<ncomp && in_progress < 2)
+      for (int comp=0; comp<ncomps; ++pos, ++comp)
         {
-          comp_files[hi] = doc->get_djvu_file(comp_ids[hi]);
-          in_progress += 1;
-          hi += 1;
+          DjVmDir::File *file = flist[pos];
+          comp_ids[comp] = file->get_load_name();
+          comp_flags[comp] = 0;
+          if (file->is_page() && page_flags[pageno++])
+            comp_flags[comp] = 1;
         }
-      if (in_progress > 0)
-        monitor.wait();
+    }
+  else
+    {
+      ncomps = npages;
+      comp_flags.resize(ncomps - 1);
+      comp_files.resize(ncomps - 1);
+      for (int comp=0; comp<ncomps; ++comp)
+        comp_flags[comp] = page_flags[comp];
+    }
+  
+  // Download
+  get_portcaster()->add_route(doc, this);
+  while (!mystop)
+    {
+      int comp;
+      int wanted = 0;
+      int loaded = 0;
+      int asked = 0;
+      for (comp=0; comp<ncomps; comp++)
+        {
+          int flags = comp_flags[comp];
+          if (flags > 2)
+            loaded += 1;
+          else if (flags < 2)
+            continue;
+          else if (!comp_files[comp]->is_data_present())
+            asked += 1;
+          else 
+            {
+              comp_flags[comp] += 1;
+              mark_included_files(comp_files[comp]);
+            } 
+        }
+      for (comp=0; comp<ncomps; comp++)
+        if (comp_flags[comp] > 0)
+          wanted += 1;
+      progress(loaded * 100 / wanted);
+      if (wanted == loaded)
+        break;
+      for (comp=0; comp<ncomps && asked < 2; comp++)
+        if (comp_flags[comp] == 1)
+          {
+            if (comp_ids.size() > 0)
+              comp_files[comp] = doc->get_djvu_file(comp_ids[comp]);
+            else
+              comp_files[comp] = doc->get_djvu_file(comp);
+            comp_flags[comp] += 1;
+            if (!comp_files[comp]->is_data_present())
+              asked += 1;
+          }
+      GMonitorLock lock(&monitor);
+      for (comp=0; comp<ncomps; comp++)
+        if (comp_flags[comp] == 2)
+          if (! comp_files[comp]->is_data_present())
+            {
+              monitor.wait();
+              break;
+            }
     }
   if (mystop)
-    G_THROW("STOP");
+    G_THROW(DataPool::Stop);
   // Saving!
-  doc->write(obs);
+  GP<DjVmDoc> djvm;
+  if (! pages)
+    {
+      djvm = doc->get_djvm_doc();
+    }
+  else
+    {
+      djvm = DjVmDoc::create();
+      GP<DjVmDir> dir = doc->get_djvm_dir();
+      GPList<DjVmDir::File> flist = dir->get_files_list();
+      GPosition pos=flist;
+      int pageno = 0;
+      for (int comp=0; comp<ncomps; ++pos, ++comp)
+        {
+          if (flist[pos]->is_page())
+            pageno += 1;
+          if (comp_flags[comp])
+            {
+              GP<DjVmDir::File> f = new DjVmDir::File(*flist[pos]);
+              if (f->is_page() && f->get_save_name()==f->get_title())
+                f->set_title(GUTF8String(pageno));
+              GP<DjVuFile> file = comp_files[comp];
+              GP<DataPool> data = file->get_init_data_pool();
+              djvm->insert_file(f, data);
+            }
+        }
+    }
+  if (obs)
+    djvm->write(obs);
+  else if (odir.is_valid() && oname.length() > 0)
+    djvm->expand(odir, oname);
   return DDJVU_JOB_OK;
 }
 
@@ -2840,17 +3303,40 @@ ddjvu_document_save(ddjvu_document_t *document, FILE *output,
       ref(job);
       job->myctx = document->myctx;
       job->mydoc = document;
+      bool indirect = false;
       // parse options
       while (optc>0)
         {
           GNativeString narg(optv[0]);
           GUTF8String uarg = narg;
-          complain(uarg, "Unrecognized option.");
+          const char *s1 = (const char*)narg;
+          if (s1[0] == '-') s1++;
+          if (s1[0] == '-') s1++;
+          // separate arguments
+          if (!strncmp(s1, "page=", 5) ||
+              !strncmp(s1, "pages=", 6) )
+            {
+              if (job->pages.length())
+                complain(uarg,"multiple page specifications");
+              job->pages = uarg;
+            }
+          else if (!strncmp(s1, "indirect=", 9))
+            {
+              GURL oname = GURL::Filename::UTF8(s1 + 9);
+              job->odir = oname.base();
+              job->oname = oname.fname();
+              indirect = true;
+            }
+          else
+            {
+              complain(uarg, "Unrecognized option.");
+            }
+          // next option
           optc -= 1;
           optv += 1;
         }
       // go
-      job->obs = ByteStream::create(output, "wb", false);
+      job->obs = (indirect) ? 0 : ByteStream::create(output, "wb", false);
       job->start();
     }
   G_CATCH(ex)
@@ -2964,6 +3450,8 @@ ddjvu_document_get_outline(ddjvu_document_t *document)
   G_ENDCATCH;
   return miniexp_status(DDJVU_JOB_FAILED);
 }
+
+
 
 
 // ----------------------------------------
@@ -3088,6 +3576,7 @@ ddjvu_document_get_pagetext(ddjvu_document_t *document, int pageno,
 // characters or illegal backslash sequences. Function <anno_getc()> then 
 // creates the proper escapes on the fly.
 
+
 static struct {
   const char *s;
   char buf[8];
@@ -3096,6 +3585,7 @@ static struct {
   bool compat;
   bool eof;
 } anno_dat;
+
 
 static bool
 anno_compat(const char *s)
@@ -3128,6 +3618,7 @@ anno_compat(const char *s)
     }
   return compat;
 }
+
 
 static int
 anno_getc(void)
@@ -3179,6 +3670,7 @@ anno_getc(void)
   return c;
 }
 
+
 static int
 anno_ungetc(int c)
 {
@@ -3194,6 +3686,7 @@ anno_ungetc(int c)
   anno_dat.buf[0] = c;
   return c;
 }
+
 
 static void
 anno_sub(ByteStream *bs, miniexp_t &result)
@@ -3224,6 +3717,50 @@ anno_sub(ByteStream *bs, miniexp_t &result)
   minilisp_ungetc = saved_ungetc;
 }
 
+
+static miniexp_t
+get_bytestream_anno(GP<ByteStream> annobs)
+{
+  if (! (annobs && annobs->size()))
+    return miniexp_nil;
+  GP<IFFByteStream> iff = IFFByteStream::create(annobs);
+  GUTF8String chkid;
+  minivar_t result;
+  while (iff->get_chunk(chkid))
+    {
+      GP<ByteStream> bs;
+      if (chkid == "ANTa") 
+        bs = iff->get_bytestream();
+      else if (chkid == "ANTz")
+        bs = BSByteStream::create(iff->get_bytestream());
+      if (bs)
+        anno_sub(bs, result);
+      iff->close_chunk();
+    }
+  return miniexp_reverse(result);
+}
+
+
+static miniexp_t
+get_file_anno(GP<DjVuFile> file)
+{
+  // Make sure all data is present
+  if (! file || ! file->is_all_data_present())
+    {
+      if (file && file->is_data_present())
+        {
+          if (! file->are_incl_files_created())
+            file->process_incl_chunks();
+          if (! file->are_incl_files_created())
+            return miniexp_status(DDJVU_JOB_FAILED);
+        }
+      return miniexp_dummy;
+    }
+  // Access annotation data
+  return get_bytestream_anno(file->get_merged_anno());
+}
+
+
 miniexp_t
 ddjvu_document_get_pageanno(ddjvu_document_t *document, int pageno)
 {
@@ -3233,39 +3770,9 @@ ddjvu_document_get_pageanno(ddjvu_document_t *document, int pageno)
       if (doc)
         {
           document->pageinfoflag = true;
-          GP<DjVuFile> file = doc->get_djvu_file(pageno);
-          // Make sure all data is present
-          if (! file || ! file->is_all_data_present())
-            {
-              if (file->is_data_present())
-                {
-                  if (! file->are_incl_files_created())
-                    file->process_incl_chunks();
-                  if (! file->are_incl_files_created())
-                    return miniexp_status(DDJVU_JOB_FAILED);
-                }
-              return miniexp_dummy;
-            }
-          // Access annotation data
-          GP<ByteStream> annobs = file->get_merged_anno();
-          if (! (annobs && annobs->size()))
-            return miniexp_nil;
-          minivar_t result;
-          GP<IFFByteStream> iff = IFFByteStream::create(annobs);
-          GUTF8String chkid;
-          while (iff->get_chunk(chkid))
-            {
-              GP<ByteStream> bs;
-              if (chkid == "ANTa") 
-                bs = iff->get_bytestream();
-              else if (chkid == "ANTz")
-                bs = BSByteStream::create(iff->get_bytestream());
-              if (bs)
-                anno_sub(bs, result);
-              iff->close_chunk();
-            }
-          result = miniexp_reverse(result);
-          miniexp_protect(document, result);
+          minivar_t result = get_file_anno( doc->get_djvu_file(pageno) );
+          if (miniexp_consp(result))
+            miniexp_protect(document, result);
           return result;
         }
     }
@@ -3276,6 +3783,57 @@ ddjvu_document_get_pageanno(ddjvu_document_t *document, int pageno)
   G_ENDCATCH;
   return miniexp_status(DDJVU_JOB_FAILED);
 }
+
+
+miniexp_t
+ddjvu_document_get_anno(ddjvu_document_t *document, int compat)
+{
+  G_TRY
+    {
+      DjVuDocument *doc = document->doc;
+      if (doc)
+        {
+#if EXPERIMENTAL_DOCUMENT_ANNOTATIONS
+          // not yet implemented
+          GP<ByteStream> anno = doc->get_document_anno();
+          if (anno)
+            return get_bytestream_anno(anno);
+#endif
+          if (compat)
+            {
+              // look for shared annotations
+              int doc_type = doc->get_doc_type();
+              if (doc_type != DjVuDocument::BUNDLED &&
+                  doc_type != DjVuDocument::INDIRECT )
+                return miniexp_nil;
+              GP<DjVmDir> dir = doc->get_djvm_dir();
+              int filenum = dir->get_files_num();
+              GP<DjVmDir::File> fdesc;
+              for (int i=0; i<filenum; i++)
+                {
+                  GP<DjVmDir::File> f = dir->pos_to_file(i);
+                  if (!f->is_shared_anno())
+                    continue;
+                  if (fdesc)
+                    return miniexp_nil;
+                  fdesc = f;
+                }
+              if (fdesc)
+                {
+                  GUTF8String id = fdesc->get_load_name();
+                  return get_file_anno(doc->get_djvu_file(id));
+                }
+            }
+        }
+    }
+  G_CATCH(ex)
+    {
+      ERROR1(document, ex);
+    }
+  G_ENDCATCH;
+  return miniexp_nil;
+}
+
 
 
 

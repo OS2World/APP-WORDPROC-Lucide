@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuImage.cpp,v 1.13 2006/01/19 15:20:41 leonb Exp $
-// $Name:  $
+// $Id: DjVuImage.cpp,v 1.14 2007/03/25 20:48:30 leonb Exp $
+// $Name: release_3_5_19 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -1075,13 +1077,13 @@ do_bitmap(const DjVuImage &dimg, BImager get,
     GRect rect=inrect;
     GRect all=inall;
     if( dimg.get_rotate() )
-    {
+      {
         GRectMapper mapper;
         mapper.rotate(-dimg.get_rotate());
         mapper.map(rect);
         mapper.map(all);
     }
-
+    
   // Sanity
   if (! ( all.contains(rect.xmin, rect.ymin) &&
           all.contains(rect.xmax-1, rect.ymax-1) ))
@@ -1135,16 +1137,16 @@ static GP<GPixmap>
 do_pixmap(const DjVuImage &dimg, PImager get,
           const GRect &inrect, const GRect &inall, double gamma )
 {
-    GRect rect=inrect;
-    GRect all=inall;
-    if( dimg.get_rotate()%4 )
+  GRect rect=inrect;
+  GRect all=inall;
+  if( dimg.get_rotate()%4 )
     {
-        GRectMapper mapper;
+      GRectMapper mapper;
       mapper.rotate(-dimg.get_rotate());
-        mapper.map(rect);
-        mapper.map(all);
+      mapper.map(rect);
+      mapper.map(all);
     }
-
+  
   // Sanity
   if (! ( all.contains(rect.xmin, rect.ymin) &&
           all.contains(rect.xmax-1, rect.ymax-1) ))
@@ -1153,7 +1155,6 @@ do_pixmap(const DjVuImage &dimg, PImager get,
   int red, w=0, h=0, rw=0, rh=0;
   w = dimg.get_real_width();
   h = dimg.get_real_height();
-  
 
   rw = all.width();
   rh = all.height();
@@ -1252,29 +1253,29 @@ DjVuImage::get_decoded_anno()
       if (djvuinfo)
         rotate_count = rotate_count - djvuinfo->orientation;
       ///decode
-        djvuanno->decode(bs);
-            ///map hyperlinks correctly for rotation           
+      djvuanno->decode(bs);
+      ///map hyperlinks correctly for rotation           
       if( rotate_count & 3 )
         {   
-            GRect input, output;
+          GRect input, output;
           input = GRect(0,0,get_width(),get_height());
           if (rotate_count & 1)
             output = GRect(0,0,get_height(),get_width());
           else
             output = GRect(0,0,get_width(),get_height());
-            GRectMapper mapper;
-            mapper.clear();
-            mapper.set_input(input);
-            mapper.set_output(output);               
+          GRectMapper mapper;
+          mapper.clear();
+          mapper.set_input(input);
+          mapper.set_output(output);               
           mapper.rotate(-rotate_count);
-            GPList<GMapArea> &list=djvuanno->ant->map_areas;
-            for(GPosition pos=list;pos;++pos)
-                list[pos]->unmap(mapper);
-            }
-        return djvuanno;
+          GPList<GMapArea> &list=djvuanno->ant->map_areas;
+          for(GPosition pos=list;pos;++pos)
+            list[pos]->unmap(mapper);
+        }
+      return djvuanno;
     }
     else
-        return NULL;
+      return NULL;
 }
 
 

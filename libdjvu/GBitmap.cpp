@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GBitmap.cpp,v 1.11 2005/12/24 12:45:01 leonb Exp $
-// $Name:  $
+// $Id: GBitmap.cpp,v 1.13 2007/03/25 20:48:31 leonb Exp $
+// $Name: release_3_5_19 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -69,7 +71,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.11 2005/12/24 12:45:01 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.13 2007/03/25 20:48:31 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -298,6 +300,7 @@ GBitmap::init(ByteStream &ref, int aborder)
   char lookahead = '\n';
   int acolumns = read_integer(lookahead, ref);
   int arows = read_integer(lookahead, ref);
+  int maxval = 1;
   init(arows, acolumns, aborder);
   // go reading file
   if (magic[0]=='P')
@@ -309,20 +312,22 @@ GBitmap::init(ByteStream &ref, int aborder)
           read_pbm_text(ref); 
           return;
         case '2':
-          grays = 1 + read_integer(lookahead, ref);
-          if (grays > 256)
-            G_THROW("Cannot read PGM with depth greater than 8 bits.");
-          read_pgm_text(ref); 
+          maxval = read_integer(lookahead, ref);
+          if (maxval > 65535)
+            G_THROW("Cannot read PGM with depth greater than 16 bits.");
+          grays = (maxval>255 ? 256 : maxval+1);
+          read_pgm_text(ref, maxval); 
           return;
         case '4':
           grays = 2;
           read_pbm_raw(ref); 
           return;
         case '5':
-          grays = 1 + read_integer(lookahead, ref);
-          if (grays > 256)
-            grays = 256;
-          read_pgm_raw(ref); 
+          maxval = read_integer(lookahead, ref);
+          if (maxval > 65535)
+            G_THROW("Cannot read PGM with depth greater than 16 bits.");
+          grays = (maxval>255 ? 256 : maxval+1);
+          read_pgm_raw(ref, maxval); 
           return;
         }
     }
@@ -793,15 +798,18 @@ GBitmap::read_pbm_text(ByteStream &bs)
 }
 
 void 
-GBitmap::read_pgm_text(ByteStream &bs)
+GBitmap::read_pgm_text(ByteStream &bs, int maxval)
 {
   unsigned char *row = bytes_data + border;
   row += (nrows-1) * bytes_per_row;
   char lookahead = '\n';
+  GTArray<unsigned char> ramp(0, maxval);
+  for (int i=0; i<=maxval; i++)
+    ramp[i] = (i<maxval ? ((grays-1)*(maxval-i) + maxval/2) / maxval : 0);
   for (int n = nrows-1; n>=0; n--) 
     {
       for (int c = 0; c<ncolumns; c++)
-        row[c] = grays - 1 - read_integer(lookahead, bs);
+        row[c] = ramp[read_integer(lookahead, bs)];
       row -= bytes_per_row;
     }
 }
@@ -833,17 +841,34 @@ GBitmap::read_pbm_raw(ByteStream &bs)
 }
 
 void 
-GBitmap::read_pgm_raw(ByteStream &bs)
+GBitmap::read_pgm_raw(ByteStream &bs, int maxval)
 {
+  int maxbin = (maxval>255) ? 65536 : 256;
+  GTArray<unsigned char> ramp(0, maxbin-1);
+  for (int i=0; i<maxbin; i++)
+    ramp[i] = (i<maxval ? ((grays-1)*(maxval-i) + maxval/2) / maxval : 0);
+  unsigned char *bramp = ramp;
   unsigned char *row = bytes_data + border;
   row += (nrows-1) * bytes_per_row;
   for (int n = nrows-1; n>=0; n--) 
     {
-      for (int c = 0; c<ncolumns; c++)
+      if (maxbin > 256)
         {
-          unsigned char x;
-          bs.read((void*)&x, 1);
-          row[c] = grays - 1 - x;
+          for (int c = 0; c<ncolumns; c++)
+            {
+              unsigned char x[2];
+              bs.read((void*)&x, 2);
+              row[c] = bramp[x[0]*256+x[1]];
+            }
+        }
+      else
+        {
+          for (int c = 0; c<ncolumns; c++)
+            {
+              unsigned char x;
+              bs.read((void*)&x, 1);
+              row[c] = bramp[x];
+            }
         }
       row -= bytes_per_row;
     }

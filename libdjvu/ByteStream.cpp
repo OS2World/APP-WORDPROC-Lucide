@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: ByteStream.cpp,v 1.20 2005/12/24 12:45:01 leonb Exp $
-// $Name:  $
+// $Id: ByteStream.cpp,v 1.23 2007/03/25 20:48:29 leonb Exp $
+// $Name: release_3_5_19 $
 
 // From: Leon Bottou, 1/31/2002
 // This file has very little to do with my initial implementation.
@@ -250,9 +252,6 @@ ByteStream::Memory::operator[] (int n)
 class ByteStream::Static : public ByteStream
 {
 public:
-  class Allocate;
-  class Duplicate;
-  friend class Duplicate;
 
   /** Creates a Static object for allocating the memory area of
       length #sz# starting at address #buffer#. */
@@ -266,9 +265,6 @@ public:
       Valid offsets for function #seek# range from 0 to the value returned
       by this function. */
   virtual int size(void) const;
-  virtual GP<ByteStream> duplicate(const size_t xsize) const;
-  /// Returns false, unless a subclass of ByteStream::Static
-  virtual bool is_static(void) const { return true; }
 protected:
   const char *data;
   int bsize;
@@ -278,51 +274,10 @@ private:
 
 ByteStream::Static::~Static() {}
 
-class ByteStream::Static::Allocate : public ByteStream::Static
-{
-public:
-  friend class ByteStream;
-protected:
-  char *buf;
-  GPBuffer<char> gbuf;
-public:
-  Allocate(const size_t size) : Static(0,size), gbuf(buf,size) { data=buf; }
-  virtual ~Allocate();
-};
-
-ByteStream::Static::Allocate::~Allocate() {}
-
 inline int
 ByteStream::Static::size(void) const
 {
   return bsize;
-}
-
-class ByteStream::Static::Duplicate : public ByteStream::Static
-{
-protected:
-  GP<ByteStream> gbs;
-public:
-  Duplicate(const ByteStream::Static &bs, const size_t size);
-};
-
-ByteStream::Static::Duplicate::Duplicate(
-  const ByteStream::Static &bs, const size_t xsize)
-: ByteStream::Static(0,0)
-{
-  if(xsize&&(bs.bsize<bs.where))
-  {
-    const size_t bssize=(size_t)bs.bsize-(size_t)bs.where;
-    bsize=(size_t)((xsize>bssize)?bssize:xsize);
-    gbs=const_cast<ByteStream::Static *>(&bs);
-    data=bs.data+bs.where;
-  }
-}
-
-GP<ByteStream>
-ByteStream::Static::duplicate(const size_t xsize) const
-{
-  return new ByteStream::Static::Duplicate(*this,xsize);
 }
 
 #if HAS_MEMMAP
@@ -1201,31 +1156,6 @@ ByteStream::create_static(const void * buffer, size_t sz)
   return new Static(buffer, sz);
 }
 
-GP<ByteStream>
-ByteStream::duplicate(const size_t xsize) const
-{
-  GP<ByteStream> retval;
-  const long int pos=tell();
-  const int tsize=size();
-  ByteStream &self=*(const_cast<ByteStream *>(this));
-  if(tsize < 0 || pos < 0 || (unsigned int)tsize < 1+(unsigned int)pos)
-  {
-    retval=ByteStream::create();
-    retval->copy(self,xsize);
-    retval->seek(0L);
-  }else
-  {
-    const size_t s=(size_t)tsize-(size_t)pos;
-    const int size=(!xsize||(s<xsize))?s:xsize;
-    ByteStream::Static::Allocate *bs=new ByteStream::Static::Allocate(size);
-    retval=bs;
-    self.readall(bs->buf,size);
-  }
-  self.seek(pos,SEEK_SET,true);
-  return retval;
-}
-
-
 #if HAS_MEMMAP
 MemoryMapByteStream::MemoryMapByteStream(void)
 : ByteStream::Static(0,0)
@@ -1247,30 +1177,19 @@ GUTF8String
 MemoryMapByteStream::init(const int fd,const bool closeme)
 {
   GUTF8String retval;
+  data = (char*)(-1);
 #if defined(PROT_READ) && defined(MAP_SHARED)
   struct stat statbuf;
-  if(!fstat(fd,&statbuf))
-  {
-    if(statbuf.st_size)
+  if(!fstat(fd,&statbuf) && statbuf.st_size)
     {
       bsize=statbuf.st_size;
       data=(char *)mmap(0,statbuf.st_size,PROT_READ,MAP_SHARED,fd,0);
     }
-  }else
-  {
-    if(closeme)
-    {
-      close(fd);
-    }
-    retval= ERR_MSG("ByteStream.open_fail2");
-  }
-#else
-  retval= ERR_MSG("ByteStream.open_fail2");
 #endif
+  if(data == (char *)(-1))
+    retval = ERR_MSG("ByteStream.open_fail2");
   if(closeme)
-  {
     close(fd);
-  }
   return retval;
 }
 

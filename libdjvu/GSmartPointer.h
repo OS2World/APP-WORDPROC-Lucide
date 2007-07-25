@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GSmartPointer.h,v 1.11 2003/11/07 22:08:21 leonb Exp $
-// $Name:  $
+// $Id: GSmartPointer.h,v 1.13 2007/03/25 20:48:32 leonb Exp $
+// $Name: release_3_5_19 $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -86,7 +88,7 @@
 // <http://prdownloads.sourceforge.net/djvu/DjVu2_2b-src.tgz>.
 
     @version 
-    #$Id: GSmartPointer.h,v 1.11 2003/11/07 22:08:21 leonb Exp $# 
+    #$Id: GSmartPointer.h,v 1.13 2007/03/25 20:48:32 leonb Exp $# 
     @args
 */
 //@{
@@ -107,35 +109,6 @@ namespace DJVU {
 #endif
 
 
-
-/* What is this innovation ? 
-   What does it do that a GArray does not do ? */
-
-class GPBufferBase
-{
-public:
-  GPBufferBase(void *&,const size_t n,const size_t t);
-  void swap(GPBufferBase &p);
-  void resize(const size_t n,const size_t t);
-  void replace(void *nptr,const size_t n);
-  void set(const size_t t,const char c);
-  ~GPBufferBase();
-  operator int(void) const { return ptr ? num : 0; }
-private:
-  void *&ptr;
-  size_t num;
-};
-
-template<class TYPE>
-class GPBuffer : public GPBufferBase
-{
-public:
-  GPBuffer(TYPE *&xptr,const size_t n=0) : GPBufferBase((void *&)xptr,n,sizeof(TYPE)) {}
-  inline void resize(const size_t n) {GPBufferBase::resize(n,sizeof(TYPE));}
-  inline void clear(void) {GPBufferBase::set(sizeof(TYPE),0);}
-  inline void set(const char c) {GPBufferBase::set(sizeof(TYPE),c);}
-  inline operator int(void) const {return GPBufferBase::operator int();}
-};
 
 /** Base class for reference counted objects.  
     This is the base class for all reference counted objects.
@@ -478,6 +451,39 @@ GP<TYPE>::operator! () const
 {
   return !ptr;
 }
+
+/* GPBUFFER */
+
+/* What is this LT innovation ? 
+   What does it do that a GArray does not do ? 
+   What about the objects construction and destruction ? */
+
+class GPBufferBase
+{
+public:
+  GPBufferBase(void *&,const size_t n,const size_t t);
+  void swap(GPBufferBase &p);
+  void resize(const size_t n,const size_t t);
+  void replace(void *nptr,const size_t n);
+  void set(const size_t t,const char c);
+  ~GPBufferBase();
+  operator int(void) const { return ptr ? num : 0; }
+private:
+  void *&ptr;
+  size_t num;
+};
+
+template<class TYPE>
+class GPBuffer : public GPBufferBase
+{
+public:
+  GPBuffer(TYPE *&xptr,const size_t n=0) : GPBufferBase((void *&)xptr,n,sizeof(TYPE)) {}
+  inline void resize(const size_t n) {GPBufferBase::resize(n,sizeof(TYPE));}
+  inline void clear(void) {GPBufferBase::set(sizeof(TYPE),0);}
+  inline void set(const char c) {GPBufferBase::set(sizeof(TYPE),c);}
+  inline operator int(void) const {return GPBufferBase::operator int();}
+};
+
 
 
 #ifdef HAVE_NAMESPACES

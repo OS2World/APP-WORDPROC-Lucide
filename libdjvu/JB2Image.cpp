@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: JB2Image.cpp,v 1.10 2004/04/17 23:56:11 leonb Exp $
-// $Name:  $
+// $Id: JB2Image.cpp,v 1.13 2007/03/25 20:48:32 leonb Exp $
+// $Name: release_3_5_19 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -470,7 +472,7 @@ JB2Dict::JB2Codec::CodeNum(int low, int high, NumContext *pctx, int v)
   bool negative=false;
   int cutoff;
   // Check
-  if (pctx && ((int)*pctx >= cur_ncell))
+  if (!pctx || ((int)*pctx >= cur_ncell))
     G_THROW( ERR_MSG("JB2Image.bad_numcontext") );
   // Start all phases
   cutoff = 0;
@@ -581,8 +583,7 @@ JB2Dict::JB2Codec::init_library(JB2Dict &jim)
     {
       shape2lib[i] = i;
       lib2shape[i] = i;
-      JB2Shape &jshp = jim.get_shape(i);
-      libinfo[i].compute_bounding_box(*(jshp.bits));
+      jim.get_bounding_box(i, libinfo[i]);
     }
 }
 
@@ -1060,19 +1061,24 @@ JB2Dict::JB2Codec::Decode::code(const GP<JB2Dict> &gjim)
     G_THROW( ERR_MSG("JB2Image.bad_number") );
   }
   JB2Dict &jim=*gjim;
-      // -------------------------
-      // THIS IS THE DECODING PART
-      // -------------------------
-      int rectype;
-      JB2Shape tmpshape;
-      do
-        {
-          code_record(rectype, gjim, &tmpshape);        
-        } 
-      while(rectype != END_OF_DATA);
-      if (!gotstartrecordp)
-        G_THROW( ERR_MSG("JB2Image.no_start") );
-      jim.compress();
+  // -------------------------
+  // THIS IS THE DECODING PART
+  // -------------------------
+  int rectype;
+  JB2Shape tmpshape;
+  do {
+    code_record(rectype, gjim, &tmpshape);        
+  } while(rectype != END_OF_DATA);
+  if (!gotstartrecordp)
+    G_THROW( ERR_MSG("JB2Image.no_start") );
+  // cache bounding boxes
+  int nshapes = jim.get_shape_count();
+  int ishapes = jim.get_inherited_shape_count();
+  jim.boxes.resize(0, nshapes-ishapes-1);
+  for (int i = ishapes; i < nshapes; i++)
+    jim.boxes[i-ishapes] = libinfo[i];
+  // compress
+  jim.compress();
 }
 
 
@@ -1362,9 +1368,9 @@ JB2Dict::JB2Codec::Decode::code(const GP<JB2Image> &gjim)
 ////////////////////////////////////////
 
 void 
-JB2Dict::JB2Codec::LibRect::compute_bounding_box(const GBitmap &bm)
+JB2Dict::LibRect::compute_bounding_box(const GBitmap &bm)
 {
-  // First lock the stuff.
+  // Avoid trouble
   GMonitorLock lock(bm.monitor());
   // Get size
   const int w = bm.columns();
@@ -1411,6 +1417,27 @@ JB2Dict::JB2Codec::LibRect::compute_bounding_box(const GBitmap &bm)
         break;
     }
 }
+
+
+void
+JB2Dict::get_bounding_box(int shapeno, LibRect &dest)
+{
+  if (shapeno < inherited_shapes && inherited_dict)
+    {
+      inherited_dict->get_bounding_box(shapeno, dest);
+    }
+  else if (shapeno >= inherited_shapes &&
+           shapeno < inherited_shapes + boxes.size())
+    {
+      dest = boxes[shapeno - inherited_shapes];
+    }
+  else
+    {
+      JB2Shape &jshp = get_shape(shapeno);
+      dest.compute_bounding_box(*(jshp.bits));
+    }
+}
+
 
 GP<JB2Dict>
 JB2Dict::create(void)

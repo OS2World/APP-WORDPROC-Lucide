@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GScaler.h,v 1.9 2003/11/07 22:08:21 leonb Exp $
-// $Name:  $
+// $Id: GScaler.h,v 1.11 2007/03/25 20:48:32 leonb Exp $
+// $Name: release_3_5_19 $
 
 #ifndef _GSCALER_H_
 #define _GSCALER_H_
@@ -98,7 +100,7 @@ namespace DJVU {
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GScaler.h,v 1.9 2003/11/07 22:08:21 leonb Exp $# */
+    #$Id: GScaler.h,v 1.11 2007/03/25 20:48:32 leonb Exp $# */
 //@{
 
 
@@ -292,11 +294,11 @@ protected:
   GPixel *get_line(int, const GRect &, const GRect &, const GPixmap &);
   // Temporaries
   GPixel *lbuffer;
-  GPBufferBase glbuffer;
+  GPBuffer<GPixel> glbuffer;
   GPixel *p1;
-  GPBufferBase gp1;
+  GPBuffer<GPixel> gp1;
   GPixel *p2;
-  GPBufferBase gp2;
+  GPBuffer<GPixel> gp2;
   int    l1;
   int    l2;
 };

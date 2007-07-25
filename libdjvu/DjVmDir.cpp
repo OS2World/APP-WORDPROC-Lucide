@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVmDir.cpp,v 1.11 2005/12/30 15:22:16 leonb Exp $
-// $Name:  $
+// $Id: DjVmDir.cpp,v 1.13 2007/03/25 20:48:29 leonb Exp $
+// $Name: release_3_5_19 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -558,7 +560,6 @@ GP<DjVmDir::File>
 DjVmDir::title_to_file(const GUTF8String &title) const
 {
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-
    GPosition pos;
    return (title2file.contains(title, pos))?title2file[pos]:(GP<DjVmDir::File>(0));
 }
@@ -782,19 +783,8 @@ DjVmDir::set_file_title(const GUTF8String &id, const GUTF8String &title)
 {
    DEBUG_MSG("DjVmDir::set_file_title(): id='" << id << "', title='" << title << "'\n");
    DEBUG_MAKE_INDENT(3);
-   
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-
    GPosition pos;
-   
-      // First see, if the title is unique
-   for(pos=files_list;pos;++pos)
-   {
-      GP<File> file=files_list[pos];
-      if (file->id!=id && file->title==title)
-        G_THROW( ERR_MSG("DjVmDir.title_in_use") "\t" + GUTF8String(title));
-   }
-
       // Check if ID is valid
    if (!id2file.contains(id, pos))
       G_THROW( ERR_MSG("DjVmDir.no_info") "\t" + GUTF8String(id));

@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DataPool.h,v 1.10 2003/11/07 22:08:20 leonb Exp $
-// $Name:  $
+// $Id: DataPool.h,v 1.12 2007/03/25 20:48:29 leonb Exp $
+// $Name: release_3_5_19 $
 
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -96,7 +98,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DataPool.h,v 1.10 2003/11/07 22:08:20 leonb Exp $#
+    @version #$Id: DataPool.h,v 1.12 2007/03/25 20:48:29 leonb Exp $#
 */
 
 //@{
@@ -508,7 +510,6 @@ public:
 	  @param callback Function to call
 	  @param cl_data Argument to pass to the callback when it's called. */
    void		add_trigger(int start, int length,
-//			    void (* callback)(GP<GPEnabled> &), GP<GPEnabled> cl_data);
 			    void (* callback)(void *), void * cl_data);
 
       /** Associates the specified {\em trigger callback} with the
@@ -518,14 +519,15 @@ public:
 	  The callback will be called when there is data available for
 	  every offset from #0# to #thresh#, if #thresh# is positive, or
 	  when #EOF# condition has been set otherwise. */
-//   void		add_trigger(int thresh, void (* callback)(GP<GPEnabled> &), GP<GPEnabled> cl_data);
-   void		add_trigger(int thresh, void (* callback)(void *), void * cl_data);
+
+   void		add_trigger(int thresh, 
+                            void (* callback)(void *), void * cl_data);
 
       /** Use this function to unregister callbacks, which are no longer
 	  needed. {\bf Note!} It's important to do it when the client
 	  is about to be destroyed. */
    void		del_trigger(void (* callback)(void *), void *  cl_data);
-//   void		del_trigger(void (* callback)(GP<GPEnabled> &), GP<GPEnabled>  cl_data);
+
       //@}
 
       /** Loads data from the file into memory. This function is only useful
@@ -554,6 +556,8 @@ public:
       /** Useful in comparing data pools.  Returns true if dirived from
           same URL or bytestream. */
    bool simple_compare(DataPool &pool) const;
+
+
 private:
    bool		eof_flag;
    bool		stop_flag;

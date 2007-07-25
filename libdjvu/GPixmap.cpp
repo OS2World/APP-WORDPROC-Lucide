@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GPixmap.cpp,v 1.13 2005/12/24 12:45:01 leonb Exp $
-// $Name:  $
+// $Id: GPixmap.cpp,v 1.16 2007/03/25 20:48:32 leonb Exp $
+// $Name: release_3_5_19 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -463,83 +465,119 @@ void
 GPixmap::init(ByteStream &bs)
 {
   // Read header
-  int raw = 0;
-  char magic[2];
-  magic[0] = magic[1] = 0;
-  bs.readall((void*)magic, sizeof(magic));
-  if (magic[0]=='P' && magic[1]=='3')
-  {
-    raw = 0;
-  }else if (magic[0]=='P' && magic[1]=='6')
-  {
-    raw = 1;
-  }else
-  {
+  bool raw = false;
+  bool grey = false;
+  int magic = bs.read16();
+  switch (magic)
+    {
+    case ('P'<<8)+'2':
+      grey = true;
+      break;
+    case ('P'<<8)+'3':
+      break;
+    case ('P'<<8)+'5':
+      raw = grey = true;
+    case ('P'<<8)+'6':
+      raw = true;
+      break;
+    default:
 #ifdef NEED_JPEG_DECODER
-    bs.seek(0L);
-    JPEGDecoder::decode(bs,*this);
-    return;
-#else // NEED_JPEG_DECODER
-  
-    G_THROW( ERR_MSG("GPixmap.unk_PPM") );
-#endif // NEED_JPEG_DECODER
-  }
+      bs.seek(0L);
+      JPEGDecoder::decode(bs,*this);
+      return;
+#else
+      
+      G_THROW( ERR_MSG("GPixmap.unk_PPM") );
+#endif
+    }
   // Read image size
   char lookahead = '\n';
+  int bytesperrow = 0;
+  int bytespercomp = 1;
   int acolumns = read_integer(lookahead, bs);
   int arows = read_integer(lookahead, bs);
   int maxval = read_integer(lookahead, bs);
+  if (maxval > 65535)
+    G_THROW("Cannot read PPM with depth greater than 48 bits.");
   if (maxval > 255)
-    G_THROW("Cannot read PPM with depth greater than 24 bits.");
+    bytespercomp = 2;
   init(arows, acolumns, 0);
+  // Prepare ramp
+  GTArray<unsigned char> ramp;
+  int maxbin = 1 << (8 * bytespercomp);
+  ramp.resize(0, maxbin-1);
+  for (int i=0; i<maxbin; i++)
+    ramp[i] = (i<maxval ? (255*i + maxval/2) / maxval : 255);
+  unsigned char *bramp = ramp;
   // Read image data
-  if (raw)
-  {
-    GTArray<unsigned char> line(ncolumns*3);
-    for (int y=nrows-1; y>=0; y--) 
-      {
-        GPixel *p = (*this)[y];
-        unsigned char *rgb = &line[0];
-        if ( bs.readall((void*)rgb, ncolumns*3) < (size_t)(ncolumns*3))
-          G_THROW( ByteStream::EndOfFile );
-        for (int x=0; x<ncolumns; x+=1, rgb+=3)
-          {
-            p[x].r = rgb[0];
-            p[x].g = rgb[1];
-            p[x].b = rgb[2];
-          }
-      }
-  }
+  if (raw && grey)
+    {
+      bytesperrow = ncolumns * bytespercomp;
+      GTArray<unsigned char> line(bytesperrow);
+      for (int y=nrows-1; y>=0; y--) 
+        {
+          GPixel *p = (*this)[y];
+          unsigned char *g = &line[0];
+          if ( bs.readall((void*)g, bytesperrow) < (size_t)bytesperrow)
+            G_THROW( ByteStream::EndOfFile );
+          if (bytespercomp <= 1)
+            {
+              for (int x=0; x<ncolumns; x+=1, g+=1)
+                p[x].r = p[x].g = p[x].b = bramp[g[0]];
+            }
+          else
+            {
+              for (int x=0; x<ncolumns; x+=1, g+=2)
+                p[x].r = p[x].g = p[x].b = bramp[g[0]*256+g[1]];
+            }
+        }
+    }
+  else if (raw)
+    {
+      bytesperrow = ncolumns * bytespercomp * 3;
+      GTArray<unsigned char> line(bytesperrow);
+      for (int y=nrows-1; y>=0; y--) 
+        {
+          GPixel *p = (*this)[y];
+          unsigned char *rgb = &line[0];
+          if ( bs.readall((void*)rgb, bytesperrow) < (size_t)bytesperrow)
+            G_THROW( ByteStream::EndOfFile );
+          if (bytespercomp <= 1)
+            {
+              for (int x=0; x<ncolumns; x+=1, rgb+=3)
+                {
+                  p[x].r = bramp[rgb[0]];
+                  p[x].g = bramp[rgb[1]];
+                  p[x].b = bramp[rgb[2]];
+                }
+            }
+          else
+            for (int x=0; x<ncolumns; x+=1, rgb+=6)
+              {
+                p[x].r = bramp[rgb[0]*256+rgb[1]];
+                p[x].g = bramp[rgb[2]*256+rgb[3]];
+                p[x].b = bramp[rgb[4]*256+rgb[5]];
+              }
+        }
+    }
   else
-  {
-    for (int y=nrows-1; y>=0; y--) 
     {
-      GPixel *p = (*this)[y];
-      for (int x=0; x<ncolumns; x++)
-      {
-        p[x].r = read_integer(lookahead, bs);
-        p[x].g = read_integer(lookahead, bs);
-        p[x].b = read_integer(lookahead, bs);
-      }
+      for (int y=nrows-1; y>=0; y--) 
+        {
+          GPixel *p = (*this)[y];
+          for (int x=0; x<ncolumns; x++)
+            if (grey)
+              {
+                p[x].g = p[x].b = p[x].r = ramp[read_integer(lookahead, bs)];
+              }
+            else
+              {
+                p[x].r = ramp[read_integer(lookahead, bs)];
+                p[x].g = ramp[read_integer(lookahead, bs)];
+                p[x].b = ramp[read_integer(lookahead, bs)];
+              }
+        }
     }
-  }
-  // Process small values of maxval
-  if (maxval>0 && maxval<255)
-  {
-    char table[256];
-    for (int i=0; i<256; i++)
-      table[i] = (i<maxval ? (255*i + maxval/2) / maxval : 255);
-    for (int y=0; y<nrows; y++)
-    {
-      GPixel *p = (*this)[y];
-      for (int x=0; x<ncolumns; x++)
-      {
-        p[x].r = table[p[x].r];
-        p[x].g = table[p[x].g];
-        p[x].b = table[p[x].b];
-      }
-    }
-  }
 }
 
 

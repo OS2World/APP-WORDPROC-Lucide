@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GContainer.h,v 1.17 2006/02/21 16:10:29 docbill Exp $
-// $Name:  $
+// $Id: GContainer.h,v 1.19 2007/03/25 20:48:31 leonb Exp $
+// $Name: release_3_5_19 $
 
 #ifndef _GCONTAINER_H_
 #define _GCONTAINER_H_
@@ -130,8 +132,84 @@ namespace DJVU {
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.17 2006/02/21 16:10:29 docbill Exp $# */
+    #$Id: GContainer.h,v 1.19 2007/03/25 20:48:31 leonb Exp $# */
 //@{
+
+
+
+// ------------------------------------------------------------
+// HASH FUNCTIONS
+// ------------------------------------------------------------
+
+
+/** @name Hash functions
+    These functions let you use template class \Ref{GMap} with the
+    corresponding elementary types. The returned hash code may be reduced to
+    an arbitrary range by computing its remainder modulo the upper bound of
+    the range.
+    @memo Hash functions for elementary types. */
+//@{
+
+/** Hashing function (unsigned int). */
+static inline unsigned int 
+hash(const unsigned int & x) 
+{ 
+  return x; 
+}
+
+/** Hashing function (int). */
+static inline unsigned int 
+hash(const int & x) 
+{ 
+  return (unsigned int)x;
+}
+
+/** Hashing function (long). */
+static inline unsigned int
+hash(const long & x) 
+{ 
+  return (unsigned int)x;
+}
+
+/** Hashing function (unsigned long). */
+static inline unsigned int
+hash(const unsigned long & x) 
+{ 
+  return (unsigned int)x;
+}
+
+/** Hashing function (const void *). */
+static inline unsigned int 
+hash(const void * const & x) 
+{ 
+  return (unsigned long) x; 
+}
+
+/** Hashing function (float). */
+static inline unsigned int
+hash(const float & x) 
+{ 
+  // optimizer will get rid of unnecessary code  
+  unsigned int *addr = (unsigned int*)&x;
+  if (sizeof(float)<2*sizeof(unsigned int))
+    return addr[0];
+  else
+    return addr[0]^addr[1];
+}
+
+/** Hashing function (double). */
+static inline unsigned int
+hash(const double & x) 
+{ 
+  // optimizer will get rid of unnecessary code
+  unsigned int *addr = (unsigned int*)&x;
+  if (sizeof(double)<2*sizeof(unsigned int))
+    return addr[0];
+  else if (sizeof(double)<4*sizeof(unsigned int))
+    return addr[0]^addr[1];
+  else
+    return addr[0]^addr[1]^addr[2]^addr[3];    
+}
 
 
 
@@ -332,7 +410,6 @@ public:
 protected:
   const Traits &traits;
   void  *data;
-  GPBufferBase gdata;
   int   minlo;
   int   maxhi;
   int   lobound;
@@ -1263,80 +1340,6 @@ public:
     { GSetBase::operator=(r); return *this; }
 };
 
-
-// ------------------------------------------------------------
-// HASH FUNCTIONS
-// ------------------------------------------------------------
-
-
-/** @name Hash functions
-    These functions let you use template class \Ref{GMap} with the
-    corresponding elementary types. The returned hash code may be reduced to
-    an arbitrary range by computing its remainder modulo the upper bound of
-    the range.
-    @memo Hash functions for elementary types. */
-//@{
-
-/** Hashing function (unsigned int). */
-static inline unsigned int 
-hash(const unsigned int & x) 
-{ 
-  return x; 
-}
-
-/** Hashing function (int). */
-static inline unsigned int 
-hash(const int & x) 
-{ 
-  return (unsigned int)x;
-}
-
-/** Hashing function (long). */
-static inline unsigned int
-hash(const long & x) 
-{ 
-  return (unsigned int)x;
-}
-
-/** Hashing function (unsigned long). */
-static inline unsigned int
-hash(const unsigned long & x) 
-{ 
-  return (unsigned int)x;
-}
-
-/** Hashing function (const void *). */
-static inline unsigned int 
-hash(const void * const & x) 
-{ 
-  return (unsigned long) x; 
-}
-
-/** Hashing function (float). */
-static inline unsigned int
-hash(const float & x) 
-{ 
-  // optimizer will get rid of unnecessary code  
-  unsigned int *addr = (unsigned int*)&x;
-  if (sizeof(float)<2*sizeof(unsigned int))
-    return addr[0];
-  else
-    return addr[0]^addr[1];
-}
-
-/** Hashing function (double). */
-static inline unsigned int
-hash(const double & x) 
-{ 
-  // optimizer will get rid of unnecessary code
-  unsigned int *addr = (unsigned int*)&x;
-  if (sizeof(double)<2*sizeof(unsigned int))
-    return addr[0];
-  else if (sizeof(double)<4*sizeof(unsigned int))
-    return addr[0]^addr[1];
-  else
-    return addr[0]^addr[1]^addr[2]^addr[3];    
-}
 
 
 //@}

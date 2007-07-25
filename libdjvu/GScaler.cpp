@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,7 +53,7 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GScaler.cpp,v 1.11 2004/06/03 14:15:18 leonb Exp $
+// $Id: GScaler.cpp,v 1.15 2007/03/25 20:48:32 leonb Exp $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -464,7 +466,7 @@ GBitmapScaler::scale( const GRect &provided_input, const GBitmap &input,
       {
         // Prepare for side effects
         lbuffer[0]   = lbuffer[1];
-        lbuffer[bufw] = lbuffer[bufw];
+        lbuffer[bufw+1] = lbuffer[bufw];
         unsigned char *line = lbuffer+1-required_red.xmin;
         unsigned char *dest  = output[y-desired_output.ymin];
         // Loop horizontally
@@ -497,17 +499,17 @@ GBitmapScaler::scale( const GRect &provided_input, const GBitmap &input,
 
 
 GPixmapScaler::GPixmapScaler()
-  : glbuffer((void *&)lbuffer,0,sizeof(GPixel)), 
-    gp1((void *&)p1,0,sizeof(GPixel)), 
-    gp2((void *&)p2,0,sizeof(GPixel))
+  : glbuffer(lbuffer,0), 
+    gp1(p1,0), 
+    gp2(p2,0)
 {
 }
 
 
 GPixmapScaler::GPixmapScaler(int inw, int inh, int outw, int outh)
-  : glbuffer((void *&)lbuffer,0,sizeof(GPixel)), 
-    gp1((void *&)p1,0,sizeof(GPixel)), 
-    gp2((void *&)p2,0,sizeof(GPixel))
+  : glbuffer(lbuffer,0), 
+    gp1(p1,0), 
+    gp2(p2,0)
 {
   set_input_size(inw, inh);
   set_output_size(outw, outh);
@@ -612,16 +614,16 @@ GPixmapScaler::scale( const GRect &provided_input, const GPixmap &input,
       desired_output.height() != (int)output.rows() )
     output.init(desired_output.height(), desired_output.width());
   // Prepare temp stuff 
-  gp1.resize(0,sizeof(GPixel));
-  gp2.resize(0,sizeof(GPixel));
-  glbuffer.resize(0,sizeof(GPixel));
+  gp1.resize(0);
+  gp2.resize(0);
+  glbuffer.resize(0);
   prepare_interp();
   const int bufw = required_red.width();
-  glbuffer.resize(bufw+2,sizeof(GPixel));
+  glbuffer.resize(bufw+2);
   if (xshift>0 || yshift>0)
     {
-      gp1.resize(bufw,sizeof(GPixel));
-      gp2.resize(bufw,sizeof(GPixel));
+      gp1.resize(bufw);
+      gp2.resize(bufw);
       l1 = l2 = -1;
     }
   // Loop on output lines
@@ -668,7 +670,7 @@ GPixmapScaler::scale( const GRect &provided_input, const GPixmap &input,
       {
         // Prepare for side effects
         lbuffer[0]   = lbuffer[1];
-        lbuffer[bufw] = lbuffer[bufw];
+        lbuffer[bufw+1] = lbuffer[bufw];
         GPixel *line = lbuffer+1-required_red.xmin;
         GPixel *dest  = output[y-desired_output.ymin];
         // Loop horizontally
@@ -690,9 +692,9 @@ GPixmapScaler::scale( const GRect &provided_input, const GPixmap &input,
       }
     }
   // Free temporaries
-  gp1.resize(0,sizeof(GPixel));
-  gp2.resize(0,sizeof(GPixel));
-  glbuffer.resize(0,sizeof(GPixel));
+  gp1.resize(0);
+  gp2.resize(0);
+  glbuffer.resize(0);
 }
 
 

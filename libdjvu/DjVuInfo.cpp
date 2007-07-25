@@ -5,7 +5,8 @@
 //C- Copyright (c) 2001  AT&T
 //C-
 //C- This software is subject to, and may be distributed under, the
-//C- GNU General Public License, Version 2. The license should have
+//C- GNU General Public License, either Version 2 of the license,
+//C- or (at your option) any later version. The license should have
 //C- accompanied the software or you may obtain a copy of the license
 //C- from the Free Software Foundation at http://www.fsf.org .
 //C-
@@ -14,10 +15,10 @@
 //C- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //C- GNU General Public License for more details.
 //C- 
-//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library
-//C- distributed by Lizardtech Software.  On July 19th 2002, Lizardtech 
-//C- Software authorized us to replace the original DjVu(r) Reference 
-//C- Library notice by the following text (see doc/lizard2002.djvu):
+//C- DjVuLibre-3.5 is derived from the DjVu(r) Reference Library from
+//C- Lizardtech Software.  Lizardtech Software has authorized us to
+//C- replace the original DjVu(r) Reference Library notice by the following
+//C- text (see doc/lizard2002.djvu and doc/lizardtech2007.djvu):
 //C-
 //C-  ------------------------------------------------------------------
 //C- | DjVu (r) Reference Library (v. 3.5)
@@ -26,7 +27,8 @@
 //C- | 6,058,214 and patents pending.
 //C- |
 //C- | This software is subject to, and may be distributed under, the
-//C- | GNU General Public License, Version 2. The license should have
+//C- | GNU General Public License, either Version 2 of the license,
+//C- | or (at your option) any later version. The license should have
 //C- | accompanied the software or you may obtain a copy of the license
 //C- | from the Free Software Foundation at http://www.fsf.org .
 //C- |
@@ -51,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuInfo.cpp,v 1.10 2005/12/24 12:45:01 leonb Exp $
-// $Name:  $
+// $Id: DjVuInfo.cpp,v 1.11 2007/03/25 20:48:30 leonb Exp $
+// $Name: release_3_5_19 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -128,18 +130,18 @@ DjVuInfo::decode(ByteStream &bs)
     flags = buffer[9];
   // Fixup
   if (gamma<0.3)
-     gamma=0.3;
+    gamma=0.3;
   if (gamma>5.0)
-     gamma=5.0;
+    gamma=5.0;
   if (dpi < 25 || dpi > 6000)
     dpi = 300;
   switch (flags & 0x7)
-  {
+    {
     case 6:  orientation=1; break; 
     case 2:  orientation=2; break; 
     case 5:  orientation=3; break;
     default: orientation=0; break;
-  }
+    }
 }
 
 void 
@@ -154,12 +156,12 @@ DjVuInfo::encode(ByteStream &bs)
   bs.write8((int)(10.0*gamma+0.5) );
   unsigned char flags;
   switch (orientation) 
-  {
+    {
     default: flags=0; break;
     case 1:  flags=6; break;
     case 2:  flags=2; break;
     case 3:  flags=5; break;
-  }
+    }
   bs.write8(flags);
 }
 

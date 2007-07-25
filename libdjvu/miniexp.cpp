@@ -4,7 +4,8 @@
 // Copyright (c) 2005  Leon Bottou
 //
 // This software is subject to, and may be distributed under, the
-// GNU General Public License, Version 2. The license should have
+// GNU General Public License, either version 2 of the license
+// or (at your option) any later version. The license should have
 // accompanied the software or you may obtain a copy of the license
 // from the Free Software Foundation at http://www.fsf.org .
 //
@@ -14,7 +15,7 @@
 // GNU General Public License for more details.
 // -------------------------------------------------------------------
 */
-/* $Id: miniexp.cpp,v 1.12 2006/02/21 19:27:41 leonb Exp $ */
+/* $Id: miniexp.cpp,v 1.14 2007/03/25 20:48:35 leonb Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -364,10 +365,11 @@ gc_run(void)
         clear_marks(b);
       // mark
       minivar_t::mark(gc_mark);
-      { // extra nesting for windows
-        for (int i=0; i<recentsize; i++)
-          gc_mark((miniexp_t*)&gc.recent[i]);
-      }
+      for (int i=0; i<recentsize; i++)
+        {
+          miniexp_t p = (miniexp_t)gc.recent[i];
+          gc_mark(&p);
+        }
       // sweep
       gc.objs_free = gc.pairs_free = 0;
       gc.objs_freelist = gc.pairs_freelist = 0;
