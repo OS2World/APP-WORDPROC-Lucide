@@ -1,5 +1,8 @@
-1.?:
-  - Updated NLS-files: Czech, French, Dutch
+1.01:
+  - DJVU plugin: plugin may eat great amount of memory, fixed.
+  - DJVU plugin: djvulibre updated to version 3.5.19.
+  - DJVU plugin: fix opening files with non-latin chars in filename.
+  - Updated NLS-files: Czech, French, Dutch.
 
 1.0:
   - Show message with missed modulename if Lucide.dll cannot be loaded.
