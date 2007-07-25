@@ -1,7 +1,7 @@
 .autodepend
 
-TEST=0
-VERSION=1.0
+TEST=1
+VERSION=1.01
 
 !if $(TEST)==1
 	BMODE=os2v2

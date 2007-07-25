@@ -237,7 +237,7 @@ SOM_Scope boolean  SOMLINK renderPageToPixbuf(LuDjvuDocument *somSelf,
     long pixbuf_height = pixbuf->getHeight( ev );
     short bpp = getBpp( somSelf, ev );
 
-    LuPixbuf *pb = new LuPixbuf( ev, prect.w, prect.h, bpp );
+    LuPixbuf *pb = new LuPixbuf( ev, rrect.w, rrect.h, bpp );
     long pb_rowsize = pb->getRowSize( ev );
     long pb_height = pb->getHeight( ev );
     char *pbbuf = (char *)pb->getDataPtr( ev );

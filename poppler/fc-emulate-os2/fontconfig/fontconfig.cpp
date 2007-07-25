@@ -554,8 +554,8 @@ FcPattern *FcPatternBuild( void *,
                     const char *fcSpacing, FcType tSpacing, int spacing,
                     const char *fcLang, FcType tLang, const char *lang, void * )
 {
-//printf( "FAMILY: %s, SLANT: %d, WEIGHT: %d, WIDTH: %d, SPACING: %d, LANG: %s\n",
-//            family, slant, weight, width, spacing, lang );
+	//printf( "FAMILY: %s, SLANT: %d, WEIGHT: %d, WIDTH: %d, SPACING: %d, LANG: %s\n",
+    //        family, slant, weight, width, spacing, lang );
 
     FcPattern *p = new FcPattern;
     p->family   = newstrdup( family );
