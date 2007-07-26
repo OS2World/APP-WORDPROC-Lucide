@@ -3,7 +3,11 @@
   - DJVU plugin: djvulibre updated to version 3.5.19.
   - DJVU plugin: fix opening files with non-latin chars in filename.
   - PDF plugin: freetype library updated to version 2.3.5.
-  - TAB key switch between navigation pane and document
+  - TAB key switch between navigation pane and document (closed
+    tickets #112, #123).
+  - Zoom in/Zoom out menuitems and corresponding Ctrl++/Ctrl+- hotkeys.
+  - Ctrl+Shift++/Ctrl+Shift+- hotkeys for rotate CW/CCW, Ctrl+P for Print
+    (closed ticket #108).
   - Updated NLS-files: Czech, French, Dutch.
 
 1.0:

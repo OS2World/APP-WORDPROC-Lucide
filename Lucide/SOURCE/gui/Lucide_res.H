@@ -82,12 +82,14 @@
 #define CM_ACTSIZE      402
 #define CM_FITWIDTH     403
 #define CM_ZOOM_IN_OUT	404
-#define CM_ROTATE90CW   405
-#define CM_ROTATE90CCW  406
-#define CM_SINGLEPAGE   407
-#define CM_CONTINUOUS   408
-#define CM_DOCINFO      409
-#define CM_FONTSINFO    410
+#define CM_ZOOM_IN      405
+#define CM_ZOOM_OUT     406
+#define CM_ROTATE90CW   407
+#define CM_ROTATE90CCW  408
+#define CM_SINGLEPAGE   409
+#define CM_CONTINUOUS   410
+#define CM_DOCINFO      411
+#define CM_FONTSINFO    412
 
 #define CM_NAVPANE      501
 #define CM_MAXVIEW      502

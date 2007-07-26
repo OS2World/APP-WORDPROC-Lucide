@@ -81,6 +81,7 @@ class DocumentViewer
         void searchDocument( const char *_searchString, bool _caseSensitive,
                              bool _continueSearch );
         void setFullscreen( bool _fullscreen );
+        void zoomInOut( bool zoomIn );
 
         static void registerClass();
 

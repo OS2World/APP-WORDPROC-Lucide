@@ -11,7 +11,7 @@ MENU_OPEN=~Abrir...\tCtrl+O
 MENU_SAVE_AS=~Guardar como...
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=~Preferencias de p gina...
-MENU_PRINT=~Imprimir...
+MENU_PRINT=~Imprimir...\tCtrl+P
 MENU_PLUGINS_LIST=~Lista de plugins...
 MENU_EXIT=~Salir\tCtrl+X
 
@@ -26,14 +26,14 @@ MENU_VIEW=~Ver
 MENU_FIT_WINDOW=Ajustar a la ~ventana
 MENU_ACTUAL_SIZE=~Tama¤o real
 MENU_FIT_WIDTH=Ajustar al ~ancho
-MENU_ZOOM_IN_OUT=Aumentar/Reducir ~zoom
+# - unused - MENU_ZOOM_IN_OUT=Aumentar/Reducir ~zoom
 MENU_FIRST_PAGE=~Primera p gina
 MENU_PREV_PAGE=P gina anterior\t-
 MENU_NEXT_PAGE=P gina ~siguiente\t+
 MENU_LAST_PAGE=~éltima p gina
 MENU_GO_TO_PAGE=~Ir a la p gina...\tCtrl+N
-MENU_ROTATE_CW=~Girar 90ø en sentido horario
-MENU_ROTATE_CCW=Girar 90ø en sentido antihorario
+MENU_ROTATE_CW=~Girar 90ø en sentido horario\tCtrl+Shift++
+MENU_ROTATE_CCW=Girar 90ø en sentido antihorario\tCtrl+Shift+-
 MENU_SINGLE_PAGE=~Una p gina cada vez
 MENU_CONTINUOUS=Estilo ~continuo
 MENU_DOCUMENT_INFO=~Informaci¢n sobre el documento...

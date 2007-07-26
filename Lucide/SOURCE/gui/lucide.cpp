@@ -179,8 +179,9 @@ void Lucide::enableZoomMenus()
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_ACTSIZE), (MPARAM)scalable );
     WinEnableMenuItem( hWndMenu, CM_FITWIDTH, scalable );
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FITWIDTH), (MPARAM)scalable );
-    WinEnableMenuItem( hWndMenu, CM_ZOOM_IN_OUT, scalable );
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_ZOOM_IN_OUT), (MPARAM)scalable );
+    WinEnableMenuItem( hWndMenu, CM_ZOOM_IN, scalable );
+    WinEnableMenuItem( hWndMenu, CM_ZOOM_OUT, scalable );
     WinEnableControl( hToolBar, TBID_ZOOM, scalable );
     BOOL rotable = doc->isRotable( ev );
     WinEnableMenuItem( hWndMenu, CM_ROTATE90CW, rotable );
@@ -272,8 +273,9 @@ void Lucide::checkMenus()
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_ACTSIZE), (MPARAM)FALSE );
         WinEnableMenuItem( hWndMenu, CM_FITWIDTH, FALSE );
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FITWIDTH), (MPARAM)FALSE );
-        WinEnableMenuItem( hWndMenu, CM_ZOOM_IN_OUT, FALSE );
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_ZOOM_IN_OUT), (MPARAM)FALSE );
+        WinEnableMenuItem( hWndMenu, CM_ZOOM_IN, FALSE );
+        WinEnableMenuItem( hWndMenu, CM_ZOOM_OUT, FALSE );
         WinEnableControl( hToolBar, TBID_ZOOM, FALSE );
 
         WinEnableMenuItem( hWndMenu, CM_ROTATE90CW, FALSE );
@@ -716,8 +718,6 @@ void Lucide::toggleZoom()
     if ( ( doc != NULL ) && doc->isScalable( ev ) )
     {
         bool isZoom = !docViewer->isZoomMode();
-
-        WinCheckMenuItem( hWndMenu, CM_ZOOM_IN_OUT, isZoom );
         WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( CM_ZOOM_IN_OUT ), (MPARAM)isZoom );
         docViewer->setZoomMode( isZoom );
     }
@@ -930,6 +930,14 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
                 case CM_ZOOM_IN_OUT:
                     Lucide::toggleZoom();
+                    return (MRESULT)FALSE;
+
+                case CM_ZOOM_IN:
+                    docViewer->zoomInOut( true );
+                    return (MRESULT)FALSE;
+
+                case CM_ZOOM_OUT:
+                    docViewer->zoomInOut( false );
                     return (MRESULT)FALSE;
 
                 case CM_SINGLEPAGE:

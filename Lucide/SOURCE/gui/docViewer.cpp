@@ -1703,27 +1703,33 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
     return FALSE;
 }
 
+void DocumentViewer::zoomInOut( bool zoomIn )
+{
+    if ( ( doc != NULL ) && doc->isScalable( ev ) )
+    {
+        double z = getRealZoom() / 4;
+        double zval = 0;
+        if ( zoomIn ) {
+            zval = getRealZoom() + z;
+        } else {
+            zval = getRealZoom() - z;
+        }
+        zval = (long)( zval * 20.0 ) / 20.0;   // Round to 0.05 (5%)
+        if ( zval == getRealZoom() ) {
+            zval += ( zoomIn ? 0.01 : -0.01 );
+        }
+        if ( zval > 0.1 ) {
+            Lucide::setZoom( zval );
+        }
+    }
+}
+
 // handles WM_BUTTON1CLICK
 BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
 {
     if ( zoomMode )
     {
-        double z = getRealZoom() / 4;
-        double zval = 0;
-        bool doPlus = false;
-        if ( WinGetPhysKeyState( HWND_DESKTOP, 0x1d ) & 0x8000 ) {
-            zval = getRealZoom() - z;
-        } else {
-            zval = getRealZoom() + z;
-            doPlus = true;
-        }
-        zval = (long)( zval * 20.0 ) / 20.0;   // Round to 0.05 (5%)
-        if ( zval == getRealZoom() ) {
-            zval += ( doPlus ? 0.01 : -0.01 );
-        }
-        if ( zval > 0.1 ) {
-            Lucide::setZoom( zval );
-        }
+        zoomInOut( ( WinGetPhysKeyState( HWND_DESKTOP, 0x1d ) & 0x8000 ) == 0 );
         return TRUE;
     }
     else
@@ -1863,6 +1869,10 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
         }
     }
 
+    //
+    // In fullscreen mode accelerators not work, so we process these keys here.
+    //
+
     // Ctrl+L
     if ( ( fsflags & KC_CTRL ) && !( fsflags & KC_KEYUP ) && ( toupper( usch ) == 'L' ) )
     {
@@ -1881,7 +1891,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
         return TRUE;
     }
 
-    // Ctrl
+    // Ctrl && zoomMode
     if ( ( fsflags & KC_VIRTUALKEY ) && ( usvk == VK_CTRL ) && zoomMode ) {
         wmMouseMove( hwnd, 0, 0 ); // to switch mouse pointer if in zoomMode
     }
