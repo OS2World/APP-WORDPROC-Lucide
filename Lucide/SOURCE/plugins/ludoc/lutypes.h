@@ -48,6 +48,8 @@ struct LuRectangle
 #define LU_LINK_TYPE_TITLE         0
 #define LU_LINK_TYPE_PAGE          1
 #define LU_LINK_TYPE_EXTERNAL_URI  2
+#define LU_LINK_TYPE_EXTERNAL_FILE 3
+#define LU_LINK_TYPE_LAUNCH        4
 
 
 struct LuLink

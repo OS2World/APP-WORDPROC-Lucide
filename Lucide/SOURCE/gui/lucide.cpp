@@ -746,8 +746,27 @@ void Lucide::cmdSwitchToFullscreen()
     }
 }
 
-void Lucide::newWindow()
+void Lucide::newWindow( char *file, bool addDir )
 {
+    char *param = NULL;
+    
+    if ( file != NULL )
+    {
+        if ( addDir )
+        {
+            param = new char[ CCHMAXPATH ];
+            strcpy( param, docFullName );
+            char *lastSlash = strrchr( param, '\\' );
+            if ( lastSlash != NULL ) {
+                *( lastSlash + 1 ) = 0;
+            }
+            strcat( param, file );
+        }
+        else {
+            param = newstrdup( file );
+        }
+    }
+
     PROGDETAILS pd;
     pd.Length                      = sizeof( PROGDETAILS );
     pd.progt.progc                 = PROG_DEFAULT;
@@ -768,7 +787,9 @@ void Lucide::newWindow()
     pd.swpInitial.ulReserved1      = 0;
     pd.swpInitial.ulReserved2      = 0;
 
-    WinStartApp( NULLHANDLE, &pd, NULL, NULL, 0 );
+    WinStartApp( NULLHANDLE, &pd, param, NULL, 0 );
+
+    delete param;
 }
 
 static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
@@ -798,7 +819,7 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             switch ( SHORT1FROMMP(mp1) )
             {
                 case CM_NEW_WINDOW:
-                    Lucide::newWindow();
+                    Lucide::newWindow( NULL, false );
                     return (MRESULT)FALSE;
 
                 case CM_OPEN:

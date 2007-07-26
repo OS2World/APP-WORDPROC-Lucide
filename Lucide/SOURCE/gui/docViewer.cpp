@@ -1764,6 +1764,13 @@ BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
                             delete m;
                         }
                     }
+                    else if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_EXTERNAL_FILE )
+                    {
+                        char *uri = links[ pg ]->_buffer[i].link.uri;
+                        if ( uri != NULL ) {
+                        	Lucide::newWindow( uri, true );    
+                        }
+                    }
                     else if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_TITLE )
                     {
                         char *title = links[ pg ]->_buffer[i].link.title;

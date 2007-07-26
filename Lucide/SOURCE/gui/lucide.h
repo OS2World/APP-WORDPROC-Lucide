@@ -84,7 +84,7 @@ class Lucide
         static bool showIndex;
 		static ActiveWindow activeWindow;
         
-        static void newWindow();
+        static void newWindow( char *file, bool addDir );
         static void openDocument();
         static void closeDocument();
         static void loadDocument( const char *fn );

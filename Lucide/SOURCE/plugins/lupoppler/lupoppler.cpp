@@ -574,6 +574,21 @@ static long find_dest_page( PDFDoc *doc, LinkDest *link_dest )
     return page_num;
 }
 
+static long find_dest_r_page( LinkDest *link_dest )
+{
+    long page_num = 0;
+
+    if ( link_dest == NULL ) {
+        return page_num;
+    }
+
+    if ( !link_dest->isPageRef() ) {
+        page_num = link_dest->getPageNum() - 1;
+    }
+
+    return page_num;
+}
+
 static void build_goto_dest( PDFDoc *doc, LuLink *evlink, LinkGoTo *link )
 {
     LinkDest *link_dest;
@@ -597,13 +612,32 @@ static void build_goto_dest( PDFDoc *doc, LuLink *evlink, LinkGoTo *link )
     }
 }
 
+static void build_goto_r_dest( LuLink *evlink, LinkGoToR *link )
+{
+    LinkDest *link_dest;
+    UGooString *named_dest;
+
+    if ( !link->isOk() ) {
+        return;
+    }
+
+    link_dest  = link->getDest();
+    named_dest = link->getNamedDest();
+
+    char *file = link->getFileName()->getCString();
+    if ( file != NULL ) {
+        evlink->uri = somstrdup( file );
+    }
+    evlink->page = find_dest_r_page( link_dest );
+}
+
 static void build_link( PDFDoc *doc, LuLink *evlink,
                         const char *title, LinkAction *link_action )
 {
     evlink->title = somstrdup( title );
-    evlink->uri = NULL;
-    evlink->type = LU_LINK_TYPE_TITLE;
-    evlink->page = 0;
+    evlink->uri   = NULL;
+    evlink->type  = LU_LINK_TYPE_TITLE;
+    evlink->page  = 0;
 
     if ( link_action == NULL ) {
         return;
@@ -616,6 +650,14 @@ static void build_link( PDFDoc *doc, LuLink *evlink,
                 evlink->type = LU_LINK_TYPE_PAGE;
                 LinkGoTo *lgt = dynamic_cast <LinkGoTo *> (link_action);
                 build_goto_dest( doc, evlink, lgt );
+            }
+            break;
+
+        case actionGoToR:
+            {
+                evlink->type = LU_LINK_TYPE_EXTERNAL_FILE;
+                LinkGoToR *lgt = dynamic_cast <LinkGoToR *> (link_action);
+                build_goto_r_dest( evlink, lgt );
             }
             break;
 

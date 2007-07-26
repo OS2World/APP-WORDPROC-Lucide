@@ -8,6 +8,7 @@
   - Zoom in/Zoom out menuitems and corresponding Ctrl++/Ctrl+- hotkeys.
   - Ctrl+Shift++/Ctrl+Shift+- hotkeys for rotate CW/CCW, Ctrl+P for Print
     (closed ticket #108).
+  - Opening external files from links in document.
   - Updated NLS-files: Czech, French, Dutch.
 
 1.0:
