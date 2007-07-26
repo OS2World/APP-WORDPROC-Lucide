@@ -4,3 +4,9 @@ for Watcom.
 Added after
   /* Watcom doesn't provide 64-bit data types */
 string.
+
+
+In devel\ftoption.h commented:
+#define FT_DEBUG_LEVEL_ERROR
+#define FT_DEBUG_LEVEL_TRACE
+#define FT_DEBUG_MEMORY
