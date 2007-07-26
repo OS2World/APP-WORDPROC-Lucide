@@ -282,6 +282,12 @@ MRESULT EXPENTRY IndexWindow::panelProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                     break;
             }
             break;
+            
+        case WM_FOCUSCHANGE:
+            if ( SHORT1FROMMP( mp2 ) ) {
+                Lucide::activeWindow = AwIndex;
+            }
+            break;
     }
 
     return _this->pOldPanelProc( hwnd, msg, mp1, mp2 );

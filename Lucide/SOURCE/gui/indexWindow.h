@@ -52,6 +52,7 @@ class IndexWindow
         virtual ~IndexWindow();
 
         HWND getHWND() { return hWndPanel; }
+        HWND getIndexHWND() { return hWndIndex; }
         
         void setDocument( LuDocument *_doc );
 		bool goToPage( TreeRecord *parent, long page );

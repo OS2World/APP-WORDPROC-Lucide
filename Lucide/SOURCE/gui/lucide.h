@@ -42,6 +42,7 @@ class LuDocument;
 class ProgressDlg;
 
 enum PgLayout { SinglePage = 0, Continuous = 1 };
+enum ActiveWindow { AwIndex, AwView };
 
 struct LuWindowPos
 {
@@ -81,6 +82,7 @@ class Lucide
         static bool dontSwitchPage;
         static SHORT splitterPos;
         static bool showIndex;
+		static ActiveWindow activeWindow;
         
         static void newWindow();
         static void openDocument();
@@ -100,8 +102,10 @@ class Lucide
         static void toggleMaxview();
         static void toggleFullscreen();
         static void focusDocview();
+        static void focusIndex();
         static void cmdMinimize();
         static void cmdSwitchToFullscreen();
+        static void cmdSwitchWindow();
         static void createThumbnail( LuDocument *_doc );
         static bool isThumbNeeded( const char *fn );
         static void writeThumbnail( const char *fn );

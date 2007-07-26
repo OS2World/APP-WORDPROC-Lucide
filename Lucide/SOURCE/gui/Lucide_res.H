@@ -98,6 +98,7 @@
 // No menuitems for this commands
 #define CM_MINIMIZE     701
 #define CM_TOFULLSCREEN 702
+#define CM_SWITCHWINDOW 703
 
 #define TBID_PAGENUM    1
 #define TBID_OFPAGES    2

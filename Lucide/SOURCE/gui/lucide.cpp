@@ -106,6 +106,7 @@ LuWindowPos  Lucide::winPos                        = {0};
 char         Lucide::docFullName[ CCHMAXPATH ]     = "";
 char         Lucide::docFileName[ CCHMAXPATHCOMP ] = "";
 char        *Lucide::password                      = NULL;
+ActiveWindow Lucide::activeWindow                  = AwView;
 // static data for asynch loading document
 ProgressDlg *Lucide::loadProgressDlg               = NULL;
 bool         Lucide::docLoaded                     = false;;
@@ -696,6 +697,20 @@ void Lucide::focusDocview()
     WinSetFocus( HWND_DESKTOP, docViewer->getViewHWND() );
 }
 
+void Lucide::focusIndex()
+{
+    WinSetFocus( HWND_DESKTOP, indexWin->getIndexHWND() );
+}
+
+void Lucide::cmdSwitchWindow()
+{
+    if ( activeWindow == AwIndex ) {
+        focusDocview();
+    } else {
+        focusIndex();
+    }
+}
+
 void Lucide::toggleZoom()
 {
     if ( ( doc != NULL ) && doc->isScalable( ev ) )
@@ -939,6 +954,9 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                         Lucide::checkNavpane();
                         WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS,
                             MPFROMSHORT( Lucide::showIndex ? Lucide::splitterPos : 0 ), MPVOID );
+                        if ( !Lucide::showIndex ) {
+                            Lucide::focusDocview();
+                        }
                     }
                     return (MRESULT)FALSE;
 
@@ -960,6 +978,10 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
                 case CM_TOFULLSCREEN:
                     Lucide::cmdSwitchToFullscreen();
+                    return (MRESULT)FALSE;
+
+                case CM_SWITCHWINDOW:
+                    Lucide::cmdSwitchWindow();
                     return (MRESULT)FALSE;
             }
         }

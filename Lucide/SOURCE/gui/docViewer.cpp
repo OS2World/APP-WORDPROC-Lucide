@@ -2079,6 +2079,12 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
                 return (MRESULT)TRUE;
             }
             break;
+
+        case WM_FOCUSCHANGE:
+            if ( SHORT1FROMMP( mp2 ) ) {
+                Lucide::activeWindow = AwView;
+            }
+            break;
     }
 
     return WinDefWindowProc( hwnd, msg, mp1, mp2 );

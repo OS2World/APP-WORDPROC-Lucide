@@ -3,6 +3,7 @@
   - DJVU plugin: djvulibre updated to version 3.5.19.
   - DJVU plugin: fix opening files with non-latin chars in filename.
   - PDF plugin: freetype library updated to version 2.3.5.
+  - TAB key switch between navigation pane and document
   - Updated NLS-files: Czech, French, Dutch.
 
 1.0:
