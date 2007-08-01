@@ -19,11 +19,19 @@ to easily add more plugins.
          JPG                   -
   --------------------------------------------------------------------------
 
-This program requires UClip package (enhanced OS/2 clipboard support)
-and Innotek LIBC:
+This program requires UClip package (enhanced OS/2 clipboard support):
 
   - http://hobbes.nmsu.edu/cgi-bin/h-search?key=UClip
-  - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.1-csd1.zip
+  
+UClip requires Innotek LIBC 0.6.1:
+  
+  - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.1-csd1.zip (zip format)
+    or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_1-csd1.wpi (WarpIn format)
+
+DJVU plugin requires Innotek LIBC 0.6.3:
+  
+  - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.3-csd3.zip (zip format)
+    or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_3-csd3.wpi (WarpIn format)
 
 
 PostScript printing requires PostScript-capable printer (pscript.drv).
@@ -92,5 +100,5 @@ http://www.ecomstation.com
 
 :: Copyright ::
 
-(c) 2006 by Eugene Romanenko, netlabs.org
+(c) 2006-2007 by Eugene Romanenko, netlabs.org
     in co-operation with Serenity Systems International

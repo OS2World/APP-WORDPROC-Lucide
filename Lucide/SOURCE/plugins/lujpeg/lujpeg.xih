@@ -142,6 +142,7 @@ typedef LuJpegDocumentData* (SOMLINK * somTD_LuJpegDocument_DataThunk)(void*);
   #define _somDumpSelfInt somSelf->somDumpSelfInt
   #define _loadFile somSelf->loadFile
   #define _getBpp somSelf->getBpp
+  #define _isScalable somSelf->isScalable
   #define _getPageCount somSelf->getPageCount
   #define _getPageSize somSelf->getPageSize
   #define _renderPageToPixbuf somSelf->renderPageToPixbuf
@@ -246,6 +247,45 @@ static somMethodProc* LuJpegDocument_parent_LuDocument_getBpp_resolved;
 #endif
 #define LuJpegDocument_parents_getBpp(somSelf,ev) (\
    LuJpegDocument_parent_LuDocument_getBpp(somSelf,ev))
+
+/*
+ * Overridden method: isScalable
+ */
+SOM_Scope boolean  SOMLINK isScalable(LuJpegDocument *somSelf, Environment *ev);
+static char *somMN_LuJpegDocumentisScalable = "LuDocument::isScalable";
+static somId somId_LuJpegDocumentisScalable = &somMN_LuJpegDocumentisScalable;
+#ifdef somId_isScalable
+#undef somId_isScalable
+#else
+#define somId_isScalable somId_LuJpegDocumentisScalable
+#endif
+typedef boolean   SOMLINK somTP_xih_LuJpegDocument_isScalable(LuJpegDocument *somSelf, Environment *ev);
+typedef somTP_xih_LuJpegDocument_isScalable *somTD_xih_LuJpegDocument_isScalable;
+/* define the parent method call macro */
+static somMethodProc* LuJpegDocument_parent_LuDocument_isScalable_resolved;
+#define LuJpegDocument_parent_LuDocument_isScalable(somSelf,ev) \
+  ((( somTD_xih_LuJpegDocument_isScalable ) \
+      LuJpegDocument_parent_LuDocument_isScalable_resolved) \
+	(somSelf,ev))
+/* define a variety of (possibly ambiguous) short forms */
+#ifndef SOMGD_pmc_parent_isScalable
+  #ifdef parent_isScalable
+    #define SOMGD_pmc_parent_isScalable
+    #undef parent_isScalable
+  #else
+#define parent_isScalable LuJpegDocument_parent_LuDocument_isScalable
+  #endif
+#endif
+#ifndef SOMGD_pmc_parent_LuDocument_isScalable
+  #ifdef parent_LuDocument_isScalable
+    #define SOMGD_pmc_parent_LuDocument_isScalable
+    #undef parent_LuDocument_isScalable
+  #else
+    #define parent_LuDocument_isScalable LuJpegDocument_parent_LuDocument_isScalable
+  #endif
+#endif
+#define LuJpegDocument_parents_isScalable(somSelf,ev) (\
+   LuJpegDocument_parent_LuDocument_isScalable(somSelf,ev))
 
 /*
  * Overridden method: getPageCount
@@ -430,6 +470,8 @@ static somOverrideMethod_t LuJpegDocumentOM[] = {
          (somMethodProc *) loadFile  },
     {    &somId_LuJpegDocumentgetBpp,
          (somMethodProc *) getBpp  },
+    {    &somId_LuJpegDocumentisScalable,
+         (somMethodProc *) isScalable  },
     {    &somId_LuJpegDocumentgetPageCount,
          (somMethodProc *) getPageCount  },
     {    &somId_LuJpegDocumentgetPageSize,
@@ -454,7 +496,7 @@ static somId somPCLuJpegDocument[] = {
 };
 
 static somStaticClassInfo LuJpegDocumentSCI = {
-    4, 0, 7, 0, 0, 0, /* layout version 4 */ 
+    4, 0, 8, 0, 0, 0, /* layout version 4 */ 
     LuJpegDocument_MajorVersion, LuJpegDocument_MinorVersion,
     sizeof(LuJpegDocumentData), LuJpegDocument_MaxNoMethods, 1,
     &somCN_LuJpegDocument,
@@ -506,6 +548,8 @@ SOMClass * SOMLINK LuJpegDocumentNewClass (integer4 somtmajorVersion,
 	somParentNumResolve(LuJpegDocumentCClassData.parentMtab, 1, LuDocumentClassData.getPageSize);
     LuJpegDocument_parent_LuDocument_getPageCount_resolved = 
 	somParentNumResolve(LuJpegDocumentCClassData.parentMtab, 1, LuDocumentClassData.getPageCount);
+    LuJpegDocument_parent_LuDocument_isScalable_resolved = 
+	somParentNumResolve(LuJpegDocumentCClassData.parentMtab, 1, LuDocumentClassData.isScalable);
     LuJpegDocument_parent_LuDocument_getBpp_resolved = 
 	somParentNumResolve(LuJpegDocumentCClassData.parentMtab, 1, LuDocumentClassData.getBpp);
     LuJpegDocument_parent_LuDocument_loadFile_resolved = 

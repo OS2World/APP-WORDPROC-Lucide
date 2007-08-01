@@ -24,6 +24,7 @@ interface LuJpegDocument : LuDocument
     	
         loadFile: override;
         getBpp: override;
+        isScalable: override;
         getPageCount: override;
         getPageSize: override;
         renderPageToPixbuf: override;

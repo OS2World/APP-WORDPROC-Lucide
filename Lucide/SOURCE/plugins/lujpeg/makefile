@@ -21,13 +21,14 @@ all: make.cfg lujpeg.dll
    DEL MAKE.CFG
 
 
-lujpeg.dll: lujpeg.obj ..\ludoc\ludoc.lib
+lujpeg.dll: lujpeg.obj jpscale.obj ..\ludoc\ludoc.lib
   copy &&|
 option quiet
 system os2v2 dll initinstance terminstance
 option map=$(OBJDIR)\lujpeg
 option statics
 file $(OBJDIR)\lujpeg.obj
+file $(OBJDIR)\jpscale.obj
 name $(EXEDIR)\lujpeg
 lib ..\..\..\..\libjpeg\libjpeg.lib
 lib ..\ludoc\ludoc

@@ -57,11 +57,15 @@
 #define HAVE_BOOLEAN
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <setjmp.h>
 #include <jpeglib.h>
 
 
+void resample( Environment *ev,
+               LuPixbuf *out, int out_x0, int out_y0, int out_x1, int out_y1,
+               LuPixbuf *in, float in_x0, float in_y0, float in_x1, float in_y1 );
 
 unsigned _System LibMain( unsigned hmod, unsigned termination )
 {
@@ -199,6 +203,12 @@ SOM_Scope short  SOMLINK getBpp(LuJpegDocument *somSelf,  Environment *ev)
 }
 
 
+SOM_Scope boolean  SOMLINK isScalable(LuJpegDocument *somSelf,
+                                       Environment *ev)
+{
+    return TRUE;
+}
+
 SOM_Scope long  SOMLINK getPageCount(LuJpegDocument *somSelf,
                                       Environment *ev)
 {
@@ -239,23 +249,52 @@ SOM_Scope boolean  SOMLINK renderPageToPixbuf(LuJpegDocument *somSelf,
     LuJpegDocumentData *somThis = LuJpegDocumentGetData(somSelf);
     JpegDocument *d = (JpegDocument *)somThis->data;
 
-    //somPrintf( "src_x: %d  src_y: %d  src_width: %d  src_height: %d\n",
-    //            src_x, src_y, src_width, src_height );
+    //somPrintf( "src_x: %d  src_y: %d  src_width: %d  src_height: %d  scale: %f\n",
+    //            src_x, src_y, src_width, src_height, scale );
+
+    long real_src_x = ( (double)src_x / scale );
+    long real_src_y = ( (double)src_y / scale );
+    long real_src_width = ( (double)src_width / scale );
+    long real_src_height = ( (double)src_height / scale );
 
     short bpp = getBpp( somSelf, ev );
+
     int pb_rowstride = d->pb->getRowSize( ev );
-    int pb_height = d->pb->getHeight( ev );
-    int pixbuf_rowstride = pixbuf->getRowSize( ev );
-    char *pb_data = (char *)d->pb->getDataPtr( ev );
-    char *pixbuf_data = (char *)pixbuf->getDataPtr( ev );
+    int pb_width     = d->pb->getWidth( ev );
+    int pb_height    = d->pb->getHeight( ev );
+    char *pb_data    = (char *)d->pb->getDataPtr( ev );
+
+    real_src_width   = __min( real_src_width, pb_width );
+    real_src_height  = __min( real_src_height, pb_height );
+
+    LuPixbuf *tmp = new LuPixbuf( ev, real_src_width, real_src_height, bpp );
+    int pixbuf_rowstride = tmp->getRowSize( ev );
+    char *pixbuf_data = (char *)tmp->getDataPtr( ev );
     char *src, *dst;
     int i, y;
-    for ( y = pb_height-(src_y+src_height), i = 0; i < src_height; y++, i++ )
+    //somPrintf( "0: %d | %d | %d\n", pb_height, real_src_y, real_src_height );
+    for ( y = pb_height-(real_src_y+real_src_height), i = 0; i < real_src_height; y++, i++ )
     {
-        src = pb_data + (y * pb_rowstride) + (src_x * bpp);
+        //somPrintf( "1: %x | %d | %d | %d | %d\n", pb_data, y, pb_rowstride, real_src_x, bpp );
+        src = pb_data + (y * pb_rowstride) + (real_src_x * bpp);
         dst = pixbuf_data + (i * pixbuf_rowstride);
-        memcpy( dst, src, src_width * bpp );
+        memcpy( dst, src, real_src_width * bpp );
     }
+
+    char *dt = (char *)pixbuf->getDataPtr( ev );
+    if ( scale == 1.0 )
+    {
+        memcpy( dt, pixbuf_data, pixbuf->getDataLen( ev ) );
+    }
+    else
+    {
+    	if ( ( real_src_width > 0 ) && ( real_src_height > 0 ) )
+    	{
+            resample( ev, pixbuf, 0, 0, src_width-1, src_height-1,
+                          tmp, 0, 0, real_src_width, real_src_height );
+        }
+    }
+    delete tmp;
 
     return TRUE;
 }
