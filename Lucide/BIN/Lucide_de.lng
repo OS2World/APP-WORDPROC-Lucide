@@ -10,7 +10,7 @@ MENU_NEW_WINDOW=~Neues Fenster
 MENU_OPEN=~ôffnen...\tStrg+O
 MENU_SAVE_AS=~Sichern unter...
 MENU_PAGE_SETUP=Seitenein~richtung...
-MENU_PRINT=~Drucken...\tCtrl+P
+MENU_PRINT=~Drucken...\tStrg+P
 MENU_PLUGINS_LIST=Plugin-~Liste...
 MENU_EXIT=B~eenden\tStrg+X
 MENU_EDIT=~Bearbeiten
@@ -24,13 +24,15 @@ MENU_FIT_WINDOW=~Ganze Seite
 MENU_ACTUAL_SIZE=~Originalgrî·e
 MENU_FIT_WIDTH=Seiten~breite
 # - unused - MENU_ZOOM_IN_OUT=~Zoom-Modus (grîsser/kleiner)
+MENU_ZOOM_IN=Vergrî·ern\tStrg++
+MENU_ZOOM_OUT=Verkleinern\tStrg+-
 MENU_FIRST_PAGE=~Erste Seite
 MENU_PREV_PAGE=~Vorige Seite\t-
 MENU_NEXT_PAGE=~NÑchste Seite\t+
 MENU_LAST_PAGE=~Letzte Seite
 MENU_GO_TO_PAGE=Gehe zu ~Seite...\tStrg+N
-MENU_ROTATE_CW=90¯ im UZS ~drehen\tCtrl+Shift++
-MENU_ROTATE_CCW=90¯ gegen ~UZS drehen\tCtrl+Shift+-
+MENU_ROTATE_CW=90¯ im UZS ~drehen\tStrg+Umschalt++
+MENU_ROTATE_CCW=90¯ gegen ~UZS drehen\tStrg+Umschalt+-
 MENU_SINGLE_PAGE=Einzelne Sei~te
 MENU_CONTINUOUS=~Fortlaufend
 MENU_DOCUMENT_INFO=Do~kumentinformationen...
@@ -91,7 +93,7 @@ MSGS_RERR_FONT_NOT_FOUND=Schrift %s nicht gefunden
 # "Plugins list" dialog
 #
 PLUGLIST_PLUGINS_LIST=Plugin-Liste
-PLUGLIST_CLOSE=S~chliessen
+PLUGLIST_CLOSE=S~chlie·en
 # List columns titles
 PLUGLIST_PLUGIN_NAME=Plugin-Name
 PLUGLIST_SUPP_EXTS=UnterstÅtzte Erweiterungen
@@ -101,7 +103,7 @@ PLUGLIST_PLUGIN_DESC=Plugin-Beschreibung
 # "Font info" dialog
 #
 FONTINFO_FONTINFO=Schrifteninformation
-FONTINFO_CLOSE=S~chliessen
+FONTINFO_CLOSE=S~chlie·en
 FONTINFO_ENUMERATING=ZÑhle Schriften, bitte warten...
 # List columns titles
 FONTINFO_NAME=Name
@@ -116,7 +118,7 @@ FONTINFO_EMBED_EMBEDDED_SUBSET=Teilweise
 # "Document info" dialog
 #
 DOCINFO_DOCUMENT_INFO=Dokumentinformationen
-DOCINFO_CLOSE=S~chliessen
+DOCINFO_CLOSE=S~chlie·en
 # Document info keys
 DOCINFO_TITLE=Titel:
 DOCINFO_FORMAT=Format:
@@ -223,4 +225,4 @@ PSW_TITLE=Dokument ist verschlÅsselt!
 PSW_PASSWORD=~Passwort
 PSW_OK=~OK
 PSW_CANCEL=~Abbruch
- 
+

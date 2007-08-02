@@ -136,7 +136,7 @@ void PluginManager::loadPlugin( const char *path, const char *dllname )
 }
 
 
-// returns NULL if not suitable plugin found
+// returns NULL if no suitable plugin found
 // if checkOnly is true - just check if suitable plugin exist
 LuDocument *PluginManager::createDocumentForExt( const char *ext, bool checkOnly )
 {
@@ -219,7 +219,7 @@ static bool checkData( LuCheckStruct *checkStruct, const char *file )
     return false;
 }
 
-// returns NULL if not suitable plugin found
+// returns NULL if no suitable plugin found
 // if checkOnly is true - just check if suitable plugin exist
 LuDocument *PluginManager::createDocumentForFile( const char *file, bool checkOnly )
 {
