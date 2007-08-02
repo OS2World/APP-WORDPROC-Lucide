@@ -383,149 +383,139 @@ void Lucide::loadDocument( const char *fn )
 {
     char *msg = newstrdupL( MSGS_NO_SUIT_PLUG );
 
-    // find extension
-    char *ext = strrchr( fn, '.' );
-    if ( ext == NULL )
+    // test if file supported and then close previous opened document
+    if ( pluginMan->createDocumentForFile( fn, true ) == NULL )
     {
         WinMessageBox( HWND_DESKTOP, hWndFrame, msg,
                        NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
     }
     else
     {
-        // test if extension supported and then close previous opened document
-        if ( pluginMan->createDocumentForExt( ext + 1, true ) == NULL )
+        closeDocument();
+
+        doc = pluginMan->createDocumentForFile( fn, false );
+        if ( doc == NULL )
         {
             WinMessageBox( HWND_DESKTOP, hWndFrame, msg,
                            NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
         }
         else
         {
-            closeDocument();
-
-            doc = pluginMan->createDocumentForExt( ext + 1, false );
-            if ( doc == NULL )
-            {
-                WinMessageBox( HWND_DESKTOP, hWndFrame, msg,
-                               NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
+            strcpy( docFullName, fn );
+            if ( password != NULL ) {
+                delete password;
+                password = NULL;
             }
-            else
+            bool once = true;
+            while ( once || ( password != NULL ) )
             {
-                strcpy( docFullName, fn );
+                once = false;
+                docLoaded = false;
+                loadError = NULL;
+
+                // Load document asynchronously
+                loadProgressDlg = new ProgressDlg( hWndFrame );
+                char *ldmsg = newstrdupL( MSGS_LOADING_DOCUMENT );
+                loadProgressDlg->setText( ldmsg );
+                delete ldmsg;
+                loadProgressDlg->show( loadthread, NULL ); // doc will be loaded
+                delete loadProgressDlg;
+
                 if ( password != NULL ) {
                     delete password;
                     password = NULL;
                 }
-                bool once = true;
-                while ( once || ( password != NULL ) )
+
+                if ( docLoaded )
                 {
-                    once = false;
-                    docLoaded = false;
-                    loadError = NULL;
-
-                    // Load document asynchronously
-                    loadProgressDlg = new ProgressDlg( hWndFrame );
-                    char *ldmsg = newstrdupL( MSGS_LOADING_DOCUMENT );
-                    loadProgressDlg->setText( ldmsg );
-                    delete ldmsg;
-                    loadProgressDlg->show( loadthread, NULL ); // doc will be loaded
-                    delete loadProgressDlg;
-
-                    if ( password != NULL ) {
-                        delete password;
-                        password = NULL;
-                    }
-
-                    if ( docLoaded )
+                    char *t = new char[ 2048 ];
+                    char _fn[ _MAX_FNAME ];
+                    char _ex[ _MAX_EXT ];
+                    _splitpath( fn, NULL, NULL, _fn, _ex );
+                    strcpy( docFileName, _fn );
+                    strcat( docFileName, _ex );
+                    snprintf( t, 2048, "%s - %s", docFileName, title );
+                    WinSetWindowText( hWndFrame, t );
+                    delete t;
+                    setDocument( doc );
+                }
+                else
+                {
+                    if ( loadErrorCode == LU_LDERR_NO_ERROR )
                     {
-                        char *t = new char[ 2048 ];
-                        char _fn[ _MAX_FNAME ];
-                        char _ex[ _MAX_EXT ];
-                        _splitpath( fn, NULL, NULL, _fn, _ex );
-                        strcpy( docFileName, _fn );
-                        strcat( docFileName, _ex );
-                        snprintf( t, 2048, "%s - %s", docFileName, title );
-                        WinSetWindowText( hWndFrame, t );
-                        delete t;
-                        setDocument( doc );
+                        char *m = newstrdupL( MSGS_FILE_LOAD_ERROR );
+                        WinMessageBox( HWND_DESKTOP, hWndFrame, m,
+                                       NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
+                        delete m;
                     }
                     else
                     {
-                        if ( loadErrorCode == LU_LDERR_NO_ERROR )
+                        std::string msgTempl = getLocalizedString( MSGS_LDERR );
+
+                        const int errmsgLen = 1024;
+                        char *errmsg = new char[ errmsgLen ];
+                        memset( errmsg, 0, errmsgLen );
+
+                        if ( loadErrorCode == LU_LDERR_CUSTOM )
                         {
-                            char *m = newstrdupL( MSGS_FILE_LOAD_ERROR );
-                            WinMessageBox( HWND_DESKTOP, hWndFrame, m,
-                                           NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
-                            delete m;
+                            snprintf( errmsg, errmsgLen, msgTempl.c_str(), loadError );
+                            SOMFree( loadError );
                         }
                         else
                         {
-                            std::string msgTempl = getLocalizedString( MSGS_LDERR );
-
-                            const int errmsgLen = 1024;
-                            char *errmsg = new char[ errmsgLen ];
-                            memset( errmsg, 0, errmsgLen );
-
-                            if ( loadErrorCode == LU_LDERR_CUSTOM )
+                            const char *lmsg = NULL;
+                            switch ( loadErrorCode )
                             {
-                                snprintf( errmsg, errmsgLen, msgTempl.c_str(), loadError );
-                                SOMFree( loadError );
-                            }
-                            else
-                            {
-                                const char *lmsg = NULL;
-                                switch ( loadErrorCode )
-                                {
-                                    case LU_LDERR_OUT_OF_MEMORY:
-                                        lmsg = MSGS_LDERR_OUT_OF_MEMORY;
-                                        break;
-                                    case LU_LDERR_OPEN_ERROR:
-                                        lmsg = MSGS_LDERR_OPEN_ERROR;
-                                        break;
-                                    case LU_LDERR_READ_ERROR:
-                                        lmsg = MSGS_LDERR_READ_ERROR;
-                                        break;
-                                    case LU_LDERR_DAMAGED:
-                                        lmsg = MSGS_LDERR_DAMAGED;
-                                        break;
-                                    case LU_LDERR_WRONG_FORMAT:
-                                        lmsg = MSGS_LDERR_WRONG_FORMAT;
-                                        break;
-                                    case LU_LDERR_ENCRYPTED:
-                                        {
-                                            lmsg = MSGS_LDERR_ENCRYPTED;
+                                case LU_LDERR_OUT_OF_MEMORY:
+                                    lmsg = MSGS_LDERR_OUT_OF_MEMORY;
+                                    break;
+                                case LU_LDERR_OPEN_ERROR:
+                                    lmsg = MSGS_LDERR_OPEN_ERROR;
+                                    break;
+                                case LU_LDERR_READ_ERROR:
+                                    lmsg = MSGS_LDERR_READ_ERROR;
+                                    break;
+                                case LU_LDERR_DAMAGED:
+                                    lmsg = MSGS_LDERR_DAMAGED;
+                                    break;
+                                case LU_LDERR_WRONG_FORMAT:
+                                    lmsg = MSGS_LDERR_WRONG_FORMAT;
+                                    break;
+                                case LU_LDERR_ENCRYPTED:
+                                    {
+                                        lmsg = MSGS_LDERR_ENCRYPTED;
 
-                                            PasswordDlg *pd = new PasswordDlg( hWndFrame );
-                                            if ( pd->showDialog() == DID_OK ) {
-                                                password = newstrdup( pd->getPassword() );
-                                            }
-                                            delete pd;
+                                        PasswordDlg *pd = new PasswordDlg( hWndFrame );
+                                        if ( pd->showDialog() == DID_OK ) {
+                                            password = newstrdup( pd->getPassword() );
                                         }
-                                        break;
-                                }
-
-                                if ( lmsg != NULL ) {
-                                    snprintf( errmsg, errmsgLen, msgTempl.c_str(),
-                                              getLocalizedString( lmsg ).c_str() );
-                                }
+                                        delete pd;
+                                    }
+                                    break;
                             }
 
-                            if ( password == NULL )
-                            {
-                                WinMessageBox( HWND_DESKTOP, hWndFrame, errmsg, NULL, 0,
-                                               MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
+                            if ( lmsg != NULL ) {
+                                snprintf( errmsg, errmsgLen, msgTempl.c_str(),
+                                          getLocalizedString( lmsg ).c_str() );
                             }
-                            delete errmsg;
-                        } // ( loadErrorCode == LU_LDERR_NO_ERROR )
-
-                        if ( password == NULL ) {
-                            delete doc;
-                            doc = NULL;
                         }
-                    } // ( docLoaded )
-                } // while ( once || ( password != NULL ) )
-            } // ( doc == NULL )
-        } // ( pluginMan->createDocumentForExt( ext + 1, true ) == NULL )
-    } // ( ext == NULL )
+
+                        if ( password == NULL )
+                        {
+                            WinMessageBox( HWND_DESKTOP, hWndFrame, errmsg, NULL, 0,
+                                           MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
+                        }
+                        delete errmsg;
+                    } // ( loadErrorCode == LU_LDERR_NO_ERROR )
+
+                    if ( password == NULL ) {
+                        delete doc;
+                        doc = NULL;
+                    }
+                } // ( docLoaded )
+            } // while ( once || ( password != NULL ) )
+        } // ( doc == NULL )
+    } // ( pluginMan->createDocumentForFile( fn, true ) == NULL )
     delete msg;
 }
 
@@ -749,7 +739,7 @@ void Lucide::cmdSwitchToFullscreen()
 void Lucide::newWindow( char *file, bool addDir )
 {
     char *param = NULL;
-    
+
     if ( file != NULL )
     {
         if ( addDir )

@@ -38,6 +38,8 @@
 #include "pluginman.h"
 #include "luutils.h"
 #include <dos.h>
+#include <fcntl.h>
+#include <stdio.h>
 #include <ludoc.xh>
 
 
@@ -86,9 +88,10 @@ PluginManager::~PluginManager()
 void PluginManager::loadPlugin( const char *path, const char *dllname )
 {
     // Function pointer variables
-    LuDocument * APIENTRY (*pCreateObject)();
-    char * APIENTRY (*pGetSupportedExtensions)();
-    char * APIENTRY (*pGetDescription)();
+    LuDocument * APIENTRY (*pCreateObject)()      = NULL;
+    char * APIENTRY (*pGetSupportedExtensions)()  = NULL;
+    char * APIENTRY (*pGetDescription)()          = NULL;
+    LuCheckStruct * APIENTRY (*pGetCheckStruct)() = NULL;
 
     std::string fulldllname = path;
     fulldllname += dllname;
@@ -111,6 +114,11 @@ void PluginManager::loadPlugin( const char *path, const char *dllname )
         if ( DosQueryProcAddr( h, 0, "getDescription", (PFN *)&pGetDescription ) != 0 )
             break;
 
+        // optional
+        if ( DosQueryProcAddr( h, 0, "getCheckStruct", (PFN *)&pGetCheckStruct ) != 0 ) {
+            pGetCheckStruct = NULL;
+        }
+
         res = true;
     } while (0);
 
@@ -121,6 +129,7 @@ void PluginManager::loadPlugin( const char *path, const char *dllname )
         pi.name = dllname;
         pi.extensions = pGetSupportedExtensions();
         pi.description = pGetDescription();
+        pi.checkStruct = ( pGetCheckStruct == NULL ) ? NULL : pGetCheckStruct();
 
         plugins->push_back( pi );
     }
@@ -135,7 +144,7 @@ LuDocument *PluginManager::createDocumentForExt( const char *ext, bool checkOnly
         return NULL;
     }
 
-    LuDocument * APIENTRY (*pCreateObject)();
+    LuDocument * APIENTRY (*pCreateObject)() = NULL;
 
     for ( int i = 0; i < plugins->size(); i++ )
     {
@@ -177,6 +186,82 @@ LuDocument *PluginManager::createDocumentForExt( const char *ext, bool checkOnly
     return NULL;
 }
 
+static bool checkDataEntry( LuCheckData *data, int h )
+{
+    lseek( h, data->offset, SEEK_SET );
+    unsigned char *buf = new char[ data->length ];
+    read( h, buf, data->length );
+    bool result = ( memcmp( data->data, buf, data->length ) == 0 );
+    delete buf;
+    return result;
+}
+
+static bool checkData( LuCheckStruct *checkStruct, const char *file )
+{
+    int h = open( file, O_RDONLY | O_BINARY );
+
+    if ( h != -1 )
+    {
+        bool result = true;
+
+        for ( unsigned long i = 0; i < checkStruct->count; i++ )
+        {
+            if ( !checkDataEntry( &(checkStruct->cdata[ i ]), h ) ) {
+                result = false;
+                break;
+            }
+        }
+
+        close( h );
+        return result;
+    }
+
+    return false;
+}
+
+// returns NULL if not suitable plugin found
+// if checkOnly is true - just check if suitable plugin exist
+LuDocument *PluginManager::createDocumentForFile( const char *file, bool checkOnly )
+{
+    LuDocument *ld = NULL;
+
+    // Search by extension
+    char *ext = strrchr( file, '.' );
+    if ( ext != NULL ) {
+        ld = createDocumentForExt( ext + 1, checkOnly );
+    }
+
+    if ( ld != NULL ) {
+        return ld;
+    }
+
+    // Search by checkstruct
+    LuDocument * APIENTRY (*pCreateObject)() = NULL;
+
+    for ( int i = 0; i < plugins->size(); i++ )
+    {
+        PluginInfo *pi = &(*plugins)[ i ];
+
+        if ( pi->checkStruct != NULL )
+        {
+            if ( checkData( pi->checkStruct, file ) )
+            {
+                if ( DosQueryProcAddr( pi->handle, 0, "createObject",
+                                       (PFN *)&pCreateObject ) == 0 )
+                {
+                    if ( checkOnly ) {
+                        return (LuDocument *)TRUE;
+                    }
+                    else {
+                        return pCreateObject();
+                    }
+                }
+            }
+        }
+    }
+
+    return NULL;
+}
 
 std::string PluginManager::getExtsMask()
 {
@@ -196,4 +281,5 @@ std::string PluginManager::getExtsMask()
     }
     return cRet;
 }
+
 

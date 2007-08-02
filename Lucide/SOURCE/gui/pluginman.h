@@ -38,6 +38,8 @@
 #include <vector>
 #include <string>
 
+#include <lutypes.h>
+
 
 class LuDocument;
 
@@ -47,6 +49,7 @@ struct PluginInfo
     std::string name;
     std::string extensions;
     std::string description;
+    LuCheckStruct *checkStruct;
 };
 
 typedef std::vector<PluginInfo> PluginInfoList;
@@ -60,6 +63,7 @@ class PluginManager
         PluginManager();
         ~PluginManager();
         PluginInfoList *getPluginsList() { return plugins; }
+        LuDocument *createDocumentForFile( const char *file, bool checkOnly );
         LuDocument *createDocumentForExt( const char *ext, bool checkOnly );
         std::string getExtsMask();
 };

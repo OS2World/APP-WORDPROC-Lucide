@@ -37,11 +37,11 @@
 
 
 struct LuRectangle
-{ 
-	double x1;
-	double y1;
-	double x2;
-	double y2; 
+{
+    double x1;
+    double y1;
+    double x2;
+    double y2;
 };
 
 
@@ -54,32 +54,32 @@ struct LuRectangle
 
 struct LuLink
 {
-	char *title;
-	char *uri;
-	long type;
-	long page;
+    char *title;
+    char *uri;
+    long type;
+    long page;
 };
 
 
 struct LuLinkMapping
 {
-	LuLink link;
-	LuRectangle area;
+    LuLink link;
+    LuRectangle area;
 };
 
 
-#define LU_FONTEMBED_NOT_EMBEDDED		0
-#define LU_FONTEMBED_EMBEDDED			1
-#define LU_FONTEMBED_EMBEDDED_SUBSET	2
+#define LU_FONTEMBED_NOT_EMBEDDED       0
+#define LU_FONTEMBED_EMBEDDED           1
+#define LU_FONTEMBED_EMBEDDED_SUBSET    2
 
 struct LuFontInfo
 {
-	char  *name;
-	char  *type;
-	short embedded;
+    char  *name;
+    char  *type;
+    short embedded;
 };
 
-	
+    
 #define LU_DOCUMENT_LAYOUT_SINGLE_PAGE       0
 #define LU_DOCUMENT_LAYOUT_ONE_COLUMN        1
 #define LU_DOCUMENT_LAYOUT_TWO_COLUMN_LEFT   2
@@ -87,7 +87,7 @@ struct LuFontInfo
 #define LU_DOCUMENT_LAYOUT_TWO_PAGE_LEFT     4
 #define LU_DOCUMENT_LAYOUT_TWO_PAGE_RIGHT    5
 
-	
+    
 #define LU_DOCUMENT_MODE_NONE             0
 #define LU_DOCUMENT_MODE_USE_OC           1
 #define LU_DOCUMENT_MODE_USE_THUMBS       2
@@ -133,25 +133,25 @@ struct LuFontInfo
 
 struct LuDocumentInfo
 {
-	char *title;
-	char *format;
-	char *author;
-	char *subject;
-	char *keywords;
-	char *creator;
-	char *producer;
-	long security;
-	long linearized;
-	unsigned long creation_date;
-	unsigned long modified_date;
-	unsigned long layout;
-	unsigned long mode;
-	unsigned long ui_hints;
-	unsigned long permissions;
-	long n_pages;
+    char *title;
+    char *format;
+    char *author;
+    char *subject;
+    char *keywords;
+    char *creator;
+    char *producer;
+    long security;
+    long linearized;
+    unsigned long creation_date;
+    unsigned long modified_date;
+    unsigned long layout;
+    unsigned long mode;
+    unsigned long ui_hints;
+    unsigned long permissions;
+    long n_pages;
 
-	// Mask of all valid fields
-	unsigned long fields_mask;
+    // Mask of all valid fields
+    unsigned long fields_mask;
 };
 
 #ifndef __SOMIDL__
@@ -176,5 +176,20 @@ typedef long (_System *_asynchCallbackFn)( void *data );
 #define LU_RERR_CORRUPTED_PAGE_DATA   3
 #define LU_RERR_FONT_NOT_FOUND        4
 
+
+// structs to detect type of file by it's content
+
+struct LuCheckData
+{
+    unsigned long  offset;  // from beginning of file
+    unsigned long  length;  // length of data bytes to check
+    void          *data;    // pointer to data bytes
+};
+
+struct LuCheckStruct
+{
+    unsigned long  count;    // number of LuCheckData structures
+    LuCheckData   *cdata;    //
+};
 
 #endif // lutypes_h

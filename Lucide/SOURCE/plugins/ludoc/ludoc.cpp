@@ -76,6 +76,11 @@ extern "C" char * _System getSupportedExtensions()
     return "";
 }
 
+extern "C" LuCheckStruct * _System getCheckStruct()
+{
+	return NULL;
+}
+
 extern "C" char * _System getDescription()
 {
     return "NULL plugin, abstract base class for Lucide plugins.";

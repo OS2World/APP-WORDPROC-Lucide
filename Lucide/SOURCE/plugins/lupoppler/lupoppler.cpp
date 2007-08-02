@@ -86,6 +86,14 @@ extern "C" char * _System getSupportedExtensions()
     return "PDF";
 }
 
+LuCheckData   lcd = { 0, 5, (void *)"%PDF-" };
+LuCheckStruct lcs = { 1, &lcd };
+
+extern "C" LuCheckStruct * _System getCheckStruct()
+{
+	return &lcs;
+}
+
 extern "C" char * _System getDescription()
 {
     return "PDF plugin, based on poppler library v0.5.4";

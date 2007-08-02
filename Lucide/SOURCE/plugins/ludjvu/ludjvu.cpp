@@ -77,6 +77,15 @@ extern "C" char * _System getSupportedExtensions()
     return "DJVU;DJV";
 }
 
+LuCheckData   lcd = { 0, 8, (void *)"AT&TFORM" };
+LuCheckStruct lcs = { 1, &lcd };
+
+extern "C" LuCheckStruct * _System getCheckStruct()
+{
+	return &lcs;
+}
+
+
 extern "C" char * _System getDescription()
 {
     return "DjVu plugin, based on DjVuLibre v3.5.19";

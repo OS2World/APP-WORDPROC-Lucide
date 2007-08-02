@@ -40,6 +40,7 @@ export LuPopplerDocumentCClassData
 export createObject
 export getSupportedExtensions
 export getDescription
+export getCheckStruct
 | tmpmake.lnk >NUL
     wlink @tmpmake.lnk
     del tmpmake.lnk

@@ -77,6 +77,7 @@ unsigned _System LibMain( unsigned hmod, unsigned termination )
     return( 1 );
 }
 
+
 extern "C" LuDocument * _System createObject()
 {
     return new LuJpegDocument;
@@ -86,6 +87,15 @@ extern "C" char * _System getSupportedExtensions()
 {
     return "JPG;JPEG;JPE";
 }
+
+LuCheckData   lcd = { 0, 2, (void *)"\xff\xd8" };
+LuCheckStruct lcs = { 1, &lcd };
+
+extern "C" LuCheckStruct * _System getCheckStruct()
+{
+	return &lcs;
+}
+
 
 extern "C" char * _System getDescription()
 {

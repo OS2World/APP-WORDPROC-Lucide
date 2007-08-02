@@ -1,3 +1,9 @@
+1.02:
+  - JPG plugin: added support for quality image scaling.  
+  - If the filename does not have an extension or the extension is unknown,
+    it will check file data to determine a suitable plugin (closed
+    ticket #43).
+
 1.01:
   - DJVU plugin: plugin may eat great amount of memory, fixed.
   - DJVU plugin: djvulibre updated to version 3.5.19.
