@@ -51,7 +51,7 @@ export _LuIndexNodeCClassData=LuIndexNodeCClassData
 export createObject
 export getSupportedExtensions
 export getDescription
-export getCheckStruct
+export getSignatureCheck
 export uniConvertSpChars
 export uniLigaturesLength
 export uniReplaceLigatures

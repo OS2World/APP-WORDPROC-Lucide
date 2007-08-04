@@ -49,7 +49,7 @@ struct PluginInfo
     std::string name;
     std::string extensions;
     std::string description;
-    LuCheckStruct *checkStruct;
+    LuSignatureCheck *signatures;
 };
 
 typedef std::vector<PluginInfo> PluginInfoList;

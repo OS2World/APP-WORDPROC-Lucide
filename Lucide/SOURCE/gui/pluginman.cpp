@@ -58,7 +58,7 @@ PluginManager::PluginManager()
     strcat( buffer, "LU*.DLL" );
 
     // enum plugins, (LU*.DLL) except for LUDOC.DLL, which is 'null' plugin
-    // and Lucide.dll, which isn't plugin.
+    // and Lucide.dll, which is not a plugin.
     struct find_t ffblk;
     unsigned done = _dos_findfirst( buffer, _A_RDONLY | _A_NORMAL, &ffblk );
     while ( done == 0 )
@@ -88,10 +88,10 @@ PluginManager::~PluginManager()
 void PluginManager::loadPlugin( const char *path, const char *dllname )
 {
     // Function pointer variables
-    LuDocument * APIENTRY (*pCreateObject)()      = NULL;
-    char * APIENTRY (*pGetSupportedExtensions)()  = NULL;
-    char * APIENTRY (*pGetDescription)()          = NULL;
-    LuCheckStruct * APIENTRY (*pGetCheckStruct)() = NULL;
+    LuDocument       * APIENTRY (*pCreateObject)()           = NULL;
+    char             * APIENTRY (*pGetSupportedExtensions)() = NULL;
+    char             * APIENTRY (*pGetDescription)()         = NULL;
+    LuSignatureCheck * APIENTRY (*pGetSignatureCheck)()      = NULL;
 
     std::string fulldllname = path;
     fulldllname += dllname;
@@ -115,8 +115,8 @@ void PluginManager::loadPlugin( const char *path, const char *dllname )
             break;
 
         // optional
-        if ( DosQueryProcAddr( h, 0, "getCheckStruct", (PFN *)&pGetCheckStruct ) != 0 ) {
-            pGetCheckStruct = NULL;
+        if ( DosQueryProcAddr( h, 0, "getSignatureCheck", (PFN *)&pGetSignatureCheck ) != 0 ) {
+            pGetSignatureCheck = NULL;
         }
 
         res = true;
@@ -125,16 +125,32 @@ void PluginManager::loadPlugin( const char *path, const char *dllname )
     if ( res )
     {
         PluginInfo pi;
-        pi.handle = h;
-        pi.name = dllname;
-        pi.extensions = pGetSupportedExtensions();
+        pi.handle      = h;
+        pi.name        = dllname;
+        pi.extensions  = pGetSupportedExtensions();
         pi.description = pGetDescription();
-        pi.checkStruct = ( pGetCheckStruct == NULL ) ? NULL : pGetCheckStruct();
+        pi.signatures  = ( pGetSignatureCheck == NULL ) ? NULL : pGetSignatureCheck();
 
         plugins->push_back( pi );
     }
 }
 
+static LuDocument *createDocFromDll( HMODULE handle, bool checkOnly )
+{
+    LuDocument * APIENTRY (*pCreateObject)() = NULL;
+
+    if ( DosQueryProcAddr( handle, 0, "createObject", (PFN *)&pCreateObject ) == 0 )
+    {
+        if ( checkOnly ) {
+            return (LuDocument *)TRUE;
+        }
+        else {
+            return pCreateObject();
+        }
+    }
+
+    return NULL;
+}
 
 // returns NULL if no suitable plugin found
 // if checkOnly is true - just check if suitable plugin exist
@@ -143,8 +159,6 @@ LuDocument *PluginManager::createDocumentForExt( const char *ext, bool checkOnly
     if ( ext == NULL ) {
         return NULL;
     }
-
-    LuDocument * APIENTRY (*pCreateObject)() = NULL;
 
     for ( int i = 0; i < plugins->size(); i++ )
     {
@@ -164,18 +178,12 @@ LuDocument *PluginManager::createDocumentForExt( const char *ext, bool checkOnly
 
         if ( strstr( cExts, cExt ) != NULL )
         {
-            if ( DosQueryProcAddr( pi->handle, 0, "createObject",
-                                   (PFN *)&pCreateObject ) == 0 )
+            LuDocument *d = createDocFromDll( pi->handle, checkOnly );
+            if ( d != NULL )
             {
                 delete cExt;
                 delete cExts;
-
-                if ( checkOnly ) {
-                    return (LuDocument *)TRUE;
-                }
-                else {
-                    return pCreateObject();
-                }
+                return d;
             }
         }
 
@@ -186,37 +194,52 @@ LuDocument *PluginManager::createDocumentForExt( const char *ext, bool checkOnly
     return NULL;
 }
 
-static bool checkDataEntry( LuCheckData *data, int h )
+static bool checkSignature( LuSignature *signature, int h )
 {
-    lseek( h, data->offset, SEEK_SET );
-    unsigned char *buf = new char[ data->length ];
-    read( h, buf, data->length );
-    bool result = ( memcmp( data->data, buf, data->length ) == 0 );
+    lseek( h, signature->offset, ( signature->origin == 0 ) ? SEEK_SET : SEEK_END );
+    unsigned char *buf = new char[ signature->length ];
+    read( h, buf, signature->length );
+    bool result = ( memcmp( signature->data, buf, signature->length ) == 0 );
     delete buf;
     return result;
 }
 
-static bool checkData( LuCheckStruct *checkStruct, const char *file )
+static bool checkSignatureList( LuSignatureList *siglist, int h )
+{
+    bool result = true;
+
+    // all signatures must be checked for positive result
+    for ( unsigned long i = 0; i < siglist->count; i++ )
+    {
+        if ( !checkSignature( &(siglist->signatures[ i ]), h ) ) {
+            result = false;
+            break;
+        }
+    }
+
+    return result;
+}
+
+static bool checkSignatures( LuSignatureCheck *signatures, const char *file )
 {
     int h = open( file, O_RDONLY | O_BINARY );
 
-    if ( h != -1 )
-    {
-        bool result = true;
-
-        for ( unsigned long i = 0; i < checkStruct->count; i++ )
-        {
-            if ( !checkDataEntry( &(checkStruct->cdata[ i ]), h ) ) {
-                result = false;
-                break;
-            }
-        }
-
-        close( h );
-        return result;
+    if ( h == -1 ) {
+        return false;
     }
 
-    return false;
+    bool result = false;
+
+    // if one signature list checked - result is positive
+    for ( unsigned long i = 0; i < signatures->count; i++ )
+    {
+        if ( result = checkSignatureList( &(signatures->slists[ i ]), h ) ) {
+            break;
+        }
+    }
+    close( h );
+
+    return result;
 }
 
 // returns NULL if no suitable plugin found
@@ -236,25 +259,38 @@ LuDocument *PluginManager::createDocumentForFile( const char *file, bool checkOn
     }
 
     // Search by checkstruct
-    LuDocument * APIENTRY (*pCreateObject)() = NULL;
+    for ( int i = 0; i < plugins->size(); i++ )
+    {
+        PluginInfo *pi = &(*plugins)[ i ];
+
+        if ( pi->signatures != NULL )
+        {
+            if ( checkSignatures( pi->signatures, file ) )
+            {
+                LuDocument *d = createDocFromDll( pi->handle, checkOnly );
+                if ( d != NULL ) {
+                    return d;
+                }
+            }
+        }
+    }
+
+
+    // Search by isFileSupported()
+    BOOL APIENTRY (*pIsFileSupported)(PCSZ) = NULL;
 
     for ( int i = 0; i < plugins->size(); i++ )
     {
         PluginInfo *pi = &(*plugins)[ i ];
 
-        if ( pi->checkStruct != NULL )
+        if ( DosQueryProcAddr( pi->handle, 0, "isFileSupported",
+                               (PFN *)&pIsFileSupported ) == 0 )
         {
-            if ( checkData( pi->checkStruct, file ) )
+            if ( pIsFileSupported( file ) )
             {
-                if ( DosQueryProcAddr( pi->handle, 0, "createObject",
-                                       (PFN *)&pCreateObject ) == 0 )
-                {
-                    if ( checkOnly ) {
-                        return (LuDocument *)TRUE;
-                    }
-                    else {
-                        return pCreateObject();
-                    }
+                LuDocument *d = createDocFromDll( pi->handle, checkOnly );
+                if ( d != NULL ) {
+                    return d;
                 }
             }
         }

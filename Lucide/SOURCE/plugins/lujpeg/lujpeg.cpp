@@ -67,7 +67,7 @@ void resample( Environment *ev,
                LuPixbuf *out, int out_x0, int out_y0, int out_x1, int out_y1,
                LuPixbuf *in, float in_x0, float in_y0, float in_x1, float in_y1 );
 
-unsigned _System LibMain( unsigned hmod, unsigned termination )
+unsigned EXPENTRY LibMain( unsigned hmod, unsigned termination )
 {
     if ( termination ) {
         /* DLL is detaching from process */
@@ -78,26 +78,27 @@ unsigned _System LibMain( unsigned hmod, unsigned termination )
 }
 
 
-extern "C" LuDocument * _System createObject()
+extern "C" LuDocument * EXPENTRY createObject()
 {
     return new LuJpegDocument;
 }
 
-extern "C" char * _System getSupportedExtensions()
+extern "C" char * EXPENTRY getSupportedExtensions()
 {
     return "JPG;JPEG;JPE";
 }
 
-LuCheckData   lcd = { 0, 2, (void *)"\xff\xd8" };
-LuCheckStruct lcs = { 1, &lcd };
+static LuSignature      lsig = { 0, 0, 2, (void *)"\xff\xd8" };
+static LuSignatureList  lsl  = { 1, &lsig };
+static LuSignatureCheck lsc  = { 1, &lsl };
 
-extern "C" LuCheckStruct * _System getCheckStruct()
+extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 {
-	return &lcs;
+	return &lsc;
 }
 
 
-extern "C" char * _System getDescription()
+extern "C" char * EXPENTRY getDescription()
 {
     return "Jpeg plugin, based on IJG JPEG Library v6b";
 }

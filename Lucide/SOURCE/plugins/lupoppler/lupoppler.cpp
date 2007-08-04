@@ -35,7 +35,12 @@
 #endif
 #define LuPopplerDocument_Class_Source
 
-#include "lupoppler.xih"
+#define INCL_DOS
+#include <os2.h>
+
+#include <vector>
+#include <time.h>
+#include <uconv.h>
 
 #include <goo\GooString.h>
 #include <goo\GooList.h>
@@ -53,19 +58,13 @@
 #include <Gfx.h>
 #include <Link.h>
 
-#define INCL_DOS
-#include <os2.h>
-
-#include <vector>
-using namespace std;
-#include <time.h>
-#include <uconv.h>
+#include "lupoppler.xih"
 #include "cpconv.h"
 
-typedef vector<LuRectangle> RectList;
+typedef std::vector<LuRectangle> RectList;
 
 
-unsigned _System LibMain( unsigned hmod, unsigned termination )
+unsigned EXPENTRY LibMain( unsigned hmod, unsigned termination )
 {
     if ( termination ) {
         /* DLL is detaching from process */
@@ -76,25 +75,26 @@ unsigned _System LibMain( unsigned hmod, unsigned termination )
 }
 
 
-extern "C" LuDocument * _System createObject()
+extern "C" LuDocument * EXPENTRY createObject()
 {
     return new LuPopplerDocument;
 }
 
-extern "C" char * _System getSupportedExtensions()
+extern "C" char * EXPENTRY getSupportedExtensions()
 {
     return "PDF";
 }
 
-LuCheckData   lcd = { 0, 5, (void *)"%PDF-" };
-LuCheckStruct lcs = { 1, &lcd };
+static LuSignature      lsig = { 0, 0, 5, (void *)"%PDF-" };
+static LuSignatureList  lsl  = { 1, &lsig };
+static LuSignatureCheck lsc  = { 1, &lsl };
 
-extern "C" LuCheckStruct * _System getCheckStruct()
+extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 {
-	return &lcs;
+	return &lsc;
 }
 
-extern "C" char * _System getDescription()
+extern "C" char * EXPENTRY getDescription()
 {
     return "PDF plugin, based on poppler library v0.5.4";
 }

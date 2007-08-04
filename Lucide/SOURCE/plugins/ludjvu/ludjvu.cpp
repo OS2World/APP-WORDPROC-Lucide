@@ -57,7 +57,7 @@ struct DjvuDocument
 };
 
 
-unsigned _System LibMain( unsigned hmod, unsigned termination )
+unsigned EXPENTRY LibMain( unsigned hmod, unsigned termination )
 {
     if ( termination ) {
         // DLL is detaching from process
@@ -67,26 +67,27 @@ unsigned _System LibMain( unsigned hmod, unsigned termination )
     return( 1 );
 }
 
-extern "C" LuDocument * _System createObject()
+extern "C" LuDocument * EXPENTRY createObject()
 {
     return new LuDjvuDocument;
 }
 
-extern "C" char * _System getSupportedExtensions()
+extern "C" char * EXPENTRY getSupportedExtensions()
 {
     return "DJVU;DJV";
 }
 
-LuCheckData   lcd = { 0, 8, (void *)"AT&TFORM" };
-LuCheckStruct lcs = { 1, &lcd };
+static LuSignature      lsig = { 0, 0, 8, (void *)"AT&TFORM" };
+static LuSignatureList  lsl  = { 1, &lsig };
+static LuSignatureCheck lsc  = { 1, &lsl };
 
-extern "C" LuCheckStruct * _System getCheckStruct()
+extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 {
-	return &lcs;
+	return &lsc;
 }
 
 
-extern "C" char * _System getDescription()
+extern "C" char * EXPENTRY getDescription()
 {
     return "DjVu plugin, based on DjVuLibre v3.5.19";
 }

@@ -55,7 +55,7 @@
 #include "ludoc.xih"
 
 
-unsigned _System LibMain( unsigned hmod, unsigned termination )
+unsigned EXPENTRY LibMain( unsigned hmod, unsigned termination )
 {
     if ( termination ) {
         /* DLL is detaching from process */
@@ -66,22 +66,22 @@ unsigned _System LibMain( unsigned hmod, unsigned termination )
 }
 
 
-extern "C" LuDocument * _System createObject()
+extern "C" LuDocument * EXPENTRY createObject()
 {
     return new LuDocument;
 }
 
-extern "C" char * _System getSupportedExtensions()
+extern "C" char * EXPENTRY getSupportedExtensions()
 {
     return "";
 }
 
-extern "C" LuCheckStruct * _System getCheckStruct()
+extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 {
 	return NULL;
 }
 
-extern "C" char * _System getDescription()
+extern "C" char * EXPENTRY getDescription()
 {
     return "NULL plugin, abstract base class for Lucide plugins.";
 }

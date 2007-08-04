@@ -40,7 +40,7 @@ export LuDjvuDocumentCClassData=_LuDjvuDocumentCClassData
 export createObject
 export getSupportedExtensions
 export getDescription
-export getCheckStruct
+export getSignatureCheck
 | tmpmake.lnk >NUL
     wlink @tmpmake.lnk
     del tmpmake.lnk

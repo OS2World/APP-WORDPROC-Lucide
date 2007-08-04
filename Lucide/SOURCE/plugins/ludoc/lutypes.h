@@ -35,6 +35,8 @@
 #ifndef lutypes_h
 #define lutypes_h
 
+#include <os2.h>
+
 
 struct LuRectangle
 {
@@ -155,7 +157,7 @@ struct LuDocumentInfo
 };
 
 #ifndef __SOMIDL__
-typedef long (_System *_asynchCallbackFn)( void *data );
+typedef long (EXPENTRY *_asynchCallbackFn)( void *data );
 //typedef _asynchCallbackFn *asynchCallbackFn;
 #endif
 
@@ -176,20 +178,33 @@ typedef long (_System *_asynchCallbackFn)( void *data );
 #define LU_RERR_CORRUPTED_PAGE_DATA   3
 #define LU_RERR_FONT_NOT_FOUND        4
 
+//
+// ***  Structs to detect type of file by it's content ***
+//
 
-// structs to detect type of file by it's content
-
-struct LuCheckData
+// one signature to check
+struct LuSignature
 {
-    unsigned long  offset;  // from beginning of file
-    unsigned long  length;  // length of data bytes to check
-    void          *data;    // pointer to data bytes
+    unsigned long  offset; // offset to read data
+    unsigned long  origin; // offset: 0 - from beginning of file, 1 - from end
+    unsigned long  length; // length of data bytes to check
+    void          *data;   // pointer to data bytes
 };
 
-struct LuCheckStruct
+// list of signatures to check
+// all signatures must be checked for positive result
+struct LuSignatureList
 {
-    unsigned long  count;    // number of LuCheckData structures
-    LuCheckData   *cdata;    //
+    unsigned long  count;       // number of LuSignature structures
+    LuSignature   *signatures;  // array of LuSignature structures
+};
+
+// list of checklists
+// at least one checklist must be checked for positive result
+struct LuSignatureCheck
+{
+    unsigned long    count;   // number of LuSignatureList structures
+    LuSignatureList *slists;  // array of LuSignatureList structures
 };
 
 #endif // lutypes_h
