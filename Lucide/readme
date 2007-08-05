@@ -19,21 +19,17 @@ to easily add more plugins.
          JPG                   Scaling
   --------------------------------------------------------------------------
 
-This program requires UClip package (enhanced OS/2 clipboard support):
-
-  - http://hobbes.nmsu.edu/cgi-bin/h-search?key=UClip
-  
-UClip requires Innotek LIBC 0.6.1:
-  
-  - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.1-csd1.zip (zip format)
-    or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_1-csd1.wpi (WarpIn format)
-
 DJVU plugin requires Innotek LIBC 0.6.3:
   
   - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.3-csd3.zip (zip format)
     or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_3-csd3.wpi (WarpIn format)
 
+Optional: to place unicode text to clipboard in OpenOffice.org-compatible
+format you need to install UClip package (enhanced OS/2 clipboard support):
 
+  - http://hobbes.nmsu.edu/cgi-bin/h-search?key=UClip
+
+    
 PostScript printing requires PostScript-capable printer (pscript.drv).
 
 
