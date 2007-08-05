@@ -73,6 +73,7 @@ SOM_Scope void SOMLINK LuPixbufInit(LuPixbuf *somSelf,  Environment *ev,
 	    somThis->rowsize = (somThis->rowsize + 3) &~3;
 	}
     somThis->dlen = somThis->rowsize * somThis->height;
+    //somPrintf( "LuPixbufInit: allocating %d bytes\n", somThis->dlen );
     somThis->data = (char *)SOMMalloc( somThis->dlen );
     memset( somThis->data, 0xff, somThis->dlen );
 }

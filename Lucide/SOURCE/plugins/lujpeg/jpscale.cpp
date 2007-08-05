@@ -286,7 +286,7 @@ void resample( Environment *ev,
     raster = (uint8_t*) my_calloc(in_window_w, 3);
     for (k = 0; k < tmp_m_height; ++k)
     {
-        get_row( ev, raster, in, int(floorf(in_x0)), in_window_w, k );
+        get_row( ev, raster, in, int(floorf(in_x0)), in_window_w, k+in_y0 );
         for (i = 0; i < tmp_m_width; ++i)
         {
             float       red = 0.0f;
