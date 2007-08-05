@@ -43,6 +43,7 @@ class ProgressDlg;
 
 enum PgLayout { SinglePage = 0, Continuous = 1 };
 enum ActiveWindow { AwIndex, AwView };
+enum FileList { ListFirst, ListPrevious, ListNext, ListLast };
 
 struct LuWindowPos
 {
@@ -61,6 +62,7 @@ class Lucide
     
 		static ProgressDlg *loadProgressDlg;
 		static char docFullName[ CCHMAXPATH ];
+		static char docDirName[ CCHMAXPATHCOMP ];
 		static char *password;
 		static bool docLoaded;
 		static long loadErrorCode;
@@ -73,6 +75,8 @@ class Lucide
         static void enableZoomMenus();
         static void setZoomChecks( SHORT cmd, SHORT cbind, double zoom );
         static void loadthread( void *p );
+        static void readMask( const char *mask );
+        static void loadFileList();
         
         static void *thumbnailData;
         static int thumbnailDataLen;
@@ -109,6 +113,7 @@ class Lucide
         static void createThumbnail( LuDocument *_doc );
         static bool isThumbNeeded( const char *fn );
         static void writeThumbnail( const char *fn );
+        static void gotoFile( FileList file );
 };
 
 #endif // __LUCIDE_H

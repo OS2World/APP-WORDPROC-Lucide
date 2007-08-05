@@ -51,13 +51,18 @@
 #endif
 #define LuPixbuf_Class_Source
 
+#define INCL_DOS
+#include <os2.h>
+#include <assert.h>
+
 #include "lupixbuf.xih"
 
 
-SOM_Scope void SOMLINK LuPixbufInit(LuPixbuf *somSelf,  Environment *ev, 
-                                    somInitCtrl* ctrl, long w, 
+SOM_Scope void SOMLINK LuPixbufInit(LuPixbuf *somSelf,  Environment *ev,
+                                    somInitCtrl* ctrl, long w,
                                     long h, short bpp)
 {
+    APIRET rc = 0;
     LuPixbufData *somThis;
     somInitCtrl globalCtrl;
     somBooleanVector myMask;
@@ -70,11 +75,17 @@ SOM_Scope void SOMLINK LuPixbufInit(LuPixbuf *somSelf,  Environment *ev,
     somThis->bpp = bpp;
     somThis->rowsize = ( somThis->width * somThis->bpp );
     if ( bpp != 4 ) {
-	    somThis->rowsize = (somThis->rowsize + 3) &~3;
-	}
+        somThis->rowsize = (somThis->rowsize + 3) &~3;
+    }
     somThis->dlen = somThis->rowsize * somThis->height;
+
     //somPrintf( "LuPixbufInit: allocating %d bytes\n", somThis->dlen );
-    somThis->data = (char *)SOMMalloc( somThis->dlen );
+
+    // To support HUGE pixbufs we need HMA
+    // (Is OBJ_ANY compatible with old (9.0xx) kernels?)
+    rc = DosAllocMem( &(somThis->data), somThis->dlen, PAG_COMMIT | fPERM | OBJ_ANY );
+    assert( rc == 0 );
+
     memset( somThis->data, 0xff, somThis->dlen );
 }
 
@@ -141,7 +152,7 @@ SOM_Scope void SOMLINK somDestruct(LuPixbuf *somSelf, octet doFree,
     LuPixbuf_BeginDestructor;
 
     // local LuPixbuf deinitialization code
-    SOMFree( somThis->data );
+    DosFreeMem( somThis->data );
     // local LuPixbuf deinitialization code end
 
     LuPixbuf_EndDestructor;

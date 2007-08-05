@@ -40,8 +40,10 @@
 #include <os2.h>
 
 #include <string>
+#include <set>
 #include <stdio.h>
 #include <process.h>
+#include <dos.h>
 
 #include <ludoc.xh>
 
@@ -105,6 +107,7 @@ bool         Lucide::isFullscreen                  = false;
 LuWindowPos  Lucide::winPos                        = {0};
 char         Lucide::docFullName[ CCHMAXPATH ]     = "";
 char         Lucide::docFileName[ CCHMAXPATHCOMP ] = "";
+char         Lucide::docDirName[ CCHMAXPATHCOMP ]  = "";
 char        *Lucide::password                      = NULL;
 ActiveWindow Lucide::activeWindow                  = AwView;
 // static data for asynch loading document
@@ -115,6 +118,9 @@ long         Lucide::loadErrorCode                 = LU_LDERR_NO_ERROR;
 void        *Lucide::thumbnailData                 = NULL;
 int          Lucide::thumbnailDataLen              = 0;
 
+// List of files in current directory
+static std::set<std::string> fileList;
+static std::set<std::string>::const_iterator fileListIterator;
 
 HMODULE _hmod = NULLHANDLE;
 
@@ -429,9 +435,13 @@ void Lucide::loadDocument( const char *fn )
                 if ( docLoaded )
                 {
                     char *t = new char[ 2048 ];
+                    char _dr[ _MAX_DRIVE ];
+                    char _di[ _MAX_DIR ];
                     char _fn[ _MAX_FNAME ];
                     char _ex[ _MAX_EXT ];
-                    _splitpath( fn, NULL, NULL, _fn, _ex );
+                    _splitpath( fn, _dr, _di, _fn, _ex );
+                    strcpy( docDirName, _dr );
+                    strcat( docDirName, _di );
                     strcpy( docFileName, _fn );
                     strcat( docFileName, _ex );
                     snprintf( t, 2048, "%s - %s", docFileName, title );
@@ -519,6 +529,46 @@ void Lucide::loadDocument( const char *fn )
     delete msg;
 }
 
+void Lucide::readMask( const char *mask )
+{
+    char *buf = new char[ CCHMAXPATH ];
+    strcpy( buf, docFullName );
+    char *r = strrchr( buf, '\\' );
+    if ( r != NULL )
+    {
+        *( r + 1 ) = 0;
+        strcat( buf, mask );
+
+        struct find_t ffblk;
+        unsigned done = _dos_findfirst( buf, _A_RDONLY | _A_NORMAL, &ffblk );
+        while ( done == 0 )
+        {
+            fileList.insert( ffblk.name );
+            done = _dos_findnext( &ffblk );
+        }
+        _dos_findclose( &ffblk );
+
+    }
+    delete buf;
+}
+
+void Lucide::loadFileList()
+{
+    fileList.clear();
+
+    char *exts = newstrdup( pluginMan->getExtsMask().c_str() );
+
+    char *p = strtok( exts, ";" );
+    while( p != NULL )
+    {
+        readMask( p );
+        p = strtok( NULL, ";" );
+    }
+    delete exts;
+
+    fileListIterator = fileList.find( docFileName );
+}
+
 void Lucide::openDocument()
 {
     char dirbuf[ CCHMAXPATH ];
@@ -541,6 +591,7 @@ void Lucide::openDocument()
         PrfWriteProfileString( HINI_USERPROFILE, appName, lvd, buf );
 
         loadDocument( fd->szFullFile );
+        loadFileList();
     }
     delete fd;
 }
@@ -782,6 +833,39 @@ void Lucide::newWindow( char *file, bool addDir )
     delete param;
 }
 
+void Lucide::gotoFile( FileList file )
+{
+    if ( file == ListFirst ) {
+        fileListIterator = fileList.begin();
+    }
+    else if ( file == ListPrevious )
+    {
+        if ( fileListIterator == fileList.begin() ) {
+            fileListIterator = fileList.end();
+        }
+        fileListIterator--;
+    }
+    else if ( file == ListNext )
+    {
+        fileListIterator++;
+        if ( fileListIterator == fileList.end() ) {
+            fileListIterator = fileList.begin();
+        }
+    }
+    else if ( file == ListLast ) {
+        fileListIterator = fileList.end();
+        fileListIterator--;
+    }
+
+    std::string fname = *fileListIterator;
+    char *fn = new char[ CCHMAXPATH ];
+    strcpy( fn, docDirName );
+    strcat( fn, fname.c_str() );
+
+    loadDocument( fn );
+    delete fn;
+}
+
 static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
     switch ( msg )
@@ -820,9 +904,26 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     Lucide::saveDocumentAs();
                     return (MRESULT)FALSE;
 
+                case CM_FILEFIRST:
+                    Lucide::gotoFile( ListFirst );
+                    return (MRESULT)FALSE;
+
+                case CM_FILEPREVIOUS:
+                    Lucide::gotoFile( ListPrevious );
+                    return (MRESULT)FALSE;
+
+                case CM_FILENEXT:
+                    Lucide::gotoFile( ListNext );
+                    return (MRESULT)FALSE;
+
+                case CM_FILELAST:
+                    Lucide::gotoFile( ListLast );
+                    return (MRESULT)FALSE;
+
                 case CM_PRINT:
                 {
-                    PrintDlg *d = new PrintDlg( hWndFrame, doc, Lucide::docFileName, docViewer->getCurrentPage() + 1 );
+                    PrintDlg *d = new PrintDlg( hWndFrame, doc, Lucide::docFileName,
+                                                docViewer->getCurrentPage() + 1 );
                     if ( d->showDialog() == DID_OK )
                     {
                         // print

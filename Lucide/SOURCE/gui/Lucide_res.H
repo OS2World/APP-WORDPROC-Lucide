@@ -66,6 +66,11 @@
 #define CM_PLUGINSLIST  105
 #define CM_EXIT         106
 
+#define CM_FILEFIRST    151
+#define CM_FILEPREVIOUS 152
+#define CM_FILENEXT     153
+#define CM_FILELAST     154
+
 #define CM_COPY         201
 #define CM_SELECTALL    202
 #define CM_FIND         203
