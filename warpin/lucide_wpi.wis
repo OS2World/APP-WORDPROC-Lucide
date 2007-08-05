@@ -113,7 +113,6 @@ Return WirexxGetEnv('plug_jpeg')
 <PCK INDEX=1
      PACKAGEID="netlabs.org\Lucide\Lucide core\1\0\1"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
-     REQUIRES="netlabs.org\UClip\Binaries\0\2\1\0"     
      BASE
      TITLE="=("title")"
      CREATEOBJECT='WPFolder|=("folder")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
