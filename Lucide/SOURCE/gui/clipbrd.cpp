@@ -42,9 +42,53 @@
 #include <string.h>
 #include <malloc.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "cpconv.h"
 
 #include "UClip.h"
+
+
+static BOOL APIENTRY (*pUWinOpenClipbrd)(HAB)                      = NULL;
+static BOOL APIENTRY (*pUWinEmptyClipbrd)(HAB)                     = NULL;
+static BOOL APIENTRY (*pUWinSetClipbrdData)(HAB,ULONG,ULONG,ULONG) = NULL;
+static BOOL APIENTRY (*pUWinCloseClipbrd)(HAB)                     = NULL;
+
+static bool loadUClip();
+
+static HMODULE ucHandle = NULLHANDLE;
+static bool uclipLoaded = loadUClip();
+
+
+static void freeUClip()
+{
+    if ( ucHandle != NULLHANDLE ) {
+        DosFreeModule( ucHandle );
+    }
+}
+
+static bool loadUClip()
+{
+    bool res = false;
+    do
+    {
+      if ( DosLoadModule( NULL, 0, "UCLIP", &ucHandle ) != 0 )
+        break;
+      if (DosQueryProcAddr(ucHandle,0,"UWinOpenClipbrd",(PFN *)&pUWinOpenClipbrd)!= 0)
+        break;
+      if (DosQueryProcAddr(ucHandle,0,"UWinEmptyClipbrd",(PFN *)&pUWinEmptyClipbrd)!= 0)
+        break;
+      if (DosQueryProcAddr(ucHandle,0,"UWinSetClipbrdData",(PFN *)&pUWinSetClipbrdData)!= 0)
+        break;
+      if (DosQueryProcAddr(ucHandle,0,"UWinCloseClipbrd",(PFN *)&pUWinCloseClipbrd)!= 0)
+        break;
+
+      res = true;
+    } while (0);
+
+    atexit( freeUClip );
+
+    return res;
+}
 
 
 void textToClipbrd( HAB hab, const char *text )
@@ -72,9 +116,13 @@ void textToClipbrd( HAB hab, const char *text )
     size_t len = 0;
     size_t olen = 0;
 
-    if ( UWinOpenClipbrd( hab ) )
+    if ( uclipLoaded ? pUWinOpenClipbrd( hab ) : WinOpenClipbrd( hab ) )
     {
-        UWinEmptyClipbrd( hab );
+        if ( uclipLoaded ) {
+            pUWinEmptyClipbrd( hab );
+        } else {
+            WinEmptyClipbrd( hab );
+        }
 
         size_t cSubs = 0;
         len = strlen( text );
@@ -93,7 +141,11 @@ void textToClipbrd( HAB hab, const char *text )
             void *memuni = (void *)new char[ olen ];
             memcpy( memuni, shmemuni, olen );
 
-            UWinSetClipbrdData( hab, (ULONG)shmemuni, UCLIP_CF_UNICODETEXT, CFI_POINTER );
+            if ( uclipLoaded ) {
+                pUWinSetClipbrdData( hab,(ULONG)shmemuni,UCLIP_CF_UNICODETEXT,CFI_POINTER );
+            } else {
+                DosFreeMem( shmemuni );
+            }
 
             int liglen = uniLigaturesLength( (UniChar *)memuni );
             if ( liglen > 0 )  // string contain ligature(s)
@@ -117,12 +169,20 @@ void textToClipbrd( HAB hab, const char *text )
                 void *tmpsys = shmemsys;
                 UniUconvFromUcs( objtosys, &tmpuni, &unilen, &tmpsys, &olen, &cSubs );
 
-                UWinSetClipbrdData( hab, (ULONG)shmemsys, UCLIP_CF_TEXT, CFI_POINTER );
+                if ( uclipLoaded ) {
+                    pUWinSetClipbrdData( hab, (ULONG)shmemsys, UCLIP_CF_TEXT, CFI_POINTER );
+                } else {
+                    WinSetClipbrdData( hab, (ULONG)shmemsys, CF_TEXT, CFI_POINTER );
+                }
             }
             delete memuni;
         }
 
-        UWinCloseClipbrd( hab );
+        if ( uclipLoaded ) {
+            pUWinCloseClipbrd( hab );
+        } else {
+            WinCloseClipbrd( hab );
+        }
     }
 
     UniFreeUconvObject( objtouni );

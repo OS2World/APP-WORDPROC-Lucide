@@ -3,6 +3,7 @@
   - If the filename does not have an extension or the extension is unknown,
     it will check file data to determine a suitable plugin (closed
     ticket #43).
+  - UClip package is optional now.
   - Updated NLS-files: German, ...
 
 1.01:

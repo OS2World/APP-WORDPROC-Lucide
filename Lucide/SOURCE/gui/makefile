@@ -77,7 +77,6 @@ lib ..\plugins\ludoc\ludoc
 lib somtk
 lib libconv
 lib libuls
-lib UClip
 export LucideMain
 | tmpmake.lnk >NUL
     wlink @tmpmake.lnk
