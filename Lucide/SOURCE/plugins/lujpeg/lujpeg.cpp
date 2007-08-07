@@ -192,7 +192,8 @@ SOM_Scope boolean  SOMLINK loadFile(LuJpegDocument *somSelf,
         i--;
         jpeg_read_scanlines( &cinfo, buffer, 1 );
         dst = pixbuf_data + ( i * pixbuf_rowstride );
-        for ( j = 0; j < pixbuf_rowstride; j += bpp )
+        int len = pixbuf_width * bpp;
+        for ( j = 0; j < len; j += bpp )
         {
             dst[ j ] = buffer[0][ j + 2 ];
             dst[ j + 1 ] = buffer[0][ j + 1 ];
