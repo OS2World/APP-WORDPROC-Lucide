@@ -5,6 +5,7 @@
     ticket #43).
   - Menuitems and hotkeys to subsequently load supported files in same
     directory.
+  - Hotkeys (Ctrl+0/1/2) for predefined zoom levels.
   - UClip package is optional now.
   - Updated NLS-files: German, ...
 

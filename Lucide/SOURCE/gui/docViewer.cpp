@@ -1096,7 +1096,7 @@ void DocumentViewer::wmPaint( HWND hwnd )
         if ( WinIntersectRect( hab, &rclDraw, &rcl, &rclPage ) )
         {
             spos_x = sHscrollPos + rclDraw.xLeft - xPos;
-            spos_y = ( yPos > 0 ) ? rclPage.yTop - rclDraw.yTop : (cyClient - rclDraw.yTop) + sVscrollPos;
+            spos_y = ( height < cyClient ) ? rclPage.yTop - rclDraw.yTop : (cyClient - rclDraw.yTop) + sVscrollPos;
             LONG rclx = rclDraw.xRight - rclDraw.xLeft;
             LONG rcly = rclDraw.yTop - rclDraw.yBottom;
 
@@ -1768,7 +1768,7 @@ BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
                     {
                         char *uri = links[ pg ]->_buffer[i].link.uri;
                         if ( uri != NULL ) {
-                        	Lucide::newWindow( uri, true );    
+                            Lucide::newWindow( uri, true );
                         }
                     }
                     else if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_TITLE )
