@@ -23,9 +23,9 @@ MENU_FINDAGAIN=Buscar si~guiente\tCtrl+G
 MENU_SETTINGS=~Preferencias
 
 MENU_VIEW=~Ver
-MENU_FIT_WINDOW=Ajustar a la ~ventana
-MENU_ACTUAL_SIZE=~Tama¤o real
-MENU_FIT_WIDTH=Ajustar al ~ancho
+MENU_FIT_WINDOW=Ajustar a la ~ventana\tCtrl+0
+MENU_ACTUAL_SIZE=~Tama¤o real\tCtrl+1
+MENU_FIT_WIDTH=Ajustar al ~ancho\tCtrl+2
 # - unused - MENU_ZOOM_IN_OUT=Aumentar/Reducir ~zoom
 MENU_FIRST_PAGE=~Primera p gina
 MENU_PREV_PAGE=P gina anterior\t-
