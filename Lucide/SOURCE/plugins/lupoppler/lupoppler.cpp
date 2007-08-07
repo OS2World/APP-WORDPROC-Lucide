@@ -89,6 +89,7 @@ static LuSignature      lsig = { 0, 0, 5, (void *)"%PDF-" };
 static LuSignatureList  lsl  = { 1, &lsig };
 static LuSignatureCheck lsc  = { 1, &lsl };
 
+// getSignatureCheck is optional
 extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 {
 	return &lsc;
