@@ -79,10 +79,11 @@ ludoc.xh: ludoc.idl
 MAKE.CFG: makefile
   copy &&|
 -zq 
--zp=4
+-zp=8
 -bm
 -ot
 -ox
+-oh
 -xs
 -xr
 -I..\..\sominc

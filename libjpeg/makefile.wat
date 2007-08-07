@@ -15,7 +15,7 @@ SYSTEM=OS2
 CC= wcl386
 
 # You may need to adjust these cc options:
-CFLAGS=-zq -zp=4 -bm -ot -ox -bt=$(SYSTEM)
+CFLAGS=-zq -zp=8 -bm -ot -ox -oh -bt=$(SYSTEM)
 
 # Caution: avoid -ol or -ox; these generate bad code with 10.0 or 10.0a.
 # Generally, we recommend defining any configuration symbols in jconfig.h,

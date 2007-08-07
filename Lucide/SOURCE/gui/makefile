@@ -140,9 +140,10 @@ lcd.obj:            lcd.c               makefile
 MAKE.CFG: makefile
   copy &&|
 -zq
--zp=4
+-zp=8
 -ot
 -ox
+-oh
 -bm
 -sg
 -DVERSION="$(VERSION)"  

@@ -2,7 +2,7 @@
 
 CC=wcl386
 
-CFLAGS=-zq -zp=4 -bm -sg -ot -ox -xs -xr -I.. -I..\goo -I..\..\..\libjpeg -I..\..\fc-emulate-os2 -DOS2
+CFLAGS=-zq -zp=8 -bm -sg -ot -ox -oh -xs -xr -I.. -I..\goo -I..\..\..\libjpeg -I..\..\fc-emulate-os2 -DOS2
 
 LIBS=libpoppler.lib
 
