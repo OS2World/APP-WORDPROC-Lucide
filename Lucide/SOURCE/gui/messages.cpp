@@ -34,6 +34,8 @@
 
 #include "messages.h"
 
+// Dynamic menu items
+extern const char *MENU_CLEAR_LIST = "MENU_CLEAR_LIST";
 
 // Toolbar hints
 const char *TBHINT_OPEN          = "TBHINT_OPEN";

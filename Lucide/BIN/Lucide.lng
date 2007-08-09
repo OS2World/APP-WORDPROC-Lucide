@@ -8,6 +8,13 @@
 MENU_DOCUMENT=~Document
 MENU_NEW_WINDOW=~New window
 MENU_OPEN=~Open...\tCtrl+O
+MENU_NEXT_PREVIOUS=Next/Pre~vious
+MENU_FIRST=First\tShift+Home
+MENU_PREVIOUS=Previous\tShift+PgUp
+MENU_NEXT=Next\tShift+PgDn
+MENU_LAST=Last\tShift+End
+MENU_RECENT_FILES=~Recent files
+MENU_CLEAR_LIST=~Clear list
 MENU_SAVE_AS=~Save As...
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Pa~ge setup...
@@ -44,11 +51,6 @@ MENU_MAXVIEW=~Maximized view\tF11
 MENU_FULLSCREEN=~Fullscreen\tCtrl+L
 MENU_HELP=~Help
 MENU_PRODUCT_INFORMATION=~Product Information
-MENU_NEXT_PREVIOUS=Next/Pre~vious
-MENU_FIRST=First\tShift+Home
-MENU_PREVIOUS=Previous\tShift+PgUp
-MENU_NEXT=Next\tShift+PgDn
-MENU_LAST=Last\tShift+End
 
 #
 # Toolbar hints

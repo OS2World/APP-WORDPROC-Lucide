@@ -107,6 +107,9 @@
 #define CM_TOFULLSCREEN 702
 #define CM_SWITCHWINDOW 703
 
+#define CM_RECENT       1000
+#define CM_RECENTCLEAR  1099
+
 #define TBID_PAGENUM    1
 #define TBID_OFPAGES    2
 #define TBID_ZOOM       3

@@ -8,6 +8,11 @@
 MENU_DOCUMENT=~Документ
 MENU_NEW_WINDOW=~Новое окно
 MENU_OPEN=~Открыть...\tCtrl+O
+MENU_NEXT_PREVIOUS=Следующий/П~редыдущий
+MENU_FIRST=Первый\tShift+Home
+MENU_PREVIOUS=Предыдущий\tShift+PgUp
+MENU_NEXT=Следующий\tShift+PgDn
+MENU_LAST=Последний\tShift+End
 MENU_SAVE_AS=~Сохранить как...
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Па~раметры страницы...
@@ -44,11 +49,6 @@ MENU_MAXVIEW=~Масимально развернуть\tF11
 MENU_FULLSCREEN=~Полноэкранный режим\tCtrl+L
 MENU_HELP=~Справка
 MENU_PRODUCT_INFORMATION=~О программе
-MENU_NEXT_PREVIOUS=Следующий/П~редыдущий
-MENU_FIRST=Первый\tShift+Home
-MENU_PREVIOUS=Предыдущий\tShift+PgUp
-MENU_NEXT=Следующий\tShift+PgDn
-MENU_LAST=Последний\tShift+End
 
 #
 # Toolbar hints

@@ -59,6 +59,7 @@
 #include "passwordDlg.h"
 #include "docViewer.h"
 #include "indexWindow.h"
+#include "recent.h"
 #include "lusettings.h"
 #include "luutils.h"
 #include "tb_spl.h"
@@ -96,6 +97,7 @@ DocumentViewer *docViewer = NULL;
 IndexWindow    *indexWin  = NULL;
 FindDlg        *findDlg   = NULL;
 LuSettings     *settings  = NULL;
+RecentFiles    *recent    = NULL;
 char           *title     = NULL;
 
 
@@ -447,6 +449,7 @@ void Lucide::loadDocument( const char *fn )
                     snprintf( t, 2048, "%s - %s", docFileName, title );
                     WinSetWindowText( hWndFrame, t );
                     delete t;
+                    recent->addFile( docFullName );
                     setDocument( doc );
                 }
                 else
@@ -559,7 +562,7 @@ void Lucide::loadFileList()
     char *exts = newstrdup( pluginMan->getExtsMask().c_str() );
 
     char *p = strtok( exts, ";" );
-    while( p != NULL )
+    while ( p != NULL )
     {
         readMask( p );
         p = strtok( NULL, ";" );
@@ -835,6 +838,10 @@ void Lucide::newWindow( char *file, bool addDir )
 
 void Lucide::gotoFile( FileList file )
 {
+    if ( fileList.size() == 0 ) {
+        return;
+    }
+
     if ( file == ListFirst ) {
         fileListIterator = fileList.begin();
     }
@@ -900,10 +907,6 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     Lucide::openDocument();
                     return (MRESULT)FALSE;
 
-                case CM_SAVEAS:
-                    Lucide::saveDocumentAs();
-                    return (MRESULT)FALSE;
-
                 case CM_FILEFIRST:
                     Lucide::gotoFile( ListFirst );
                     return (MRESULT)FALSE;
@@ -918,6 +921,29 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
                 case CM_FILELAST:
                     Lucide::gotoFile( ListLast );
+                    return (MRESULT)FALSE;
+
+                case CM_RECENT + 1:
+                case CM_RECENT + 2:
+                case CM_RECENT + 3:
+                case CM_RECENT + 4:
+                case CM_RECENT + 5:
+                case CM_RECENT + 6:
+                case CM_RECENT + 7:
+                case CM_RECENT + 8:
+                case CM_RECENT + 9:
+                {
+                    std::string f = recent->getFile( SHORT1FROMMP(mp1) );
+                    Lucide::loadDocument( f.c_str() );
+                    return (MRESULT)FALSE;
+                }
+
+                case CM_RECENTCLEAR:
+                    recent->clear();
+                    return (MRESULT)FALSE;
+
+                case CM_SAVEAS:
+                    Lucide::saveDocumentAs();
                     return (MRESULT)FALSE;
 
                 case CM_PRINT:
@@ -1179,10 +1205,12 @@ extern "C" APIRET APIENTRY LucideMain( int argc, char *argv[] )
     WinSendMsg( hHorizSplitter, SBM_SETFIXEDSIZE,
                 MPFROMSHORT( DEFAULT_PICTSIZE + TOOLBAR_HEIGHT_ADD ), MPVOID );
 
-    findDlg = new FindDlg( hWndFrame );
     Lucide::checkMenus();
     Lucide::setPageLayout( settings->layout );
     Lucide::setZoom( settings->zoom );
+
+    findDlg = new FindDlg( hWndFrame );
+    recent  = new RecentFiles( hWndMenu );
 
     // Показать окно программы
     if ( !PMRestoreWindowPos( NULL, appName, fwp, hWndFrame,
@@ -1217,6 +1245,8 @@ extern "C" APIRET APIENTRY LucideMain( int argc, char *argv[] )
 
     WinDestroyWindow( hWndFrame );
 
+    recent->save();
+
     Lucide::closeDocument();
     delete docViewer;
     delete indexWin;
@@ -1225,6 +1255,7 @@ extern "C" APIRET APIENTRY LucideMain( int argc, char *argv[] )
     delete pluginMan;
 
     delete findDlg;
+    delete recent;
     delete title;
     delete settings;
     unInitPipeMon();

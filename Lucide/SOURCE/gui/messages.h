@@ -36,6 +36,9 @@
 #define __MESSAGES_H
 
 
+// Dynamic menu items
+extern const char *MENU_CLEAR_LIST;
+
 // Toolbar hints
 extern const char *TBHINT_OPEN;
 extern const char *TBHINT_PRINT;

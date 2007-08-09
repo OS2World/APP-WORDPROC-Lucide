@@ -37,7 +37,7 @@ OBJS = Lucide.obj luutils.obj clipbrd.obj pmsplitter.obj pmtoolbar.obj \
        fontsInfoDlg.obj docInfoDlg.obj findDlg.obj progressDlg.obj \
        aboutDlg.obj settingsDlg.obj lusettings.obj printDlg.obj \
        print.obj stbrowser.obj pipemon.obj lucidethumbs.obj \
-       passwordDlg.obj
+       passwordDlg.obj recent.obj
 
 lucide.dll: $(OBJS) lucide.res
   copy &&|
@@ -72,6 +72,7 @@ file $(OBJDIR)\stbrowser.obj
 file $(OBJDIR)\pipemon.obj
 file $(OBJDIR)\lucidethumbs.obj
 file $(OBJDIR)\passwordDlg.obj
+file $(OBJDIR)\recent.obj
 name $(EXEDIR)\lucide
 lib ..\plugins\ludoc\ludoc
 lib somtk
@@ -134,6 +135,7 @@ linklab.obj:        linklab.c
 wwbtn.obj:          wwbtn.c
 stbrowser.obj:      stbrowser.c
 passwordDlg.obj:    passwordDlg.cpp
+recent.obj:         recent.cpp
 lcd.obj:            lcd.c               makefile
 
 
