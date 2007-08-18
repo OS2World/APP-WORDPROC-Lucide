@@ -80,6 +80,8 @@ HWND createToolbar( HWND hwnd );
 void AboutBox( HWND hWndFrame );
 void initPipeMon( HWND hWndFrame );
 void unInitPipeMon();
+HWND LcdFileDlg( HWND hwndP, HWND hwndO, FILEDLG *pfild );
+
 
 HAB   hab            = NULLHANDLE;
 HWND  hWndFrame      = NULLHANDLE;
@@ -583,7 +585,7 @@ void Lucide::openDocument()
                            dirbuf, sizeof( dirbuf ) );
     snprintf( fd->szFullFile, sizeof( fd->szFullFile ),
               "%s%s", dirbuf, pluginMan->getExtsMask().c_str() );
-    WinFileDlg( HWND_DESKTOP, hWndFrame, fd );
+    LcdFileDlg( HWND_DESKTOP, hWndFrame, fd );
     if ( fd->lReturn == DID_OK )
     {
         char drv[ _MAX_DRIVE ] = "";

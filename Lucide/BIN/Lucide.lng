@@ -233,3 +233,16 @@ PSW_TITLE=Document is encrypted!
 PSW_PASSWORD=~Password
 PSW_OK=~OK
 PSW_CANCEL=~Cancel
+
+#
+# Open file dialog
+#
+FDLG_OPEN=Open
+FDLG_FILENAME=File~name
+FDLG_DRIVE=D~rive
+FDLG_FILETYPE=File ~Type
+FDLG_FILE=~File
+FDLG_DIRECTORY=~Directory
+FDLG_OK=~OK
+FDLG_CANCEL=~Cancel
+FDLG_NO_PREVIEW_AVAILABLE=No preview available

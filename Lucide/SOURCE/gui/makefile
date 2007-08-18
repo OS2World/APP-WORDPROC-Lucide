@@ -1,7 +1,7 @@
 .autodepend
 
 TEST=0
-VERSION=1.02
+VERSION=1.10-test
 
 !if $(TEST)==1
 	BMODE=os2v2
@@ -37,7 +37,7 @@ OBJS = Lucide.obj luutils.obj clipbrd.obj pmsplitter.obj pmtoolbar.obj \
        fontsInfoDlg.obj docInfoDlg.obj findDlg.obj progressDlg.obj \
        aboutDlg.obj settingsDlg.obj lusettings.obj printDlg.obj \
        print.obj stbrowser.obj pipemon.obj lucidethumbs.obj \
-       passwordDlg.obj recent.obj
+       passwordDlg.obj recent.obj lcdfdlg.obj
 
 lucide.dll: $(OBJS) lucide.res
   copy &&|
@@ -73,6 +73,7 @@ file $(OBJDIR)\pipemon.obj
 file $(OBJDIR)\lucidethumbs.obj
 file $(OBJDIR)\passwordDlg.obj
 file $(OBJDIR)\recent.obj
+file $(OBJDIR)\lcdfdlg.obj
 name $(EXEDIR)\lucide
 lib ..\plugins\ludoc\ludoc
 lib somtk
@@ -136,6 +137,7 @@ wwbtn.obj:          wwbtn.c
 stbrowser.obj:      stbrowser.c
 passwordDlg.obj:    passwordDlg.cpp
 recent.obj:         recent.cpp
+lcdfdlg.obj:        lcdfdlg.cpp
 lcd.obj:            lcd.c               makefile
 
 

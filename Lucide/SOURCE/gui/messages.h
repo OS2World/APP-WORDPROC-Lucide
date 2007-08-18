@@ -129,5 +129,8 @@ extern const char *PRINT_GENERATING_POSTSCRIPT;
 extern const char *PRINT_SPOOLING_POSTSCRIPT;
 extern const char *PRINT_FAILED;
 
+// Open file dialog
+extern const char *FDLG_NO_PREVIEW_AVAILABLE;
+
 
 #endif // __MESSAGES_H

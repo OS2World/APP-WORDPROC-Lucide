@@ -175,5 +175,8 @@
 #define IDD_PASSWORD        1009
 #define IDC_PASSWORD        10
 
+#define IDD_LCD_FILEDLG     1010
+#define IDC_PREVIEW			5000
+
 
 #endif // __LUCIDE_RES_H

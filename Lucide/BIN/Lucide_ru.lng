@@ -232,3 +232,16 @@ PSW_TITLE=Документ зашифрован!
 PSW_PASSWORD=~Пароль
 PSW_OK=ОК
 PSW_CANCEL=Отказ
+
+#
+# Open file dialog
+#
+FDLG_OPEN=Открыть
+#FDLG_FILENAME=File~name
+#FDLG_DRIVE=D~rive
+#FDLG_FILETYPE=File ~Type
+#FDLG_FILE=~File
+#FDLG_DIRECTORY=~Directory
+#FDLG_OK=~OK
+FDLG_CANCEL=Отказ
+FDLG_NO_PREVIEW_AVAILABLE=Предпросмотр недоступен

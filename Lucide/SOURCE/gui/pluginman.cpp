@@ -309,9 +309,9 @@ std::string PluginManager::getExtsMask()
         char *tmpexts = newstrdup( pi->extensions.c_str() );
         char *p = strtok( tmpexts, ";" );
         while ( p != NULL ) {
-            cRet += "*.";
+            cRet += '*';
             cRet += p;
-            cRet += ";";
+            cRet += ';';
             p = strtok( NULL, ";" );
         }
     }

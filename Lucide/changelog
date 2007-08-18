@@ -1,4 +1,4 @@
-1.02:
+1.10-test:
   - JPG plugin: added support for quality image scaling.  
   - If the filename does not have an extension or the extension is unknown,
     Lucide will check file data to determine a suitable plugin (closed
@@ -6,6 +6,7 @@
   - Menuitems and hotkeys to subsequently load supported files in same
     directory.
   - List of recent files.
+  - Custom file dialog with preview.
   - Hotkeys (Ctrl+0/1/2) for predefined zoom levels.
   - UClip package is optional now.
   - Updated NLS-files: German, ...

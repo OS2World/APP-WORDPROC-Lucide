@@ -72,6 +72,10 @@ HMMIO  APIENTRY (*pMmioOpen)(PSZ,PMMIOINFO,ULONG);
 LONG   APIENTRY (*pMmioWrite)(HMMIO,PCHAR,LONG);
 ULONG  APIENTRY (*pMmioSetHeader)(HMMIO,PVOID,LONG,PLONG,ULONG,ULONG);
 USHORT APIENTRY (*pMmioClose)(HMMIO,USHORT);
+ULONG  APIENTRY (*pMmioIdentifyFile)(PSZ,PMMIOINFO,PMMFORMATINFO,PFOURCC,ULONG,ULONG);
+ULONG  APIENTRY (*pMmioQueryHeaderLength)(HMMIO,PLONG,ULONG,ULONG);
+ULONG  APIENTRY (*pMmioGetHeader)(HMMIO,PVOID,LONG,PLONG,ULONG,ULONG);
+LONG   APIENTRY (*pMmioRead)(HMMIO,PCHAR,LONG);
 
 static bool loadMMIOFuncs()
 {
@@ -87,6 +91,14 @@ static bool loadMMIOFuncs()
         if ( DosQueryProcAddr( mmioHndl, 0, "mmioSetHeader", (PFN *)&pMmioSetHeader ) != 0 )
             break;
         if ( DosQueryProcAddr( mmioHndl, 0, "mmioClose", (PFN *)&pMmioClose ) != 0 )
+            break;
+        if ( DosQueryProcAddr( mmioHndl, 0, "mmioIdentifyFile", (PFN *)&pMmioIdentifyFile ) != 0 )
+            break;
+        if ( DosQueryProcAddr( mmioHndl, 0, "mmioQueryHeaderLength", (PFN *)&pMmioQueryHeaderLength ) != 0 )
+            break;
+        if ( DosQueryProcAddr( mmioHndl, 0, "mmioGetHeader", (PFN *)&pMmioGetHeader ) != 0 )
+            break;
+        if ( DosQueryProcAddr( mmioHndl, 0, "mmioRead", (PFN *)&pMmioRead ) != 0 )
             break;
 
         res = true;
@@ -344,5 +356,134 @@ void Lucide::writeThumbnail( const char *fn )
     delete thumbnailData;
     thumbnailData = NULL;
     thumbnailDataLen = 0;
+}
+
+
+HBITMAP LoadBitmap( HAB hab, HDC hdc, HPS *hps, PSZ pszFileName )
+{
+    HBITMAP       hbm;
+    MMIOINFO      mmioinfo;
+    MMFORMATINFO  mmFormatInfo;
+    HMMIO         hmmio;
+    ULONG         ulImageHeaderLength;
+    MMIMAGEHEADER mmImgHdr;
+    ULONG         ulBytesRead;
+    ULONG         dwNumRowBytes;
+    PBYTE         pRowBuffer;
+    ULONG         dwRowCount;
+    SIZEL         ImageSize;
+    ULONG         dwHeight, dwWidth;
+    SHORT         wBitCount;
+    FOURCC        fccStorageSystem;
+    ULONG         dwPadBytes;
+    ULONG         dwRowBits;
+    ULONG         ulReturnCode;
+    ULONG         dwReturnCode;
+    HBITMAP       hbReturnCode;
+    LONG          lReturnCode;
+    FOURCC        fccIOProc;
+
+
+    ulReturnCode = pMmioIdentifyFile( pszFileName, 0L, &mmFormatInfo,
+                                      &fccStorageSystem, 0L, 0L );
+    if ( ulReturnCode == MMIO_ERROR ) {
+         return NULLHANDLE;
+    }
+
+    if( mmFormatInfo.fccIOProc == FOURCC_DOS ) {
+         return NULLHANDLE;
+    }
+
+    if ( (mmFormatInfo.ulMediaType != MMIO_MEDIATYPE_IMAGE) ||
+         ((mmFormatInfo.ulFlags & MMIO_CANREADTRANSLATED) == 0) ) {
+         return NULLHANDLE;
+    }
+    else {
+         fccIOProc = mmFormatInfo.fccIOProc;
+    }
+
+    memset( &mmioinfo, 0L, sizeof( MMIOINFO ) );
+    mmioinfo.fccIOProc = fccIOProc;
+    mmioinfo.ulTranslate = MMIO_TRANSLATEHEADER | MMIO_TRANSLATEDATA;
+
+    hmmio = pMmioOpen( (PSZ)pszFileName, &mmioinfo,
+                      MMIO_READ | MMIO_DENYWRITE | MMIO_NOIDENTIFY );
+
+    if ( !hmmio ) {
+         return NULLHANDLE;
+    }
+
+    dwReturnCode = pMmioQueryHeaderLength( hmmio, (PLONG)&ulImageHeaderLength, 0L, 0L );
+
+    if ( ulImageHeaderLength != sizeof ( MMIMAGEHEADER ) ) {
+         pMmioClose( hmmio, 0L );
+         return NULLHANDLE;
+    }
+
+    ulReturnCode = pMmioGetHeader( hmmio, &mmImgHdr, sizeof( MMIMAGEHEADER ),
+                                   (PLONG)&ulBytesRead, 0L, 0L );
+
+    if ( ulReturnCode != MMIO_SUCCESS ) {
+         pMmioClose( hmmio, 0L );
+         return NULLHANDLE;
+    }
+
+    dwHeight = mmImgHdr.mmXDIBHeader.BMPInfoHeader2.cy;
+    dwWidth = mmImgHdr.mmXDIBHeader.BMPInfoHeader2.cx;
+    wBitCount = mmImgHdr.mmXDIBHeader.BMPInfoHeader2.cBitCount;
+    dwRowBits = dwWidth * mmImgHdr.mmXDIBHeader.BMPInfoHeader2.cBitCount;
+    dwNumRowBytes = dwRowBits >> 3;
+
+    if ( dwRowBits % 8 ) {
+         dwNumRowBytes++;
+    }
+
+    dwPadBytes = ( dwNumRowBytes % 4 );
+
+    if ( dwPadBytes ) {
+         dwNumRowBytes += 4 - dwPadBytes;
+    }
+
+    pRowBuffer = (PBYTE)malloc( dwNumRowBytes );
+
+    ImageSize.cx = dwWidth;
+    ImageSize.cy = dwHeight;
+
+    *hps = GpiCreatePS( hab, hdc, &ImageSize,
+                        PU_PELS | GPIF_DEFAULT | GPIT_MICRO | GPIA_ASSOC );
+
+    if ( !*hps ) {
+        free( pRowBuffer );
+        pMmioClose( hmmio, 0L );
+        return NULLHANDLE;
+    }
+
+    hbm = GpiCreateBitmap( *hps, &mmImgHdr.mmXDIBHeader.BMPInfoHeader2, 0L, NULL, NULL );
+
+    if ( !hbm )
+    {
+        free( pRowBuffer );
+        pMmioClose( hmmio, 0L );
+        return NULLHANDLE;
+    }
+
+    hbReturnCode = GpiSetBitmap( *hps, hbm );
+
+    for ( dwRowCount = 0; dwRowCount < dwHeight; dwRowCount++ )
+    {
+         ulBytesRead = pMmioRead( hmmio, pRowBuffer, dwNumRowBytes );
+
+         if ( !ulBytesRead ) {
+              break;
+         }
+
+         lReturnCode = GpiSetBitmapBits( *hps, dwRowCount, 1, pRowBuffer,
+                                         (PBITMAPINFO2)&mmImgHdr.mmXDIBHeader.BMPInfoHeader2 );
+    }
+
+    pMmioClose( hmmio, 0L );
+    free( pRowBuffer );
+
+    return hbm;
 }
 
