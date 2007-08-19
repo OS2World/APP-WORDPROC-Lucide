@@ -21,11 +21,11 @@ void previewFile( HWND hwnd, const char *fn );
 
 struct previewData
 {
-    PFNWP   oldPvProc;
-    HDC     hdc;
-    HPS     hps;
-    HBITMAP image;
-    char    *text;
+    PFNWP    oldPvProc;
+    HDC      hdc;
+    HPS      hps;
+    HBITMAP  image;
+    char     *text;
 };
 
 #define IMAGE_X 256
@@ -58,6 +58,7 @@ static MRESULT EXPENTRY PreviewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp
                     BITMAPINFOHEADER bmi = { 0 };
                     bmi.cbFix = sizeof( BITMAPINFOHEADER );
                     GpiQueryBitmapParameters( pd->image, &bmi );
+                    //printf( "bmi.cx: %d,  bmi.cy: %d\n", bmi.cx, bmi.cy );
                     LONG xPos = ( rect.xRight - bmi.cx ) / 2;
                     LONG yPos = ( rect.yTop - bmi.cy ) / 2;
                     POINTL ptl = { xPos, yPos };
@@ -236,11 +237,21 @@ static PVOID getEA( const char *pszPath, const char *pszEAname, PULONG ealen )
                             pFEA2 = (PFEA2)((CHAR*)pFEA2 + offset);
                             if ( !strcmp( pFEA2->szName, pszEAname ) )
                             {
-                                pEABase = (CHAR*)pFEA2->szName + pFEA2->cbName+1;
-                                USHORT len = pFEA2->cbValue;
-                                if(len) {
-                                    pEAValue=malloc( len );
-                                    memcpy( pEAValue, pEABase, len );
+                                USHORT len = 0;
+                                PVOID pValue = NULL;
+                                pEABase = (CHAR*)pFEA2->szName + pFEA2->cbName + 1;
+                                if ( pszEAname[0] == '.' ) {
+                                    len = *(USHORT *)( pEABase + sizeof( USHORT ) );
+                                    pValue = pEABase + ( sizeof( USHORT ) * 2 );
+                                }
+                                else {
+                                    len = pFEA2->cbValue;
+                                    pValue = pEABase;
+                                }
+                                if ( len )
+                                {
+                                    pEAValue = malloc( len );
+                                    memcpy( pEAValue, pValue, len );
                                     *ealen = len;
                                 }
                                 break;
@@ -277,6 +288,221 @@ static void readGif( HWND hwnd, const char *fn )
         }
     }
     WinInvalidateRect( hwnd, NULL, FALSE );
+}
+
+static BOOL GetPointerBitmaps( HWND hwnd, PBYTE pchIcon, PBITMAPARRAYFILEHEADER2 pbafh2,
+                               HBITMAP *phbmPointer, HBITMAP *phbmColor, USHORT usIconSize )
+{
+    HPS   hps;
+    USHORT usBitCount, usRGB;
+    PBITMAPFILEHEADER2 pbfh2;
+    PBITMAPINFOHEADER2 pbmp2;
+    USHORT usExtra, usExp;
+    PBYTE  p;
+
+    *phbmPointer = (HBITMAP)0;
+    *phbmColor   = (HBITMAP)0;
+
+    // Is it the correct icon type ?
+    switch (pbafh2->usType)
+    {
+        case BFT_BITMAPARRAY:
+            pbfh2 = &pbafh2->bfh2;
+            break;
+
+        case BFT_ICON:
+        case BFT_BMAP:
+        case BFT_POINTER:
+        case BFT_COLORICON:
+        case BFT_COLORPOINTER:
+            pbfh2 = (PBITMAPFILEHEADER2)pbafh2;
+            break;
+
+        default :
+            return FALSE;
+    }
+    pbmp2 = &pbfh2->bmp2;
+
+    // Is it a BITMAPINFOHEADER or BITMAPINFOHEADER2 ?
+    if (pbmp2->cbFix == sizeof (BITMAPINFOHEADER2))
+    {
+        usRGB = sizeof (RGB2);
+        usBitCount = pbmp2->cBitCount;
+        if (usIconSize && pbmp2->cx != usIconSize)
+            return FALSE;
+    }
+    else if (pbmp2->cbFix == sizeof (BITMAPINFOHEADER))
+    {
+        PBITMAPINFOHEADER pbmp = (PBITMAPINFOHEADER)pbmp2;
+        usRGB = sizeof (RGB);
+        usBitCount = pbmp->cBitCount;
+        if (usIconSize && pbmp->cx != usIconSize)
+            return FALSE;
+    }
+    else  // Unknown length found
+        return FALSE;
+
+    // Create the first pointer by getting the presentation space first
+    // and than call GpiCreateBitmap
+    hps = WinGetPS(hwnd);
+    *phbmPointer = GpiCreateBitmap( hps, pbmp2, CBM_INIT,
+                                    (PBYTE)pchIcon + pbfh2->offBits, (PBITMAPINFO2)pbmp2 );
+    if (*phbmPointer == GPI_ERROR)
+    {
+        WinReleasePS(hps);
+        return FALSE;
+    }
+    WinReleasePS(hps);
+
+    // If it is a color icon than another BITMAPFILEHEADER follow after
+    // the color information. This color information contains of a number
+    // of RGB or RGB2 structures. The number depends of the number of colors
+    // in the bitmap. The number of colors is calculated by looking at
+    // the Number of bits per pel and using this number as an exponent on 2.
+    if (pbfh2->usType != BFT_COLORICON && pbfh2->usType != BFT_COLORPOINTER)
+        return TRUE;
+
+    // Calculate beginning of BITMAPFILEHEADER structure 2^Bits_per_pel
+    for (usExtra = 1, usExp = 0; usExp < usBitCount; usExp++)
+        usExtra *= 2;
+
+    p = (PBYTE)(pbfh2) + (pbfh2->cbSize + usExtra * usRGB);
+    pbfh2 = (PBITMAPFILEHEADER2)p;
+    // Get adress of BITMAPINFOHEADER
+    pbmp2 = &pbfh2->bmp2;
+
+    if (pbmp2->cbFix == sizeof (BITMAPINFOHEADER2))
+    {
+        if (pbmp2->cBitCount == 1)
+            return TRUE;
+    }
+    else if (pbmp2->cbFix == sizeof (BITMAPINFOHEADER))
+    {
+        PBITMAPINFOHEADER pbmp = (PBITMAPINFOHEADER)pbmp2;
+        if (pbmp->cBitCount == 1)
+            return TRUE;
+    }
+    else  // Unknown length found
+        return TRUE;
+
+    // And create bitmap number 2
+    hps = WinGetPS(hwnd);
+    *phbmColor = GpiCreateBitmap( hps, pbmp2, CBM_INIT,
+                                  (PBYTE)pchIcon + pbfh2->offBits, (PBITMAPINFO2)pbmp2 );
+    if (*phbmColor == GPI_ERROR)
+    {
+        GpiDeleteBitmap(*phbmPointer);
+        return FALSE;
+    }
+    WinReleasePS(hps);
+    return TRUE;
+}
+
+static HBITMAP IconBufferToBitmap( HWND hwnd, PBYTE pchIcon, USHORT usIconSize )
+{
+    static USHORT usDeviceCX = 0;
+    static USHORT usDeviceCY = 0;
+    BOOL fContinue, fIconFound;
+    POINTERINFO PointerInfo;
+    PBITMAPARRAYFILEHEADER2 pbafh2;
+    PBYTE p;
+    HPOINTER hptrIcon = NULLHANDLE;
+
+    memset(&PointerInfo, 0, sizeof PointerInfo);
+
+    if (!usDeviceCX)
+    {
+        usDeviceCX = WinQuerySysValue(HWND_DESKTOP, SV_CXSCREEN);
+        usDeviceCY = WinQuerySysValue(HWND_DESKTOP, SV_CYSCREEN);
+    }
+
+    fIconFound = FALSE;
+    pbafh2 = (PBITMAPARRAYFILEHEADER2)pchIcon;
+
+    switch (pbafh2->usType)
+    {
+        case BFT_BITMAPARRAY:
+            break;
+        case BFT_ICON:
+        case BFT_BMAP:
+        case BFT_POINTER:
+        case BFT_COLORICON:
+        case BFT_COLORPOINTER:
+            if (GetPointerBitmaps( hwnd, pchIcon, pbafh2, &PointerInfo.hbmPointer,
+                                   &PointerInfo.hbmColor, 0))
+            {
+                fIconFound = TRUE;
+            }
+            else
+                return NULLHANDLE;
+            break;
+        default :
+            return NULLHANDLE;
+    }
+
+    // First see if the icon contains an icon for the current device size.
+    fContinue = TRUE;
+    while (!fIconFound && fContinue)
+    {
+        if (pbafh2->cxDisplay == usDeviceCX && pbafh2->cyDisplay == usDeviceCY)
+        {
+            if (GetPointerBitmaps( hwnd, pchIcon, pbafh2, &PointerInfo.hbmPointer,
+                                   &PointerInfo.hbmColor, usIconSize ))
+            {
+                fIconFound = TRUE;
+                break;
+            }
+        }
+
+        p = (PBYTE)pchIcon + pbafh2->offNext;
+        if (!pbafh2->offNext)
+            break;
+        pbafh2 = (PBITMAPARRAYFILEHEADER2)p;
+    }
+
+    // Now look for the independed icons
+    if (!fIconFound)
+    {
+        pbafh2 = (PBITMAPARRAYFILEHEADER2)pchIcon;
+        fContinue = TRUE;
+        while (fContinue)
+        {
+            if (pbafh2->cxDisplay == 0 && pbafh2->cyDisplay == 0)
+            {
+                if (GetPointerBitmaps( hwnd, pchIcon, pbafh2, &PointerInfo.hbmPointer,
+                                       &PointerInfo.hbmColor, usIconSize ))
+                {
+                    fIconFound = TRUE;
+                    break;
+                }
+            }
+
+            p = (PBYTE)pchIcon + pbafh2->offNext;
+            if (!pbafh2->offNext)
+                break;
+            pbafh2 = (PBITMAPARRAYFILEHEADER2)p;
+        }
+    }
+
+    // if we still haven't found an icon we take the first icon there is
+    if (!fIconFound)
+    {
+        pbafh2 = (PBITMAPARRAYFILEHEADER2)pchIcon;
+        if (GetPointerBitmaps( hwnd, pchIcon, pbafh2, &PointerInfo.hbmPointer,
+                               &PointerInfo.hbmColor, 0 ))
+        {
+            fIconFound = TRUE;
+        }
+    }
+
+    if (!fIconFound)
+        return NULLHANDLE;
+
+    if ( PointerInfo.hbmPointer != NULLHANDLE ) {
+        GpiDeleteBitmap(PointerInfo.hbmPointer);
+    }
+
+    return PointerInfo.hbmColor;
 }
 
 static void previewFile( HWND hwnd, const char *fn )
@@ -321,5 +547,20 @@ static void previewFile( HWND hwnd, const char *fn )
         delete tmpgif;
         free( eadata );
     }
+    else // eadata == NULL
+    {
+        eadata = getEA( fn, ".ICON", &ealen );
+        if ( eadata != NULL )
+        {
+            HBITMAP hbm = IconBufferToBitmap( hwnd, (PBYTE)eadata, ealen );
+
+            previewData *pd = (previewData *)WinQueryWindowULong( hwnd, QWL_USER );
+            pd->image = hbm;
+            WinInvalidateRect( hwnd, NULL, FALSE );
+
+            free( eadata );
+        }
+    }
 }
+
 
