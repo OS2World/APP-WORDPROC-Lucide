@@ -3,7 +3,6 @@
 #define INCL_GPI
 #include <os2.h>
 
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <io.h>
@@ -25,7 +24,10 @@ struct previewData
     HDC      hdc;
     HPS      hps;
     HBITMAP  image;
+    HBITMAP  mask;
     char     *text;
+    HPS      hpsBuffer;
+    HDC      hdcBuffer;
 };
 
 #define IMAGE_X 256
@@ -40,16 +42,22 @@ static MRESULT EXPENTRY PreviewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp
         case WM_PAINT:
             {
                 RECTL rect = {0};
+                RECTL rcl = {0};
                 WinQueryWindowRect( hwnd, &rect );
+                WinCopyRect( hab, &rcl, &rect );
                 HPS hps = WinBeginPaint( hwnd, 0L, 0L );
-                WinFillRect( hps, &rect, SYSCLR_WINDOWFRAME );
+
+                GpiSetColor( pd->hpsBuffer, SYSCLR_WINDOWTEXT );
+                GpiSetBackColor( pd->hpsBuffer, SYSCLR_DIALOGBACKGROUND );
+                WinFillRect( pd->hpsBuffer, &rect, SYSCLR_WINDOWFRAME );
                 rect.xLeft++;
                 rect.yBottom++;
                 rect.xRight--;
                 rect.yTop--;
-                WinFillRect( hps, &rect, SYSCLR_DIALOGBACKGROUND );
-                if ( pd->image == NULLHANDLE ) {
-                    WinDrawText( hps, -1, pd->text, &rect, 0, 0,
+                WinFillRect( pd->hpsBuffer, &rect, SYSCLR_DIALOGBACKGROUND );
+                if ( pd->image == NULLHANDLE )
+                {
+                    WinDrawText( pd->hpsBuffer, -1, pd->text, &rect, 0, 0,
                                  DT_TEXTATTRS | DT_CENTER | DT_VCENTER );
                 }
                 else
@@ -58,12 +66,34 @@ static MRESULT EXPENTRY PreviewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp
                     BITMAPINFOHEADER bmi = { 0 };
                     bmi.cbFix = sizeof( BITMAPINFOHEADER );
                     GpiQueryBitmapParameters( pd->image, &bmi );
-                    //printf( "bmi.cx: %d,  bmi.cy: %d\n", bmi.cx, bmi.cy );
                     LONG xPos = ( rect.xRight - bmi.cx ) / 2;
                     LONG yPos = ( rect.yTop - bmi.cy ) / 2;
-                    POINTL ptl = { xPos, yPos };
-                    WinDrawBitmap( hps, pd->image, NULL, &ptl, 0, 0, DBM_NORMAL );
+
+                    if ( pd->mask != NULLHANDLE )
+                    {
+                        GpiQueryBitmapParameters( pd->mask, &bmi );
+                        GpiSetColor( pd->hpsBuffer, SYSCLR_DIALOGBACKGROUND );
+                        GpiSetBackColor( pd->hpsBuffer, CLR_BLACK );
+                        POINTL aptl[ 4 ] = { { xPos, yPos },
+                                             { xPos + bmi.cx, yPos + (bmi.cy / 2) },
+                                             { 0, bmi.cy / 2 }, { bmi.cx + 1, bmi.cy + 1 } };
+                        GpiWCBitBlt( pd->hpsBuffer, pd->mask, 4, aptl, ROP_SRCAND, BBO_IGNORE );
+                    }
+                    if ( pd->image != NULLHANDLE )
+                    {
+                        GpiQueryBitmapParameters( pd->image, &bmi );
+                        POINTL aptl1[ 4 ] = { { xPos, yPos },
+                                              { xPos + bmi.cx, yPos + bmi.cy },
+                                              { 0, 0 }, { bmi.cx + 1, bmi.cy + 1 } };
+                        if ( pd->mask == NULLHANDLE ) {
+                            WinDrawBitmap( pd->hpsBuffer, pd->image, NULL, aptl1, 0, 0, DBM_NORMAL );
+                        }
+                        else {
+                            GpiWCBitBlt( pd->hpsBuffer, pd->image, 4, aptl1, ROP_SRCPAINT, BBO_IGNORE );
+                        }
+                    }
                 }
+                BlitGraphicsBuffer( hps, pd->hpsBuffer, &rcl );
                 WinEndPaint( hps );
             }
             return (MRESULT)FALSE;
@@ -73,21 +103,15 @@ static MRESULT EXPENTRY PreviewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp
             if ( pd->image != NULLHANDLE ) {
                 GpiDeleteBitmap( pd->image );
             }
+            if ( pd->mask != NULLHANDLE ) {
+                GpiDeleteBitmap( pd->mask );
+            }
             delete pd->text;
+            DestroyGraphicsBuffer( pd->hpsBuffer, pd->hdcBuffer );
             delete pd;
             return (MRESULT)FALSE;
     }
     return pd->oldPvProc( hwnd, msg, mp1, mp2 );
-}
-
-static void previewImageCreate( HWND hwnd )
-{
-    previewData *pd = new previewData;
-    memset( pd, 0, sizeof( previewData ) );
-    pd->oldPvProc = WinSubclassWindow( hwnd, PreviewProc );
-    pd->text = newstrdupL( FDLG_NO_PREVIEW_AVAILABLE );
-    WinSetWindowULong( hwnd, QWL_USER, (ULONG)pd );
-    WinInvalidateRect( hwnd, NULL, FALSE );
 }
 
 static void resizePreview( HWND hwnd )
@@ -101,6 +125,21 @@ static void resizePreview( HWND hwnd )
     LONG xRight = rect.xRight;
     WinQueryWindowRect( hwnd, &rect );
     WinSetWindowPos( hwnd, HWND_TOP, 0, 0, xRight + 8, rect.yTop, SWP_SIZE );
+}
+
+static void previewImageCreate( HWND hwnd )
+{
+    previewData *pd = new previewData;
+    memset( pd, 0, sizeof( previewData ) );
+    RECTL rcl;
+    WinQueryWindowRect( hwnd, &rcl );
+    HPS hps = WinGetPS( hwnd );
+    CreateGraphicsBuffer( hab, &rcl, hps, &pd->hpsBuffer, &pd->hdcBuffer );
+    WinReleasePS( hps );
+    pd->oldPvProc = WinSubclassWindow( hwnd, PreviewProc );
+    pd->text = newstrdupL( FDLG_NO_PREVIEW_AVAILABLE );
+    WinSetWindowULong( hwnd, QWL_USER, (ULONG)pd );
+    WinInvalidateRect( hwnd, NULL, FALSE );
 }
 
 
@@ -287,7 +326,6 @@ static void readGif( HWND hwnd, const char *fn )
             pd->hdc = NULLHANDLE;
         }
     }
-    WinInvalidateRect( hwnd, NULL, FALSE );
 }
 
 static BOOL GetPointerBitmaps( HWND hwnd, PBYTE pchIcon, PBITMAPARRAYFILEHEADER2 pbafh2,
@@ -398,7 +436,8 @@ static BOOL GetPointerBitmaps( HWND hwnd, PBYTE pchIcon, PBITMAPARRAYFILEHEADER2
     return TRUE;
 }
 
-static HBITMAP IconBufferToBitmap( HWND hwnd, PBYTE pchIcon, USHORT usIconSize )
+static BOOL IconBufferToBitmaps( HWND hwnd, PBYTE pchIcon, USHORT usIconSize,
+                                 HBITMAP *clr, HBITMAP *ptr )
 {
     static USHORT usDeviceCX = 0;
     static USHORT usDeviceCY = 0;
@@ -408,10 +447,9 @@ static HBITMAP IconBufferToBitmap( HWND hwnd, PBYTE pchIcon, USHORT usIconSize )
     PBYTE p;
     HPOINTER hptrIcon = NULLHANDLE;
 
-    memset(&PointerInfo, 0, sizeof PointerInfo);
+    memset( &PointerInfo, 0, sizeof PointerInfo );
 
-    if (!usDeviceCX)
-    {
+    if ( !usDeviceCX ) {
         usDeviceCX = WinQuerySysValue(HWND_DESKTOP, SV_CXSCREEN);
         usDeviceCY = WinQuerySysValue(HWND_DESKTOP, SV_CYSCREEN);
     }
@@ -434,10 +472,10 @@ static HBITMAP IconBufferToBitmap( HWND hwnd, PBYTE pchIcon, USHORT usIconSize )
                 fIconFound = TRUE;
             }
             else
-                return NULLHANDLE;
+                return FALSE;
             break;
         default :
-            return NULLHANDLE;
+            return FALSE;
     }
 
     // First see if the icon contains an icon for the current device size.
@@ -496,13 +534,12 @@ static HBITMAP IconBufferToBitmap( HWND hwnd, PBYTE pchIcon, USHORT usIconSize )
     }
 
     if (!fIconFound)
-        return NULLHANDLE;
+        return FALSE;
 
-    if ( PointerInfo.hbmPointer != NULLHANDLE ) {
-        GpiDeleteBitmap(PointerInfo.hbmPointer);
-    }
+    *clr = PointerInfo.hbmColor;
+    *ptr = PointerInfo.hbmPointer;
 
-    return PointerInfo.hbmColor;
+    return TRUE;
 }
 
 static void previewFile( HWND hwnd, const char *fn )
@@ -513,6 +550,10 @@ static void previewFile( HWND hwnd, const char *fn )
         GpiDeleteBitmap( pd->image );
         pd->image = NULLHANDLE;
     }
+    if ( pd->mask != NULLHANDLE ) {
+        GpiDeleteBitmap( pd->mask );
+        pd->mask = NULLHANDLE;
+    }
     if ( pd->hps != NULLHANDLE ) {
         GpiDestroyPS( pd->hps );
         pd->hps = NULLHANDLE;
@@ -521,7 +562,6 @@ static void previewFile( HWND hwnd, const char *fn )
         DevCloseDC( pd->hdc );
         pd->hdc = NULLHANDLE;
     }
-    WinInvalidateRect( hwnd, NULL, FALSE );
 
 
     ULONG ealen = 0;
@@ -552,15 +592,12 @@ static void previewFile( HWND hwnd, const char *fn )
         eadata = getEA( fn, ".ICON", &ealen );
         if ( eadata != NULL )
         {
-            HBITMAP hbm = IconBufferToBitmap( hwnd, (PBYTE)eadata, ealen );
-
-            previewData *pd = (previewData *)WinQueryWindowULong( hwnd, QWL_USER );
-            pd->image = hbm;
-            WinInvalidateRect( hwnd, NULL, FALSE );
-
+            IconBufferToBitmaps( hwnd, (PBYTE)eadata, ealen, &pd->image, &pd->mask );
             free( eadata );
         }
     }
+
+    WinInvalidateRect( hwnd, NULL, FALSE );
 }
 
 
