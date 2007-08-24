@@ -8,7 +8,15 @@
 MENU_DOCUMENT=~Dokument
 MENU_NEW_WINDOW=~Neues Fenster
 MENU_OPEN=~ôffnen...\tStrg+O
+MENU_NEXT_PREVIOUS=NÑchste/~Vorhergehende Datei
+MENU_FIRST=~Erste\tUmschalt+Pos1
+MENU_PREVIOUS=~Vorige\tUmschalt+BildOb.
+MENU_NEXT=~NÑchste\tUmschalt+BildUnt.
+MENU_LAST=~Letzte\tUmschalt+Ende
+MENU_RECENT_FILES=~Wiederholen
+MENU_CLEAR_LIST=~Liste lîschen
 MENU_SAVE_AS=~Sichern unter...
+# MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Seitenein~richtung...
 MENU_PRINT=~Drucken...\tStrg+P
 MENU_PLUGINS_LIST=Plugin-~Liste...
@@ -20,9 +28,9 @@ MENU_FIND=~Suchen...\tStrg+F
 MENU_FINDAGAIN=~Weitersuchen\tStrg+G
 MENU_SETTINGS=~Einstellungen...
 MENU_VIEW=~Anzeige
-MENU_FIT_WINDOW=~Ganze Seite\tCtrl+0
-MENU_ACTUAL_SIZE=~Originalgrî·e\tCtrl+1
-MENU_FIT_WIDTH=Seiten~breite\tCtrl+2
+MENU_FIT_WINDOW=~Ganze Seite
+MENU_ACTUAL_SIZE=~Originalgrî·e
+MENU_FIT_WIDTH=Seiten~breite
 # - unused - MENU_ZOOM_IN_OUT=~Zoom-Modus (grîsser/kleiner)
 MENU_ZOOM_IN=Vergrî·ern\tStrg++
 MENU_ZOOM_OUT=Verkleinern\tStrg+-
@@ -66,7 +74,7 @@ TB_PAGENUM=von %d
 #
 # Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=%APPNAME% - Document Viewer
+MSGS_MAIN_WIN_TITLE=%APPNAME% - Dokumentenanzeige
 MSGS_NO_SUIT_PLUG=Kein passendes Plugin fÅr das Dokument gefunden!
 MSGS_FILE_LOAD_ERROR=Datei kann nicht gelesen werden!
 MSGS_LOADING_DOCUMENT=ôffne Dokument, bitte warten...
@@ -225,4 +233,18 @@ PSW_TITLE=Dokument ist verschlÅsselt!
 PSW_PASSWORD=~Passwort
 PSW_OK=~OK
 PSW_CANCEL=~Abbruch
+
+#
+# Open file dialog
+#
+FDLG_OPEN=ôffnen...
+FDLG_FILENAME=Datei~name
+FDLG_DRIVE=~Laufwerk
+FDLG_FILETYPE=Datei~typ
+FDLG_FILE=~Datei
+FDLG_DIRECTORY=~Verzeichnis
+FDLG_OK=~OK
+FDLG_CANCEL=~Abbruch
+FDLG_NO_PREVIEW_AVAILABLE=Keine Vorschau verfÅgbar
+
 
