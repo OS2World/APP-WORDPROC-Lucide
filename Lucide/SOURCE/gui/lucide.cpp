@@ -42,6 +42,7 @@
 #include <string>
 #include <set>
 #include <stdio.h>
+#include <stdlib.h>
 #include <process.h>
 #include <dos.h>
 
@@ -418,7 +419,8 @@ void Lucide::loadDocument( const char *fn )
         }
         else
         {
-            strcpy( docFullName, fn );
+            _fullpath( docFullName, fn, CCHMAXPATH );
+
             if ( password != NULL ) {
                 delete password;
                 password = NULL;
@@ -450,7 +452,7 @@ void Lucide::loadDocument( const char *fn )
                     char _di[ _MAX_DIR ];
                     char _fn[ _MAX_FNAME ];
                     char _ex[ _MAX_EXT ];
-                    _splitpath( fn, _dr, _di, _fn, _ex );
+                    _splitpath( docFullName, _dr, _di, _fn, _ex );
                     strcpy( docDirName, _dr );
                     strcat( docDirName, _di );
                     strcpy( docFileName, _fn );
@@ -539,6 +541,8 @@ void Lucide::loadDocument( const char *fn )
         } // ( doc == NULL )
     } // ( pluginMan->createDocumentForFile( fn, true ) == NULL )
     delete msg;
+
+    loadFileList();
 }
 
 void Lucide::readMask( const char *mask )
@@ -603,7 +607,6 @@ void Lucide::openDocument()
         PrfWriteProfileString( HINI_USERPROFILE, appName, lvd, buf );
 
         loadDocument( fd->szFullFile );
-        loadFileList();
     }
     delete fd;
 }
