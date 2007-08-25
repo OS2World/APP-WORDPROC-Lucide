@@ -86,6 +86,8 @@ MAKE.CFG: makefile
 -oh
 -xs
 -xr
+-5
+-fp5
 -I..\..\sominc
 -DOS2
 | MAKE.CFG >NUL

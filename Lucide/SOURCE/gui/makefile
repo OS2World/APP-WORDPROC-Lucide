@@ -150,6 +150,8 @@ MAKE.CFG: makefile
 -oh
 -bm
 -sg
+-5
+-fp5
 -DVERSION="$(VERSION)"  
 !if $(TEST)==1
 -D__TEST__

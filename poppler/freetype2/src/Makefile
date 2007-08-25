@@ -2,7 +2,7 @@
 
 CC=wcl386
 
-CFLAGS=-zq -zp=8 -bm -ot -ox -oh -sg -I..\include -DOS2 -DFT2_BUILD_LIBRARY
+CFLAGS=-zq -zp=8 -bm -ot -ox -oh -sg -5 -fp5 -I..\include -DOS2 -DFT2_BUILD_LIBRARY
 
 LIBS=ft2lib.lib
 

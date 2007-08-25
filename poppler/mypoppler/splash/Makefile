@@ -2,7 +2,7 @@
 
 CC=wcl386
 
-CFLAGS=-zq -zp=8 -bm -sg -ot -ox -oh -xs -xr -I.. -I..\..\freetype2\include -DOS2
+CFLAGS=-zq -zp=8 -bm -sg -ot -ox -oh -xs -xr -5 -fp5 -I.. -I..\..\freetype2\include -DOS2
 
 LIBS=libsplash.lib
 

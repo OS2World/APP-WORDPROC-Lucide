@@ -1,7 +1,7 @@
 .autodepend
 
 CC=wpp386
-CFLAGS=-zq -zp=8 -bm -sg -ot -ox -xs -oh -xr -I..\..\freetype2\include -DOS2
+CFLAGS=-zq -zp=8 -bm -sg -ot -ox -xs -oh -xr -5 -fp5 -I..\..\freetype2\include -DOS2
 
 LIBS=libfcos2.lib
 

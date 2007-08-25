@@ -61,6 +61,8 @@ MAKE.CFG: makefile
 -xs
 -xr
 -sg
+-5
+-fp5
 -I..\..\sominc
 -I..\ludoc
 -I..\..\..\..\poppler\mypoppler

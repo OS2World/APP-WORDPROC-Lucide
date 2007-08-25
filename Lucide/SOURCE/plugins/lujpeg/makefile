@@ -60,6 +60,8 @@ MAKE.CFG: makefile
 -oh
 -xs
 -xr
+-5
+-fp5
 -I..\..\sominc
 -I..\ludoc
 -I..\..\..\..\libjpeg
