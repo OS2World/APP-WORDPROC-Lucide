@@ -244,15 +244,21 @@ void Lucide::checkZoomMenus()
     }
 }
 
-void Lucide::checkMenus()
+void Lucide::checkMenus( bool initial )
 {
-    // pre-set "Actual size"
-    setZoomChecks( CM_ACTSIZE, 0, 0 );
+    if ( initial )
+    {
+        // pre-set "Actual size"
+        setZoomChecks( CM_ACTSIZE, 0, 0 );
+    }
 
     if ( doc == NULL )
     {
-        // "single page" mode by default
-        WinCheckMenuItem( hWndMenu, CM_SINGLEPAGE, TRUE );
+        if ( initial )
+        {
+            // "single page" mode by default
+            WinCheckMenuItem( hWndMenu, CM_SINGLEPAGE, TRUE );
+        }
 
         WinEnableMenuItem( hWndMenu, CM_SAVEAS, FALSE );
         WinEnableMenuItem( hWndMenu, CM_PRINT, FALSE );
@@ -337,7 +343,7 @@ void Lucide::setDocument( LuDocument *_doc )
 {
     docViewer->setDocument( _doc );
     indexWin->setDocument( _doc );
-    checkMenus();
+    checkMenus( false );
 }
 
 void Lucide::setPageLayout( PgLayout layout )
@@ -361,6 +367,7 @@ void Lucide::closeDocument()
     delete doc;
     doc = NULL;
     WinSetWindowText( hWndFrame, title );
+    checkMenus( false );
 
     if ( thumbnailData != NULL ) {
         writeThumbnail( docFullName );
@@ -1207,7 +1214,7 @@ extern "C" APIRET APIENTRY LucideMain( int argc, char *argv[] )
     WinSendMsg( hHorizSplitter, SBM_SETFIXEDSIZE,
                 MPFROMSHORT( DEFAULT_PICTSIZE + TOOLBAR_HEIGHT_ADD ), MPVOID );
 
-    Lucide::checkMenus();
+    Lucide::checkMenus( true );
     Lucide::setPageLayout( settings->layout );
     Lucide::setZoom( settings->zoom );
 

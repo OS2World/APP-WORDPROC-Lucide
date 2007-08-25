@@ -285,6 +285,8 @@ void DocumentViewer::close()
     haveLinks   = false;
 
     DosReleaseMutexSem( todrawAccess );
+    
+    WinInvalidateRect( hWndDocFrame, NULL, TRUE );
 }
 
 // sets the page layout

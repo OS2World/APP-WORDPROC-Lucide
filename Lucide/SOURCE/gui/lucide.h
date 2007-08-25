@@ -96,7 +96,7 @@ class Lucide
         static void setDocument( LuDocument *_doc );
         static void checkNavigationMenus();
         static void checkZoomMenus();
-        static void checkMenus();
+        static void checkMenus( bool initial );
         static void checkNavpane();
         static void goToPage( long page );
         static void setZoom( double zoom );
