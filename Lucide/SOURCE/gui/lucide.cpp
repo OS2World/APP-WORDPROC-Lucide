@@ -854,6 +854,12 @@ void Lucide::gotoFile( FileList file )
         return;
     }
 
+    if ( fileListIterator == fileList.end() ) {
+        // If viewed file extension not in supported extensions
+        //   list - fileListIterator will equal fileList.end()
+        fileListIterator = fileList.begin();
+    }
+
     if ( file == ListFirst ) {
         fileListIterator = fileList.begin();
     }
