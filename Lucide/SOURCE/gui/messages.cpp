@@ -130,3 +130,4 @@ const char *PRINT_FAILED                = "PRINT_FAILED";
 
 // Open file dialog
 const char *FDLG_NO_PREVIEW_AVAILABLE = "FDLG_NO_PREVIEW_AVAILABLE";
+const char *FDLG_ALL_SUPPORTED_TYPES  = "FDLG_ALL_SUPPORTED_TYPES";

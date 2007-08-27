@@ -66,6 +66,7 @@ class PluginManager
         LuDocument *createDocumentForFile( const char *file, bool checkOnly );
         LuDocument *createDocumentForExt( const char *ext, bool checkOnly );
         std::string getExtsMask();
+        void getExtsList( std::vector<std::string> *list );
 };
 
 

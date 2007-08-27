@@ -131,6 +131,7 @@ extern const char *PRINT_FAILED;
 
 // Open file dialog
 extern const char *FDLG_NO_PREVIEW_AVAILABLE;
+extern const char *FDLG_ALL_SUPPORTED_TYPES;
 
 
 #endif // __MESSAGES_H

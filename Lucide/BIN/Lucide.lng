@@ -246,3 +246,4 @@ FDLG_DIRECTORY=~Directory
 FDLG_OK=~OK
 FDLG_CANCEL=~Cancel
 FDLG_NO_PREVIEW_AVAILABLE=No preview available
+FDLG_ALL_SUPPORTED_TYPES=<All supported types>

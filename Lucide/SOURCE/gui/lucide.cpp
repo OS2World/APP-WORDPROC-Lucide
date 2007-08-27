@@ -587,15 +587,12 @@ void Lucide::loadFileList()
 
 void Lucide::openDocument()
 {
-    char dirbuf[ CCHMAXPATH ];
     PFILEDLG fd = new FILEDLG;
     memset( fd, 0, sizeof( FILEDLG ) );
     fd->cbSize = sizeof( FILEDLG );
     fd->fl = FDS_CENTER | FDS_OPEN_DIALOG;
     PrfQueryProfileString( HINI_USERPROFILE, appName, lvd, "",
-                           dirbuf, sizeof( dirbuf ) );
-    snprintf( fd->szFullFile, sizeof( fd->szFullFile ),
-              "%s%s", dirbuf, pluginMan->getExtsMask().c_str() );
+                           fd->szFullFile, sizeof( fd->szFullFile ) );
     LcdFileDlg( HWND_DESKTOP, hWndFrame, fd );
     if ( fd->lReturn == DID_OK )
     {

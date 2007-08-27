@@ -314,8 +314,24 @@ std::string PluginManager::getExtsMask()
             cRet += ';';
             p = strtok( NULL, ";" );
         }
+        delete tmpexts;
     }
     return cRet;
+}
+
+void PluginManager::getExtsList( std::vector<std::string> *list )
+{
+    for ( int i = 0; i < plugins->size(); i++ )
+    {
+        PluginInfo *pi = &(*plugins)[ i ];
+        char *tmpexts = newstrdup( pi->extensions.c_str() );
+        char *p = strtok( tmpexts, ";" );
+        while ( p != NULL ) {
+            list->push_back( p );
+            p = strtok( NULL, ";" );
+        }
+        delete tmpexts;
+    }
 }
 
 

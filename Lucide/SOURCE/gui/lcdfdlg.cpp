@@ -9,12 +9,14 @@
 #include <fcntl.h>
 
 #include "globals.h"
+#include "pluginman.h"
 #include "lucide_res.h"
 #include "luutils.h"
 #include "messages.h"
 
 
-static HWND hWndFrame = NULLHANDLE;
+static HWND hWndFrame            = NULLHANDLE;
+static char *szAllSupportedTypes = NULL;
 
 void previewFile( HWND hwnd, const char *fn );
 
@@ -142,9 +144,60 @@ static void previewImageCreate( HWND hwnd )
     WinInvalidateRect( hwnd, NULL, FALSE );
 }
 
+static bool isAllFiles( HWND hwnd )
+{
+    char ftext[ 200 ];
+    WinQueryDlgItemText( hwnd, DID_FILTER_CB, sizeof( ftext ), ftext );
+    return ( strcmp( ftext, szAllSupportedTypes ) != 0 );
+}
+
+static BOOL checkFile( char *file, std::vector<std::string> *extList )
+{
+    BOOL rVal = FALSE;
+    std::vector<std::string>::const_iterator iter;
+    for ( iter = extList->begin(); iter != extList->end(); iter++ )
+    {
+        char ext[ 100 ];
+        ext[0] = '.';
+        ext[1] = 0;
+        strcat( ext, (*iter).c_str() );
+        int flen = strlen( file );
+        int elen = strlen( ext );
+
+        if ( flen < elen ) {
+            continue;
+        }
+
+        char *compare_pos = file + flen - elen;
+        if ( stricmp( compare_pos, ext ) == 0 ) {
+            rVal = TRUE;
+            break;
+        }
+    }
+
+    return rVal;
+}
+
+
+struct LcdFDlgData
+{
+    bool isAllFiles;
+    std::vector<std::string> *extList;
+
+    LcdFDlgData() {
+        isAllFiles = false;
+        extList = new std::vector<std::string>;
+    }
+
+    ~LcdFDlgData() {
+        delete extList;
+    }
+};
 
 static MRESULT EXPENTRY LcdFileDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
+    FILEDLG *pfild = (FILEDLG *)WinQueryWindowULong( hwnd, QWL_USER );
+
     switch ( msg )
     {
         case WM_INITDLG:
@@ -153,28 +206,41 @@ static MRESULT EXPENTRY LcdFileDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM
             localizeDialog( hwnd );
             centerWindow( hWndFrame, hwnd );
             previewImageCreate( WinWindowFromID( hwnd, IDC_PREVIEW ) );
+            SHORT sInx = SHORT1FROMMR( WinSendDlgItemMsg( hwnd, DID_FILTER_CB, LM_SEARCHSTRING,
+                    MPFROM2SHORT( LSS_CASESENSITIVE, 0 ), MPFROMP( szAllSupportedTypes ) ) );
+            WinSendDlgItemMsg( hwnd, DID_FILTER_CB, LM_SELECTITEM,
+                               MPFROMSHORT( sInx ), MPFROMSHORT( TRUE ) );
+
+            ((LcdFDlgData *)pfild->ulUser)->isAllFiles = isAllFiles( hwnd );
         }
         break;
 
+        case FDM_FILTER:
+            if ( ((LcdFDlgData *)pfild->ulUser)->isAllFiles ) {
+                return (MRESULT)TRUE;
+            }
+            else {
+                return (MRESULT)checkFile( (char *)mp1,
+                                           ((LcdFDlgData *)pfild->ulUser)->extList );
+            }
+
         case WM_CONTROL:
         {
-            switch (SHORT1FROMMP(mp1))
+            switch ( SHORT1FROMMP(mp1) )
             {
                 case DID_FILES_LB:
                     if (SHORT2FROMMP(mp1) == LN_SELECT)
                     {
-                        const MRESULT mr = WinDefFileDlgProc(hwnd, msg, mp1, mp2);
+                        const MRESULT mr = WinDefFileDlgProc( hwnd, msg, mp1, mp2 );
 
                         const HWND lbHwnd = HWNDFROMMP(mp2);
                         const LONG index  = WinQueryLboxSelectedItem(lbHwnd);
 
                         char itemText[ CCHMAXPATH ] = { 0 };
 
-
                         if ( index >= 0 )
                         {
                             char fn[ CCHMAXPATH ] = { 0 };
-                            FILEDLG *pfild = (FILEDLG *)WinQueryWindowULong(hwnd, QWL_USER);
                             WinQueryLboxItemText( lbHwnd, (SHORT)index, itemText, CCHMAXPATH );
                             strcpy( fn, pfild->szFullFile );
                             strcat( fn, itemText );
@@ -183,6 +249,10 @@ static MRESULT EXPENTRY LcdFileDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM
 
                         return mr;
                     }
+                    break;
+
+                case DID_FILTER_CB:
+                    ((LcdFDlgData *)pfild->ulUser)->isAllFiles = isAllFiles( hwnd );
                     break;
             }
         }
@@ -197,6 +267,9 @@ static MRESULT EXPENTRY LcdFileDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM
 HWND LcdFileDlg( HWND hwndP, HWND hwndO, FILEDLG *pfild )
 {
     hWndFrame = hwndO;
+    if ( szAllSupportedTypes == NULL ) {
+        szAllSupportedTypes = newstrdupL( FDLG_ALL_SUPPORTED_TYPES );
+    }
 
     pfild->fl |= FDS_CUSTOM;
 
@@ -207,7 +280,17 @@ HWND LcdFileDlg( HWND hwndP, HWND hwndO, FILEDLG *pfild )
     pfild->hMod    = _hmod;
     pfild->usDlgId = IDD_LCD_FILEDLG;
 
-    return WinFileDlg( hwndP, hwndO, pfild );
+    char **apsz;
+    apsz = (char **)malloc( sizeof( char* ) * 2 );
+    apsz[ 0 ] = szAllSupportedTypes;
+    apsz[ 1 ] = NULL;
+    pfild->papszITypeList = (PAPSZ)apsz;
+    pfild->ulUser = (ULONG)new LcdFDlgData;
+    pluginMan->getExtsList( ((LcdFDlgData *)pfild->ulUser)->extList );
+    HWND hDlg = WinFileDlg( hwndP, hwndO, pfild );
+    free( apsz );
+    delete ((LcdFDlgData *)pfild->ulUser);
+    return hDlg;
 }
 
 

@@ -245,3 +245,4 @@ FDLG_OPEN=Открыть
 #FDLG_OK=~OK
 FDLG_CANCEL=Отказ
 FDLG_NO_PREVIEW_AVAILABLE=Предпросмотр недоступен
+FDLG_ALL_SUPPORTED_TYPES=<Все поддерживаемые типы>
