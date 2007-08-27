@@ -6,7 +6,7 @@
   - Menuitems and hotkeys to subsequently load supported files in same
     directory.
   - List of recent files.
-  - Custom file dialog with preview.
+  - Custom file dialog with preview (closed ticket #86).
   - Hotkeys (Ctrl+0/1/2) for predefined zoom levels.
   - UClip package is optional now.
   - Updated NLS-files: German, ...
