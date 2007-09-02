@@ -106,6 +106,7 @@ class DocumentViewer
         BOOL wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmClick( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 );
+		void wmTimer( USHORT idTimer );
         void winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRectangle *r );
         void winPosToDocPos( PageDrawArea *pda, LuRectangle *r );
         void docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl );
@@ -164,6 +165,10 @@ class DocumentViewer
         
         // fullscreen
         bool fullscreen;
+        long secondsNoMouse;
+        bool mouseHidden;
+        SHORT xLastPos;
+        SHORT yLastPos;
         PgLayout pglSave;
         double zoomSave;
 

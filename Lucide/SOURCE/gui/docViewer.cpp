@@ -62,6 +62,7 @@ typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 #define BORDER_COLOR    0x909090L
 #define PAGEBACK_COLOR  0xFFFFFFL
 #define VERT_SPACE      2
+#define NO_MOUSE_TIMER  1
 
 // DocumentViewer constructor
 DocumentViewer::DocumentViewer( HWND hWndFrame )
@@ -105,7 +106,11 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     WinSetRectEmpty( hab, &savedRcl );
     drawPS = false;
     // fullscreen
-    fullscreen = false;
+    fullscreen     = false;
+    secondsNoMouse = 0;
+    mouseHidden    = false;
+    xLastPos       = 0;
+    yLastPos       = 0;
     // asynch draw
     abortAsynch = false;
     termdraw    = false;
@@ -144,6 +149,7 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     hWndVscroll = WinWindowFromID( hWndDocFrame, FID_VERTSCROLL );
 
     drawThreadId = _beginthread( drawthread, NULL, 262144, this );
+    WinStartTimer( hab, hWndDoc, NO_MOUSE_TIMER, 1000 );
 }
 
 // DocumentViewer destructor
@@ -285,7 +291,7 @@ void DocumentViewer::close()
     haveLinks   = false;
 
     DosReleaseMutexSem( todrawAccess );
-    
+
     WinInvalidateRect( hWndDocFrame, NULL, TRUE );
 }
 
@@ -433,6 +439,11 @@ void DocumentViewer::setFullscreen( bool _fullscreen )
     WinSetWindowULong( hWndDocFrame, QWL_STYLE, ulFrameStyle );
     WinSendMsg( hWndDocFrame, WM_UPDATEFRAME,
                 MPFROMLONG( FCF_VERTSCROLL | FCF_HORZSCROLL | FCF_SIZEBORDER ), MPVOID );
+
+    if ( mouseHidden ) {
+        WinShowPointer( HWND_DESKTOP, TRUE );
+        mouseHidden = false;
+    }
 }
 
 // copy selected text to clipboard
@@ -1586,6 +1597,18 @@ void DocumentViewer::scrollToPos( HWND hwnd, HRGN hrgn, LONG xpos, LONG ypos,
 // changes mouse ptr to 'hand' if it moves over link area
 BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
 {
+    if ( ( xpos != xLastPos ) || ( ypos != yLastPos ) ) // only if mouse really moved
+    {
+        secondsNoMouse = 0;
+        if ( fullscreen && mouseHidden )
+        {
+            WinShowPointer( HWND_DESKTOP, TRUE );
+            mouseHidden = false;
+        }
+    }
+    xLastPos = xpos;
+    yLastPos = ypos;
+
     if ( zoomMode )
     {
         HPOINTER ptr = zoomInPtr;
@@ -1889,6 +1912,12 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
         return TRUE;
     }
 
+    // Esc && fullscreen
+    if ( fullscreen && ( fsflags & KC_VIRTUALKEY ) && ( usvk == VK_ESC ) ) {
+        Lucide::toggleFullscreen();
+        return TRUE;
+    }
+
     // +
     if ( ( fsflags & KC_CHAR ) && !( fsflags & KC_KEYUP ) && ( usch == '+' ) ) {
         goToPage( currentpage + 1 );
@@ -2018,6 +2047,21 @@ void DocumentViewer::wmDrop( PDRAGINFO dragInfo )
     Lucide::loadDocument( fpath );
 }
 
+// handles WM_TIMER
+void DocumentViewer::wmTimer( USHORT idTimer )
+{
+    if ( idTimer == NO_MOUSE_TIMER )
+    {
+        secondsNoMouse++;
+
+        if ( fullscreen && !mouseHidden && ( secondsNoMouse > 3 ) )
+        {
+            WinShowPointer( HWND_DESKTOP, FALSE );
+            mouseHidden = true;
+        }
+    }
+}
+
 
 // static, window procedure
 MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
@@ -2103,6 +2147,10 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
             if ( SHORT1FROMMP( mp2 ) ) {
                 Lucide::activeWindow = AwView;
             }
+            break;
+
+        case WM_TIMER:
+            _this->wmTimer( SHORT1FROMMP( mp1 ) );
             break;
     }
 
