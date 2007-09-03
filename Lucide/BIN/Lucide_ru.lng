@@ -211,6 +211,7 @@ PD_PAGE_ORIENTATION=Ориентация страницы
 PD_PORTRAIT=Книжная
 PD_LANDSCAPE=Альбомная
 PD_MARGINS=Отступы (мм)
+PD_IGNORE_PRINTER_MARGINS=Игнорировать отступы принтера
 PD_MLEFT=Слева
 PD_MRIGHT=Справа
 PD_MTOP=Сверху

@@ -447,6 +447,10 @@ void PrintDlg::applyForm( HWND hwnd )
         long margin_bottom_min = pcurForm->yBottomClip;
         long margin_right_min  = pcurForm->cx - pcurForm->xRightClip;
 
+        if ( WinQueryButtonCheckstate( hwnd, IDC_IGNMARGINS ) ) {
+            margin_top_min = margin_left_min = margin_bottom_min = margin_right_min = 0;
+        }
+
         long margin_top_max    = pcurForm->cy - margin_bottom_min;
         long margin_left_max   = pcurForm->cx - margin_right_min;
         long margin_bottom_max = pcurForm->cy - margin_top_min;
@@ -626,6 +630,16 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                 {
                     bool portrait = WinQueryButtonCheckstate( hwnd, IDC_PORTRAIT );
                     _this->setPortraitOrientation( portrait, hwnd );
+                }
+                break;
+
+                case IDC_IGNMARGINS:
+                {
+                    if ( ( SHORT2FROMMP(mp1) == BN_CLICKED ) ||
+                         ( SHORT2FROMMP(mp1) == BN_DBLCLICKED ) )
+                    {
+                        _this->applyForm( hwnd );
+                    }
                 }
                 break;
 

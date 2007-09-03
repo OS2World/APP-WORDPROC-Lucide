@@ -8,7 +8,9 @@
   - List of recent files.
   - Custom file dialog with preview (closed ticket #86).
   - Hotkeys (Ctrl+0/1/2) for predefined zoom levels.
+  - 'Ignore printer margins' option in Print dialog (closed ticket #110).
   - UClip package is optional now.
+  - Small fixes and improvements.
   - Updated NLS-files: German, ...
 
 1.01:

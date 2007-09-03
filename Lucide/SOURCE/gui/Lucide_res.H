@@ -166,11 +166,12 @@
 #define IDC_HIGHER_IMAGE_QUALITY	26
 #define IDC_PORTRAIT		27
 #define IDC_LANDSCAPE		28
-#define IDC_MLEFT			29
-#define IDC_MRIGHT			30
-#define IDC_MTOP			31
-#define IDC_MBOTTOM			32
-#define IDC_SELECTED_FORM	33
+#define IDC_IGNMARGINS		29
+#define IDC_MLEFT			30
+#define IDC_MRIGHT			31
+#define IDC_MTOP			32
+#define IDC_MBOTTOM			33
+#define IDC_SELECTED_FORM	34
 
 #define IDD_PASSWORD        1009
 #define IDC_PASSWORD        10
