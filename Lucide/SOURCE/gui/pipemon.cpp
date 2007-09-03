@@ -49,6 +49,10 @@ static const char *cmPrev       = "$prev";
 static const char *cmNext       = "$next";
 static const char *cmMinimize   = "$minimize";
 static const char *cmFullScreen = "$switchfullscreen";
+static const char *cmRotate     = "$rotate";
+static const char *cmZoomIn     = "$zoomin";
+static const char *cmZoomOut    = "$zoomout";
+static const char *cmZoomOrig   = "$zoomoriginal";
 
 
 static void pipeMonitor( void *p )
@@ -97,6 +101,26 @@ static void pipeMonitor( void *p )
                     else if ( strnicmp( buf, cmFullScreen, strlen( cmFullScreen ) ) == 0 )
                     {
                         WinPostMsg( hWndFrame, WM_COMMAND, MPFROMSHORT( CM_TOFULLSCREEN ),
+                                    MPFROM2SHORT( CMDSRC_OTHER, TRUE ) );
+                    }
+                    else if ( strnicmp( buf, cmRotate, strlen( cmRotate ) ) == 0 )
+                    {
+                        WinPostMsg( hWndFrame, WM_COMMAND, MPFROMSHORT( CM_ROTATE90CW ),
+                                    MPFROM2SHORT( CMDSRC_OTHER, TRUE ) );
+                    }
+                    else if ( strnicmp( buf, cmZoomIn, strlen( cmZoomIn ) ) == 0 )
+                    {
+                        WinPostMsg( hWndFrame, WM_COMMAND, MPFROMSHORT( CM_ZOOM_IN ),
+                                    MPFROM2SHORT( CMDSRC_OTHER, TRUE ) );
+                    }
+                    else if ( strnicmp( buf, cmZoomOut, strlen( cmZoomOut ) ) == 0 )
+                    {
+                        WinPostMsg( hWndFrame, WM_COMMAND, MPFROMSHORT( CM_ZOOM_OUT ),
+                                    MPFROM2SHORT( CMDSRC_OTHER, TRUE ) );
+                    }
+                    else if ( strnicmp( buf, cmZoomOrig, strlen( cmZoomOrig ) ) == 0 )
+                    {
+                        WinPostMsg( hWndFrame, WM_COMMAND, MPFROMSHORT( CM_ACTSIZE ),
                                     MPFROM2SHORT( CMDSRC_OTHER, TRUE ) );
                     }
                 }
