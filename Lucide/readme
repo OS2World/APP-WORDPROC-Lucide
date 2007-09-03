@@ -65,6 +65,10 @@ $prev              - will switch to previous page
 $next              - will switch to next page
 $switchfullscreen  - will switch to fullscreen (even if minimized)
 $minimize          - will mimimize Lucide (even if fullscreen)
+$rotate            - will rotate 90ø CW
+$zoomin            - will zoom in
+$zoomout           - will zoom out
+$zoomoriginal      - will zoom to actual size
 
 This may be useful for presentations with remote control.
 
