@@ -239,13 +239,13 @@ void LucidePrinting::printPagePm( long page, HPS hpsPrinter, PHCINFO pcurForm )
     doc->getPageSize( ev, page, &w, &h );
 
     // Magrins
-    LONG mLeft   = __max( psetup->margin_left, pcurForm->xLeftClip );
-    LONG mBottom = __max( psetup->margin_bottom, pcurForm->yBottomClip );
-    LONG mRight  = __max( psetup->margin_right, pcurForm->cx - pcurForm->xRightClip );
-    LONG mTop    = __max( psetup->margin_top, pcurForm->cy - pcurForm->yTopClip );
+    LONG mLeft   = psetup->margin_left;
+    LONG mBottom = psetup->margin_bottom;
+    LONG mRight  = psetup->margin_right;
+    LONG mTop    = psetup->margin_top;
 
     // Count paper page size in hi-metric
-    LONG pwidth = ( pcurForm->cx - mLeft - mRight ) * UNITS_MULTIPLIER;
+    LONG pwidth = ( pcurForm->cx - psetup->margin_left - mRight ) * UNITS_MULTIPLIER;
     LONG pheight = ( pcurForm->cy - mTop - mBottom ) * UNITS_MULTIPLIER;
 
     double zoom = 1.0;
@@ -273,7 +273,7 @@ void LucidePrinting::printPagePm( long page, HPS hpsPrinter, PHCINFO pcurForm )
     if ( prheight < pheight ) {
         yPos = pheight - prheight;
     }
-    RECTL rclDraw = { mLeft*UNITS_MULTIPLIER, (mBottom*UNITS_MULTIPLIER)+yPos,
+    RECTL rclDraw = { psetup->margin_left*UNITS_MULTIPLIER, (mBottom*UNITS_MULTIPLIER)+yPos,
                       prwidth, prheight+yPos };
 
     LONG rclx = w;
@@ -325,10 +325,10 @@ bool LucidePrinting::doPsPrint( HAB lhab )
     delete generating_ps;
 
     // Magrins
-    LONG mLeft   = __max( psetup->margin_left, curForm.xLeftClip );
-    LONG mBottom = __max( psetup->margin_bottom, curForm.yBottomClip );
-    LONG mRight  = __max( psetup->margin_right, curForm.cx - curForm.xRightClip );
-    LONG mTop    = __max( psetup->margin_top, curForm.cy - curForm.yTopClip );
+    LONG mLeft   = psetup->margin_left;
+    LONG mBottom = psetup->margin_bottom;
+    LONG mRight  = psetup->margin_right;
+    LONG mTop    = psetup->margin_top;
 
     // Count paper page size in 1/72 inches
     double pwidth = ( (double)( curForm.cx - mLeft - mRight ) / 25.4 ) * 72.0;
