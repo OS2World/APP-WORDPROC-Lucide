@@ -1,17 +1,17 @@
-1.10-test:
+1.20:
   - JPG plugin: added support for quality image scaling.  
   - If the filename does not have an extension or the extension is unknown,
     Lucide will check file data to determine a suitable plugin (closed
     ticket #43).
-  - Menuitems and hotkeys to subsequently load supported files in same
-    directory.
-  - List of recent files.
-  - Custom file dialog with preview (closed ticket #86).
-  - Hotkeys (Ctrl+0/1/2) for predefined zoom levels.
-  - 'Ignore printer margins' option in Print dialog (closed ticket #110).
-  - UClip package is optional now.
-  - Small fixes and improvements.
-  - Updated NLS-files: German, ...
+  - Added menuitems and hotkeys to subsequently load supported files in
+    same directory (Menu: Document->Next/Previous, closed ticket #66).
+  - Added list of recent files (Menu: Document->Recent files).
+  - Implemented custom file dialog with preview (closed ticket #86).
+  - Added hotkeys (Ctrl+0/1/2) for predefined zoom levels.
+  - Added 'Ignore printer margins' option in Print dialog (closed ticket #110).
+  - UClip package is optional now (closed ticket #115).
+  - Small fixes and improvements (closed ticket #126).
+  - Updated NLS-file: German.
 
 1.01:
   - DJVU plugin: plugin may eat great amount of memory, fixed.
