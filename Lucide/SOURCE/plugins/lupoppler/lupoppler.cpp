@@ -95,7 +95,7 @@ static LuSignatureCheck lsc  = { 1, &lsl };
 // getSignatureCheck is optional
 extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 {
-	return &lsc;
+    return &lsc;
 }
 
 extern "C" char * EXPENTRY getDescription()
@@ -294,14 +294,14 @@ static void copy_page_to_pixbuf( Environment *ev, SplashBitmap *bitmap, LuPixbuf
     {
         dst = pixbuf_data + i * pixbuf_rowstride;
         src = ((char *)color_ptr) + j * splash_rowstride;
-        //memcpy( dst, src, rowstride );
-        
+        memcpy( dst, src, rowstride );
+
         // source 4 Bpp, dest 3 Bpp
         for ( k = 0, l = 0, m = 0; k < width; k++ ) {
-        	dst[ l++ ] = src[ m++ ];
-        	dst[ l++ ] = src[ m++ ];
-        	dst[ l++ ] = src[ m++ ];
-        	m++;
+            dst[ l++ ] = src[ m++ ];
+            dst[ l++ ] = src[ m++ ];
+            dst[ l++ ] = src[ m++ ];
+            m++;
         }
     }
 
@@ -797,11 +797,10 @@ SOM_Scope boolean SOMLINK exportToPostScript(LuPopplerDocument *somSelf,
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
     PDFDoc *doc = ((PopplerDocument *)somThis->data)->doc;
 
-    PSOutputDev *out = new PSOutputDev( filename, doc->getXRef(), doc->getCatalog(), "",
+    PSOutputDev *out = new PSOutputDev( filename, doc->getXRef(), doc->getCatalog(), NULL,
                                 (first_page <= last_page) ? (first_page + 1) : (last_page + 1),
                                 (first_page <= last_page) ? (last_page + 1) : (first_page + 1),
-                                        psModePS, (int)width, (int)height,
-                                        gFalse, 0, 0, 0, 0, gFalse );
+                                        psModePS, (int)width, (int)height, gFalse );
 
     if ( !out->isOk() ) {
         delete out;
@@ -1338,6 +1337,8 @@ SOM_Scope boolean  SOMLINK getThumbnailSize(LuPopplerDocument *somSelf,
     return retval;
 }
 
+
+// TODO: currently unused, must be fixed as bpp and internal bpp is different
 SOM_Scope LuPixbuf*  SOMLINK getThumbnail(LuPopplerDocument *somSelf,
                                            Environment *ev, long pagenum,
                                           short suggested_width)
