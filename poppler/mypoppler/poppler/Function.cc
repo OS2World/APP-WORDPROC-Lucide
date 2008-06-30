@@ -22,7 +22,10 @@
 #include "Stream.h"
 #include "Error.h"
 #include "Function.h"
-#include "UGooString.h"
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 //------------------------------------------------------------------------
 // Function
@@ -191,10 +194,11 @@ SampledFunction::SampledFunction(Object *funcObj, Dict *dict) {
   Object obj1, obj2;
   Guint buf, bitMask;
   int bits;
-  int s;
+  Guint s;
   int i;
 
   samples = NULL;
+  sBuf = NULL;
   ok = gFalse;
 
   //----- initialize the generic stuff
@@ -205,6 +209,14 @@ SampledFunction::SampledFunction(Object *funcObj, Dict *dict) {
     error(-1, "Type 0 function is missing range");
     goto err1;
   }
+  if (m > sampledFuncMaxInputs) {
+    error(-1, "Sampled functions with more than %d inputs are unsupported",
+	  sampledFuncMaxInputs);
+    goto err1;
+  }
+
+  //----- buffer
+  sBuf = (double *)gmallocn(1 << m, sizeof(double));
 
   //----- get the stream
   if (!funcObj->isStream()) {
@@ -240,7 +252,7 @@ SampledFunction::SampledFunction(Object *funcObj, Dict *dict) {
     goto err2;
   }
   sampleBits = obj1.getInt();
-  sampleMul = 1.0 / (double)((1 << sampleBits) - 1);
+  sampleMul = 1.0 / (pow(2.0, (double)sampleBits) - 1);
   obj1.free();
 
   //----- Encode
@@ -348,12 +360,16 @@ SampledFunction::~SampledFunction() {
   if (samples) {
     gfree(samples);
   }
+  if (sBuf) {
+    gfree(sBuf);
+  }
 }
 
 SampledFunction::SampledFunction(SampledFunction *func) {
   memcpy(this, func, sizeof(SampledFunction));
   samples = (double *)gmallocn(nSamples, sizeof(double));
   memcpy(samples, func->samples, nSamples * sizeof(double));
+  sBuf = (double *)gmallocn(1 << m, sizeof(double));
 }
 
 void SampledFunction::transform(double *in, double *out) {
@@ -361,7 +377,6 @@ void SampledFunction::transform(double *in, double *out) {
   int e[funcMaxInputs][2];
   double efrac0[funcMaxInputs];
   double efrac1[funcMaxInputs];
-  double s[1 << funcMaxInputs];
   int i, j, k, idx, t;
 
   // map input values into sample array
@@ -390,18 +405,18 @@ void SampledFunction::transform(double *in, double *out) {
       for (k = 0, t = j; k < m; ++k, t >>= 1) {
 	idx += idxMul[k] * (e[k][t & 1]);
       }
-      if (idx >= 0 && idx < nSamples) s[j] = samples[idx];
+      sBuf[j] = samples[idx];
     }
 
     // do m sets of interpolations
     for (j = 0, t = (1<<m); j < m; ++j, t >>= 1) {
       for (k = 0; k < t; k += 2) {
-	s[k >> 1] = efrac0[j] * s[k] + efrac1[j] * s[k+1];
+	sBuf[k >> 1] = efrac0[j] * sBuf[k] + efrac1[j] * sBuf[k+1];
       }
     }
 
     // map output value to range
-    out[i] = s[0] * (decode[i][1] - decode[i][0]) + decode[i][0];
+    out[i] = sBuf[0] * (decode[i][1] - decode[i][0]) + decode[i][0];
     if (out[i] < range[i][0]) {
       out[i] = range[i][0];
     } else if (out[i] > range[i][1]) {
@@ -541,6 +556,7 @@ StitchingFunction::StitchingFunction(Object *funcObj, Dict *dict) {
   funcs = NULL;
   bounds = NULL;
   encode = NULL;
+  scale = NULL;
 
   //----- initialize the generic stuff
   if (!init(dict)) {
@@ -560,6 +576,7 @@ StitchingFunction::StitchingFunction(Object *funcObj, Dict *dict) {
   funcs = (Function **)gmallocn(k, sizeof(Function *));
   bounds = (double *)gmallocn(k + 1, sizeof(double));
   encode = (double *)gmallocn(2 * k, sizeof(double));
+  scale = (double *)gmallocn(k, sizeof(double));
   for (i = 0; i < k; ++i) {
     funcs[i] = NULL;
   }
@@ -610,6 +627,17 @@ StitchingFunction::StitchingFunction(Object *funcObj, Dict *dict) {
   }
   obj1.free();
 
+  //----- pre-compute the scale factors
+  for (i = 0; i < k; ++i) {
+    if (bounds[i] == bounds[i+1]) {
+      // avoid a divide-by-zero -- in this situation, function i will
+      // never be used anyway
+      scale[i] = 0;
+    } else {
+      scale[i] = (encode[2*i+1] - encode[2*i]) / (bounds[i+1] - bounds[i]);
+    }
+  }
+
   ok = gTrue;
   return;
 
@@ -631,6 +659,8 @@ StitchingFunction::StitchingFunction(StitchingFunction *func) {
   memcpy(bounds, func->bounds, (k + 1) * sizeof(double));
   encode = (double *)gmallocn(2 * k, sizeof(double));
   memcpy(encode, func->encode, 2 * k * sizeof(double));
+  scale = (double *)gmallocn(k, sizeof(double));
+  memcpy(scale, func->scale, k * sizeof(double));
   ok = gTrue;
 }
 
@@ -647,6 +677,7 @@ StitchingFunction::~StitchingFunction() {
   gfree(funcs);
   gfree(bounds);
   gfree(encode);
+  gfree(scale);
 }
 
 void StitchingFunction::transform(double *in, double *out) {
@@ -665,8 +696,7 @@ void StitchingFunction::transform(double *in, double *out) {
       break;
     }
   }
-  x = encode[2*i] + ((x - bounds[i]) / (bounds[i+1] - bounds[i])) *
-                    (encode[2*i+1] - encode[2*i]);
+  x = encode[2*i] + (x - bounds[i]) * scale[i];
   funcs[i]->transform(&x, out);
 }
 
@@ -978,6 +1008,7 @@ PostScriptFunction::PostScriptFunction(Object *funcObj, Dict *dict) {
   GooString *tok;
 
   code = NULL;
+  codeString = NULL;
   codeSize = 0;
   ok = gFalse;
 
@@ -1181,14 +1212,25 @@ GBool PostScriptFunction::parseCode(Stream *str, int *codePtr) {
 GooString *PostScriptFunction::getToken(Stream *str) {
   GooString *s;
   int c;
+  GBool comment;
 
   s = new GooString();
-  do {
-    c = str->getChar();
-    if (c != EOF) {
-      codeString->append(c);
+  comment = gFalse;
+  while (1) {
+    if ((c = str->getChar()) == EOF) {
+      break;
     }
-  } while (c != EOF && isspace(c));
+    codeString->append(c);
+    if (comment) {
+      if (c == '\x0a' || c == '\x0d') {
+	comment = gFalse;
+      }
+    } else if (c == '%') {
+      comment = gTrue;
+    } else if (!isspace(c)) {
+      break;
+    }
+  }
   if (c == '{' || c == '}') {
     s->append((char)c);
   } else if (isdigit(c) || c == '.' || c == '-') {
@@ -1224,7 +1266,7 @@ void PostScriptFunction::resizeCode(int newSize) {
 
 void PostScriptFunction::exec(PSStack *stack, int codePtr) {
   int i1, i2;
-  double r1, r2;
+  double r1, r2, result;
   GBool b1, b2;
 
   while (1) {
@@ -1269,7 +1311,9 @@ void PostScriptFunction::exec(PSStack *stack, int codePtr) {
       case psOpAtan:
 	r2 = stack->popNum();
 	r1 = stack->popNum();
-	stack->pushReal(atan2(r1, r2));
+	result = atan2(r1, r2) * 180.0 / M_PI;
+	if (result < 0) result += 360.0;
+	stack->pushReal(result);
 	break;
       case psOpBitshift:
 	i2 = stack->popInt();
@@ -1291,7 +1335,7 @@ void PostScriptFunction::exec(PSStack *stack, int codePtr) {
 	stack->copy(stack->popInt());
 	break;
       case psOpCos:
-	stack->pushReal(cos(stack->popNum()));
+	stack->pushReal(cos(stack->popNum() * M_PI / 180.0));
 	break;
       case psOpCvi:
 	if (!stack->topIsInt()) {
@@ -1472,7 +1516,7 @@ void PostScriptFunction::exec(PSStack *stack, int codePtr) {
 	}
 	break;
       case psOpSin:
-	stack->pushReal(sin(stack->popNum()));
+	stack->pushReal(sin(stack->popNum() * M_PI / 180.0));
 	break;
       case psOpSqrt:
 	stack->pushReal(sqrt(stack->popNum()));

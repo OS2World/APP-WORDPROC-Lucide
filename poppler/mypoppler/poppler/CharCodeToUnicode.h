@@ -19,7 +19,7 @@
 #include "CharTypes.h"
 
 #if MULTITHREADED
-#include <goo/GooMutex.h>
+#include "goo/GooMutex.h"
 #endif
 
 struct CharCodeToUnicodeString;
@@ -27,6 +27,7 @@ struct CharCodeToUnicodeString;
 //------------------------------------------------------------------------
 
 class CharCodeToUnicode {
+friend class UnicodeToCharCode;
 public:
 
   // Read the CID-to-Unicode mapping for <collection> from the file
@@ -47,6 +48,7 @@ public:
 
   // Parse a ToUnicode CMap for an 8- or 16-bit font.
   static CharCodeToUnicode *parseCMap(GooString *buf, int nBits);
+  static CharCodeToUnicode *parseCMapFromFile(GooString *fileName, int nBits);
 
   // Parse a ToUnicode CMap for an 8- or 16-bit font, merging it into
   // <this>.
@@ -64,7 +66,9 @@ public:
   void setMapping(CharCode c, Unicode *u, int len);
 
   // Map a CharCode to Unicode.
-  int mapToUnicode(CharCode c, Unicode *u, int size);
+  int mapToUnicode(CharCode c, Unicode **u);
+
+  int mapToCharCode(Unicode* u, CharCode *c, int usize);
 
   // Return the mapping's length, i.e., one more than the max char
   // code supported by the mapping.

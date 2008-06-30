@@ -1,3 +1,6 @@
+1.XX:
+  - PDF plugin: Poppler (pdf rendering) library updated to version 0.8.3.
+
 1.20:
   - JPG plugin: added support for quality image scaling.  
   - If the filename does not have an extension or the extension is unknown,

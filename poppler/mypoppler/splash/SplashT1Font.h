@@ -24,18 +24,19 @@ class SplashT1FontFile;
 class SplashT1Font: public SplashFont {
 public:
 
-  SplashT1Font(SplashT1FontFile *fontFileA, SplashCoord *matA);
+  SplashT1Font(SplashT1FontFile *fontFileA, SplashCoord *matA,
+	       SplashCoord *textMatA);
 
   virtual ~SplashT1Font();
 
   // Munge xFrac and yFrac before calling SplashFont::getGlyph.
   virtual GBool getGlyph(int c, int xFrac, int yFrac,
-			 SplashGlyphBitmap *bitmap);
+			 SplashGlyphBitmap *bitmap, int x0, int y0, SplashClip *clip, SplashClipResult *clipRes);
 
   // Rasterize a glyph.  The <xFrac> and <yFrac> values are the same
   // as described for getGlyph.
   virtual GBool makeGlyph(int c, int xFrac, int yFrac,
-			  SplashGlyphBitmap *bitmap);
+			  SplashGlyphBitmap *bitmap, int x0, int y0, SplashClip *clip, SplashClipResult *clipRes);
 
   // Return the path for a glyph.
   virtual SplashPath *getGlyphPath(int c);
@@ -43,7 +44,10 @@ public:
 private:
 
   int t1libID;			// t1lib font ID
+  int outlineID;		// t1lib font ID for glyph outlines
   float size;
+  float outlineSize;		// size for glyph outlines
+  float outlineMul;
 };
 
 #endif // HAVE_T1LIB_H

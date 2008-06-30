@@ -50,6 +50,7 @@ static char specialChars[256] = {
 Lexer::Lexer(XRef *xrefA, Stream *str) {
   Object obj;
 
+  lookCharLastValueCached = LOOK_VALUE_NOT_CACHED;
   xref = xrefA;
 
   curStr.initStream(str);
@@ -63,6 +64,7 @@ Lexer::Lexer(XRef *xrefA, Stream *str) {
 Lexer::Lexer(XRef *xrefA, Object *obj) {
   Object obj2;
 
+  lookCharLastValueCached = LOOK_VALUE_NOT_CACHED;
   xref = xrefA;
 
   if (obj->isStream()) {
@@ -90,27 +92,44 @@ Lexer::~Lexer() {
   }
 }
 
-int Lexer::getChar() {
+int Lexer::getChar(GBool comesFromLook) {
   int c;
+
+  if (LOOK_VALUE_NOT_CACHED != lookCharLastValueCached) {
+    c = lookCharLastValueCached;
+    lookCharLastValueCached = LOOK_VALUE_NOT_CACHED;
+    return c;
+  }
 
   c = EOF;
   while (!curStr.isNone() && (c = curStr.streamGetChar()) == EOF) {
-    curStr.streamClose();
-    curStr.free();
-    ++strPtr;
-    if (strPtr < streams->getLength()) {
-      streams->get(strPtr, &curStr);
-      curStr.streamReset();
+    if (comesFromLook == gTrue) {
+      return EOF;
+    } else {
+      curStr.streamClose();
+      curStr.free();
+      ++strPtr;
+      if (strPtr < streams->getLength()) {
+        streams->get(strPtr, &curStr);
+        curStr.streamReset();
+      }
     }
   }
   return c;
 }
 
 int Lexer::lookChar() {
-  if (curStr.isNone()) {
-    return EOF;
+  
+  if (LOOK_VALUE_NOT_CACHED != lookCharLastValueCached) {
+    return lookCharLastValueCached;
   }
-  return curStr.streamLookChar();
+  lookCharLastValueCached = getChar(gTrue);
+  if (lookCharLastValueCached == EOF) {
+    lookCharLastValueCached = LOOK_VALUE_NOT_CACHED;
+    return EOF;
+  } else {
+    return lookCharLastValueCached;
+  }
 }
 
 Object *Lexer::getObj(Object *obj, int objNum) {
@@ -298,13 +317,15 @@ Object *Lexer::getObj(Object *obj, int objNum) {
 	  n = 0;
 	  
 	  // we are growing see if the document is not malformed and we are growing too much
-	  if (objNum != -1)
+	  if (objNum > 0 && xref != NULL)
 	  {
-	    int newObjNum = xref->getNumEntry(getPos());
+	    int newObjNum = xref->getNumEntry(curStr.streamGetPos());
 	    if (newObjNum != objNum)
 	    {
 	      error(getPos(), "Unterminated string");
 	      done = gTrue;
+	      delete s;
+	      n = -2;
 	    }
 	  }
 	}
@@ -312,17 +333,22 @@ Object *Lexer::getObj(Object *obj, int objNum) {
 	++n;
       }
     } while (!done);
-    if (!s)
-      s = new GooString(tokBuf, n);
-    else
-      s->append(tokBuf, n);
-    obj->initString(s);
+    if (n >= 0) {
+      if (!s)
+        s = new GooString(tokBuf, n);
+      else
+        s->append(tokBuf, n);
+      obj->initString(s);
+    } else {
+      obj->initEOF();
+    }
     break;
 
   // name
   case '/':
     p = tokBuf;
     n = 0;
+    s = NULL;
     while ((c = lookChar()) != EOF && !specialChars[c]) {
       getChar();
       if (c == '#') {
@@ -350,14 +376,30 @@ Object *Lexer::getObj(Object *obj, int objNum) {
 	}
       }
      notEscChar:
-      if (++n == tokBufSize) {
-	error(getPos(), "Name token too long");
-	break;
+      if (n == tokBufSize) {
+	if (!s)
+	{
+	  error(getPos(), "Warning: name token is longer than what the specification says it can be");
+	  s = new GooString(tokBuf, tokBufSize);
+	}
+	else
+	{
+	  // the spec says 127 is the maximum, we are already at 256 so bail out
+	  error(getPos(), "Name token too long");
+	  break;
+	}
+	p = tokBuf;
+	n = 0;
       }
       *p++ = c;
+      ++n;
     }
     *p = '\0';
-    obj->initName(tokBuf);
+    if (s) {
+      s->append(tokBuf, n);
+      obj->initName(s->getCString());
+      delete s;
+    } else obj->initName(tokBuf);
     break;
 
   // array punctuation

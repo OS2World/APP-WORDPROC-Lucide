@@ -18,190 +18,594 @@
 #include <stddef.h>
 #include <string.h>
 #include <ctype.h>
-#include "gtypes.h"
+#include <assert.h>
+#include <math.h>
+#include "gmem.h"
 #include "GooString.h"
 
-static inline int size(int len) {
-  int delta;
+//------------------------------------------------------------------------
 
+union GooStringFormatArg {
+  int i;
+  Guint ui;
+  long l;
+  Gulong ul;
+  double f;
+  char c;
+  char *s;
+  GooString *gs;
+};
+
+enum GooStringFormatType {
+  fmtIntDecimal,
+  fmtIntHex,
+  fmtIntOctal,
+  fmtIntBinary,
+  fmtUIntDecimal,
+  fmtUIntHex,
+  fmtUIntOctal,
+  fmtUIntBinary,
+  fmtLongDecimal,
+  fmtLongHex,
+  fmtLongOctal,
+  fmtLongBinary,
+  fmtULongDecimal,
+  fmtULongHex,
+  fmtULongOctal,
+  fmtULongBinary,
+  fmtDouble,
+  fmtDoubleTrim,
+  fmtChar,
+  fmtString,
+  fmtGooString,
+  fmtSpace
+};
+
+static char *formatStrings[] = {
+  "d", "x", "o", "b", "ud", "ux", "uo", "ub",
+  "ld", "lx", "lo", "lb", "uld", "ulx", "ulo", "ulb",
+  "f", "g",
+  "c",
+  "s",
+  "t",
+  "w",
+  NULL
+};
+
+//------------------------------------------------------------------------
+
+int inline GooString::roundedSize(int len) {
+  int delta;
+  if (len <= STR_STATIC_SIZE-1)
+      return STR_STATIC_SIZE;
   delta = len < 256 ? 7 : 255;
   return ((len + 1) + delta) & ~delta;
 }
 
-inline void GooString::resize(int length1) {
-  char *s1;
+// Make sure that the buffer is big enough to contain <newLength> characters
+// plus terminating 0.
+// We assume that if this is being called from the constructor, <s> was set
+// to NULL and <length> was set to 0 to indicate unused string before calling us.
+void inline GooString::resize(int newLength) {
+  char *s1 = s;
 
-  if (!s) {
-    s = new char[size(length1)];
-  } else if (size(length1) != size(length)) {
-    s1 = new char[size(length1)];
-    if (length1 < length) {
-      memcpy(s1, s, length1);
-      s1[length1] = '\0';
+  if (!s || (roundedSize(length) != roundedSize(newLength))) {
+    // requires re-allocating data for string
+    if (newLength < STR_STATIC_SIZE) {
+      s1 = sStatic;
     } else {
-      memcpy(s1, s, length + 1);
+      // allocate a rounded amount
+      if (s == sStatic)
+	s1 = (char*)gmalloc(roundedSize(newLength));
+      else
+	s1 = (char*)grealloc(s, roundedSize(newLength));
     }
-    delete[] s;
-    s = s1;
+    if (s == sStatic || s1 == sStatic) {
+      // copy the minimum, we only need to if are moving to or
+      // from sStatic.
+      // assert(s != s1) the roundedSize condition ensures this
+      if (newLength < length) {
+	memcpy(s1, s, newLength);
+      } else {
+	memcpy(s1, s, length);
+      }
+    }
+
   }
+
+  s = s1;
+  length = newLength;
+  s[length] = '\0';
+}
+
+GooString* GooString::Set(const char *s1, int s1Len, const char *s2, int s2Len)
+{
+    int newLen = 0;
+    char *p;
+
+    if (s1) {
+        if (CALC_STRING_LEN == s1Len) {
+            s1Len = strlen(s1);
+        } else
+            assert(s1Len >= 0);
+        newLen += s1Len;
+    }
+
+    if (s2) {
+        if (CALC_STRING_LEN == s2Len) {
+            s2Len = strlen(s2);
+        } else
+            assert(s2Len >= 0);
+        newLen += s2Len;
+    }
+
+    resize(newLen);
+    p = s;
+    if (s1) {
+        memcpy(p, s1, s1Len);
+        p += s1Len;
+    }
+    if (s2) {
+        memcpy(p, s2, s2Len);
+        p += s2Len;
+    }
+    return this;
 }
 
 GooString::GooString() {
   s = NULL;
-  resize(length = 0);
-  s[0] = '\0';
+  length = 0;
+  Set(NULL);
 }
 
 GooString::GooString(const char *sA) {
-  int n = strlen(sA);
-
   s = NULL;
-  resize(length = n);
-  memcpy(s, sA, n + 1);
+  length = 0;
+  Set(sA, CALC_STRING_LEN);
 }
 
 GooString::GooString(const char *sA, int lengthA) {
   s = NULL;
-  resize(length = lengthA);
-  memcpy(s, sA, length * sizeof(char));
-  s[length] = '\0';
+  length = 0;
+  Set(sA, lengthA);
 }
 
 GooString::GooString(GooString *str, int idx, int lengthA) {
   s = NULL;
-  resize(length = lengthA);
-  memcpy(s, str->getCString() + idx, length);
-  s[length] = '\0';
+  length = 0;
+  assert(idx + lengthA <= str->length);
+  Set(str->getCString() + idx, lengthA);
 }
 
 GooString::GooString(GooString *str) {
   s = NULL;
-  resize(length = str->getLength());
-  memcpy(s, str->getCString(), length + 1);
+  length = 0;
+  Set(str->getCString(), str->length);
 }
 
 GooString::GooString(GooString *str1, GooString *str2) {
-  int n1 = str1->getLength();
-  int n2 = str2->getLength();
-
   s = NULL;
-  resize(length = n1 + n2);
-  memcpy(s, str1->getCString(), n1);
-  memcpy(s + n1, str2->getCString(), n2 + 1);
+  length = 0;
+  Set(str1->getCString(), str1->length, str2->getCString(), str2->length);
 }
 
 GooString *GooString::fromInt(int x) {
   char buf[24]; // enough space for 64-bit ints plus a little extra
-  GBool neg;
-  Guint y;
-  int i;
+  char *p;
+  int len;
+  formatInt(x, buf, sizeof(buf), gFalse, 0, 10, &p, &len);
+  return new GooString(p, len);
+}
 
-  i = 24;
-  if (x == 0) {
-    buf[--i] = '0';
-  } else {
-    if ((neg = x < 0)) {
-      y = (Guint)-x;
-    } else {
-      y = (Guint)x;
-    }
-    while (i > 0 && y > 0) {
-      buf[--i] = '0' + y % 10;
-      y /= 10;
-    }
-    if (neg && i > 0) {
-      buf[--i] = '-';
-    }
-  }
-  return new GooString(buf + i, 24 - i);
+GooString *GooString::format(char *fmt, ...) {
+  va_list argList;
+  GooString *s;
+
+  s = new GooString();
+  va_start(argList, fmt);
+  s->appendfv(fmt, argList);
+  va_end(argList);
+  return s;
+}
+
+GooString *GooString::formatv(char *fmt, va_list argList) {
+  GooString *s;
+
+  s = new GooString();
+  s->appendfv(fmt, argList);
+  return s;
 }
 
 GooString::~GooString() {
-  delete[] s;
+  if (s != sStatic)
+    free(s);
 }
 
 GooString *GooString::clear() {
-  s[length = 0] = '\0';
   resize(0);
   return this;
 }
 
 GooString *GooString::append(char c) {
-  resize(length + 1);
-  s[length++] = c;
-  s[length] = '\0';
-  return this;
+  return append((const char*)&c, 1);
 }
 
 GooString *GooString::append(GooString *str) {
-  int n = str->getLength();
-
-  resize(length + n);
-  memcpy(s + length, str->getCString(), n + 1);
-  length += n;
-  return this;
-}
-
-GooString *GooString::append(const char *str) {
-  int n = strlen(str);
-
-  resize(length + n);
-  memcpy(s + length, str, n + 1);
-  length += n;
-  return this;
+  return append(str->getCString(), str->getLength());
 }
 
 GooString *GooString::append(const char *str, int lengthA) {
+  int prevLen = length;
+  if (CALC_STRING_LEN == lengthA)
+    lengthA = strlen(str);
   resize(length + lengthA);
-  memcpy(s + length, str, lengthA);
-  length += lengthA;
-  s[length] = '\0';
+  memcpy(s + prevLen, str, lengthA);
   return this;
+}
+
+GooString *GooString::appendf(char *fmt, ...) {
+  va_list argList;
+
+  va_start(argList, fmt);
+  appendfv(fmt, argList);
+  va_end(argList);
+  return this;
+}
+
+GooString *GooString::appendfv(char *fmt, va_list argList) {
+  GooStringFormatArg *args;
+  int argsLen, argsSize;
+  GooStringFormatArg arg;
+  int idx, width, prec;
+  GBool reverseAlign, zeroFill;
+  GooStringFormatType ft;
+  char buf[65];
+  int len, i;
+  char *p0, *p1, *str;
+
+  argsLen = 0;
+  argsSize = 8;
+  args = (GooStringFormatArg *)gmallocn(argsSize, sizeof(GooStringFormatArg));
+
+  p0 = fmt;
+  while (*p0) {
+    if (*p0 == '{') {
+      ++p0;
+      if (*p0 == '{') {
+	++p0;
+	append('{');
+      } else {
+
+	// parse the format string
+	if (!(*p0 >= '0' && *p0 <= '9')) {
+	  break;
+	}
+	idx = *p0 - '0';
+	for (++p0; *p0 >= '0' && *p0 <= '9'; ++p0) {
+	  idx = 10 * idx + (*p0 - '0');
+	}
+	if (*p0 != ':') {
+	  break;
+	}
+	++p0;
+	if (*p0 == '-') {
+	  reverseAlign = gTrue;
+	  ++p0;
+	} else {
+	  reverseAlign = gFalse;
+	}
+	width = 0;
+	zeroFill = *p0 == '0';
+	for (; *p0 >= '0' && *p0 <= '9'; ++p0) {
+	  width = 10 * width + (*p0 - '0');
+	}
+	if (*p0 == '.') {
+	  ++p0;
+	  prec = 0;
+	  for (; *p0 >= '0' && *p0 <= '9'; ++p0) {
+	    prec = 10 * prec + (*p0 - '0');
+	  }
+	} else {
+	  prec = 0;
+	}
+	for (ft = (GooStringFormatType)0;
+	     formatStrings[ft];
+	     ft = (GooStringFormatType)(ft + 1)) {
+	  if (!strncmp(p0, formatStrings[ft], strlen(formatStrings[ft]))) {
+	    break;
+	  }
+	}
+	if (!formatStrings[ft]) {
+	  break;
+	}
+	p0 += strlen(formatStrings[ft]);
+	if (*p0 != '}') {
+	  break;
+	}
+	++p0;
+
+	// fetch the argument
+	if (idx > argsLen) {
+	  break;
+	}
+	if (idx == argsLen) {
+	  if (argsLen == argsSize) {
+	    argsSize *= 2;
+	    args = (GooStringFormatArg *)greallocn(args, argsSize,
+						 sizeof(GooStringFormatArg));
+	  }
+	  switch (ft) {
+	  case fmtIntDecimal:
+	  case fmtIntHex:
+	  case fmtIntOctal:
+	  case fmtIntBinary:
+	  case fmtSpace:
+	    args[argsLen].i = va_arg(argList, int);
+	    break;
+	  case fmtUIntDecimal:
+	  case fmtUIntHex:
+	  case fmtUIntOctal:
+	  case fmtUIntBinary:
+	    args[argsLen].ui = va_arg(argList, Guint);
+	    break;
+	  case fmtLongDecimal:
+	  case fmtLongHex:
+	  case fmtLongOctal:
+	  case fmtLongBinary:
+	    args[argsLen].l = va_arg(argList, long);
+	    break;
+	  case fmtULongDecimal:
+	  case fmtULongHex:
+	  case fmtULongOctal:
+	  case fmtULongBinary:
+	    args[argsLen].ul = va_arg(argList, Gulong);
+	    break;
+	  case fmtDouble:
+	  case fmtDoubleTrim:
+	    args[argsLen].f = va_arg(argList, double);
+	    break;
+	  case fmtChar:
+	    args[argsLen].c = (char)va_arg(argList, int);
+	    break;
+	  case fmtString:
+	    args[argsLen].s = va_arg(argList, char *);
+	    break;
+	  case fmtGooString:
+	    args[argsLen].gs = va_arg(argList, GooString *);
+	    break;
+	  }
+	  ++argsLen;
+	}
+
+	// format the argument
+	arg = args[idx];
+	switch (ft) {
+	case fmtIntDecimal:
+	  formatInt(arg.i, buf, sizeof(buf), zeroFill, width, 10, &str, &len);
+	  break;
+	case fmtIntHex:
+	  formatInt(arg.i, buf, sizeof(buf), zeroFill, width, 16, &str, &len);
+	  break;
+	case fmtIntOctal:
+	  formatInt(arg.i, buf, sizeof(buf), zeroFill, width, 8, &str, &len);
+	  break;
+	case fmtIntBinary:
+	  formatInt(arg.i, buf, sizeof(buf), zeroFill, width, 2, &str, &len);
+	  break;
+	case fmtUIntDecimal:
+	  formatUInt(arg.ui, buf, sizeof(buf), zeroFill, width, 10,
+		     &str, &len);
+	  break;
+	case fmtUIntHex:
+	  formatUInt(arg.ui, buf, sizeof(buf), zeroFill, width, 16,
+		     &str, &len);
+	  break;
+	case fmtUIntOctal:
+	  formatUInt(arg.ui, buf, sizeof(buf), zeroFill, width, 8, &str, &len);
+	  break;
+	case fmtUIntBinary:
+	  formatUInt(arg.ui, buf, sizeof(buf), zeroFill, width, 2, &str, &len);
+	  break;
+	case fmtLongDecimal:
+	  formatInt(arg.l, buf, sizeof(buf), zeroFill, width, 10, &str, &len);
+	  break;
+	case fmtLongHex:
+	  formatInt(arg.l, buf, sizeof(buf), zeroFill, width, 16, &str, &len);
+	  break;
+	case fmtLongOctal:
+	  formatInt(arg.l, buf, sizeof(buf), zeroFill, width, 8, &str, &len);
+	  break;
+	case fmtLongBinary:
+	  formatInt(arg.l, buf, sizeof(buf), zeroFill, width, 2, &str, &len);
+	  break;
+	case fmtULongDecimal:
+	  formatUInt(arg.ul, buf, sizeof(buf), zeroFill, width, 10,
+		     &str, &len);
+	  break;
+	case fmtULongHex:
+	  formatUInt(arg.ul, buf, sizeof(buf), zeroFill, width, 16,
+		     &str, &len);
+	  break;
+	case fmtULongOctal:
+	  formatUInt(arg.ul, buf, sizeof(buf), zeroFill, width, 8, &str, &len);
+	  break;
+	case fmtULongBinary:
+	  formatUInt(arg.ul, buf, sizeof(buf), zeroFill, width, 2, &str, &len);
+	  break;
+	case fmtDouble:
+	  formatDouble(arg.f, buf, sizeof(buf), prec, gFalse, &str, &len);
+	  break;
+	case fmtDoubleTrim:
+	  formatDouble(arg.f, buf, sizeof(buf), prec, gTrue, &str, &len);
+	  break;
+	case fmtChar:
+	  buf[0] = arg.c;
+	  str = buf;
+	  len = 1;
+	  reverseAlign = !reverseAlign;
+	  break;
+	case fmtString:
+	  str = arg.s;
+	  len = strlen(str);
+	  reverseAlign = !reverseAlign;
+	  break;
+	case fmtGooString:
+	  str = arg.gs->getCString();
+	  len = arg.gs->getLength();
+	  reverseAlign = !reverseAlign;
+	  break;
+	case fmtSpace:
+	  str = buf;
+	  len = 0;
+	  width = arg.i;
+	  break;
+	}
+
+	// append the formatted arg, handling width and alignment
+	if (!reverseAlign && len < width) {
+	  for (i = len; i < width; ++i) {
+	    append(' ');
+	  }
+	}
+	append(str, len);
+	if (reverseAlign && len < width) {
+	  for (i = len; i < width; ++i) {
+	    append(' ');
+	  }
+	}
+      }
+
+    } else if (*p0 == '}') {
+      ++p0;
+      if (*p0 == '}') {
+	++p0;
+      }
+      append('}');
+      
+    } else {
+      for (p1 = p0 + 1; *p1 && *p1 != '{' && *p1 != '}'; ++p1) ;
+      append(p0, p1 - p0);
+      p0 = p1;
+    }
+  }
+
+  gfree(args);
+  return this;
+}
+
+void GooString::formatInt(long x, char *buf, int bufSize,
+			GBool zeroFill, int width, int base,
+			char **p, int *len) {
+  static char vals[17] = "0123456789abcdef";
+  GBool neg;
+  int start, i, j;
+
+  i = bufSize;
+  if ((neg = x < 0)) {
+    x = -x;
+  }
+  start = neg ? 1 : 0;
+  if (x == 0) {
+    buf[--i] = '0';
+  } else {
+    while (i > start && x) {
+      buf[--i] = vals[x % base];
+      x /= base;
+    }
+  }
+  if (zeroFill) {
+    for (j = bufSize - i; i > start && j < width - start; ++j) {
+      buf[--i] = '0';
+    }
+  }
+  if (neg) {
+    buf[--i] = '-';
+  }
+  *p = buf + i;
+  *len = bufSize - i;
+}
+
+void GooString::formatUInt(Gulong x, char *buf, int bufSize,
+			 GBool zeroFill, int width, int base,
+			 char **p, int *len) {
+  static char vals[17] = "0123456789abcdef";
+  int i, j;
+
+  i = bufSize;
+  if (x == 0) {
+    buf[--i] = '0';
+  } else {
+    while (i > 0 && x) {
+      buf[--i] = vals[x % base];
+      x /= base;
+    }
+  }
+  if (zeroFill) {
+    for (j = bufSize - i; i > 0 && j < width; ++j) {
+      buf[--i] = '0';
+    }
+  }
+  *p = buf + i;
+  *len = bufSize - i;
+}
+
+void GooString::formatDouble(double x, char *buf, int bufSize, int prec,
+			   GBool trim, char **p, int *len) {
+  GBool neg, started;
+  double x2;
+  int d, i, j;
+
+  if ((neg = x < 0)) {
+    x = -x;
+  }
+  x = floor(x * pow((double)10, prec) + 0.5);
+  i = bufSize;
+  started = !trim;
+  for (j = 0; j < prec && i > 1; ++j) {
+    x2 = floor(0.1 * (x + 0.5));
+    d = (int)floor(x - 10 * x2 + 0.5);
+    if (started || d != 0) {
+      buf[--i] = '0' + d;
+      started = gTrue;
+    }
+    x = x2;
+  }
+  if (i > 1 && started) {
+    buf[--i] = '.';
+  }
+  if (i > 1) {
+    do {
+      x2 = floor(0.1 * (x + 0.5));
+      d = (int)floor(x - 10 * x2 + 0.5);
+      buf[--i] = '0' + d;
+      x = x2;
+    } while (i > 1 && x);
+  }
+  if (neg) {
+    buf[--i] = '-';
+  }
+  *p = buf + i;
+  *len = bufSize - i;
 }
 
 GooString *GooString::insert(int i, char c) {
-  int j;
-
-  resize(length + 1);
-  for (j = length + 1; j > i; --j)
-    s[j] = s[j-1];
-  s[i] = c;
-  ++length;
-  return this;
+  return insert(i, (const char*)&c, 1);
 }
 
 GooString *GooString::insert(int i, GooString *str) {
-  int n = str->getLength();
-  int j;
-
-  resize(length + n);
-  for (j = length; j >= i; --j)
-    s[j+n] = s[j];
-  memcpy(s+i, str->getCString(), n);
-  length += n;
-  return this;
-}
-
-GooString *GooString::insert(int i, const char *str) {
-  int n = strlen(str);
-  int j;
-
-  resize(length + n);
-  for (j = length; j >= i; --j)
-    s[j+n] = s[j];
-  memcpy(s+i, str, n);
-  length += n;
-  return this;
+  return insert(i, str->getCString(), str->getLength());
 }
 
 GooString *GooString::insert(int i, const char *str, int lengthA) {
   int j;
+  int prevLen = length;
+  if (CALC_STRING_LEN == lengthA)
+    lengthA = strlen(str);
 
   resize(length + lengthA);
-  for (j = length; j >= i; --j)
+  for (j = prevLen; j >= i; --j)
     s[j+lengthA] = s[j];
   memcpy(s+i, str, lengthA);
-  length += lengthA;
   return this;
 }
 
@@ -215,7 +619,7 @@ GooString *GooString::del(int i, int n) {
     for (j = i; j <= length - n; ++j) {
       s[j] = s[j + n];
     }
-    resize(length -= n);
+    resize(length - n);
   }
   return this;
 }

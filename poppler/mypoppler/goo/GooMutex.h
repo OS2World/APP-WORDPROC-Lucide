@@ -45,9 +45,7 @@ typedef HMTX GooMutex;
 #define gLockMutex(m) DosRequestMutexSem(*m,SEM_INDEFINITE_WAIT)
 #define gUnlockMutex(m) DosReleaseMutexSem(*m)
 
-
-#else 
-// assume pthreads
+#else // assume pthreads
 
 #include <pthread.h>
 

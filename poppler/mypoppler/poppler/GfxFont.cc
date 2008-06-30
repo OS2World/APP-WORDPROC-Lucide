@@ -28,7 +28,6 @@
 #include <fofi/FoFiType1.h>
 #include <fofi/FoFiType1C.h>
 #include <fofi/FoFiTrueType.h>
-#include "UGooString.h"
 #include "GfxFont.h"
 
 //------------------------------------------------------------------------
@@ -97,6 +96,10 @@ static StdFontMapEntry stdFontMap[] = {
   { "TimesNewRomanPSMT,Italic",     "Times-Italic" }
 };
 
+static int parseCharName(char *charName, Unicode *uBuf, int uLen,
+			 GBool names, GBool ligatures, 
+			 GBool numeric, GBool hex, GBool variants);
+
 //------------------------------------------------------------------------
 // GfxFont
 //------------------------------------------------------------------------
@@ -149,6 +152,7 @@ GfxFont::GfxFont(char *tagA, Ref idA, GooString *nameA) {
   stretch = StretchNotDefined;
   weight = WeightNotDefined;
   refCnt = 1;
+  dfp = NULL;
 }
 
 GfxFont::~GfxFont() {
@@ -166,6 +170,7 @@ GfxFont::~GfxFont() {
   if (extFontFile) {
     delete extFontFile;
   }
+  delete dfp;
 }
 
 void GfxFont::incRefCnt() {
@@ -264,29 +269,42 @@ void GfxFont::readFontDescriptor(XRef *xref, Dict *fontDict) {
       if (obj2.fetch(xref, &obj3)->isStream()) {
 	obj3.streamGetDict()->lookup("Subtype", &obj4);
 	if (obj4.isName("Type1")) {
-	    embFontID = obj2.getRef();
+	  embFontID = obj2.getRef();
 	  if (type != fontType1) {
 	    error(-1, "Mismatch between font type and embedded font file");
 	    type = fontType1;
 	  }
 	} else if (obj4.isName("Type1C")) {
-	    embFontID = obj2.getRef();
+	  embFontID = obj2.getRef();
 	  if (type != fontType1 && type != fontType1C) {
 	    error(-1, "Mismatch between font type and embedded font file");
 	  }
 	  type = fontType1C;
 	} else if (obj4.isName("TrueType")) {
-	    embFontID = obj2.getRef();
+	  embFontID = obj2.getRef();
 	  if (type != fontTrueType) {
 	    error(-1, "Mismatch between font type and embedded font file");
 	    type = fontTrueType;
 	  }
 	} else if (obj4.isName("CIDFontType0C")) {
-	    embFontID = obj2.getRef();
+	  embFontID = obj2.getRef();
 	  if (type != fontCIDType0) {
 	    error(-1, "Mismatch between font type and embedded font file");
 	  }
 	  type = fontCIDType0C;
+	} else if (obj4.isName("OpenType")) {
+	  embFontID = obj2.getRef();
+	  if (type == fontTrueType) {
+	    type = fontTrueTypeOT;
+	  } else if (type == fontType1) {
+	    type = fontType1COT;
+	  } else if (type == fontCIDType0) {
+	    type = fontCIDType0COT;
+	  } else if (type == fontCIDType2) {
+	    type = fontCIDType2OT;
+	  } else {
+	    error(-1, "Mismatch between font type and embedded font file");
+	  }
 	} else {
 	  error(-1, "Unknown embedded font type '%s'",
 		obj4.isName() ? obj4.getName() : "???");
@@ -390,9 +408,17 @@ char *GfxFont::readExtFontFile(int *len) {
     error(-1, "External font file '%s' vanished", extFontFile->getCString());
     return NULL;
   }
-  fseek(f, 0, SEEK_END);
+  if (fseek(f, 0, SEEK_END) != 0) {
+    error(-1, "Cannot seek to end of '%s'", extFontFile->getCString());
+    fclose(f);
+    return NULL;
+  }
   *len = (int)ftell(f);
-  fseek(f, 0, SEEK_SET);
+  if (fseek(f, 0, SEEK_SET) != 0) {
+    error(-1, "Cannot seek to start of '%s'", extFontFile->getCString());
+    fclose(f);
+    return NULL;
+  }
   buf = (char *)gmalloc(*len);
   if ((int)fread(buf, 1, *len, f) != *len) {
     error(-1, "Error reading external font file '%s'",
@@ -773,41 +799,38 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GooString *nameA,
     }
   }
 
-  // pass 2: try to fill in the missing chars, looking for names of
-  // the form 'Axx', 'xx', 'Ann', 'ABnn', or 'nn', where 'A' and 'B'
-  // are any letters, 'xx' is two hex digits, and 'nn' is 2-4
-  // decimal digits
-  if (missing && globalParams->getMapNumericCharNames()) {
+  // construct the char code -> Unicode mapping object
+  ctu = CharCodeToUnicode::make8BitToUnicode(toUnicode);
+
+  // pass 2: try to fill in the missing chars, looking for ligatures, numeric
+  // references and variants
+  if (missing) {
     for (code = 0; code < 256; ++code) {
-      if ((charName = enc[code]) && !toUnicode[code] &&
-	  strcmp(charName, ".notdef")) {
-	n = strlen(charName);
-	code2 = -1;
-	if (hex && n == 3 && isalpha(charName[0]) &&
-	    isxdigit(charName[1]) && isxdigit(charName[2])) {
-	  sscanf(charName+1, "%x", &code2);
-	} else if (hex && n == 2 &&
-		   isxdigit(charName[0]) && isxdigit(charName[1])) {
-	  sscanf(charName, "%x", &code2);
-	} else if (!hex && n >= 2 && n <= 4 &&
-		   isdigit(charName[0]) && isdigit(charName[1])) {
-	  code2 = atoi(charName);
-	} else if (n >= 3 && n <= 5 &&
-		   isdigit(charName[1]) && isdigit(charName[2])) {
-	  code2 = atoi(charName+1);
-	} else if (n >= 4 && n <= 6 &&
-		   isdigit(charName[2]) && isdigit(charName[3])) {
-	  code2 = atoi(charName+2);
-	}
-	if (code2 >= 0 && code2 <= 0xff) {
-	  toUnicode[code] = (Unicode)code2;
+      if (!toUnicode[code]) {
+	if ((charName = enc[code]) && strcmp(charName, ".notdef")
+	    && (n = parseCharName(charName, uBuf, sizeof(uBuf)/sizeof(*uBuf), 
+				  gFalse, // don't check simple names (pass 1)
+				  gTrue, // do check ligatures
+				  globalParams->getMapNumericCharNames(),
+				  hex,
+				  gTrue))) { // do check variants
+	  ctu->setMapping((CharCode)code, uBuf, n);
+	} else if (globalParams->getMapUnknownCharNames()) {
+	  // if the 'mapUnknownCharNames' flag is set, do a simple pass-through
+	  // mapping for unknown character names
+	  if (charName && charName[0]) {
+	    for (n = 0; n < sizeof(uBuf)/sizeof(*uBuf); ++n)
+	      if (!(uBuf[n] = charName[n]))
+		break;
+	    ctu->setMapping((CharCode)code, uBuf, n);
+	  } else {
+	    uBuf[0] = code;
+	    ctu->setMapping((CharCode)code, uBuf, 1);
+	  }
 	}
       }
     }
   }
-
-  // construct the char code -> Unicode mapping object
-  ctu = CharCodeToUnicode::make8BitToUnicode(toUnicode);
 
   // merge in a ToUnicode CMap, if there is one -- this overwrites
   // existing entries in ctu, i.e., the ToUnicode CMap takes
@@ -817,16 +840,17 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GooString *nameA,
 
   // look for a Unicode-to-Unicode mapping
   if (name && (utu = globalParams->getUnicodeToUnicode(name))) {
+    Unicode *uAux;
     for (i = 0; i < 256; ++i) {
       toUnicode[i] = 0;
     }
     ctu2 = CharCodeToUnicode::make8BitToUnicode(toUnicode);
     for (i = 0; i < 256; ++i) {
-      n = ctu->mapToUnicode((CharCode)i, uBuf, 8);
+      n = ctu->mapToUnicode((CharCode)i, &uAux);
       if (n >= 1) {
-	n = utu->mapToUnicode((CharCode)uBuf[0], uBuf, 8);
+	n = utu->mapToUnicode((CharCode)uAux[0], &uAux);
 	if (n >= 1) {
-	  ctu2->setMapping((CharCode)i, uBuf, n);
+	  ctu2->setMapping((CharCode)i, uAux, n);
 	}
       }
     }
@@ -938,13 +962,148 @@ Gfx8BitFont::~Gfx8BitFont() {
   }
 }
 
+// This function is in part a derived work of the Adobe Glyph Mapping
+// Convention: http://www.adobe.com/devnet/opentype/archives/glyph.html
+// Algorithmic comments are excerpted from that document to aid
+// maintainability.
+static int parseCharName(char *charName, Unicode *uBuf, int uLen,
+			 GBool names, GBool ligatures,
+			 GBool numeric, GBool hex, GBool variants)
+{
+  if (uLen <= 0) {
+    error(-1, "Zero-length output buffer (recursion overflow?) in "
+	  "parseCharName, component \"%s\"", charName);
+    return 0;
+  }
+  // Step 1: drop all the characters from the glyph name starting with the
+  // first occurrence of a period (U+002E FULL STOP), if any.
+  if (variants) {
+    char *var_part = strchr(charName, '.');
+    if (var_part == charName) {
+      return 0;	// .notdef or similar
+    } else if (var_part != NULL) {
+      // parse names of the form 7.oldstyle, P.swash, s.sc, etc.
+      char *main_part = gstrndup(charName, var_part - charName);
+      GBool namesRecurse = gTrue, variantsRecurse = gFalse;
+      int n = parseCharName(main_part, uBuf, uLen, namesRecurse, ligatures,
+			    numeric, hex, variantsRecurse);
+      gfree(main_part);
+      return n;
+    }
+  }
+  // Step 2: split the remaining string into a sequence of components, using
+  // underscore (U+005F LOW LINE) as the delimiter.
+  if (ligatures && strchr(charName, '_')) {
+    // parse names of the form A_a (e.g. f_i, T_h, l_quotesingle)
+    char *lig_part, *lig_end, *lig_copy;
+    int n = 0, m;
+    lig_part = lig_copy = copyString(charName);
+    do {
+      if ((lig_end = strchr(lig_part, '_')))
+	*lig_end = '\0';
+      if (lig_part[0] != '\0') {
+	GBool namesRecurse = gTrue, ligaturesRecurse = gFalse;
+	if ((m = parseCharName(lig_part, uBuf + n, uLen - n, namesRecurse,
+			       ligaturesRecurse, numeric, hex, variants)))
+	  n += m;
+	else
+	  error(-1, "Could not parse ligature component \"%s\" of \"%s\" in "
+		"parseCharName", lig_part, charName);
+      }
+      lig_part = lig_end + 1;
+    } while (lig_end && n < uLen);
+    gfree(lig_copy);
+    return n;
+  }
+  // Step 3: map each component to a character string according to the
+  // procedure below, and concatenate those strings; the result is the
+  // character string to which the glyph name is mapped.
+  // 3.1. if the font is Zapf Dingbats (PostScript FontName ZapfDingbats), and
+  // the component is in the ZapfDingbats list, then map it to the
+  // corresponding character in that list.
+  // 3.2. otherwise, if the component is in the Adobe Glyph List, then map it
+  // to the corresponding character in that list.
+  if (names && (uBuf[0] = globalParams->mapNameToUnicode(charName))) {
+    return 1;
+  }
+  if (numeric) {
+    unsigned int n = strlen(charName);
+    // 3.3. otherwise, if the component is of the form "uni" (U+0075 U+006E
+    // U+0069) followed by a sequence of uppercase hexadecimal digits (0 .. 9,
+    // A .. F, i.e. U+0030 .. U+0039, U+0041 .. U+0046), the length of that
+    // sequence is a multiple of four, and each group of four digits represents
+    // a number in the set {0x0000 .. 0xD7FF, 0xE000 .. 0xFFFF}, then interpret
+    // each such number as a Unicode scalar value and map the component to the
+    // string made of those scalar values. Note that the range and digit length
+    // restrictions mean that the "uni" prefix can be used only with Unicode
+    // values from the Basic Multilingual Plane (BMP).
+    if (n >= 7 && (n % 4) == 3 && !strncmp(charName, "uni", 3)) {
+      unsigned int i, m;
+      for (i = 0, m = 3; i < uLen && m < n; m += 4) {
+	if (isxdigit(charName[m]) && isxdigit(charName[m + 1]) && 
+	    isxdigit(charName[m + 2]) && isxdigit(charName[m + 3])) {
+	  unsigned int u;
+	  sscanf(charName + m, "%4x", &u);
+	  if (u <= 0xD7FF || (0xE000 <= u && u <= 0xFFFF)) {
+	    uBuf[i++] = u;
+	  }
+	}
+      }
+      return i;
+    }
+    // 3.4. otherwise, if the component is of the form "u" (U+0075) followed by
+    // a sequence of four to six uppercase hexadecimal digits {0 .. 9, A .. F}
+    // (U+0030 .. U+0039, U+0041 .. U+0046), and those digits represent a
+    // number in {0x0000 .. 0xD7FF, 0xE000 .. 0x10FFFF}, then interpret this
+    // number as a Unicode scalar value and map the component to the string
+    // made of this scalar value.
+    if (n >= 5 && n <= 7 && charName[0] == 'u' && isxdigit(charName[1]) &&
+	isxdigit(charName[2]) && isxdigit(charName[3]) && isxdigit(charName[4])
+	&& (n <= 5 || isxdigit(charName[5]))
+	&& (n <= 6 || isxdigit(charName[6]))) {
+      unsigned int u;
+      sscanf(charName + 1, "%x", &u);
+      if (u <= 0xD7FF || (0xE000 <= u && u <= 0x10FFFF)) {
+	uBuf[0] = u;
+	return 1;
+      }
+    }
+    // Not in Adobe Glyph Mapping convention: look for names of the form 'Axx',
+    // 'xx', 'Ann', 'ABnn', or 'nn', where 'A' and 'B' are any letters, 'xx' is
+    // two hex digits, and 'nn' is 2-4 decimal digits
+    if (hex && n == 3 && isalpha(charName[0]) &&
+	isxdigit(charName[1]) && isxdigit(charName[2])) {
+      sscanf(charName+1, "%x", (unsigned int *)uBuf);
+      return 1;
+    } else if (hex && n == 2 &&
+	       isxdigit(charName[0]) && isxdigit(charName[1])) {
+      sscanf(charName, "%x", (unsigned int *)uBuf);
+      return 1;
+    } else if (!hex && n >= 2 && n <= 4 &&
+	       isdigit(charName[0]) && isdigit(charName[1])) {
+      uBuf[0] = (Unicode)atoi(charName);
+      return 1;
+    } else if (n >= 3 && n <= 5 &&
+	       isdigit(charName[1]) && isdigit(charName[2])) {
+      uBuf[0] = (Unicode)atoi(charName+1);
+      return 1;
+    } else if (n >= 4 && n <= 6 &&
+	       isdigit(charName[2]) && isdigit(charName[3])) {
+      uBuf[0] = (Unicode)atoi(charName+2);
+      return 1;
+    }
+  }
+  // 3.5. otherwise, map the component to the empty string
+  return 0;
+}
+
 int Gfx8BitFont::getNextChar(char *s, int len, CharCode *code,
-			     Unicode *u, int uSize, int *uLen,
+			     Unicode **u, int *uLen,
 			     double *dx, double *dy, double *ox, double *oy) {
   CharCode c;
 
   *code = c = (CharCode)(*s & 0xff);
-  *uLen = ctu->mapToUnicode(c, u, uSize);
+  *uLen = ctu->mapToUnicode(c, u);
   *dx = widths[c];
   *dy = *ox = *oy = 0;
   return 1;
@@ -1026,10 +1185,10 @@ Gushort *Gfx8BitFont::getCodeToGIDMap(FoFiTrueType *ff) {
       useMacRoman = gTrue;
     }
   } else {
-    if (macRomanCmap >= 0) {
-      cmap = macRomanCmap;
-    } else if (msSymbolCmap >= 0) {
+    if (msSymbolCmap >= 0) {
       cmap = msSymbolCmap;
+    } else if (macRomanCmap >= 0) {
+      cmap = macRomanCmap;
     }
   }
 
@@ -1046,11 +1205,14 @@ Gushort *Gfx8BitFont::getCodeToGIDMap(FoFiTrueType *ff) {
 
   // map Unicode through the cmap
   } else if (useUnicode) {
+    Unicode *uAux;
     for (i = 0; i < 256; ++i) {
-      if (((charName = enc[i]) &&
-	   (u = globalParams->mapNameToUnicode(charName))) ||
-	  (n = ctu->mapToUnicode((CharCode)i, &u, 1))) {
+      if (((charName = enc[i]) && (u = globalParams->mapNameToUnicode(charName))))
 	map[i] = ff->mapCodeToGID(cmap, u);
+      else
+      {
+	n = ctu->mapToUnicode((CharCode)i, &uAux);
+	if (n > 0) map[i] = ff->mapCodeToGID(cmap, uAux[0]);
       }
     }
 
@@ -1115,7 +1277,7 @@ GfxCIDFont::GfxCIDFont(XRef *xref, char *tagA, Ref idA, GooString *nameA,
   Object obj1, obj2, obj3, obj4, obj5, obj6;
   CharCodeToUnicode *utu;
   CharCode c;
-  Unicode uBuf[8];
+  Unicode *uBuf;
   int c1, c2;
   int excepsSize, i, j, k, n;
 
@@ -1198,6 +1360,25 @@ GfxCIDFont::GfxCIDFont(XRef *xref, char *tagA, Ref idA, GooString *nameA,
 
       // look for a user-supplied .cidToUnicode file
       if (!(ctu = globalParams->getCIDToUnicode(collection))) {
+	// I'm not completely sure that this is the best thing to do
+	// but it seems to produce better results when the .cidToUnicode
+	// files from the poppler-data package are missing. At least
+	// we know that assuming the Identity mapping is definitely wrong.
+	//   -- jrmuizel
+	static const char * knownCollections [] = {
+	  "Adobe-CNS1",
+	  "Adobe-GB1",
+	  "Adobe-Japan1",
+	  "Adobe-Japan2",
+	  "Adobe-Korea1",
+	};
+	for (size_t i = 0; i < sizeof(knownCollections)/sizeof(knownCollections[0]); i++) {
+	  if (collection->cmp(knownCollections[i])) {
+	    error(-1, "Missing language pack for '%s' mapping", collection->getCString());
+	    delete collection;
+	    goto err2;
+	  }
+	}
 	error(-1, "Unknown character collection '%s'",
 	      collection->getCString());
 	// fall-through, assuming the Identity mapping -- this appears
@@ -1210,14 +1391,14 @@ GfxCIDFont::GfxCIDFont(XRef *xref, char *tagA, Ref idA, GooString *nameA,
   if (name && (utu = globalParams->getUnicodeToUnicode(name))) {
     if (ctu) {
       for (c = 0; c < ctu->getLength(); ++c) {
-	n = ctu->mapToUnicode(c, uBuf, 8);
+	n = ctu->mapToUnicode(c, &uBuf);
 	if (n >= 1) {
-	  n = utu->mapToUnicode((CharCode)uBuf[0], uBuf, 8);
+	  n = utu->mapToUnicode((CharCode)uBuf[0], &uBuf);
 	  if (n >= 1) {
 	    ctu->setMapping(c, uBuf, n);
+	  }
+	}
       }
-    }
-  }
       utu->decRefCnt();
     } else {
       ctu = utu;
@@ -1444,7 +1625,7 @@ GfxCIDFont::~GfxCIDFont() {
 }
 
 int GfxCIDFont::getNextChar(char *s, int len, CharCode *code,
-			    Unicode *u, int uSize, int *uLen,
+			    Unicode **u, int *uLen,
 			    double *dx, double *dy, double *ox, double *oy) {
   CID cid;
   double w, h, vx, vy;
@@ -1459,7 +1640,7 @@ int GfxCIDFont::getNextChar(char *s, int len, CharCode *code,
 
   *code = (CharCode)(cid = cMap->getCID(s, len, &n));
   if (ctu) {
-    *uLen = ctu->mapToUnicode(cid, u, uSize);
+    *uLen = ctu->mapToUnicode(cid, u);
   } else {
     *uLen = 0;
   }
@@ -1534,52 +1715,289 @@ GooString *GfxCIDFont::getCollection() {
   return cMap ? cMap->getCollection() : (GooString *)NULL;
 }
 
+Gushort GfxCIDFont::mapCodeToGID(FoFiTrueType *ff, int cmapi,
+  Unicode unicode, GBool wmode) {
+  Gushort gid = ff->mapCodeToGID(cmapi,unicode);
+  if (wmode) {
+    Gushort vgid = ff->mapToVertGID(gid);
+    if (vgid != 0) gid = vgid;
+  }
+  return gid;
+}
+
 Gushort *GfxCIDFont::getCodeToGIDMap(FoFiTrueType *ff, int *mapsizep) {
-  Gushort *map;
+#define N_UCS_CANDIDATES 2
+  /* space characters */
+  static unsigned long spaces[] = { 
+    0x2000,0x2001,0x2002,0x2003,0x2004,0x2005,0x2006,0x2007,
+    0x2008,0x2009,0x200A,0x00A0,0x200B,0x2060,0x3000,0xFEFF,
+    0
+  };
+  static char *adobe_cns1_cmaps[] = {
+    "UniCNS-UTF32-V",
+    "UniCNS-UCS2-V",
+    "UniCNS-UTF32-H",
+    "UniCNS-UCS2-H",
+    0
+  };
+  static char *adobe_gb1_cmaps[] = {
+    "UniGB-UTF32-V",
+    "UniGB-UCS2-V",
+    "UniGB-UTF32-H",
+    "UniGB-UCS2-H",
+    0
+  };
+  static char *adobe_japan1_cmaps[] = {
+    "UniJIS-UTF32-V",
+    "UniJIS-UCS2-V",
+    "UniJIS-UTF32-H",
+    "UniJIS-UCS2-H",
+    0
+  };
+  static char *adobe_japan2_cmaps[] = {
+    "UniHojo-UTF32-V",
+    "UniHojo-UCS2-V",
+    "UniHojo-UTF32-H",
+    "UniHojo-UCS2-H",
+    0
+  };
+  static char *adobe_korea1_cmaps[] = {
+    "UniKS-UTF32-V",
+    "UniKS-UCS2-V",
+    "UniKS-UTF32-H",
+    "UniKS-UCS2-H",
+    0
+  };
+  static struct CMapListEntry {
+    char *collection;
+    char *scriptTag;
+    char *toUnicodeMap;
+    char **CMaps;
+  } CMapList[] = {
+    {
+      "Adobe-CNS1",
+      "kana",
+      "Adobe-CNS1-UCS2",
+      adobe_cns1_cmaps,
+    },
+    {
+      "Adobe-GB1",
+      "kana",
+      "Adobe-GB1-UCS2",
+      adobe_gb1_cmaps,
+    },
+    {
+      "Adobe-Japan1",
+      "kana",
+      "Adobe-Japan1-UCS2",
+      adobe_japan1_cmaps,
+    },
+    {
+      "Adobe-Japan2",
+      "kana",
+      "Adobe-Japan2-UCS2",
+      adobe_japan2_cmaps,
+    },
+    {
+      "Adobe-Korea1",
+      "kana",
+      "Adobe-Korea1-UCS2",
+      adobe_korea1_cmaps,
+    },
+    {0, 0, 0, 0}
+  };
+  Unicode *humap = 0;
+  Unicode *vumap = 0;
+  Unicode *tumap = 0;
+  Gushort *codeToGID = 0;
+  unsigned long n;
+  int i;
+  unsigned long code;
+  int wmode;
+  char **cmapName;
+  CMap *cMap;
+  CMapListEntry *lp;
+  int cmap;
   int cmapPlatform, cmapEncoding;
-  int unicodeCmap, macRomanCmap, msSymbolCmap, cmap;
-  GBool useMacRoman, useUnicode;
-  char *charName;
-  Unicode u;
-  int code, i;
-  int mapsize;
-  int cidlen;
+  Ref embID;
 
   *mapsizep = 0;
   if (!ctu) return NULL;
+  if (getCollection()->cmp("Adobe-Identity") == 0) return NULL;
+  if (getEmbeddedFontID(&embID)) {
+   /* if this font is embedded font, 
+    * CIDToGIDMap should be embedded in PDF file
+    * and already set. So return it.
+    */
+    *mapsizep = getCIDToGIDLen();
+    return getCIDToGID();
+  }
 
   /* we use only unicode cmap */
   cmap = -1;
   for (i = 0; i < ff->getNumCmaps(); ++i) {
     cmapPlatform = ff->getCmapPlatform(i);
     cmapEncoding = ff->getCmapEncoding(i);
-    if ((cmapPlatform == 3 && cmapEncoding == 1) || cmapPlatform == 0)
-      cmap = i;
+    if (cmapPlatform == 3 && cmapEncoding == 10) {
+	/* UCS-4 */
+	cmap = i;
+	/* use UCS-4 cmap */
+	break;
+    } else if (cmapPlatform == 3 && cmapEncoding == 1) {
+	/* Unicode */
+	cmap = i;
+    } else if (cmapPlatform == 0 && cmap < 0) {
+	cmap = i;
+    }
   }
   if (cmap < 0)
     return NULL;
 
-  cidlen = 0;
-  mapsize = 64;
-  map = (Gushort *)gmalloc(mapsize * sizeof(Gushort));
-
-  while (cidlen < ctu->getLength()) {
-    int n;
-    if ((n = ctu->mapToUnicode((CharCode)cidlen, &u, 1)) == 0) {
-      cidlen++;
-      continue;
+  wmode = getWMode();
+  for (lp = CMapList;lp->collection != 0;lp++) {
+    if (strcmp(lp->collection,getCollection()->getCString()) == 0) {
+      break;
     }
-    if (cidlen >= mapsize) {
-      while (cidlen >= mapsize)
-	mapsize *= 2;
-      map = (Gushort *)grealloc(map, mapsize * sizeof(Gushort));
-    }
-    map[cidlen] = ff->mapCodeToGID(cmap, u);
-    cidlen++;
   }
+  n = 65536;
+  tumap = new Unicode[n];
+  humap = new Unicode[n*N_UCS_CANDIDATES];
+  memset(humap,0,sizeof(Unicode)*n*N_UCS_CANDIDATES);
+  if (lp->collection != 0) {
+    CharCodeToUnicode *tctu;
+    GooString tname(lp->toUnicodeMap);
 
-  *mapsizep = cidlen;
-  return map;
+    if ((tctu = CharCodeToUnicode::parseCMapFromFile(&tname,16)) != 0) {
+      CharCode cid;
+      for (cid = 0;cid < n ;cid++) {
+	int len;
+	Unicode *ucodes;
+
+	len = tctu->mapToUnicode(cid,&ucodes);
+	if (len == 1) {
+	  tumap[cid] = ucodes[0];
+	} else {
+	  /* if not single character, ignore it */
+	  tumap[cid] = 0;
+	}
+      }
+      delete tctu;
+    }
+    vumap = new Unicode[n];
+    memset(vumap,0,sizeof(Unicode)*n);
+    for (cmapName = lp->CMaps;*cmapName != 0;cmapName++) {
+      GooString cname(*cmapName);
+
+      if ((cMap = globalParams->getCMap(getCollection(),&cname))
+	   != 0) {
+	    if (cMap->getWMode()) {
+		cMap->setReverseMap(vumap,n,1);
+	    } else {
+		cMap->setReverseMap(humap,n,N_UCS_CANDIDATES);
+	    }
+	cMap->decRefCnt();
+      }
+    }
+    ff->setupGSUB(lp->scriptTag);
+  } else {
+    error(-1,"Unknown character collection %s\n",
+      getCollection()->getCString());
+    if ((ctu = getToUnicode()) != 0) {
+      CharCode cid;
+      for (cid = 0;cid < n ;cid++) {
+	Unicode *ucode;
+
+	if (ctu->mapToUnicode(cid, &ucode))
+	  humap[cid*N_UCS_CANDIDATES] = ucode[0];
+	else
+	  humap[cid*N_UCS_CANDIDATES] = 0;
+	for (i = 1;i < N_UCS_CANDIDATES;i++) {
+	    humap[cid*N_UCS_CANDIDATES+i] = 0;
+	}
+      }
+      ctu->decRefCnt();
+    }
+  }
+  // map CID -> Unicode -> GID
+  codeToGID = (Gushort *)gmallocn(n, sizeof(Gushort));
+  for (code = 0; code < n; ++code) {
+    Unicode unicode;
+    unsigned long gid;
+
+    unicode = 0;
+    gid = 0;
+    if (humap != 0) {
+      for (i = 0;i < N_UCS_CANDIDATES
+	&& gid == 0 && (unicode = humap[code*N_UCS_CANDIDATES+i]) != 0;i++) {
+	gid = mapCodeToGID(ff,cmap,unicode,gFalse);
+      }
+    }
+    if (gid == 0 && vumap != 0) {
+      unicode = vumap[code];
+      if (unicode != 0) {
+	gid = mapCodeToGID(ff,cmap,unicode,gTrue);
+	if (gid == 0 && tumap != 0) {
+	  if ((unicode = tumap[code]) != 0) {
+	    gid = mapCodeToGID(ff,cmap,unicode,gTrue);
+	  }
+	}
+      }
+    }
+    if (gid == 0 && tumap != 0) {
+      if ((unicode = tumap[code]) != 0) {
+	gid = mapCodeToGID(ff,cmap,unicode,gFalse);
+      }
+    }
+    if (gid == 0) {
+      /* special handling space characters */
+      unsigned long *p;
+
+      if (humap != 0) unicode = humap[code];
+      if (unicode != 0) {
+	/* check if code is space character , so map code to 0x0020 */
+	for (p = spaces;*p != 0;p++) {
+	  if (*p == unicode) {
+	    unicode = 0x20;
+	    gid = mapCodeToGID(ff,cmap,unicode,wmode);
+	    break;
+	  }
+	}
+      }
+    }
+    codeToGID[code] = gid;
+  }
+  *mapsizep = n;
+  if (humap != 0) delete[] humap;
+  if (tumap != 0) delete[] tumap;
+  if (vumap != 0) delete[] vumap;
+  return codeToGID;
+}
+
+double GfxCIDFont::getWidth (char* s, int len) {
+  int nUsed;
+  double w;
+  int a, b, m;
+
+  CID cid = cMap->getCID(s, len, &nUsed);
+
+  w = widths.defWidth;
+  if (widths.nExceps > 0 && cid >= widths.exceps[0].first) {
+    a = 0;
+    b = widths.nExceps;
+    // invariant: widths.exceps[a].first <= cid < widths.exceps[b].first
+    while (b - a > 1) {
+      m = (a + b) / 2;
+      if (widths.exceps[m].first <= cid) {
+        a = m;
+      } else {
+        b = m;
+      }
+    }
+    if (cid <= widths.exceps[a].last) {
+      w = widths.exceps[a].width;
+    }
+  }
+  return w;
 }
 
 //------------------------------------------------------------------------
@@ -1610,11 +2028,13 @@ GfxFontDict::GfxFontDict(XRef *xref, Ref *fontDictRef, Dict *fontDict) {
 	  r.gen = 999999;
 	}
       }
-      char *aux = fontDict->getKey(i)->getCString();
-      fonts[i] = GfxFont::makeFont(xref, aux,
+      fonts[i] = GfxFont::makeFont(xref, fontDict->getKey(i),
 				   r, obj2.getDict());
-      delete[] aux;
       if (fonts[i] && !fonts[i]->isOk()) {
+	// XXX: it may be meaningful to distinguish between
+	// NULL and !isOk() so that when we do lookups
+	// we can tell the difference between a missing font
+	// and a font that is just !isOk()
 	delete fonts[i];
 	fonts[i] = NULL;
       }

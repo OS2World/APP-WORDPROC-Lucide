@@ -16,7 +16,6 @@
 #include <string.h>
 #include "goo/gmem.h"
 #include "Object.h"
-#include "UGooString.h"
 #include "XRef.h"
 #include "Dict.h"
 
@@ -31,17 +30,29 @@ Dict::Dict(XRef *xrefA) {
   ref = 1;
 }
 
+Dict::Dict(Dict* dictA) {
+  xref = dictA->xref;
+  size = length = dictA->length;
+  ref = 1;
+
+  entries = (DictEntry *)gmallocn(size, sizeof(DictEntry));
+  for (int i=0; i<length; i++) {
+    entries[i].key = strdup(dictA->entries[i].key);
+    dictA->entries[i].val.copy(&entries[i].val);
+  }
+}
+
 Dict::~Dict() {
   int i;
 
   for (i = 0; i < length; ++i) {
-    delete entries[i].key;
+    gfree(entries[i].key);
     entries[i].val.free();
   }
   gfree(entries);
 }
 
-void Dict::addOwnKeyVal(UGooString *key, Object *val) {
+void Dict::add(char *key, Object *val) {
   if (length == size) {
     if (length == 0) {
       size = 8;
@@ -55,15 +66,47 @@ void Dict::addOwnKeyVal(UGooString *key, Object *val) {
   ++length;
 }
 
-inline DictEntry *Dict::find(const UGooString &key) {
+inline DictEntry *Dict::find(char *key) {
   int i;
 
   for (i = 0; i < length; ++i) {
-    if (!key.cmp(entries[i].key))
+    if (!strcmp(key, entries[i].key))
       return &entries[i];
   }
   return NULL;
 }
+
+void Dict::remove(char *key) {
+  int i; 
+  bool found = false;
+  DictEntry tmp;
+  if(length == 0) return;
+
+  for(i=0; i<length; i++) {
+    if (!strcmp(key, entries[i].key)) {
+      found = true;
+      break;
+    }
+  }
+  if(!found) return;
+  //replace the deleted entry with the last entry
+  length -= 1;
+  tmp = entries[length];
+  if (i!=length) //don't copy the last entry if it is deleted 
+    entries[i] = tmp;
+}
+
+void Dict::set(char *key, Object *val) {
+  DictEntry *e;
+  e = find (key);
+  if (e) {
+    e->val.free();
+    e->val = *val;
+  } else {
+    add (copyString(key), val);
+  }
+}
+
 
 GBool Dict::is(char *type) {
   DictEntry *e;
@@ -71,13 +114,13 @@ GBool Dict::is(char *type) {
   return (e = find("Type")) && e->val.isName(type);
 }
 
-Object *Dict::lookup(const UGooString &key, Object *obj) {
+Object *Dict::lookup(char *key, Object *obj) {
   DictEntry *e;
 
   return (e = find(key)) ? e->val.fetch(xref, obj) : obj->initNull();
 }
 
-Object *Dict::lookupNF(const UGooString &key, Object *obj) {
+Object *Dict::lookupNF(char *key, Object *obj) {
   DictEntry *e;
 
   return (e = find(key)) ? e->val.copy(obj) : obj->initNull();
@@ -103,7 +146,7 @@ GBool Dict::lookupInt(const char *key, const char *alt_key, int *value)
   return success;
 }
 
-UGooString *Dict::getKey(int i) {
+char *Dict::getKey(int i) {
   return entries[i].key;
 }
 

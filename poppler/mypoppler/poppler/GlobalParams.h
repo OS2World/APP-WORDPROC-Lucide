@@ -13,14 +13,17 @@
 #pragma interface
 #endif
 
+#include <assert.h>
 #include "poppler-config.h"
 #include <stdio.h>
+#ifndef _MSC_VER
 #include <fontconfig/fontconfig.h>
+#endif
 #include "goo/gtypes.h"
 #include "CharTypes.h"
 
 #if MULTITHREADED
-#include <goo/GooMutex.h>
+#include "goo/GooMutex.h"
 #endif
 
 class GooString;
@@ -36,6 +39,9 @@ class CMapCache;
 struct XpdfSecurityHandler;
 class GlobalParams;
 class GfxFont;
+#ifdef WIN32
+class WinFontList;
+#endif
 
 //------------------------------------------------------------------------
 
@@ -71,7 +77,15 @@ public:
   };
 
   DisplayFontParam(GooString *nameA, DisplayFontParamKind kindA);
-  ~DisplayFontParam();
+  void setFileName(GooString *fileNameA) {
+    if (displayFontT1 == kind)
+        t1.fileName = fileNameA;
+    else {
+        assert(displayFontTT == kind);
+        tt.fileName = fileNameA;
+    }
+  }  
+  virtual ~DisplayFontParam();
 };
 
 //------------------------------------------------------------------------
@@ -113,16 +127,29 @@ enum EndOfLineKind {
 
 //------------------------------------------------------------------------
 
+enum ScreenType {
+  screenUnset,
+  screenDispersed,
+  screenClustered,
+  screenStochasticClustered
+};
+
+//------------------------------------------------------------------------
+
 class GlobalParams {
 public:
 
   // Initialize the global parameters by attempting to read a config
   // file.
-  GlobalParams(char *cfgFileName);
+  GlobalParams();
 
   ~GlobalParams();
 
   void setBaseDir(char *dir);
+
+#ifdef _MSC_VER
+  void setupBaseFonts(char *dir);
+#endif
 
   //----- accessors
 
@@ -135,12 +162,6 @@ public:
   FILE *findCMapFile(GooString *collection, GooString *cMapName);
   FILE *findToUnicodeFile(GooString *name);
   DisplayFontParam *getDisplayFont(GfxFont *font);
-  GooString *getPSFile();
-  int getPSPaperWidth();
-  int getPSPaperHeight();
-  void getPSImageableArea(int *llx, int *lly, int *urx, int *ury);
-  GBool getPSDuplex();
-  GBool getPSCrop();
   GBool getPSExpandSmaller();
   GBool getPSShrinkLarger();
   GBool getPSCenter();
@@ -151,6 +172,7 @@ public:
   GBool getPSEmbedTrueType();
   GBool getPSEmbedCIDPostScript();
   GBool getPSEmbedCIDTrueType();
+  GBool getPSPreload();
   GBool getPSOPI();
   GBool getPSASCIIHex();
   GooString *getTextEncodingName();
@@ -158,14 +180,18 @@ public:
   GBool getTextPageBreaks();
   GBool getTextKeepTinyChars();
   GooString *findFontFile(GooString *fontName, char **exts);
-  GooString *getInitialZoom();
-  GBool getContinuousView();
-  GBool getEnableT1lib();
   GBool getEnableFreeType();
   GBool getAntialias();
-  GooString *getURLCommand() { return urlCommand; }
-  GooString *getMovieCommand() { return movieCommand; }
+  GBool getVectorAntialias();
+  GBool getStrokeAdjust();
+  ScreenType getScreenType();
+  int getScreenSize();
+  int getScreenDotRadius();
+  double getScreenGamma();
+  double getScreenBlackThreshold();
+  double getScreenWhiteThreshold();
   GBool getMapNumericCharNames();
+  GBool getMapUnknownCharNames();
   GBool getPrintCommands();
   GBool getProfileCommands();
   GBool getErrQuiet();
@@ -180,14 +206,6 @@ public:
 #endif
 
   //----- functions to set parameters
-
-  void setPSFile(char *file);
-  GBool setPSPaperSize(char *size);
-  void setPSPaperWidth(int width);
-  void setPSPaperHeight(int height);
-  void setPSImageableArea(int llx, int lly, int urx, int ury);
-  void setPSDuplex(GBool duplex);
-  void setPSCrop(GBool crop);
   void setPSExpandSmaller(GBool expand);
   void setPSShrinkLarger(GBool shrink);
   void setPSCenter(GBool center);
@@ -196,18 +214,25 @@ public:
   void setPSEmbedTrueType(GBool embed);
   void setPSEmbedCIDPostScript(GBool embed);
   void setPSEmbedCIDTrueType(GBool embed);
+  void setPSPreload(GBool preload);
   void setPSOPI(GBool opi);
   void setPSASCIIHex(GBool hex);
   void setTextEncoding(char *encodingName);
   GBool setTextEOL(char *s);
   void setTextPageBreaks(GBool pageBreaks);
   void setTextKeepTinyChars(GBool keep);
-  void setInitialZoom(char *s);
-  void setContinuousView(GBool cont);
-  GBool setEnableT1lib(char *s);
   GBool setEnableFreeType(char *s);
   GBool setAntialias(char *s);
+  GBool setVectorAntialias(char *s);
+  void setStrokeAdjust(GBool strokeAdjust);
+  void setScreenType(ScreenType st);
+  void setScreenSize(int size);
+  void setScreenDotRadius(int radius);
+  void setScreenGamma(double gamma);
+  void setScreenBlackThreshold(double blackThreshold);
+  void setScreenWhiteThreshold(double whiteThreshold);
   void setMapNumericCharNames(GBool map);
+  void setMapUnknownCharNames(GBool map);
   void setPrintCommands(GBool printCommandsA);
   void setProfileCommands(GBool profileCommandsA);
   void setErrQuiet(GBool errQuietA);
@@ -219,28 +244,7 @@ public:
 
 private:
 
-  void parseFile(GooString *fileName, FILE *f);
   void parseNameToUnicode(GooString *name);
-  void parseCIDToUnicode(GooList *tokens, GooString *fileName, int line);
-  void parseUnicodeToUnicode(GooList *tokens, GooString *fileName, int line);
-  void parseUnicodeMap(GooList *tokens, GooString *fileName, int line);
-  void parseCMapDir(GooList *tokens, GooString *fileName, int line);
-  void parseToUnicodeDir(GooList *tokens, GooString *fileName, int line);
-  void parsePSFile(GooList *tokens, GooString *fileName, int line);
-  void parsePSPaperSize(GooList *tokens, GooString *fileName, int line);
-  void parsePSImageableArea(GooList *tokens, GooString *fileName, int line);
-  void parsePSLevel(GooList *tokens, GooString *fileName, int line);
-  void parsePSFont(GooList *tokens, GooString *fileName, int line);
-  void parsePSFont16(char *cmdName, GooList *fontList,
-		     GooList *tokens, GooString *fileName, int line);
-  void parseTextEncoding(GooList *tokens, GooString *fileName, int line);
-  void parseTextEOL(GooList *tokens, GooString *fileName, int line);
-  void parseFontDir(GooList *tokens, GooString *fileName, int line);
-  void parseInitialZoom(GooList *tokens, GooString *fileName, int line);
-  void parseCommand(char *cmdName, GooString **val,
-		    GooList *tokens, GooString *fileName, int line);
-  void parseYesNo(char *cmdName, GBool *flag,
-		  GooList *tokens, GooString *fileName, int line);
   GBool parseYesNo2(char *token, GBool *flag);
   UnicodeMap *getUnicodeMap2(GooString *encodingName);
 
@@ -273,18 +277,12 @@ private:
   GooList *toUnicodeDirs;		// list of ToUnicode CMap dirs [GooString]
   GooHash *displayFonts;		// display font info, indexed by font name
 				//   [DisplayFontParam]
-  GooString *psFile;		// PostScript file or command (for xpdf)
-  int psPaperWidth;		// paper size, in PostScript points, for
-  int psPaperHeight;		//   PostScript output
-  int psImageableLLX,		// imageable area, in PostScript points,
-      psImageableLLY,		//   for PostScript output
-      psImageableURX,
-      psImageableURY;
-  GBool psCrop;			// crop PS output to CropBox
+#ifdef WIN32
+  WinFontList *winFontList;	// system TrueType fonts
+#endif
   GBool psExpandSmaller;	// expand smaller pages to fill paper
   GBool psShrinkLarger;		// shrink larger pages to fit paper
   GBool psCenter;		// center pages on the paper
-  GBool psDuplex;		// enable duplexing in PostScript?
   PSLevel psLevel;		// PostScript level to generate
   GooHash *psFonts;		// PostScript font info, indexed by PDF
 				//   font name [PSFontParam]
@@ -294,6 +292,8 @@ private:
   GBool psEmbedTrueType;	// embed TrueType fonts?
   GBool psEmbedCIDPostScript;	// embed CID PostScript fonts?
   GBool psEmbedCIDTrueType;	// embed CID TrueType fonts?
+  GBool psPreload;		// preload PostScript images and forms into
+				//   memory
   GBool psOPI;			// generate PostScript OPI comments?
   GBool psASCIIHex;		// use ASCIIHex instead of ASCII85?
   GooString *textEncoding;	// encoding (unicodeMap) to use for text
@@ -303,14 +303,18 @@ private:
   GBool textPageBreaks;		// insert end-of-page markers?
   GBool textKeepTinyChars;	// keep all characters in text output
   GooList *fontDirs;		// list of font dirs [GooString]
-  GooString *initialZoom;		// initial zoom level
-  GBool continuousView;		// continuous view mode
-  GBool enableT1lib;		// t1lib enable flag
   GBool enableFreeType;		// FreeType enable flag
   GBool antialias;		// anti-aliasing enable flag
-  GooString *urlCommand;		// command executed for URL links
-  GooString *movieCommand;	// command executed for movie annotations
+  GBool vectorAntialias;	// vector anti-aliasing enable flag
+  GBool strokeAdjust;		// stroke adjustment enable flag
+  ScreenType screenType;	// halftone screen type
+  int screenSize;		// screen matrix size
+  int screenDotRadius;		// screen dot radius
+  double screenGamma;		// screen gamma correction
+  double screenBlackThreshold;	// screen black clamping threshold
+  double screenWhiteThreshold;	// screen white clamping threshold
   GBool mapNumericCharNames;	// map numeric char names (from font subsets)?
+  GBool mapUnknownCharNames;	// map unknown char names?
   GBool printCommands;		// print the drawing commands
   GBool profileCommands;	// profile the drawing commands
   GBool errQuiet;		// suppress error messages?
@@ -320,7 +324,9 @@ private:
   UnicodeMapCache *unicodeMapCache;
   CMapCache *cMapCache;
   
+#ifndef _MSC_VER
   FcConfig *FCcfg;
+#endif
 
 #ifdef ENABLE_PLUGINS
   GList *plugins;		// list of plugins [Plugin]

@@ -23,6 +23,8 @@ class Catalog;
 class Annots;
 class Annot;
 class Gfx;
+class FormPageWidgets;
+class Form;
 
 //------------------------------------------------------------------------
 
@@ -34,6 +36,7 @@ public:
   PDFRectangle(double x1A, double y1A, double x2A, double y2A)
     { x1 = x1A; y1 = y1A; x2 = x2A; y2 = y2A; }
   GBool isValid() { return x1 != 0 || y1 != 0 || x2 != 0 || y2 != 0; }
+  void clipTo(PDFRectangle *rect);
 };
 
 //------------------------------------------------------------------------
@@ -104,7 +107,7 @@ class Page {
 public:
 
   // Constructor.
-  Page(XRef *xrefA, int numA, Dict *pageDict, PageAttrs *attrsA);
+  Page(XRef *xrefA, int numA, Dict *pageDict, PageAttrs *attrsA, Form *form);
 
   // Destructor.
   ~Page();
@@ -113,6 +116,7 @@ public:
   GBool isOk() { return ok; }
 
   // Get page parameters.
+  int getNum() { return num; }
   PDFRectangle *getMediaBox() { return attrs->getMediaBox(); }
   PDFRectangle *getCropBox() { return attrs->getCropBox(); }
   GBool isCropped() { return attrs->isCropped(); }
@@ -141,6 +145,12 @@ public:
   // Get annotations array.
   Object *getAnnots(Object *obj) { return annots.fetch(xref, obj); }
 
+  // Return a list of links.
+  Links *getLinks(Catalog *catalog);
+
+  // Return a list of annots. Ownership is transferred to the caller.
+  Annots *getAnnots(Catalog *catalog);
+
   // Get contents.
   Object *getContents(Object *obj) { return contents.fetch(xref, obj); }
 
@@ -151,10 +161,21 @@ public:
   // Get transition.
   Object *getTrans(Object *obj) { return trans.fetch(xref, obj); }
 
+  // Get form.
+  FormPageWidgets *getPageWidgets() { return pageWidgets; }
+
+  // Get duration, the maximum length of time, in seconds,
+  // that the page is displayed before the presentation automatically
+  // advances to the next page
+  double getDuration() { return duration; }
+
+  // Get actions
+  Object *getActions(Object *obj) { return actions.fetch(xref, obj); }
+
   Gfx *createGfx(OutputDev *out, double hDPI, double vDPI,
 		 int rotate, GBool useMediaBox, GBool crop,
 		 int sliceX, int sliceY, int sliceW, int sliceH,
-		 Links *links, Catalog *catalog,
+		 GBool printing, Catalog *catalog,
 		 GBool (*abortCheckCbk)(void *data),
 		 void *abortCheckCbkData,
 		 GBool (*annotDisplayDecideCbk)(Annot *annot, void *user_data),
@@ -163,7 +184,7 @@ public:
   // Display a page.
   void display(OutputDev *out, double hDPI, double vDPI,
 	       int rotate, GBool useMediaBox, GBool crop,
-	       Links *links, Catalog *catalog,
+	       GBool printing, Catalog *catalog,
 	       GBool (*abortCheckCbk)(void *data) = NULL,
 	       void *abortCheckCbkData = NULL,
                GBool (*annotDisplayDecideCbk)(Annot *annot, void *user_data) = NULL,
@@ -173,17 +194,24 @@ public:
   void displaySlice(OutputDev *out, double hDPI, double vDPI,
 		    int rotate, GBool useMediaBox, GBool crop,
 		    int sliceX, int sliceY, int sliceW, int sliceH,
-		    Links *links, Catalog *catalog,
+		    GBool printing, Catalog *catalog,
 		    GBool (*abortCheckCbk)(void *data) = NULL,
 		    void *abortCheckCbkData = NULL,
                     GBool (*annotDisplayDecideCbk)(Annot *annot, void *user_data) = NULL,
                     void *annotDisplayDecideCbkData = NULL);
 
   void display(Gfx *gfx);
-  
+
+  void makeBox(double hDPI, double vDPI, int rotate,
+	       GBool useMediaBox, GBool upsideDown,
+	       double sliceX, double sliceY, double sliceW, double sliceH,
+	       PDFRectangle *box, GBool *crop);
+
+  void processLinks(OutputDev *out, Catalog *catalog);
+
   // Get the page's default CTM.
   void getDefaultCTM(double *ctm, double hDPI, double vDPI,
-		     int rotate, GBool upsideDown);
+		     int rotate, GBool useMediaBox, GBool upsideDown);
 
 private:
 
@@ -192,8 +220,11 @@ private:
   PageAttrs *attrs;		// page attributes
   Object annots;		// annotations array
   Object contents;		// page contents
+  FormPageWidgets *pageWidgets; 			// the form for that page
   Object thumb;			// page thumbnail
   Object trans;			// page transition
+  Object actions;		// page addiction actions
+  double duration;              // page duration
   GBool ok;			// true if page is valid
 };
 

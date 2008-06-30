@@ -18,6 +18,7 @@
 #include "Catalog.h"
 #include "Page.h"
 #include "Annot.h"
+#include "OptionalContent.h"
 
 class GooString;
 class BaseStream;
@@ -26,6 +27,12 @@ class Links;
 class LinkAction;
 class LinkDest;
 class Outline;
+
+enum PDFWriteMode {
+  writeStandard,
+  writeForceRewrite,
+  writeForceIncremental
+};
 
 //------------------------------------------------------------------------
 // PDFDoc
@@ -61,6 +68,9 @@ public:
   // Get catalog.
   Catalog *getCatalog() { return catalog; }
 
+  // Get optional content configuration
+  OCGs *getOptContentConfig() { return catalog->getOptContentConfig(); }
+
   // Get base stream.
   BaseStream *getBaseStream() { return str; }
 
@@ -87,8 +97,9 @@ public:
   Object *getStructTreeRoot() { return catalog->getStructTreeRoot(); }
 
   // Display a page.
-  void displayPage(OutputDev *out, int page, double hDPI, double vDPI,
-		   int rotate, GBool useMediaBox, GBool crop, GBool doLinks,
+  void displayPage(OutputDev *out, int page,
+		   double hDPI, double vDPI, int rotate,
+		   GBool useMediaBox, GBool crop, GBool printing,
 		   GBool (*abortCheckCbk)(void *data) = NULL,
 		   void *abortCheckCbkData = NULL,
                    GBool (*annotDisplayDecideCbk)(Annot *annot, void *user_data) = NULL,
@@ -97,7 +108,7 @@ public:
   // Display a range of pages.
   void displayPages(OutputDev *out, int firstPage, int lastPage,
 		    double hDPI, double vDPI, int rotate,
-		    GBool useMediaBox, GBool crop, GBool doLinks,
+		    GBool useMediaBox, GBool crop, GBool printing,
 		    GBool (*abortCheckCbk)(void *data) = NULL,
 		    void *abortCheckCbkData = NULL,
                     GBool (*annotDisplayDecideCbk)(Annot *annot, void *user_data) = NULL,
@@ -105,8 +116,8 @@ public:
 
   // Display part of a page.
   void displayPageSlice(OutputDev *out, int page,
-			double hDPI, double vDPI,
-			int rotate, GBool useMediaBox, GBool crop, GBool doLinks,
+			double hDPI, double vDPI, int rotate, 
+			GBool useMediaBox, GBool crop, GBool printing,
 			int sliceX, int sliceY, int sliceW, int sliceH,
 			GBool (*abortCheckCbk)(void *data) = NULL,
 			void *abortCheckCbkData = NULL,
@@ -119,12 +130,16 @@ public:
 
   // Returns the links for the current page, transferring ownership to
   // the caller.
-  Links *takeLinks();
+  Links *getLinks(int page);
 
   // Find a named destination.  Returns the link destination, or
   // NULL if <name> is not a destination.
-  LinkDest *findDest(UGooString *name)
+  LinkDest *findDest(GooString *name)
     { return catalog->findDest(name); }
+
+  // Process the links for a page.
+  void processLinks(OutputDev *out, int page);
+
 
 #ifndef DISABLE_OUTLINE
   // Return the outline object.
@@ -164,18 +179,33 @@ public:
   double getPDFVersion() { return pdfVersion; }
 
   // Save this file with another name.
-  GBool saveAs(GooString *name);
+  GBool saveAs(GooString *name, PDFWriteMode mode=writeStandard);
+  // Save this file in the given output stream.
+  GBool saveAs(OutStream *outStr, PDFWriteMode mode=writeStandard);
+  // Save this file with another name without saving changes
+  GBool saveWithoutChangesAs(GooString *name);
+  // Save this file in the given output stream without saving changes
+  GBool saveWithoutChangesAs(OutStream *outStr);
 
   // Return a pointer to the GUI (XPDFCore or WinPDFCore object).
   void *getGUIData() { return guiData; }
 
 private:
+  // Add object to current file stream and return the offset of the beginning of the object
+  Guint writeObject (Object *obj, Ref *ref, OutStream* outStr);
+  void writeDictionnary (Dict* dict, OutStream* outStr);
+  void writeStream (Stream* str, OutStream* outStr);
+  void writeRawStream (Stream* str, OutStream* outStr);
+  void writeTrailer (Guint uxrefOffset, int uxrefSize, OutStream* outStr, GBool incrUpdate);
+  void writeString (GooString* s, OutStream* outStr);
+  void saveIncrementalUpdate (OutStream* outStr);
+  void saveCompleteRewrite (OutStream* outStr);
+
 
   GBool setup(GooString *ownerPassword, GooString *userPassword);
   GBool checkFooter();
   void checkHeader();
   GBool checkEncryption(GooString *ownerPassword, GooString *userPassword);
-  void getLinks(Page *page);
 
   GooString *fileName;
   FILE *file;
@@ -184,10 +214,10 @@ private:
   double pdfVersion;
   XRef *xref;
   Catalog *catalog;
-  Links *links;
 #ifndef DISABLE_OUTLINE
   Outline *outline;
 #endif
+  OCGs *optContentConfig;
 
   GBool ok;
   int errCode;

@@ -155,3 +155,5 @@
 #undef _LARGE_FILES
 
 #define POPPLER_DATADIR "."
+
+#define HAVE_GETTIMEOFDAY 1

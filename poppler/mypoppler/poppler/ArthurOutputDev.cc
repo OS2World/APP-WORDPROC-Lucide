@@ -71,27 +71,26 @@ ArthurOutputDev::ArthurOutputDev(QPainter *painter):
 {
   m_currentBrush = QBrush(Qt::SolidPattern);
   m_fontEngine = 0;
+  m_font = 0;
+  m_image = 0;
 }
 
 ArthurOutputDev::~ArthurOutputDev()
 {
+  delete m_fontEngine;
 }
 
 void ArthurOutputDev::startDoc(XRef *xrefA) {
-  int i;
-
   xref = xrefA;
-  if (m_fontEngine) {
-    delete m_fontEngine;
-  }
+  delete m_fontEngine;
   m_fontEngine = new SplashFontEngine(
 #if HAVE_T1LIB_H
-				    globalParams->getEnableT1lib(),
+  globalParams->getEnableT1lib(),
 #endif
 #if HAVE_FREETYPE_FREETYPE_H || HAVE_FREETYPE_H
-				    globalParams->getEnableFreeType(),
+  globalParams->getEnableFreeType(),
 #endif
-				    globalParams->getAntialias());
+  globalParams->getAntialias());
 }
 
 void ArthurOutputDev::startPage(int pageNum, GfxState *state)
@@ -210,7 +209,7 @@ void ArthurOutputDev::updateFillColor(GfxState *state)
   GfxRGB rgb;
   QColor brushColour = m_currentBrush.color();
   state->getFillRGB(&rgb);
-  brushColour.setRgbF(rgb.r, rgb.g, rgb.b, brushColour.alphaF());
+  brushColour.setRgbF(colToDbl(rgb.r), colToDbl(rgb.g), colToDbl(rgb.b), brushColour.alphaF());
   m_currentBrush.setColor(brushColour);
 }
 
@@ -219,7 +218,7 @@ void ArthurOutputDev::updateStrokeColor(GfxState *state)
   GfxRGB rgb;
   QColor penColour = m_currentPen.color();
   state->getStrokeRGB(&rgb);
-  penColour.setRgbF(rgb.r, rgb.g, rgb.b, penColour.alphaF());
+  penColour.setRgbF(colToDbl(rgb.r), colToDbl(rgb.g), colToDbl(rgb.b), penColour.alphaF());
   m_currentPen.setColor(penColour);
   m_painter->setPen(m_currentPen);
 }
@@ -241,6 +240,10 @@ void ArthurOutputDev::updateStrokeOpacity(GfxState *state)
 
 void ArthurOutputDev::updateFont(GfxState *state)
 {
+#ifdef __GNUC__
+#warning fix this, probably update with updated code from SplashOutputdev
+#endif
+/*
   GfxFont *gfxFont;
   GfxFontType fontType;
   SplashOutFontFileID *id;
@@ -403,7 +406,7 @@ void ArthurOutputDev::updateFont(GfxState *state)
 
  err2:
   delete id;
- err1:
+ err1:*/
   return;
 }
 
@@ -495,7 +498,6 @@ void ArthurOutputDev::drawChar(GfxState *state, double x, double y,
   // fill
   if (!(render & 1)) {
     int x0, y0, xFrac, yFrac;
-    SplashGlyphBitmap glyph;
 
     x0 = static_cast<int>(floor(x1));
     xFrac = splashFloor((x1 - x0) * splashFontFraction);
@@ -508,15 +510,20 @@ void ArthurOutputDev::drawChar(GfxState *state, double x, double y,
       qPath.setFillRule(Qt::WindingFill);
       for (int i = 0; i < fontPath->length; ++i) {
 	if (fontPath->flags[i] & splashPathFirst) {
-	  qPath.moveTo(x0+fontPath->pts[i].x, y0+fontPath->pts[i].y);
+	  qPath.moveTo(fontPath->pts[i].x+x0, fontPath->pts[i].y+y0);
 	} else if (fontPath->flags[i] & splashPathCurve) {
-	  qPath.quadTo(x0+fontPath->pts[i].x, y0+fontPath->pts[i].y,
-		       x0+fontPath->pts[i+1].x, y0+fontPath->pts[i+1].y);
+	  qPath.quadTo(fontPath->pts[i].x+x0, fontPath->pts[i].y+y0,
+		       fontPath->pts[i+1].x+x0, fontPath->pts[i+1].y+y0);
 	  ++i;
-	} else if (fontPath->flags[i] & splashPathArcCW) {
-	  qDebug() << "Need to implement arc";
-	} else {
-	  qPath.lineTo(x0+fontPath->pts[i].x, y0+fontPath->pts[i].y);
+	}
+#ifdef __GNUC__
+#warning FIX THIS
+#endif
+// 	else if (fontPath->flags[i] & splashPathArcCW) {
+// 	  qDebug() << "Need to implement arc";
+// 	}
+	else {
+	  qPath.lineTo(fontPath->pts[i].x+x0, fontPath->pts[i].y+y0);
 	}
 	if (fontPath->flags[i] & splashPathLast) {
 	  qPath.closeSubpath();
@@ -526,11 +533,11 @@ void ArthurOutputDev::drawChar(GfxState *state, double x, double y,
       GfxRGB rgb;
       QColor brushColour = m_currentBrush.color();
       state->getFillRGB(&rgb);
-      brushColour.setRgbF(rgb.r, rgb.g, rgb.b, state->getFillOpacity());
+      brushColour.setRgbF(colToDbl(rgb.r), colToDbl(rgb.g), colToDbl(rgb.b), state->getFillOpacity());
       m_painter->setBrush(brushColour);
       QColor penColour = m_currentPen.color();
       state->getStrokeRGB(&rgb);
-      penColour.setRgbF(rgb.r, rgb.g, rgb.b, state->getStrokeOpacity());
+      penColour.setRgbF(colToDbl(rgb.r), colToDbl(rgb.g), colToDbl(rgb.b), state->getStrokeOpacity());
       m_painter->setPen(penColour);
       m_painter->drawPath( qPath );
       m_painter->restore();
@@ -676,8 +683,7 @@ void ArthurOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
   int x, y;
   ImageStream *imgStr;
   Guchar *pix;
-  GfxRGB rgb;
-  int alpha, i;
+  int i;
   double *ctm;
   QMatrix matrix;
   int is_identity_transform;
@@ -730,6 +736,7 @@ void ArthurOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
 
   if (m_image == NULL || m_image->isNull()) {
     qDebug() << "Null image";
+    delete imgStr;
     return;
   }
   ctm = state->getCTM();
@@ -737,6 +744,8 @@ void ArthurOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
 
   m_painter->setMatrix(matrix, true);
   m_painter->drawImage( QPoint(0,0), *m_image );
+  delete m_image;
+  m_image = 0;
   free (buffer);
   delete imgStr;
 

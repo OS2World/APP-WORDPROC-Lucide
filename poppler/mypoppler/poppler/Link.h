@@ -16,9 +16,10 @@
 #include "Object.h"
 
 class GooString;
-class UGooString;
 class Array;
 class Dict;
+class Sound;
+class Movie;
 
 //------------------------------------------------------------------------
 // LinkAction
@@ -31,6 +32,8 @@ enum LinkActionKind {
   actionURI,			// URI
   actionNamed,			// named action
   actionMovie,			// movie action
+  actionRendition,
+  actionSound,			// sound action
   actionUnknown			// anything else
 };
 
@@ -135,13 +138,13 @@ public:
   // Accessors.
   virtual LinkActionKind getKind() { return actionGoTo; }
   LinkDest *getDest() { return dest; }
-  UGooString *getNamedDest() { return namedDest; }
+  GooString *getNamedDest() { return namedDest; }
 
 private:
 
   LinkDest *dest;		// regular destination (NULL for remote
 				//   link with bad destination)
-  UGooString *namedDest;	// named destination (only one of dest and
+  GooString *namedDest;	// named destination (only one of dest and
 				//   and namedDest may be non-NULL)
 };
 
@@ -166,14 +169,14 @@ public:
   virtual LinkActionKind getKind() { return actionGoToR; }
   GooString *getFileName() { return fileName; }
   LinkDest *getDest() { return dest; }
-  UGooString *getNamedDest() { return namedDest; }
+  GooString *getNamedDest() { return namedDest; }
 
 private:
 
   GooString *fileName;		// file name
   LinkDest *dest;		// regular destination (NULL for remote
 				//   link with bad destination)
-  UGooString *namedDest;	// named destination (only one of dest and
+  GooString *namedDest;	// named destination (only one of dest and
 				//   and namedDest may be non-NULL)
 };
 
@@ -251,6 +254,7 @@ private:
   GooString *name;
 };
 
+
 //------------------------------------------------------------------------
 // LinkMovie
 //------------------------------------------------------------------------
@@ -258,21 +262,100 @@ private:
 class LinkMovie: public LinkAction {
 public:
 
-  LinkMovie(Object *annotObj, Object *titleObj);
+  enum OperationType {
+    operationTypePlay,
+    operationTypePause,
+    operationTypeResume,
+    operationTypeStop
+  };
 
+  LinkMovie(Object *obj);
   virtual ~LinkMovie();
 
-  virtual GBool isOk() { return annotRef.num >= 0 || title != NULL; }
-
+  virtual GBool isOk() { return annotRef.num >= 0 || annotTitle != NULL; }
   virtual LinkActionKind getKind() { return actionMovie; }
+
+  // a movie action stores either an indirect reference to a movie annotation
+  // or the movie annotation title
+
   GBool hasAnnotRef() { return annotRef.num >= 0; }
+  GBool hasAnnotTitle() { return annotTitle != NULL; }
   Ref *getAnnotRef() { return &annotRef; }
-  GooString *getTitle() { return title; }
+  GooString *getAnnotTitle() { return annotTitle; }
+
+  OperationType getOperation() { return operation; }
 
 private:
 
-  Ref annotRef;
-  GooString *title;
+  Ref annotRef;            // Annotation
+  GooString *annotTitle;   // T
+
+  OperationType operation; // Operation
+};
+
+
+//------------------------------------------------------------------------
+// LinkRendition
+//------------------------------------------------------------------------
+
+class LinkRendition: public LinkAction {
+public:
+
+  LinkRendition(Object *Obj);
+
+  virtual ~LinkRendition();
+
+  virtual GBool isOk() { return true; }
+
+  virtual LinkActionKind getKind() { return actionRendition; }
+
+  GBool hasRenditionObject() { return !renditionObj.isNull(); }
+  Object* getRenditionObject() { return &renditionObj; }
+
+  GBool hasScreenAnnot() { return screenRef.num > 0; }
+  Ref* getScreenAnnot() { return &screenRef; }
+
+  int getOperation() { return operation; }
+
+  Movie* getMovie() { return movie; }
+
+private:
+
+  Ref screenRef;
+  Object renditionObj;
+  int operation;
+
+  Movie* movie;
+};
+
+//------------------------------------------------------------------------
+// LinkSound
+//------------------------------------------------------------------------
+
+class LinkSound: public LinkAction {
+public:
+
+  LinkSound(Object *soundObj);
+
+  virtual ~LinkSound();
+
+  virtual GBool isOk() { return sound != NULL; }
+
+  virtual LinkActionKind getKind() { return actionSound; }
+
+  double getVolume() { return volume; }
+  GBool getSynchronous() { return sync; }
+  GBool getRepeat() { return repeat; }
+  GBool getMix() { return mix; }
+  Sound *getSound() { return sound; }
+
+private:
+
+  double volume;
+  GBool sync;
+  GBool repeat;
+  GBool mix;
+  Sound *sound;
 };
 
 //------------------------------------------------------------------------
@@ -298,42 +381,6 @@ public:
 private:
 
   GooString *action;		// action subtype
-};
-
-//------------------------------------------------------------------------
-// LinkBorderStyle
-//------------------------------------------------------------------------
-
-enum LinkBorderType {
-  linkBorderSolid,
-  linkBorderDashed,
-  linkBorderEmbossed,
-  linkBorderEngraved,
-  linkBorderUnderlined
-};
-
-class LinkBorderStyle {
-public:
-
-  LinkBorderStyle(LinkBorderType typeA, double widthA,
-		  double *dashA, int dashLengthA,
-		  double rA, double gA, double bA);
-  ~LinkBorderStyle();
-
-  LinkBorderType getType() { return type; }
-  double getWidth() { return width; }
-  void getDash(double **dashA, int *dashLengthA)
-    { *dashA = dash; *dashLengthA = dashLength; }
-  void getColor(double *rA, double *gA, double *bA)
-    { *rA = r; *gA = g; *bA = b; }
-
-private:
-
-  LinkBorderType type;
-  double width;
-  double *dash;
-  int dashLength;
-  double r, g, b;
 };
 
 //------------------------------------------------------------------------
@@ -363,14 +410,10 @@ public:
   void getRect(double *xa1, double *ya1, double *xa2, double *ya2)
     { *xa1 = x1; *ya1 = y1; *xa2 = x2; *ya2 = y2; }
 
-  // Get the border style info.
-  LinkBorderStyle *getBorderStyle() { return borderStyle; }
-
 private:
 
   double x1, y1;		// lower left corner
   double x2, y2;		// upper right corner
-  LinkBorderStyle *borderStyle;	// border style
   LinkAction *action;		// action
   GBool ok;			// is link valid?
 };

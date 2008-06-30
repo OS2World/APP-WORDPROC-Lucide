@@ -23,7 +23,8 @@ class SplashFontFileID;
 // SplashFontFile
 //------------------------------------------------------------------------
 
-struct SplashFontSrc {
+class SplashFontSrc {
+public:
   SplashFontSrc();
   ~SplashFontSrc();
 
@@ -49,7 +50,7 @@ public:
 
   // Create a new SplashFont, i.e., a scaled instance of this font
   // file.
-  virtual SplashFont *makeFont(SplashCoord *mat) = 0;
+  virtual SplashFont *makeFont(SplashCoord *mat, SplashCoord *textMat) = 0;
 
   // Get the font file ID.
   SplashFontFileID *getID() { return id; }
@@ -60,6 +61,8 @@ public:
   // Decrement the reference count.  If the new value is zero, delete
   // the SplashFontFile object.
   void decRefCnt();
+
+  GBool doAdjustMatrix;
 
 protected:
 

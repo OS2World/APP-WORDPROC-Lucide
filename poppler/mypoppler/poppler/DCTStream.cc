@@ -52,7 +52,7 @@ static void str_term_source(j_decompress_ptr cinfo)
 {
 }
 
-DCTStream::DCTStream(Stream *strA):
+DCTStream::DCTStream(Stream *strA, int colorXformA) :
   FilterStream(strA) {
   init();
 }
@@ -60,6 +60,12 @@ DCTStream::DCTStream(Stream *strA):
 DCTStream::~DCTStream() {
   jpeg_destroy_decompress(&cinfo);
   delete str;
+}
+
+void exitErrorHandler(jpeg_common_struct *error) {
+  j_decompress_ptr cinfo = (j_decompress_ptr)error;
+  str_src_mgr * src = (struct str_src_mgr *)cinfo->src;
+  src->abort = true;
 }
 
 void DCTStream::init()
@@ -74,8 +80,11 @@ void DCTStream::init()
   src.pub.next_input_byte = NULL;
   src.str = str;
   src.index = 0;
+  src.abort = false;
   cinfo.src = (jpeg_source_mgr *)&src;
-  cinfo.err = jpeg_std_error(&jerr);
+  jpeg_std_error(&jerr);
+  jerr.error_exit = &exitErrorHandler;
+  cinfo.err = &jerr;
   x = 0;
   row_buffer = NULL;
 }
@@ -106,7 +115,8 @@ void DCTStream::reset() {
       if (c == -1)
       {
         error(-1, "Could not find start of jpeg data");
-        exit(1);
+        src.abort = true;
+        return;
       }
       if (c != 0xFF) c = 0;
     }
@@ -123,6 +133,8 @@ void DCTStream::reset() {
   }
 
   jpeg_read_header(&cinfo, TRUE);
+  if (src.abort) return;
+
   jpeg_start_decompress(&cinfo);
 
   row_stride = cinfo.output_width * cinfo.output_components;
@@ -130,6 +142,8 @@ void DCTStream::reset() {
 }
 
 int DCTStream::getChar() {
+  if (src.abort) return EOF;
+  
   int c;
 
   if (x == 0) {
@@ -147,6 +161,8 @@ int DCTStream::getChar() {
 }
 
 int DCTStream::lookChar() {
+  if (src.abort) return EOF;
+  
   int c;
   c = row_buffer[0][x];
   return c;

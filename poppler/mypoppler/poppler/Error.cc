@@ -18,7 +18,7 @@
 #include "GlobalParams.h"
 #include "Error.h"
 
-static void CDECL defaultErrorFunction(int pos, char *msg, va_list args)
+static void defaultErrorFunction(int pos, char *msg, va_list args)
 {
   if (pos >= 0) {
     fprintf(stderr, "Error (%d): ", pos);
@@ -30,9 +30,9 @@ static void CDECL defaultErrorFunction(int pos, char *msg, va_list args)
   fflush(stderr);
 }
 
-static void CDECL (*errorFunction)(int , char *, va_list args) = defaultErrorFunction;
+static void (*errorFunction)(int, char *, va_list args) = defaultErrorFunction;
 
-void setErrorFunction(void CDECL (* f)(int , char *, va_list args))
+void setErrorFunction(void (* f)(int, char *, va_list args))
 {
     errorFunction = f;
 }
@@ -45,5 +45,12 @@ void CDECL error(int pos, char *msg, ...) {
   }
   va_start(args, msg);
   (*errorFunction)(pos, msg, args);
+  va_end(args);
+}
+
+void warning(char *msg, ...) {
+  va_list args;
+  va_start(args, msg);
+  vprintf(msg, args);
   va_end(args);
 }

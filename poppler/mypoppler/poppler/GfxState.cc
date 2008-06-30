@@ -22,7 +22,6 @@
 #include "Page.h"
 #include "GfxState.h"
 #include "GfxFont.h"
-#include "UGooString.h"
 
 //------------------------------------------------------------------------
 
@@ -62,12 +61,12 @@ void Matrix::transform(double x, double y, double *tx, double *ty)
 
 //------------------------------------------------------------------------
 
-struct gfxBlendModeName {
+struct GfxBlendModeInfo {
   char *name;
   GfxBlendMode mode;
 };
 
-static gfxBlendModeName gfxBlendModeNames[] = {
+static GfxBlendModeInfo gfxBlendModeNames[] = {
   { "Normal",     gfxBlendNormal },
   { "Compatible", gfxBlendNormal },
   { "Multiply",   gfxBlendMultiply },
@@ -88,7 +87,7 @@ static gfxBlendModeName gfxBlendModeNames[] = {
 };
 
 #define nGfxBlendModeNames \
-          ((int)((sizeof(gfxBlendModeNames) / sizeof(gfxBlendModeName))))
+          ((int)((sizeof(gfxBlendModeNames) / sizeof(GfxBlendModeInfo))))
 	 
 //------------------------------------------------------------------------
 // 
@@ -264,6 +263,10 @@ void GfxDeviceGrayColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   cmyk->k = clip01(gfxColorComp1 - color->c[0]);
 }
 
+void GfxDeviceGrayColorSpace::getDefaultColor(GfxColor *color) {
+  color->c[0] = 0;
+}
+
 //------------------------------------------------------------------------
 // GfxCalGrayColorSpace
 //------------------------------------------------------------------------
@@ -361,6 +364,10 @@ void GfxCalGrayColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   cmyk->k = clip01(gfxColorComp1 - color->c[0]);
 }
 
+void GfxCalGrayColorSpace::getDefaultColor(GfxColor *color) {
+  color->c[0] = 0;
+}
+
 //------------------------------------------------------------------------
 // GfxDeviceRGBColorSpace
 //------------------------------------------------------------------------
@@ -424,6 +431,12 @@ void GfxDeviceRGBColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   cmyk->m = m - k;
   cmyk->y = y - k;
   cmyk->k = k;
+}
+
+void GfxDeviceRGBColorSpace::getDefaultColor(GfxColor *color) {
+  color->c[0] = 0;
+  color->c[1] = 0;
+  color->c[2] = 0;
 }
 
 //------------------------------------------------------------------------
@@ -577,6 +590,12 @@ void GfxCalRGBColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   cmyk->k = k;
 }
 
+void GfxCalRGBColorSpace::getDefaultColor(GfxColor *color) {
+  color->c[0] = 0;
+  color->c[1] = 0;
+  color->c[2] = 0;
+}
+
 //------------------------------------------------------------------------
 // GfxDeviceCMYKColorSpace
 //------------------------------------------------------------------------
@@ -665,6 +684,13 @@ void GfxDeviceCMYKColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   cmyk->m = clip01(color->c[1]);
   cmyk->y = clip01(color->c[2]);
   cmyk->k = clip01(color->c[3]);
+}
+
+void GfxDeviceCMYKColorSpace::getDefaultColor(GfxColor *color) {
+  color->c[0] = 0;
+  color->c[1] = 0;
+  color->c[2] = 0;
+  color->c[3] = gfxColorComp1;
 }
 
 //------------------------------------------------------------------------
@@ -782,7 +808,7 @@ void GfxLabColorSpace::getGray(GfxColor *color, GfxGray *gray) {
 
   getRGB(color, &rgb);
   *gray = clip01((GfxColorComp)(0.299 * rgb.r +
-		 0.587 * rgb.g +
+				0.587 * rgb.g +
 				0.114 * rgb.b + 0.5));
 }
 
@@ -842,6 +868,24 @@ void GfxLabColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   cmyk->m = m - k;
   cmyk->y = y - k;
   cmyk->k = k;
+}
+
+void GfxLabColorSpace::getDefaultColor(GfxColor *color) {
+  color->c[0] = 0;
+  if (aMin > 0) {
+    color->c[1] = dblToCol(aMin);
+  } else if (aMax < 0) {
+    color->c[1] = dblToCol(aMax);
+  } else {
+    color->c[1] = 0;
+  }
+  if (bMin > 0) {
+    color->c[2] = dblToCol(bMin);
+  } else if (bMax < 0) {
+    color->c[2] = dblToCol(bMax);
+  } else {
+    color->c[2] = 0;
+  }
 }
 
 void GfxLabColorSpace::getDefaultRanges(double *decodeLow, double *decodeRange,
@@ -974,6 +1018,20 @@ void GfxICCBasedColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   alt->getCMYK(color, cmyk);
 }
 
+void GfxICCBasedColorSpace::getDefaultColor(GfxColor *color) {
+  int i;
+
+  for (i = 0; i < nComps; ++i) {
+    if (rangeMin[i] > 0) {
+      color->c[i] = dblToCol(rangeMin[i]);
+    } else if (rangeMax[i] < 0) {
+      color->c[i] = dblToCol(rangeMax[i]);
+    } else {
+      color->c[i] = 0;
+    }
+  }
+}
+
 void GfxICCBasedColorSpace::getDefaultRanges(double *decodeLow,
 					     double *decodeRange,
 					     int maxImgPixel) {
@@ -1060,8 +1118,8 @@ GfxColorSpace *GfxIndexedColorSpace::parse(Array *arr) {
     for (i = 0; i <= indexHighA; ++i) {
       for (j = 0; j < n; ++j) {
 	if ((x = obj1.streamGetChar()) == EOF) {
-	  error(-1, "Bad Indexed color space (lookup table stream too short)");
-	  goto err3;
+	  error(-1, "Bad Indexed color space (lookup table stream too short) padding with zeroes");
+	  x = 0;
 	}
 	cs->lookup[i*n + j] = (Guchar)x;
       }
@@ -1121,7 +1179,6 @@ void GfxIndexedColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
 }
 
 void GfxIndexedColorSpace::getRGBLine(Guchar *in, unsigned int *out, int length) {
-  GfxColor color2;
   Guchar *line;
   int i, j, n;
 
@@ -1142,6 +1199,10 @@ void GfxIndexedColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   base->getCMYK(mapColorToBase(color, &color2), cmyk);
 }
 
+void GfxIndexedColorSpace::getDefaultColor(GfxColor *color) {
+  color->c[0] = 0;
+}
+
 void GfxIndexedColorSpace::getDefaultRanges(double *decodeLow,
 					    double *decodeRange,
 					    int maxImgPixel) {
@@ -1159,6 +1220,7 @@ GfxSeparationColorSpace::GfxSeparationColorSpace(GooString *nameA,
   name = nameA;
   alt = altA;
   func = funcA;
+  nonMarking = !name->cmp("None");
 }
 
 GfxSeparationColorSpace::~GfxSeparationColorSpace() {
@@ -1255,6 +1317,10 @@ void GfxSeparationColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   alt->getCMYK(&color2, cmyk);
 }
 
+void GfxSeparationColorSpace::getDefaultColor(GfxColor *color) {
+  color->c[0] = gfxColorComp1;
+}
+
 //------------------------------------------------------------------------
 // GfxDeviceNColorSpace
 //------------------------------------------------------------------------
@@ -1265,6 +1331,7 @@ GfxDeviceNColorSpace::GfxDeviceNColorSpace(int nCompsA,
   nComps = nCompsA;
   alt = altA;
   func = funcA;
+  nonMarking = gFalse;
 }
 
 GfxDeviceNColorSpace::~GfxDeviceNColorSpace() {
@@ -1285,6 +1352,7 @@ GfxColorSpace *GfxDeviceNColorSpace::copy() {
   for (i = 0; i < nComps; ++i) {
     cs->names[i] = names[i]->copy();
   }
+  cs->nonMarking = nonMarking;
   return cs;
 }
 
@@ -1334,8 +1402,12 @@ GfxColorSpace *GfxDeviceNColorSpace::parse(Array *arr) {
   }
   obj1.free();
   cs = new GfxDeviceNColorSpace(nCompsA, altA, funcA);
+  cs->nonMarking = gTrue;
   for (i = 0; i < nCompsA; ++i) {
     cs->names[i] = namesA[i];
+    if (namesA[i]->cmp("None")) {
+      cs->nonMarking = gFalse;
+    }
   }
   return cs;
 
@@ -1396,6 +1468,14 @@ void GfxDeviceNColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   alt->getCMYK(&color2, cmyk);
 }
 
+void GfxDeviceNColorSpace::getDefaultColor(GfxColor *color) {
+  int i;
+
+  for (i = 0; i < nComps; ++i) {
+    color->c[i] = gfxColorComp1;
+  }
+}
+
 //------------------------------------------------------------------------
 // GfxPatternColorSpace
 //------------------------------------------------------------------------
@@ -1449,6 +1529,10 @@ void GfxPatternColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
 void GfxPatternColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   cmyk->c = cmyk->m = cmyk->y = 0;
   cmyk->k = 1;
+}
+
+void GfxPatternColorSpace::getDefaultColor(GfxColor *color) {
+  color->c[0]=0;
 }
 
 //------------------------------------------------------------------------
@@ -1883,9 +1967,9 @@ GfxFunctionShading *GfxFunctionShading::parse(Dict *dict) {
       obj1.arrayGetLength() == 4) {
     x0A = obj1.arrayGet(0, &obj2)->getNum();
     obj2.free();
-    y0A = obj1.arrayGet(1, &obj2)->getNum();
+    x1A = obj1.arrayGet(1, &obj2)->getNum();
     obj2.free();
-    x1A = obj1.arrayGet(2, &obj2)->getNum();
+    y0A = obj1.arrayGet(2, &obj2)->getNum();
     obj2.free();
     y1A = obj1.arrayGet(3, &obj2)->getNum();
     obj2.free();
@@ -3265,6 +3349,17 @@ GfxImageColorMap::GfxImageColorMap(int bitsA, Object *decode,
   maxPixel = (1 << bits) - 1;
   colorSpace = colorSpaceA;
 
+  // this is a hack to support 16 bits images, everywhere
+  // we assume a component fits in 8 bits, with this hack
+  // we treat 16 bit images as 8 bit ones until it's fixed correctly.
+  // The hack has another part on ImageStream::getLine
+  if (maxPixel > 255) maxPixel = 255;
+
+  // initialize
+  for (k = 0; k < gfxColorMaxComps; ++k) {
+    lookup[k] = NULL;
+  }
+
   // get decode map
   if (decode->isNull()) {
     nComps = colorSpace->getNComps();
@@ -3299,9 +3394,6 @@ GfxImageColorMap::GfxImageColorMap(int bitsA, Object *decode,
   // Optimization: for Indexed and Separation color spaces (which have
   // only one component), we store color values in the lookup table
   // rather than component values.
-  for (k = 0; k < gfxColorMaxComps; ++k) {
-    lookup[k] = NULL;
-  }
   colorSpace2 = NULL;
   nComps2 = 0;
   if (colorSpace->getMode() == csIndexed) {
@@ -3371,9 +3463,6 @@ GfxImageColorMap::GfxImageColorMap(int bitsA, Object *decode,
   obj.free();
  err1:
   ok = gFalse;
-  for (k = 0; k < gfxColorMaxComps; ++k) {
-    lookup[k] = NULL;
-  }
   byte_lookup = NULL;
 }
 
@@ -3459,11 +3548,8 @@ void GfxImageColorMap::getRGB(Guchar *x, GfxRGB *rgb) {
 }
 
 void GfxImageColorMap::getGrayLine(Guchar *in, Guchar *out, int length) {
-  GfxColor color;
-  double *p;
   int i, j;
-  Guchar *inp, *outp, *tmp_line;
-  GfxColorSpace *base;
+  Guchar *inp, *tmp_line;
 
   switch (colorSpace->getMode()) {
   case csIndexed:
@@ -3492,11 +3578,8 @@ void GfxImageColorMap::getGrayLine(Guchar *in, Guchar *out, int length) {
 }
 
 void GfxImageColorMap::getRGBLine(Guchar *in, unsigned int *out, int length) {
-  GfxColor color;
-  double *p;
   int i, j;
-  Guchar *inp, *outp, *tmp_line;
-  GfxColorSpace *base;
+  Guchar *inp, *tmp_line;
 
   switch (colorSpace->getMode()) {
   case csIndexed:
@@ -3741,10 +3824,12 @@ void GfxPath::offset(double dx, double dy) {
 // GfxState
 //------------------------------------------------------------------------
 
-GfxState::GfxState(double hDPI, double vDPI, PDFRectangle *pageBox,
+GfxState::GfxState(double hDPIA, double vDPIA, PDFRectangle *pageBox,
 		   int rotateA, GBool upsideDown) {
   double kx, ky;
 
+  hDPI = hDPIA;
+  vDPI = vDPIA;
   rotate = rotateA;
   px1 = pageBox->x1;
   py1 = pageBox->y1;
@@ -3801,6 +3886,7 @@ GfxState::GfxState(double hDPI, double vDPI, PDFRectangle *pageBox,
   strokeOpacity = 1;
   fillOverprint = gFalse;
   strokeOverprint = gFalse;
+  transfer[0] = transfer[1] = transfer[2] = transfer[3] = NULL;
 
   lineWidth = 1;
   lineDash = NULL;
@@ -3810,6 +3896,7 @@ GfxState::GfxState(double hDPI, double vDPI, PDFRectangle *pageBox,
   lineJoin = 0;
   lineCap = 0;
   miterLimit = 10;
+  strokeAdjust = gFalse;
 
   font = NULL;
   fontSize = 0;
@@ -3836,6 +3923,8 @@ GfxState::GfxState(double hDPI, double vDPI, PDFRectangle *pageBox,
 }
 
 GfxState::~GfxState() {
+  int i;
+
   if (fillColorSpace) {
     delete fillColorSpace;
   }
@@ -3847,6 +3936,11 @@ GfxState::~GfxState() {
   }
   if (strokePattern) {
     delete strokePattern;
+  }
+  for (i = 0; i < 4; ++i) {
+    if (transfer[i]) {
+      delete transfer[i];
+    }
   }
   gfree(lineDash);
   if (path) {
@@ -3863,6 +3957,8 @@ GfxState::~GfxState() {
 
 // Used for copy();
 GfxState::GfxState(GfxState *state) {
+  int i;
+
   memcpy(this, state, sizeof(GfxState));
   if (fillColorSpace) {
     fillColorSpace = state->fillColorSpace->copy();
@@ -3875,6 +3971,11 @@ GfxState::GfxState(GfxState *state) {
   }
   if (strokePattern) {
     strokePattern = state->strokePattern->copy();
+  }
+  for (i = 0; i < 4; ++i) {
+    if (transfer[i]) {
+      transfer[i] = state->transfer[i]->copy();
+    }
   }
   if (lineDashLength > 0) {
     lineDash = (double *)gmallocn(lineDashLength, sizeof(double));
@@ -4024,6 +4125,15 @@ void GfxState::concatCTM(double a, double b, double c,
   }
 }
 
+void GfxState::shiftCTM(double tx, double ty) {
+  ctm[4] += tx;
+  ctm[5] += ty;
+  clipXMin += tx;
+  clipYMin += ty;
+  clipXMax += tx;
+  clipYMax += ty;
+}
+
 void GfxState::setFillColorSpace(GfxColorSpace *colorSpace) {
   if (fillColorSpace) {
     delete fillColorSpace;
@@ -4058,6 +4168,17 @@ void GfxState::setFont(GfxFont *fontA, double fontSizeA) {
 
   font = fontA;
   fontSize = fontSizeA;
+}
+
+void GfxState::setTransfer(Function **funcs) {
+  int i;
+
+  for (i = 0; i < 4; ++i) {
+    if (transfer[i]) {
+      delete transfer[i];
+    }
+    transfer[i] = funcs[i];
+  }
 }
 
 void GfxState::setLineDash(double *dash, int length, double start) {
@@ -4100,6 +4221,69 @@ void GfxState::clip() {
       }
     }
   }
+  if (xMin > clipXMin) {
+    clipXMin = xMin;
+  }
+  if (yMin > clipYMin) {
+    clipYMin = yMin;
+  }
+  if (xMax < clipXMax) {
+    clipXMax = xMax;
+  }
+  if (yMax < clipYMax) {
+    clipYMax = yMax;
+  }
+}
+
+void GfxState::clipToStrokePath() {
+  double xMin, yMin, xMax, yMax, x, y, t0, t1;
+  GfxSubpath *subpath;
+  int i, j;
+
+  xMin = xMax = yMin = yMax = 0; // make gcc happy
+  for (i = 0; i < path->getNumSubpaths(); ++i) {
+    subpath = path->getSubpath(i);
+    for (j = 0; j < subpath->getNumPoints(); ++j) {
+      transform(subpath->getX(j), subpath->getY(j), &x, &y);
+      if (i == 0 && j == 0) {
+	xMin = xMax = x;
+	yMin = yMax = y;
+      } else {
+	if (x < xMin) {
+	  xMin = x;
+	} else if (x > xMax) {
+	  xMax = x;
+	}
+	if (y < yMin) {
+	  yMin = y;
+	} else if (y > yMax) {
+	  yMax = y;
+	}
+      }
+    }
+  }
+
+  // allow for the line width
+  //~ miter joins can extend farther than this
+  t0 = fabs(ctm[0]);
+  t1 = fabs(ctm[2]);
+  if (t0 > t1) {
+    xMin -= 0.5 * lineWidth * t0;
+    xMax += 0.5 * lineWidth * t0;
+  } else {
+    xMin -= 0.5 * lineWidth * t1;
+    xMax += 0.5 * lineWidth * t1;
+  }
+  t0 = fabs(ctm[0]);
+  t1 = fabs(ctm[3]);
+  if (t0 > t1) {
+    yMin -= 0.5 * lineWidth * t0;
+    yMax += 0.5 * lineWidth * t0;
+  } else {
+    yMin -= 0.5 * lineWidth * t1;
+    yMax += 0.5 * lineWidth * t1;
+  }
+
   if (xMin > clipXMin) {
     clipXMin = xMin;
   }

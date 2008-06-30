@@ -31,13 +31,17 @@ struct SplashFontCacheTag {
 //------------------------------------------------------------------------
 
 SplashFont::SplashFont(SplashFontFile *fontFileA, SplashCoord *matA,
-		       GBool aaA) {
+		       SplashCoord *textMatA, GBool aaA) {
   fontFile = fontFileA;
   fontFile->incRefCnt();
   mat[0] = matA[0];
   mat[1] = matA[1];
   mat[2] = matA[2];
   mat[3] = matA[3];
+  textMat[0] = textMatA[0];
+  textMat[1] = textMatA[1];
+  textMat[2] = textMatA[2];
+  textMat[3] = textMatA[3];
   aa = aaA;
 
   cache = NULL;
@@ -70,11 +74,15 @@ void SplashFont::initCache() {
   } else {
     cacheSets = 1;
   }
-  cache = (Guchar *)gmallocn(cacheSets* cacheAssoc, glyphSize);
-  cacheTags = (SplashFontCacheTag *)gmallocn(cacheSets * cacheAssoc,
+  cache = (Guchar *)gmallocn_checkoverflow(cacheSets* cacheAssoc, glyphSize);
+  if (cache != NULL) {
+    cacheTags = (SplashFontCacheTag *)gmallocn(cacheSets * cacheAssoc,
 					     sizeof(SplashFontCacheTag));
-  for (i = 0; i < cacheSets * cacheAssoc; ++i) {
-    cacheTags[i].mru = i & (cacheAssoc - 1);
+    for (i = 0; i < cacheSets * cacheAssoc; ++i) {
+      cacheTags[i].mru = i & (cacheAssoc - 1);
+    }
+  } else {
+    cacheAssoc = 0;
   }
 }
 
@@ -89,7 +97,7 @@ SplashFont::~SplashFont() {
 }
 
 GBool SplashFont::getGlyph(int c, int xFrac, int yFrac,
-			   SplashGlyphBitmap *bitmap) {
+			   SplashGlyphBitmap *bitmap, int x0, int y0, SplashClip *clip, SplashClipResult *clipRes) {
   SplashGlyphBitmap bitmap2;
   int size;
   Guchar *p;
@@ -123,13 +131,26 @@ GBool SplashFont::getGlyph(int c, int xFrac, int yFrac,
       bitmap->aa = aa;
       bitmap->data = cache + (i+j) * glyphSize;
       bitmap->freeData = gFalse;
+
+      *clipRes = clip->testRect(x0 - bitmap->x,
+                                y0 - bitmap->y,
+                                x0 - bitmap->x + bitmap->w - 1,
+                                y0 - bitmap->y + bitmap->h - 1);
+
       return gTrue;
     }
   }
 
   // generate the glyph bitmap
-  if (!makeGlyph(c, xFrac, yFrac, &bitmap2)) {
+  if (!makeGlyph(c, xFrac, yFrac, &bitmap2, x0, y0, clip, clipRes)) {
     return gFalse;
+  }
+
+  if (*clipRes == splashClipAllOutside)
+  {
+    bitmap->freeData = gFalse;
+    if (bitmap2.freeData) gfree(bitmap2.data);
+    return gTrue;
   }
 
   // if the glyph doesn't fit in the bounding box, return a temporary
@@ -146,27 +167,35 @@ GBool SplashFont::getGlyph(int c, int xFrac, int yFrac,
     size = ((bitmap2.w + 7) >> 3) * bitmap2.h;
   }
   p = NULL; // make gcc happy
-  for (j = 0; j < cacheAssoc; ++j) {
-    if ((cacheTags[i+j].mru & 0x7fffffff) == cacheAssoc - 1) {
-      cacheTags[i+j].mru = 0x80000000;
-      cacheTags[i+j].c = c;
-      cacheTags[i+j].xFrac = (short)xFrac;
-      cacheTags[i+j].yFrac = (short)yFrac;
-      cacheTags[i+j].x = bitmap2.x;
-      cacheTags[i+j].y = bitmap2.y;
-      cacheTags[i+j].w = bitmap2.w;
-      cacheTags[i+j].h = bitmap2.h;
-      p = cache + (i+j) * glyphSize;
-      memcpy(p, bitmap2.data, size);
-    } else {
-      ++cacheTags[i+j].mru;
-    }
+  if (cacheAssoc == 0)
+  {
+    // we had problems on the malloc of the cache, so ignore it
+    *bitmap = bitmap2;
   }
-  *bitmap = bitmap2;
-  bitmap->data = p;
-  bitmap->freeData = gFalse;
-  if (bitmap2.freeData) {
-    gfree(bitmap2.data);
+  else
+  {
+    for (j = 0; j < cacheAssoc; ++j) {
+      if ((cacheTags[i+j].mru & 0x7fffffff) == cacheAssoc - 1) {
+        cacheTags[i+j].mru = 0x80000000;
+        cacheTags[i+j].c = c;
+        cacheTags[i+j].xFrac = (short)xFrac;
+        cacheTags[i+j].yFrac = (short)yFrac;
+        cacheTags[i+j].x = bitmap2.x;
+        cacheTags[i+j].y = bitmap2.y;
+        cacheTags[i+j].w = bitmap2.w;
+        cacheTags[i+j].h = bitmap2.h;
+        p = cache + (i+j) * glyphSize;
+        memcpy(p, bitmap2.data, size);
+      } else {
+        ++cacheTags[i+j].mru;
+      }
+    }
+    *bitmap = bitmap2;
+    bitmap->data = p;
+    bitmap->freeData = gFalse;
+    if (bitmap2.freeData) {
+      gfree(bitmap2.data);
+    }
   }
   return gTrue;
 }

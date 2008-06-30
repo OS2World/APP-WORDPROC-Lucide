@@ -2,7 +2,7 @@
 //
 // Catalog.cc
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2007 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -23,16 +23,19 @@
 #include "Error.h"
 #include "Link.h"
 #include "PageLabelInfo.h"
-#include "UGooString.h"
 #include "Catalog.h"
+#include "Form.h"
+#include "OptionalContent.h"
 
 //------------------------------------------------------------------------
 // Catalog
 //------------------------------------------------------------------------
 
 Catalog::Catalog(XRef *xrefA) {
-  Object catDict, pagesDict;
+  Object catDict, pagesDict, pagesDictRef;
   Object obj, obj2;
+  Object optContentProps;
+  char *alreadyRead;
   int numPages0;
   int i;
 
@@ -43,12 +46,22 @@ Catalog::Catalog(XRef *xrefA) {
   numPages = pagesSize = 0;
   baseURI = NULL;
   pageLabelInfo = NULL;
+  form = NULL;
+  optContent = NULL;
 
   xref->getCatalog(&catDict);
   if (!catDict.isDict()) {
     error(-1, "Catalog object is wrong type (%s)", catDict.getTypeName());
     goto err1;
   }
+  // get the AcroForm dictionary
+  catDict.dictLookup("AcroForm", &acroForm);
+
+  // load Forms
+  if (acroForm.isDict()) {
+    form = new Form(xref,&acroForm);
+  }
+
 
   // read page tree
   catDict.dictLookup("Pages", &pagesDict);
@@ -75,7 +88,16 @@ Catalog::Catalog(XRef *xrefA) {
     pageRefs[i].num = -1;
     pageRefs[i].gen = -1;
   }
-  numPages = readPageTree(pagesDict.getDict(), NULL, 0);
+  alreadyRead = (char *)gmalloc(xref->getNumObjects());
+  memset(alreadyRead, 0, xref->getNumObjects());
+  if (catDict.dictLookupNF("Pages", &pagesDictRef)->isRef() &&
+      pagesDictRef.getRefNum() >= 0 &&
+      pagesDictRef.getRefNum() < xref->getNumObjects()) {
+    alreadyRead[pagesDictRef.getRefNum()] = 1;
+  }
+  pagesDictRef.free();
+  numPages = readPageTree(pagesDict.getDict(), NULL, 0, alreadyRead);
+  gfree(alreadyRead);
   if (numPages != numPages0) {
     error(-1, "Page count in top-level pages object is incorrect");
   }
@@ -152,8 +174,14 @@ Catalog::Catalog(XRef *xrefA) {
   // get the outline dictionary
   catDict.dictLookup("Outlines", &outline);
 
-  // get the AcroForm dictionary
-  catDict.dictLookup("AcroForm", &acroForm);
+  // get the Optional Content dictionary
+  catDict.dictLookup("OCProperties", &optContentProps);
+  optContent = new OCGs(&optContentProps, xref);
+  optContentProps.free();
+
+  // perform form-related loading after all widgets have been loaded
+  if (form) 
+    form->postWidgetsLoad();
 
   catDict.free();
   return;
@@ -187,6 +215,8 @@ Catalog::~Catalog() {
     delete baseURI;
   }
   delete pageLabelInfo;
+  delete form;
+  delete optContent;
   metadata.free();
   structTreeRoot.free();
   outline.free();
@@ -217,7 +247,8 @@ GooString *Catalog::readMetadata() {
   return s;
 }
 
-int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
+int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start,
+			  char *alreadyRead) {
   Object kids;
   Object kid;
   Object kidRef;
@@ -233,10 +264,21 @@ int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
     goto err1;
   }
   for (i = 0; i < kids.arrayGetLength(); ++i) {
+    kids.arrayGetNF(i, &kidRef);
+    if (kidRef.isRef() &&
+	kidRef.getRefNum() >= 0 &&
+	kidRef.getRefNum() < xref->getNumObjects()) {
+      if (alreadyRead[kidRef.getRefNum()]) {
+	error(-1, "Loop in Pages tree");
+	kidRef.free();
+	continue;
+      }
+      alreadyRead[kidRef.getRefNum()] = 1;
+    }
     kids.arrayGet(i, &kid);
     if (kid.isDict("Page")) {
       attrs2 = new PageAttrs(attrs1, kid.getDict());
-      page = new Page(xref, start+1, kid.getDict(), attrs2);
+      page = new Page(xref, start+1, kid.getDict(), attrs2, form);
       if (!page->isOk()) {
 	++start;
 	goto err3;
@@ -252,17 +294,15 @@ int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
 	}
       }
       pages[start] = page;
-      kids.arrayGetNF(i, &kidRef);
       if (kidRef.isRef()) {
 	pageRefs[start].num = kidRef.getRefNum();
 	pageRefs[start].gen = kidRef.getRefGen();
       }
-      kidRef.free();
       ++start;
     // This should really be isDict("Pages"), but I've seen at least one
     // PDF file where the /Type entry is missing.
     } else if (kid.isDict()) {
-      if ((start = readPageTree(kid.getDict(), attrs1, start))
+      if ((start = readPageTree(kid.getDict(), attrs1, start, alreadyRead))
 	  < 0)
 	goto err2;
     } else {
@@ -270,6 +310,7 @@ int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
 	    start+1, kid.getTypeName());
     }
     kid.free();
+    kidRef.free();
   }
   delete attrs1;
   kids.free();
@@ -296,7 +337,7 @@ int Catalog::findPage(int num, int gen) {
   return 0;
 }
 
-LinkDest *Catalog::findDest(UGooString *name) {
+LinkDest *Catalog::findDest(GooString *name) {
   LinkDest *dest;
   Object obj1, obj2;
   GBool found;
@@ -304,7 +345,7 @@ LinkDest *Catalog::findDest(UGooString *name) {
   // try named destination dictionary then name tree
   found = gFalse;
   if (dests.isDict()) {
-    if (!dests.dictLookup(*name, &obj1)->isNull())
+    if (!dests.dictLookup(name->getCString(), &obj1)->isNull())
       found = gTrue;
     else
       obj1.free();
@@ -351,12 +392,13 @@ EmbFile *Catalog::embeddedFile(int i)
     Object obj, obj2;
     obj = embeddedFileNameTree.getValue(i);
     GooString *fileName = new GooString();
-    char *descString = embeddedFileNameTree.getName(i)->getCString();
-    GooString *desc = new GooString(descString);
-    delete[] descString;
+    GooString *desc = new GooString(embeddedFileNameTree.getName(i));
     GooString *createDate = new GooString();
     GooString *modDate = new GooString();
-    Stream *efStream;
+    GooString *checksum = new GooString();
+    GooString *mimetype = new GooString();
+    Stream *efStream = NULL;
+    int size = -1;
     if (obj.isRef()) {
 	if (obj.fetch(xref, &efDict)->isDict()) {
 	    // efDict matches Table 3.40 in the PDF1.6 spec
@@ -395,13 +437,13 @@ EmbFile *Catalog::embeddedFile(int i)
 		// dataDict corresponds to Table 3.41 in the PDF1.6 spec.
 		Dict *dataDict = efStream->getDict();
 
-		// subtype is normally mimetype. You can extract it with code like this:
-		// Object subtypeName;
-		// dataDict->lookup( "Subtype", &subtypeName );
-		// It is optional, so this will sometimes return a null object
-		// if (subtypeName.isName()) {
-		//        std::cout << "got subtype name: " << subtypeName.getName() << std::endl;
-		// }
+		// subtype is normally the mimetype
+		Object subtypeName;
+		if (dataDict->lookup("Subtype", &subtypeName)->isName()) {
+		    delete mimetype;
+		    mimetype = new GooString(subtypeName.getName());
+		}
+		subtypeName.free();
 
 		// paramDict corresponds to Table 3.42 in the PDF1.6 spec
 		Object paramDict;
@@ -409,14 +451,25 @@ EmbFile *Catalog::embeddedFile(int i)
 		if (paramDict.isDict()) {
 		    paramDict.dictLookup("ModDate", &paramObj);
 		    if (paramObj.isString()) {
-			delete modDate;
+		        delete modDate;
 		        modDate = new GooString(paramObj.getString());
 		    }
 		    paramObj.free();
 		    paramDict.dictLookup("CreationDate", &paramObj);
 		    if (paramObj.isString()) {
-			delete createDate;
+		        delete createDate;
 		        createDate = new GooString(paramObj.getString());
+		    }
+		    paramObj.free();
+		    paramDict.dictLookup("Size", &paramObj);
+		    if (paramObj.isInt()) {
+		        size = paramObj.getInt();
+		    }
+		    paramObj.free();
+		    paramDict.dictLookup("CheckSum", &paramObj);
+		    if (paramObj.isString()) {
+		        delete checksum;
+		        checksum = new GooString(paramObj.getString());
 		    }
 		    paramObj.free();
 		}
@@ -426,12 +479,12 @@ EmbFile *Catalog::embeddedFile(int i)
 	    obj2.free();
 	}
     }
-    EmbFile *embeddedFile = new EmbFile(fileName, desc, createDate, modDate, strObj);
+    EmbFile *embeddedFile = new EmbFile(fileName, desc, size, createDate, modDate, checksum, mimetype, strObj);
     strObj.free();
     return embeddedFile;
 }
 
-NameTree::NameTree(void)
+NameTree::NameTree()
 {
   size = 0;
   length = 0;
@@ -439,23 +492,20 @@ NameTree::NameTree(void)
 }
 
 NameTree::Entry::Entry(Array *array, int index) {
-    GooString n;
-    if (!array->getString(index, &n) || !array->getNF(index + 1, &value)) {
+    if (!array->getString(index, &name) || !array->getNF(index + 1, &value)) {
       Object aux;
       array->get(index, &aux);
       if (aux.isString() && array->getNF(index + 1, &value) )
       {
-        n.append(aux.getString());
+        name.append(aux.getString());
       }
       else
         error(-1, "Invalid page tree");
     }
-    name = new UGooString(n);
 }
 
 NameTree::Entry::~Entry() {
   value.free();
-  delete name;
 }
 
 void NameTree::addEntry(Entry *entry)
@@ -510,16 +560,15 @@ void NameTree::parse(Object *tree) {
 
 int NameTree::Entry::cmp(const void *voidKey, const void *voidEntry)
 {
-  UGooString *key = (UGooString *) voidKey;
+  GooString *key = (GooString *) voidKey;
   Entry *entry = *(NameTree::Entry **) voidEntry;
 
-  return key->cmp(entry->name);
+  return key->cmp(&entry->name);
 }
 
-GBool NameTree::lookup(UGooString *name, Object *obj)
+GBool NameTree::lookup(GooString *name, Object *obj)
 {
   Entry **entry;
-  char *cname;
 
   entry = (Entry **) bsearch(name, entries,
 			     length, sizeof(Entry *), Entry::cmp);
@@ -527,9 +576,7 @@ GBool NameTree::lookup(UGooString *name, Object *obj)
     (*entry)->value.fetch(xref, obj);
     return gTrue;
   } else {
-    cname = name->getCString();
-    printf("failed to look up %s\n", cname);
-    delete[] cname;
+    printf("failed to look up %s\n", name->getCString());
     obj->initNull();
     return gFalse;
   }
@@ -544,10 +591,10 @@ Object NameTree::getValue(int index)
   }
 }
 
-UGooString *NameTree::getName(int index)
+GooString *NameTree::getName(int index)
 {
     if (index < length) {
-	return entries[index]->name;
+	return &entries[index]->name;
     } else {
 	return NULL;
     }

@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#ifndef WIN32
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 #include <string.h>
@@ -44,13 +44,14 @@ struct str_src_mgr {
     JOCTET buffer;
     Stream *str;
     int index;
+    bool abort;
 };
 
 
 class DCTStream: public FilterStream {
 public:
 
-  DCTStream(Stream *strA);
+  DCTStream(Stream *strA, int colorXformA);
   virtual ~DCTStream();
   virtual StreamKind getKind() { return strDCT; }
   virtual void reset();
@@ -70,4 +71,4 @@ private:
   JSAMPARRAY row_buffer;
 };
 
-#endif
+#endif 

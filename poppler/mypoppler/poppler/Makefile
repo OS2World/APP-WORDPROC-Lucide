@@ -16,7 +16,8 @@ OBJS3 = Outline.obj OutputDev.obj Page.obj Parser.obj PDFDoc.obj \
         PDFDocEncoding.obj ProfileData.obj PSTokenizer.obj Stream.obj \
         UnicodeMap.obj UnicodeTypeTable.obj XRef.obj PSOutputDev.obj
 OBJS4 = TextOutputDev.obj PageLabelInfo.obj SecurityHandler.obj \
-        XpdfPluginAPI.obj UGooString.obj DCTStream.obj
+        XpdfPluginAPI.obj Form.obj Movie.obj OptionalContent.obj \ 
+        PageTransition.obj PreScanOutputDev.obj Sound.obj DCTStream.obj
         
 # DCTStream.obj
 

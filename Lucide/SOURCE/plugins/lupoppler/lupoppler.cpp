@@ -45,7 +45,6 @@
 #include <goo\GooString.h>
 #include <goo\GooList.h>
 #include <splash\SplashBitmap.h>
-#include <UGooString.h>
 #include <GlobalParams.h>
 #include <ErrorCodes.h>
 #include <PDFDoc.h>
@@ -60,6 +59,10 @@
 
 #include "lupoppler.xih"
 #include "cpconv.h"
+
+#ifdef __GNUC__
+#define __min(a,b)  (((a) < (b)) ? (a) : (b))
+#endif
 
 typedef std::vector<LuRectangle> RectList;
 
@@ -97,7 +100,7 @@ extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 
 extern "C" char * EXPENTRY getDescription()
 {
-    return "PDF plugin, based on poppler library v0.5.4";
+    return "PDF plugin, based on poppler library v0.8.3";
 }
 
 
@@ -286,12 +289,20 @@ static void copy_page_to_pixbuf( Environment *ev, SplashBitmap *bitmap, LuPixbuf
     height = __min( splash_height, pixbuf_height );
     rowstride = __min( splash_rowstride, pixbuf_rowstride );
 
-    int i, j;
+    int i, j, k, l, m;
     for ( i = 0, j = ( height - 1 ); i < height; i++, j-- )
     {
         dst = pixbuf_data + i * pixbuf_rowstride;
         src = ((char *)color_ptr) + j * splash_rowstride;
-        memcpy( dst, src, rowstride );
+        //memcpy( dst, src, rowstride );
+        
+        // source 4 Bpp, dest 3 Bpp
+        for ( k = 0, l = 0, m = 0; k < width; k++ ) {
+        	dst[ l++ ] = src[ m++ ];
+        	dst[ l++ ] = src[ m++ ];
+        	dst[ l++ ] = src[ m++ ];
+        	m++;
+        }
     }
 
     // test
@@ -487,7 +498,7 @@ SOM_Scope LuDocument_LuRectSequence*  SOMLINK getSelectionRectangles(LuPopplerDo
     poppler_selection.x2 = selection->x2;
     poppler_selection.y2 = selection->y2;
 
-    GooList *list = text_dev->getSelectionRegion( &poppler_selection, 1.0 );
+    GooList *list = text_dev->getSelectionRegion( &poppler_selection, selectionStyleWord, 1.0 );
     int len = list->getLength();
 
     if ( len > 0 )
@@ -545,7 +556,7 @@ SOM_Scope string  SOMLINK getText(LuPopplerDocument *somSelf,
     pdf_selection.y2 = selection->y2;
 
     DosRequestMutexSem( document->mutex, SEM_INDEFINITE_WAIT );
-    sel_text = text_dev->getSelectionText( &pdf_selection );
+    sel_text = text_dev->getSelectionText( &pdf_selection, selectionStyleWord );
 
     delete document->text;
     document->text = newstrdup( sel_text->getCString() );
@@ -601,7 +612,7 @@ static long find_dest_r_page( LinkDest *link_dest )
 static void build_goto_dest( PDFDoc *doc, LuLink *evlink, LinkGoTo *link )
 {
     LinkDest *link_dest;
-    UGooString *named_dest;
+    GooString *named_dest;
 
     if ( !link->isOk() ) {
         return;
@@ -624,7 +635,7 @@ static void build_goto_dest( PDFDoc *doc, LuLink *evlink, LinkGoTo *link )
 static void build_goto_r_dest( LuLink *evlink, LinkGoToR *link )
 {
     LinkDest *link_dest;
-    UGooString *named_dest;
+    GooString *named_dest;
 
     if ( !link->isOk() ) {
         return;
@@ -786,7 +797,7 @@ SOM_Scope boolean SOMLINK exportToPostScript(LuPopplerDocument *somSelf,
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
     PDFDoc *doc = ((PopplerDocument *)somThis->data)->doc;
 
-    PSOutputDev *out = new PSOutputDev( filename, doc->getXRef(), doc->getCatalog(),
+    PSOutputDev *out = new PSOutputDev( filename, doc->getXRef(), doc->getCatalog(), "",
                                 (first_page <= last_page) ? (first_page + 1) : (last_page + 1),
                                 (first_page <= last_page) ? (last_page + 1) : (first_page + 1),
                                         psModePS, (int)width, (int)height,
@@ -1349,7 +1360,7 @@ SOM_Scope LuPixbuf*  SOMLINK getThumbnail(LuPopplerDocument *somSelf,
     int i, j;
     for ( i = 0, j = ( height - 1 ); i < height; i++, j-- )
     {
-        src = data + ( j * rowstride );
+        src = (char*)(data + ( j * rowstride ));
         dst = pixbuf_data + (i * pixbuf_rowstride);
         for ( int k = 0; k < pixbuf_rowstride; k += bpp )
         {
@@ -1510,7 +1521,7 @@ SOM_Scope boolean  SOMLINK loadFile(LuPopplerDocument *somSelf,
     int err;
 
     if ( !globalParams ) {
-        globalParams = new GlobalParams( NULL );
+        globalParams = new GlobalParams();
     }
 
     filename_g = new GooString(filename);
@@ -1563,7 +1574,7 @@ SOM_Scope boolean  SOMLINK loadFile(LuPopplerDocument *somSelf,
     white[0] = 255;
     white[1] = 255;
     white[2] = 255;
-    document->output_dev = new SplashOutputDev( splashModeBGR8, 4, gFalse, white );
+    document->output_dev = new SplashOutputDev( splashModeXBGR8, 4, gFalse, white );
     document->output_dev->startDoc( document->doc->getXRef() );
 
     long numpages = document->doc->getNumPages();

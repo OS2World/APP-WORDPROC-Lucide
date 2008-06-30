@@ -17,7 +17,6 @@
 #include "goo/gtypes.h"
 #include "Object.h"
 
-class Decrypt;
 class BaseStream;
 
 //------------------------------------------------------------------------
@@ -41,6 +40,15 @@ enum StreamColorSpaceMode {
   streamCSDeviceGray,
   streamCSDeviceRGB,
   streamCSDeviceCMYK
+};
+
+//------------------------------------------------------------------------
+
+// This is in Stream.h instead of Decrypt.h to avoid really annoying
+// include file dependency loops.
+enum CryptAlgorithm {
+  cryptRC4,
+  cryptAES
 };
 
 //------------------------------------------------------------------------
@@ -79,6 +87,14 @@ public:
   // This is only used by StreamPredictor.
   virtual int getRawChar();
 
+  // Get next char directly from stream source, without filtering it
+  virtual int getUnfilteredChar () = 0;
+
+  // Resets the stream without reading anything (even not the headers)
+  // WARNING: Reading the stream with something else than getUnfilteredChar 
+  // may lead to unexcepted behaviour until you call reset ()
+  virtual void unfilteredReset () = 0;
+
   // Get next line from stream.
   virtual char *getLine(char *buf, int size);
 
@@ -99,6 +115,10 @@ public:
   // Get the BaseStream of this stream.
   virtual BaseStream *getBaseStream() = 0;
 
+  // Get the stream after the last decoder (this may be a BaseStream
+  // or a DecryptStream).
+  virtual Stream *getUndecodedStream() = 0;
+
   // Get the dictionary associated with this stream.
   virtual Dict *getDict() = 0;
 
@@ -108,6 +128,9 @@ public:
   // Get image parameters which are defined by the stream contents.
   virtual void getImageParams(int * /*bitsPerComponent*/,
 			      StreamColorSpaceMode * /*csMode*/) {}
+
+  // Return the next stream in the "stack".
+  virtual Stream *getNextStream() { return NULL; }
 
   // Add filters to this stream according to the parameters in <dict>.
   // Returns the new stream.
@@ -119,6 +142,65 @@ private:
 
   int ref;			// reference count
 };
+
+
+ //------------------------------------------------------------------------
+// OutStream
+//
+// This is the base class for all streams that output to a file
+//------------------------------------------------------------------------
+class OutStream {
+public:
+  // Constructor.
+  OutStream ();
+
+  // Desctructor.
+  virtual ~OutStream ();
+
+  // Reference counting.
+  int incRef() { return ++ref; }
+  int decRef() { return --ref; }
+
+  // Close the stream
+  virtual void close() = 0;
+
+  // Return position in stream
+  virtual int getPos() = 0;
+
+  // Put a char in the stream
+  virtual void put (char c) = 0;
+
+  //FIXME
+  // Printf-like function                         2,3 because the first arg is class instance ?
+  virtual void printf (const char *format, ...) = 0 ; //__attribute__((format(printf, 2,3))) = 0;
+
+private:
+  int ref; // reference count
+    
+};
+
+//------------------------------------------------------------------------
+// FileOutStream
+//------------------------------------------------------------------------
+class FileOutStream : public OutStream {
+public:
+  FileOutStream (FILE* fa, Guint startA);
+
+  virtual ~FileOutStream ();
+
+  virtual void close();
+
+  virtual int getPos();
+
+  virtual void put (char c);
+
+  virtual void printf (const char *format, ...);
+private:
+  FILE *f;
+  Guint start;
+
+};
+
 
 //------------------------------------------------------------------------
 // BaseStream
@@ -136,19 +218,13 @@ public:
   virtual void setPos(Guint pos, int dir = 0) = 0;
   virtual GBool isBinary(GBool last = gTrue) { return last; }
   virtual BaseStream *getBaseStream() { return this; }
+  virtual Stream *getUndecodedStream() { return this; }
   virtual Dict *getDict() { return dict.getDict(); }
+  virtual GooString *getFileName() { return NULL; }
 
   // Get/set position of first byte of stream within the file.
   virtual Guint getStart() = 0;
   virtual void moveStart(int delta) = 0;
-
-  // Set decryption for this stream.
-  virtual void doDecryption(Guchar *fileKey, int keyLength,
-			    int objNum, int objGen);
-
-protected:
-
-  Decrypt *decrypt;
 
 private:
 
@@ -170,7 +246,12 @@ public:
   virtual int getPos() { return str->getPos(); }
   virtual void setPos(Guint pos, int dir = 0);
   virtual BaseStream *getBaseStream() { return str->getBaseStream(); }
+  virtual Stream *getUndecodedStream() { return str->getUndecodedStream(); }
   virtual Dict *getDict() { return str->getDict(); }
+  virtual Stream *getNextStream() { return str; }
+
+  virtual int getUnfilteredChar () { return str->getUnfilteredChar(); }
+  virtual void unfilteredReset () { str->unfilteredReset(); }
 
 protected:
 
@@ -278,6 +359,9 @@ public:
   virtual Guint getStart() { return start; }
   virtual void moveStart(int delta);
 
+  virtual int getUnfilteredChar () { return getChar(); }
+  virtual void unfilteredReset () { reset(); }
+
 private:
 
   GBool fillBuf();
@@ -316,8 +400,13 @@ public:
   virtual void setPos(Guint pos, int dir = 0);
   virtual Guint getStart() { return start; }
   virtual void moveStart(int delta);
-  virtual void doDecryption(Guchar *fileKey, int keyLength,
-			    int objNum, int objGen);
+
+  //if needFree = true, the stream will delete buf when it is destroyed
+  //otherwise it will not touch it. Default value is false
+  virtual void setNeedFree (GBool val) { needFree = val; }
+
+  virtual int getUnfilteredChar () { return getChar(); }
+  virtual void unfilteredReset () { reset (); } 
 
 private:
 
@@ -354,6 +443,10 @@ public:
   virtual void setPos(Guint pos, int dir = 0);
   virtual Guint getStart();
   virtual void moveStart(int delta);
+
+  virtual int getUnfilteredChar () { return str->getUnfilteredChar(); }
+  virtual void unfilteredReset () { str->unfilteredReset(); }
+
 
 private:
 
@@ -503,6 +596,8 @@ public:
   virtual GooString *getPSFilter(int psLevel, char *indent);
   virtual GBool isBinary(GBool last = gTrue);
 
+  virtual void unfilteredReset ();
+
 private:
 
   int encoding;			// 'K' parameter
@@ -517,13 +612,15 @@ private:
   int row;			// current row
   int inputBuf;			// input buffer
   int inputBits;		// number of bits in input buffer
-  short *refLine;		// reference line changing elements
-  int b1;			// index into refLine
-  short *codingLine;		// coding line changing elements
-  int a0;			// index into codingLine
+  int *codingLine;		// coding line changing elements
+  int *refLine;			// reference line changing elements
+  int a0i;			// index into codingLine
+  GBool err;			// error on current line
   int outputBits;		// remaining ouput bits
   int buf;			// character buffer
 
+  void addPixels(int a1, int black);
+  void addPixelsNeg(int a1, int black);
   short getTwoDimCode();
   short getWhiteCode();
   short getBlackCode();
@@ -565,15 +662,18 @@ struct DCTHuffTable {
 class DCTStream: public FilterStream {
 public:
 
-  DCTStream(Stream *strA);
+  DCTStream(Stream *strA, int colorXformA);
   virtual ~DCTStream();
   virtual StreamKind getKind() { return strDCT; }
   virtual void reset();
+  virtual void close();
   virtual int getChar();
   virtual int lookChar();
   virtual GooString *getPSFilter(int psLevel, char *indent);
   virtual GBool isBinary(GBool last = gTrue);
   Stream *getRawStream() { return str; }
+
+  virtual void unfilteredReset();
 
 private:
 
@@ -585,7 +685,9 @@ private:
   DCTCompInfo compInfo[4];	// info for each component
   DCTScanInfo scanInfo;		// info for the current scan
   int numComps;			// number of components in image
-  int colorXform;		// need YCbCr-to-RGB transform?
+  int colorXform;		// color transform: -1 = unspecified
+				//                   0 = none
+				//                   1 = YUV/YUVK -> RGB/CMYK
   GBool gotJFIFMarker;		// set if APP0 JFIF marker was present
   GBool gotAdobeMarker;		// set if APP14 Adobe marker was present
   int restartInterval;		// restart interval, in MCUs
@@ -632,6 +734,7 @@ private:
   int readMarker();
   int read16();
 };
+
 #endif
 
 #ifndef ENABLE_ZLIB
@@ -676,6 +779,7 @@ public:
   virtual int getRawChar();
   virtual GooString *getPSFilter(int psLevel, char *indent);
   virtual GBool isBinary(GBool last = gTrue);
+  virtual void unfilteredReset ();
 
 private:
 

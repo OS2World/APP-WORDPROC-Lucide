@@ -34,12 +34,17 @@ enum XRefEntryType {
 struct XRefEntry {
   Guint offset;
   int gen;
+  int num;
   XRefEntryType type;
+  bool updated;
+  Object obj; //if this entry was updated, obj will contains the updated object
 };
 
 class XRef {
 public:
 
+  // Constructor, create an empty XRef, used for PDF writing
+  XRef();
   // Constructor.  Read xref table from stream.
   XRef(BaseStream *strA);
 
@@ -55,7 +60,8 @@ public:
   // Set the encryption parameters.
   void setEncryption(int permFlagsA, GBool ownerPasswordOkA,
 		     Guchar *fileKeyA, int keyLengthA,
-		     int encVersionA, int encRevisionA);
+		     int encVersionA, int encRevisionA,
+		     CryptAlgorithm encAlgorithmA);
 
   // Is the file encrypted?
   GBool isEncrypted() { return encrypted; }
@@ -95,12 +101,18 @@ public:
   GBool getStreamEnd(Guint streamStart, Guint *streamEnd);
 
   // Retuns the entry that belongs to the offset
-  int getNumEntry(int offset) const;
+  int getNumEntry(Guint offset) const;
 
   // Direct access.
   int getSize() { return size; }
   XRefEntry *getEntry(int i) { return &entries[i]; }
   Object *getTrailerDict() { return &trailerDict; }
+
+  // Write access
+  void setModifiedObject(Object* o, Ref r);
+  Ref addIndirectObject (Object* o);
+  void add(int num, int gen,  Guint offs, GBool used);
+  void writeToFile(OutStream* outStr);
 
 private:
 
@@ -121,6 +133,7 @@ private:
   GBool encrypted;		// true if file is encrypted
   int encRevision;		
   int encVersion;		// encryption algorithm
+  CryptAlgorithm encAlgorithm;	// encryption algorithm
   int keyLength;		// length of key, in bytes
   int permFlags;		// permission bits
   Guchar fileKey[16];		// file decryption key

@@ -14,6 +14,8 @@
 
 #include <string.h>
 #include <t1lib.h>
+#include "goo/GooString.h"
+#include "goo/gfile.h"
 #include "goo/gmem.h"
 #include "SplashT1FontEngine.h"
 #include "SplashT1Font.h"
@@ -33,12 +35,13 @@ SplashFontFile *SplashT1FontFile::loadType1Font(SplashT1FontEngine *engineA,
   int encStrSize;
   char *encPtr;
   int i;
-  GString *fileNameA;
+
+  GooString *fileNameA;
   SplashFontSrc *newsrc = NULL;
   SplashFontFile *ff;
 
   if (! src->isFile) {
-    GString *tmpFileName;
+    GooString *tmpFileName;
     FILE *tmpFile;
     if (!openTempFile(&tmpFileName, &tmpFile, "wb", NULL))
       return NULL;
@@ -51,9 +54,8 @@ SplashFontFile *SplashT1FontFile::loadType1Font(SplashT1FontEngine *engineA,
   }
   fileNameA = src->fileName;
   // load the font file
-  if ((t1libIDA = T1_AddFont(fileNameA)) < 0) {
-    if (newsrc)
-      delete newsrc;
+  if ((t1libIDA = T1_AddFont(fileNameA->getCString())) < 0) {
+    delete newsrc;
     return NULL;
   }
   T1_LoadFont(t1libIDA);
@@ -105,10 +107,11 @@ SplashT1FontFile::~SplashT1FontFile() {
   T1_DeleteFont(t1libID);
 }
 
-SplashFont *SplashT1FontFile::makeFont(SplashCoord *mat) {
+SplashFont *SplashT1FontFile::makeFont(SplashCoord *mat,
+				       SplashCoord *textMat) {
   SplashFont *font;
 
-  font = new SplashT1Font(this, mat);
+  font = new SplashT1Font(this, mat, textMat);
   font->initCache();
   return font;
 }

@@ -10,7 +10,9 @@
 
 #include <config.h>
 
-#ifndef WIN32
+#ifdef WIN32
+#  include <time.h>
+#else
 #  if defined(MACOS)
 #    include <sys/stat.h>
 #  elif !defined(ACORN)
@@ -452,21 +454,45 @@ time_t getModTime(char *fileName) {
 GBool openTempFile(GooString **name, FILE **f, char *mode, char *ext) {
 #if defined(WIN32)
   //---------- Win32 ----------
-  char *s;
+  char *tempDir;
+  GooString *s, *s2;
+  char buf[32];
+  FILE *f2;
+  int t, i;
 
-  if (!(s = _tempnam(getenv("TEMP"), NULL))) {
-    return gFalse;
+  // this has the standard race condition problem, but I haven't found
+  // a better way to generate temp file names with extensions on
+  // Windows
+  if ((tempDir = getenv("TEMP"))) {
+    s = new GooString(tempDir);
+    s->append('\\');
+  } else {
+    s = new GooString();
   }
-  *name = new GooString(s);
-  free(s);
-  if (ext) {
-    (*name)->append(ext);
+  s->append("x");
+  t = (int)time(NULL);
+  for (i = 0; i < 1000; ++i) {
+    sprintf(buf, "%d", t + i);
+    s2 = s->copy()->append(buf);
+    if (ext) {
+      s2->append(ext);
+    }
+    if (!(f2 = fopen(s2->getCString(), "r"))) {
+      if (!(f2 = fopen(s2->getCString(), mode))) {
+	delete s2;
+	delete s;
+        return gFalse;
+      }
+      *name = s2;
+      *f = f2;
+      delete s;
+      return gTrue;
+    }
+    fclose(f2);
+    delete s2;
   }
-  if (!(*f = fopen((*name)->getCString(), mode))) {
-    delete (*name);
-    return gFalse;
-  }
-  return gTrue;
+  delete s;
+  return gFalse;
 #elif defined(VMS) || defined(__EMX__) || defined(ACORN) || defined(MACOS) || defined(OS2)
   //---------- non-Unix ----------
   char *s;
@@ -643,9 +669,9 @@ GDir::GDir(char *name, GBool doStatA) {
 GDir::~GDir() {
   delete path;
 #if defined(WIN32)
-  if (hnd) {
+  if (hnd != INVALID_HANDLE_VALUE) {
     FindClose(hnd);
-    hnd = NULL;
+    hnd = INVALID_HANDLE_VALUE;
   }
 #elif defined(ACORN)
 #elif defined(MACOS)
@@ -659,11 +685,11 @@ GDirEntry *GDir::getNextEntry() {
   GDirEntry *e;
 
 #if defined(WIN32)
-  if (hnd) {
+  if (hnd != INVALID_HANDLE_VALUE) {
     e = new GDirEntry(path->getCString(), ffd.cFileName, doStat);
-    if (hnd  && !FindNextFile(hnd, &ffd)) {
+    if (!FindNextFile(hnd, &ffd)) {
       FindClose(hnd);
-      hnd = NULL;
+      hnd = INVALID_HANDLE_VALUE;
     }
   } else {
     e = NULL;
@@ -705,7 +731,7 @@ void GDir::rewind() {
 #ifdef WIN32
   GooString *tmp;
 
-  if (hnd)
+  if (hnd != INVALID_HANDLE_VALUE)
     FindClose(hnd);
   tmp = path->copy();
   tmp->append("/*.*");

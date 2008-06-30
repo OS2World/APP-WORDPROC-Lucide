@@ -56,6 +56,7 @@ void OutputDev::updateAll(GfxState *state) {
   updateLineCap(state);
   updateMiterLimit(state);
   updateLineWidth(state);
+  updateStrokeAdjust(state);
   updateFillColorSpace(state);
   updateFillColor(state);
   updateStrokeColorSpace(state);
@@ -65,6 +66,7 @@ void OutputDev::updateAll(GfxState *state) {
   updateStrokeOpacity(state);
   updateFillOverprint(state);
   updateStrokeOverprint(state);
+  updateTransfer(state);
   updateFont(state);
 }
 
@@ -121,7 +123,7 @@ void OutputDev::drawSoftMaskedImage(GfxState *state, Object *ref, Stream *str,
   drawImage(state, ref, str, width, height, colorMap, NULL, gFalse);
 }
 
-void OutputDev::endMarkedContent() {
+void OutputDev::endMarkedContent(GfxState *state) {
 }
 
 void OutputDev::beginMarkedContent(char *name) {

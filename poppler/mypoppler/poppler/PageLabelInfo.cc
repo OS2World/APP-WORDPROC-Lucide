@@ -1,8 +1,8 @@
+#include <config.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include "UGooString.h"
 
 #include "PageLabelInfo.h"
 
@@ -122,6 +122,7 @@ static int fromLatin(const char *buffer)
   return -1;
 }
 
+#ifdef TEST
 static void toLatin(int number, GooString *str, GBool uppercase) {
   char base, letter;
   int i, count;
@@ -137,6 +138,7 @@ static void toLatin(int number, GooString *str, GBool uppercase) {
   for (i = 0; i < count; i++)
     str->append(letter);
 }
+#endif
 
 PageLabelInfo::Interval::Interval(Object *dict, int baseA) {
   Object obj;

@@ -11,7 +11,9 @@
 #endif
 
 #include <stdio.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include "goo/gmem.h"
 #include "goo/GooString.h"
 #include "SplashFontFile.h"
@@ -32,6 +34,7 @@ SplashFontFile::SplashFontFile(SplashFontFileID *idA, SplashFontSrc *srcA) {
   src = srcA;
   src->ref();
   refCnt = 0;
+  doAdjustMatrix = gFalse;
 }
 
 SplashFontFile::~SplashFontFile() {
@@ -104,4 +107,3 @@ void SplashFontSrc::setBuf(char *bufA, int bufLenA, GBool del)
   bufLen = bufLenA;
   deleteSrc = del;
 }
-

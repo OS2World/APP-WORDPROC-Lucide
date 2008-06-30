@@ -14,7 +14,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#ifndef WIN32
+#ifdef HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
 #include <t1lib.h>
@@ -98,18 +98,18 @@ SplashFontFile *SplashT1FontEngine::loadType1CFont(SplashFontFileID *idA,
   SplashFontSrc *newsrc;
   
   if (src->isFile)
-    ff = FoFiType1C::load(src->fileName);
+    ff = FoFiType1C::load(src->fileName->getCString());
   else
-    ff = new FoFiType1C(src->buf, src->bufLen, gFalse);
+    ff = FoFiType1C::make(src->buf, src->bufLen);
   if (! ff)
     return NULL;
-  }
+
   tmpFileName = NULL;
   if (!openTempFile(&tmpFileName, &tmpFile, "wb", NULL)) {
     delete ff;
     return NULL;
   }
-  ff->convertToType1(NULL, gTrue, &fileWrite, tmpFile);
+  ff->convertToType1(NULL, NULL, gTrue, &fileWrite, tmpFile);
   delete ff;
   fclose(tmpFile);
   newsrc = new SplashFontSrc;

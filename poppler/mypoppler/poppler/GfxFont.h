@@ -22,6 +22,7 @@ class Dict;
 class CMap;
 class CharCodeToUnicode;
 class FoFiTrueType;
+class DisplayFontParam;
 struct GfxFontCIDWidths;
 
 //------------------------------------------------------------------------
@@ -33,12 +34,16 @@ enum GfxFontType {
   fontUnknownType,
   fontType1,
   fontType1C,
+  fontType1COT,
   fontType3,
   fontTrueType,
+  fontTrueTypeOT,
   //----- GfxCIDFont
   fontCIDType0,
   fontCIDType0C,
-  fontCIDType2
+  fontCIDType0COT,
+  fontCIDType2,
+  fontCIDType2OT
 };
 
 //------------------------------------------------------------------------
@@ -161,11 +166,15 @@ public:
   GooString *getExtFontFile() { return extFontFile; }
 
   // Get font descriptor flags.
+  int getFlags() { return flags; }
   GBool isFixedWidth() { return flags & fontFixedWidth; }
   GBool isSerif() { return flags & fontSerif; }
   GBool isSymbolic() { return flags & fontSymbolic; }
   GBool isItalic() { return flags & fontItalic; }
   GBool isBold() { return flags & fontBold; }
+
+  // Return the Unicode map.
+  virtual CharCodeToUnicode *getToUnicode() = 0;
 
   // Return the font matrix.
   double *getFontMatrix() { return fontMat; }
@@ -191,9 +200,14 @@ public:
   // the number actually used.  Returns the number of bytes used by
   // the char code.
   virtual int getNextChar(char *s, int len, CharCode *code,
-			  Unicode *u, int uSize, int *uLen,
+			  Unicode **u, int *uLen,
 			  double *dx, double *dy, double *ox, double *oy) = 0;
 
+  /* XXX: dfp shouldn't be public, however the font finding code is currently in
+   * GlobalParams. Instead it should be inside the GfxFont class. However,
+   * getDisplayFont currently uses FCcfg so moving it is not as simple. */
+  /* XXX: related to this is the fact that all of the extFontFile stuff is dead */
+  DisplayFontParam *dfp;
 protected:
 
   void readFontDescriptor(XRef *xref, Dict *fontDict);
@@ -235,7 +249,7 @@ public:
   virtual ~Gfx8BitFont();
 
   virtual int getNextChar(char *s, int len, CharCode *code,
-			  Unicode *u, int uSize, int *uLen,
+			  Unicode **u, int *uLen,
 			  double *dx, double *dy, double *ox, double *oy);
 
   // Return the encoding.
@@ -297,7 +311,7 @@ public:
   virtual GBool isCIDFont() { return gTrue; }
 
   virtual int getNextChar(char *s, int len, CharCode *code,
-			  Unicode *u, int uSize, int *uLen,
+			  Unicode **u, int *uLen,
 			  double *dx, double *dy, double *ox, double *oy);
 
   // Return the writing mode (0=horizontal, 1=vertical).
@@ -316,7 +330,11 @@ public:
 
   Gushort *getCodeToGIDMap(FoFiTrueType *ff, int *length);
 
+  double getWidth(char* s, int len);
+
 private:
+  Gushort mapCodeToGID(FoFiTrueType *ff, int cmapi,
+    Unicode unicode, GBool wmode);
 
   CMap *cMap;			// char code --> CID
   CharCodeToUnicode *ctu;	// CID --> Unicode

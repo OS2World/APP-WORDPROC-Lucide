@@ -2,7 +2,7 @@
 //
 // Catalog.h
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2007 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -19,8 +19,9 @@ class Page;
 class PageAttrs;
 struct Ref;
 class LinkDest;
-class UGooString;
 class PageLabelInfo;
+class Form;
+class OCGs;
 
 //------------------------------------------------------------------------
 // NameTree
@@ -31,18 +32,18 @@ public:
   NameTree();
   void init(XRef *xref, Object *tree);
   void parse(Object *tree);
-  GBool lookup(UGooString *name, Object *obj);
+  GBool lookup(GooString *name, Object *obj);
   void free();
   int numEntries() { return length; };
   // iterator accessor
   Object getValue(int i);
-  UGooString *getName(int i);
+  GooString *getName(int i);
 
 private:
   struct Entry {
     Entry(Array *array, int index);
     ~Entry();
-    UGooString *name;
+    GooString name;
     Object value;
     void free();
     static int cmp(const void *key, const void *entry);
@@ -61,12 +62,18 @@ private:
 class EmbFile {
 public:
   EmbFile(GooString *name, GooString *description, 
+	  int size,
 	  GooString *createDate,
-	  GooString *modDate, Object objStr) :
+	  GooString *modDate, GooString *checksum,
+	  GooString *mimetype,
+	  Object objStr) :
     m_name(name),
     m_description(description),
+    m_size(size),
     m_createDate(createDate),
-    m_modDate(modDate)
+    m_modDate(modDate),
+    m_checksum(checksum),
+    m_mimetype(mimetype)
   {
     objStr.copy(&m_objStr);
   }
@@ -77,20 +84,28 @@ public:
     delete m_description;
     delete m_modDate;
     delete m_createDate;
+    delete m_checksum;
+    delete m_mimetype;
     m_objStr.free();
   }
 
   GooString *name() { return m_name; }
   GooString *description() { return m_description; }
+  int size() { return m_size; }
   GooString *modDate() { return m_modDate; }
   GooString *createDate() { return m_createDate; }
+  GooString *checksum() { return m_checksum; }
+  GooString *mimeType() { return m_mimetype; }
   Object &streamObject() { return m_objStr; }
 
 private:
   GooString *m_name;
   GooString *m_description;
+  int m_size;
   GooString *m_createDate;
   GooString *m_modDate;
+  GooString *m_checksum;
+  GooString *m_mimetype;
   Object m_objStr;
 };
 
@@ -135,7 +150,9 @@ public:
 
   // Find a named destination.  Returns the link destination, or
   // NULL if <name> is not a destination.
-  LinkDest *findDest(UGooString *name);
+  LinkDest *findDest(GooString *name);
+
+  Object *getDests() { return &dests; }
 
   // Get the number of embedded files
   int numEmbeddedFiles() { return embeddedFileNameTree.numEntries(); }
@@ -150,6 +167,10 @@ public:
   Object *getOutline() { return &outline; }
 
   Object *getAcroForm() { return &acroForm; }
+
+  OCGs *getOptContentConfig() { return optContent; }
+
+  Form* getForm() { return form; }
 
   enum PageMode {
     pageModeNone,
@@ -166,7 +187,7 @@ public:
     pageLayoutTwoColumnLeft,
     pageLayoutTwoColumnRight,
     pageLayoutTwoPageLeft,
-    pageLayoutTwoPageRight,
+    pageLayoutTwoPageRight
   };
 
   // Returns the page mode.
@@ -178,6 +199,7 @@ private:
   XRef *xref;			// the xref table for this PDF file
   Page **pages;			// array of pages
   Ref *pageRefs;		// object ID for each page
+  Form *form;
   int numPages;			// number of pages
   int pagesSize;		// size of pages array
   Object dests;			// named destination dictionary
@@ -188,12 +210,14 @@ private:
   Object structTreeRoot;	// structure tree root dictionary
   Object outline;		// outline dictionary
   Object acroForm;		// AcroForm dictionary
+  OCGs *optContent;		// Optional Content groups
   GBool ok;			// true if catalog is valid
   PageLabelInfo *pageLabelInfo; // info about page labels
   PageMode pageMode;		// page mode
   PageLayout pageLayout;	// page layout
 
-  int readPageTree(Dict *pages, PageAttrs *attrs, int start);
+  int readPageTree(Dict *pages, PageAttrs *attrs, int start,
+		   char *alreadyRead);
   Object *findDestInTree(Object *tree, GooString *name, Object *obj);
 };
 
