@@ -552,7 +552,7 @@ void PDFDoc::saveIncrementalUpdate (OutStream* outStr)
   }
 
   Guint uxrefOffset = outStr->getPos();
-  uxref->writeToFile(outStr);
+  uxref->writeToFile(outStr, gFalse /* do not write unnecessary entries */);
 
   writeTrailer(uxrefOffset, objectsCount, outStr, gTrue);
 
@@ -592,7 +592,7 @@ void PDFDoc::saveCompleteRewrite (OutStream* outStr)
     }
   }
   Guint uxrefOffset = outStr->getPos();
-  uxref->writeToFile(outStr);
+  uxref->writeToFile(outStr, gTrue /* write all entries */);
 
   writeTrailer(uxrefOffset, uxref->getSize(), outStr, gFalse);
 
@@ -838,6 +838,7 @@ void PDFDoc::writeTrailer (Guint uxrefOffset, int uxrefSize, OutStream* outStr, 
   } else {
     //new file => same values for the two identifiers
     obj2.arrayAdd(&obj1);
+    obj1.initString(new GooString((const char*)digest, 16));
     obj2.arrayAdd(&obj1);
     trailerDict->set("ID", &obj2);
   }

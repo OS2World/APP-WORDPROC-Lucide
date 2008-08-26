@@ -34,7 +34,6 @@ enum XRefEntryType {
 struct XRefEntry {
   Guint offset;
   int gen;
-  int num;
   XRefEntryType type;
   bool updated;
   Object obj; //if this entry was updated, obj will contains the updated object
@@ -112,7 +111,7 @@ public:
   void setModifiedObject(Object* o, Ref r);
   Ref addIndirectObject (Object* o);
   void add(int num, int gen,  Guint offs, GBool used);
-  void writeToFile(OutStream* outStr);
+  void writeToFile(OutStream* outStr, GBool writeAllEntries);
 
 private:
 

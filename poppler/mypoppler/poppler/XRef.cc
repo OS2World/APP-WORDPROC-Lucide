@@ -413,6 +413,7 @@ GBool XRef::readXRefTable(Parser *parser, Guint *pos) {
 	entries[i].type = xrefEntryFree;
 	entries[i].obj.initNull ();
 	entries[i].updated = false;
+	entries[i].gen = 0;
       }
       size = newSize;
     }
@@ -527,6 +528,7 @@ GBool XRef::readXRefStream(Stream *xrefStr, Guint *pos) {
       entries[i].type = xrefEntryFree;
       entries[i].obj.initNull ();
       entries[i].updated = false;
+      entries[i].gen = 0;
     }
     size = newSize;
   }
@@ -623,6 +625,7 @@ GBool XRef::readXRefStreamSection(Stream *xrefStr, int *w, int first, int n) {
       entries[i].type = xrefEntryFree;
       entries[i].obj.initNull ();
       entries[i].updated = false;
+      entries[i].gen = 0;
     }
     size = newSize;
   }
@@ -1004,12 +1007,19 @@ Guint XRef::strToUnsigned(char *s) {
 }
 
 void XRef::add(int num, int gen, Guint offs, GBool used) {
-  size += 1;
-  entries = (XRefEntry *)greallocn(entries, size, sizeof(XRefEntry));
-  XRefEntry *e = &entries[size-1];
-
+  if (num >= size) {
+    entries = (XRefEntry *)greallocn(entries, num + 1, sizeof(XRefEntry));
+    for (int i = size; i < num + 1; ++i) {
+      entries[i].offset = 0xffffffff;
+      entries[i].type = xrefEntryFree;
+      entries[i].obj.initNull ();
+      entries[i].updated = false;
+      entries[i].gen = 0;
+    }
+    size = num + 1;
+  }
+  XRefEntry *e = &entries[num];
   e->gen = gen;
-  e->num = num;
   e->obj.initNull ();
   e->updated = false;
   if (used) {
@@ -1026,83 +1036,85 @@ void XRef::setModifiedObject (Object* o, Ref r) {
     error(-1,"XRef::setModifiedObject on unknown ref: %i, %i\n", r.num, r.gen);
     return;
   }
+  entries[r.num].obj.free();
   o->copy(&entries[r.num].obj);
   entries[r.num].updated = true;
 }
 
 Ref XRef::addIndirectObject (Object* o) {
-  //Find the next free entry
-  // lastEntry is the last free entry we encountered,
-  // entry 0 is always free
-  int lastEntry = 0;
-  int newEntry = entries[0].offset;
+  int entryIndexToUse = -1;
+  for (int i = 1; entryIndexToUse == -1 && i < size; ++i) {
+    if (entries[i].type == xrefEntryFree) entryIndexToUse = i;
+  }
 
-  do {
-    lastEntry = newEntry;
-    newEntry = entries[newEntry].offset;
-    //we are looking for a free entry that we can reuse
-    //(=> gen number != 65535)
-  } while ((newEntry != 0) && (entries[newEntry].gen == 65535));
-
-  //the linked list of free entry is empty => create a new one
-  if (newEntry == 0) {
-    newEntry = size;
+  XRefEntry *e;
+  if (entryIndexToUse == -1) {
+    entryIndexToUse = size;
     size++;
     entries = (XRefEntry *)greallocn(entries, size, sizeof(XRefEntry));
-    entries[newEntry].gen = 0;
-    entries[newEntry].num = newEntry;
-  } else { //reuse a free entry
-    //'remove' the entry we are using from the free entry linked list
-    entries[lastEntry].offset = entries[newEntry].offset;
-    entries[newEntry].num = newEntry;
+    e = &entries[entryIndexToUse];
+    e->gen = 0;
+  } else {
+    //reuse a free entry
+    e = &entries[entryIndexToUse];
     //we don't touch gen number, because it should have been 
     //incremented when the object was deleted
   }
-
-  entries[newEntry].type = xrefEntryUncompressed;
-  o->copy(&entries[newEntry].obj);
-  entries[newEntry].updated = true;
+  e->type = xrefEntryUncompressed;
+  o->copy(&e->obj);
+  e->updated = true;
 
   Ref r;
-  r.num = entries[newEntry].num;
-  r.gen = entries[newEntry].gen;
+  r.num = entryIndexToUse;
+  r.gen = e->gen;
   return r;
 }
 
-
-//used to sort the entries
-int compare (const void* a, const void* b)
-{
-  return (((XRefEntry*)a)->num - ((XRefEntry*)b)->num);
-}
-
-void XRef::writeToFile(OutStream* outStr) {
-  qsort(entries, size, sizeof(XRefEntry), compare);
+void XRef::writeToFile(OutStream* outStr, GBool writeAllEntries) {
   //create free entries linked-list
   if (entries[0].gen != 65535) {
     error(-1, "XRef::writeToFile, entry 0 of the XRef is invalid (gen != 65535)\n");
   }
-  int lastFreeEntry = 0; 
+  int lastFreeEntry = 0;
   for (int i=0; i<size; i++) {
     if (entries[i].type == xrefEntryFree) {
-      entries[lastFreeEntry].offset = entries[i].num;
+      entries[lastFreeEntry].offset = i;
       lastFreeEntry = i;
     }
   }
-  //write the new xref
-  int j;
-  outStr->printf("xref\r\n");
-  for (int i=0; i<size; i++) {
-    for(j=i; j<size; j++) { //look for consecutive entries
-      if (j!=i && entries[j].num != entries[j-1].num+1) 
-              break;
+
+  if (writeAllEntries) {
+    //write the new xref
+    outStr->printf("xref\r\n");
+    outStr->printf("%i %i\r\n", 0, size);
+    for (int i=0; i<size; i++) {
+      XRefEntry &e = entries[i];
+
+      if(e.gen > 65535) e.gen = 65535; //cap generation number to 65535 (required by PDFReference)
+      outStr->printf("%010i %05i %c\r\n", e.offset, e.gen, (e.type==xrefEntryFree)?'f':'n');
     }
-    outStr->printf("%i %i\r\n", entries[i].num, j-i);
-    for (int k=i; k<j; k++) {
-      if(entries[k].gen > 65535) entries[k].gen = 65535; //cap generation number to 65535 (required by PDFReference)
-      outStr->printf("%010i %05i %c\r\n", entries[k].offset, entries[k].gen, (entries[k].type==xrefEntryFree)?'f':'n');
+  } else {
+    //write the new xref
+    outStr->printf("xref\r\n");
+    int i = 0;
+    while (i < size) {
+      int j;
+      for(j=i; j<size; j++) { //look for consecutive entries
+        if ((entries[j].type == xrefEntryFree) && (entries[j].gen == 0))
+          break;
+      }
+      if (j-i != 0)
+      {
+        outStr->printf("%i %i\r\n", i, j-i);
+        for (int k=i; k<j; k++) {
+          XRefEntry &e = entries[k];
+          if(e.gen > 65535) e.gen = 65535; //cap generation number to 65535 (required by PDFReference)
+          outStr->printf("%010i %05i %c\r\n", e.offset, e.gen, (e.type==xrefEntryFree)?'f':'n');
+        }
+        i = j;
+      }
+      else ++i;
     }
-    i = j-1;
   }
 }
 
