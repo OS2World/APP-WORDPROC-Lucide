@@ -1710,6 +1710,7 @@ AnnotTextMarkup::~AnnotTextMarkup() {
 AnnotWidget::AnnotWidget(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
     Annot(xrefA, dict, catalog, obj) {
   type = typeWidget;
+  widget = NULL;
   initialize(xrefA, catalog, dict);
   widget = NULL;
 }

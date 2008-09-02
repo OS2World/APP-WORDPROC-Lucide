@@ -100,7 +100,7 @@ extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 
 extern "C" char * EXPENTRY getDescription()
 {
-    return "PDF plugin, based on poppler library v0.8.6";
+    return "PDF plugin, based on poppler library v0.8.7";
 }
 
 
