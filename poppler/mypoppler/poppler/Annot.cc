@@ -1712,7 +1712,6 @@ AnnotWidget::AnnotWidget(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj)
   type = typeWidget;
   widget = NULL;
   initialize(xrefA, catalog, dict);
-  widget = NULL;
 }
 
 AnnotWidget::~AnnotWidget() {
