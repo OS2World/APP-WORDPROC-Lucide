@@ -60,6 +60,8 @@
 #include "lupoppler.xih"
 #include "cpconv.h"
 
+#define WORKAROUND_RGB4
+
 #ifdef __GNUC__
 #define __min(a,b)  (((a) < (b)) ? (a) : (b))
 #endif
@@ -100,7 +102,7 @@ extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 
 extern "C" char * EXPENTRY getDescription()
 {
-    return "PDF plugin, based on poppler library v0.8.7";
+    return "PDF plugin, based on poppler library v0.10.0";
 }
 
 
@@ -294,8 +296,10 @@ static void copy_page_to_pixbuf( Environment *ev, SplashBitmap *bitmap, LuPixbuf
     {
         dst = pixbuf_data + i * pixbuf_rowstride;
         src = ((char *)color_ptr) + j * splash_rowstride;
+        
+#if !defined( WORKAROUND_RGB4 )
         memcpy( dst, src, rowstride );
-
+#else
         // source 4 Bpp, dest 3 Bpp
         for ( k = 0, l = 0, m = 0; k < width; k++ ) {
             dst[ l++ ] = src[ m++ ];
@@ -303,6 +307,7 @@ static void copy_page_to_pixbuf( Environment *ev, SplashBitmap *bitmap, LuPixbuf
             dst[ l++ ] = src[ m++ ];
             m++;
         }
+#endif
     }
 
     // test

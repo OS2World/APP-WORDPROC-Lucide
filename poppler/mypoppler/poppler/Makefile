@@ -18,17 +18,19 @@ OBJS3 = Outline.obj OutputDev.obj Page.obj Parser.obj PDFDoc.obj \
 OBJS4 = TextOutputDev.obj PageLabelInfo.obj SecurityHandler.obj \
         XpdfPluginAPI.obj Form.obj Movie.obj OptionalContent.obj \ 
         PageTransition.obj PreScanOutputDev.obj Sound.obj DCTStream.obj
+OBJS5 = FileSpec.obj        
         
 # DCTStream.obj
 
 all: $(LIBS)
 
-$(LIBS): $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4)
+$(LIBS): $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS5)
 	rm -f $(LIBS)
 	wlib -b -q $@ + $(OBJS1)
 	wlib -b -q $@ + $(OBJS2)
 	wlib -b -q $@ + $(OBJS3)
 	wlib -b -q $@ + $(OBJS4)
+	wlib -b -q $@ + $(OBJS5)
 
 .c.obj:
 	$(CC) $(CFLAGS) -c $<

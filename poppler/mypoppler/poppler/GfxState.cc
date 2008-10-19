@@ -6,6 +6,23 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Kristian Høgsberg <krh@redhat.com>
+// Copyright (C) 2006, 2007 Jeff Muizelaar <jeff@infidigm.net>
+// Copyright (C) 2006 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2006-2008 Albert Astals Cid <aacid@kde.org>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -66,7 +83,7 @@ struct GfxBlendModeInfo {
   GfxBlendMode mode;
 };
 
-static GfxBlendModeInfo gfxBlendModeNames[] = {
+static const GfxBlendModeInfo gfxBlendModeNames[] = {
   { "Normal",     gfxBlendNormal },
   { "Compatible", gfxBlendNormal },
   { "Multiply",   gfxBlendMultiply },
@@ -699,7 +716,7 @@ void GfxDeviceCMYKColorSpace::getDefaultColor(GfxColor *color) {
 
 // This is the inverse of MatrixLMN in Example 4.10 from the PostScript
 // Language Reference, Third Edition.
-static double xyzrgb[3][3] = {
+static const double xyzrgb[3][3] = {
   {  3.240449, -1.537136, -0.498531 },
   { -0.969265,  1.876011,  0.041556 },
   {  0.055643, -0.204026,  1.057229 }
@@ -2093,7 +2110,7 @@ GfxAxialShading::GfxAxialShading(GfxAxialShading *shading):
   x1 = shading->x1;
   y1 = shading->y1;
   t0 = shading->t0;
-  y1 = shading->t1;
+  t1 = shading->t1;
   nFuncs = shading->nFuncs;
   for (i = 0; i < nFuncs; ++i) {
     funcs[i] = shading->funcs[i]->copy();

@@ -2,7 +2,15 @@
 //
 // Form.cc
 //
-// Copyright 2006 Julien Rebetez
+// This file is licensed under the GPLv2 or later
+//
+// Copyright 2006-2008 Julien Rebetez <julienr@svn.gnome.org>
+// Copyright 2007 Albert Astals Cid <aacid@kde.org>
+// Copyright 2007-2008 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright 2007 Adrian Johnson <ajohnson@redneon.com>
+// Copyright 2007 Iñigo Martínez <inigomartinez@gmail.com>
+// Copyright 2008 Pino Toscano <pino@kde.org>
+// Copyright 2008 Michael Vrable <mvrable@cs.ucsd.edu>
 //
 //========================================================================
 
@@ -159,7 +167,7 @@ void FormWidget::updateField (const char *key, Object *value)
   }
   obj2.free ();
 
-  obj1->getDict ()->set ("V", value);
+  obj1->getDict ()->set (const_cast<char*>(key), value);
   //notify the xref about the update
   xref->setModifiedObject(obj1, ref1);
 }
@@ -270,9 +278,13 @@ void FormWidgetButton::loadDefaults ()
   }
 
   if (Form::fieldLookup(dict, "V", &obj1)->isName()) {
-    if (strcmp (obj1.getName(), "Off") != 0) {
-      setState(gTrue);
+    Object obj2;
+    if (dict->lookup("AS", &obj2)->isName(obj1.getName())) {
+      if (strcmp (obj1.getName(), "Off") != 0) {
+        setState(gTrue);
+      }
     }
+    obj2.free();
   } else if (obj1.isArray()) { //handle the case where we have multiple choices
     error(-1, "FormWidgetButton:: multiple choice isn't supported yet\n");
   }
@@ -753,6 +765,9 @@ FormField::FormField(XRef* xrefA, Object *aobj, const Ref& aref, FormFieldType t
   //flags
   if (Form::fieldLookup(dict, "Ff", &obj1)->isInt()) {
     int flags = obj1.getInt();
+    if (flags & 0x1) { // 1 -> ReadOnly
+      readOnly = true;
+    }
     if (flags & 0x2) { // 2 -> Required
       //TODO
     }
@@ -1151,15 +1166,6 @@ Form::Form(XRef *xrefA, Object* acroFormA)
       }
 
       rootFields[numFields++] = createFieldFromDict (&obj2, xrefA, oref.getRef());
-
-      //Mark readonly field
-      Object obj3;
-      if (Form::fieldLookup(obj2.getDict (), "Ff", &obj3)->isInt()) {
-        int flags = obj3.getInt();
-        if (flags & 0x1)
-          rootFields[numFields-1]->setReadOnly(true);
-      }
-      obj3.free();
 
       obj2.free();
       oref.free();

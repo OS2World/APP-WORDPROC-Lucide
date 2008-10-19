@@ -30,11 +30,6 @@
 /* #undef USE_FIXEDPOINT */
 #endif
 
-/* Full path for the system-wide xpdfrc file. */
-#ifndef SYSTEM_XPDFRC
-/* #undef SYSTEM_XPDFRC */
-#endif
-
 /* Include support for OPI comments. */
 #ifndef OPI_SUPPORT
 #define OPI_SUPPORT 1
@@ -52,70 +47,9 @@
 // version
 //------------------------------------------------------------------------
 
-// xpdf version
-#define xpdfVersion         "3.00"
-#define xpdfVersionNum      3.00
-#define xpdfMajorVersion    3
-#define xpdfMinorVersion    0
-#define xpdfMajorVersionStr "3"
-#define xpdfMinorVersionStr "0"
-
-// supported PDF version
-#define supportedPDFVersionStr "1.5"
-#define supportedPDFVersionNum 1.5
-
 // copyright notice
+#define popplerCopyright "Copyright 2005-2008 The Poppler Developers - http://poppler.freedesktop.org"
 #define xpdfCopyright "Copyright 1996-2004 Glyph & Cog, LLC"
-
-// Windows resource file stuff
-#define winxpdfVersion "WinXpdf 3.00"
-#define xpdfCopyrightAmp "Copyright 1996-2004 Glyph && Cog, LLC"
-
-//------------------------------------------------------------------------
-// paper size
-//------------------------------------------------------------------------
-
-// default paper size (in points) for PostScript output
-#ifdef A4_PAPER
-#define defPaperWidth  595    // ISO A4 (210x297 mm)
-#define defPaperHeight 842
-#else
-#define defPaperWidth  612    // American letter (8.5x11")
-#define defPaperHeight 792
-#endif
-
-//------------------------------------------------------------------------
-// config file (xpdfrc) path
-//------------------------------------------------------------------------
-
-// user config file name, relative to the user's home directory
-#if defined(VMS) || (defined(WIN32) && !defined(__CYGWIN32__))
-#define xpdfUserConfigFile "xpdfrc"
-#else
-#define xpdfUserConfigFile ".xpdfrc"
-#endif
-
-// system config file name (set via the configure script)
-#ifdef SYSTEM_XPDFRC
-#define xpdfSysConfigFile SYSTEM_XPDFRC
-#else
-// under Windows, we get the directory with the executable and then
-// append this file name
-#define xpdfSysConfigFile "xpdfrc"
-#endif
-
-//------------------------------------------------------------------------
-// X-related constants
-//------------------------------------------------------------------------
-
-// default maximum size of color cube to allocate
-#define defaultRGBCube 5
-
-// number of fonts (combined t1lib, FreeType, X server) to cache
-#define xOutFontCacheSize 64
-
-// number of Type 3 fonts to cache
-#define xOutT3FontCacheSize 8
 
 //------------------------------------------------------------------------
 // popen

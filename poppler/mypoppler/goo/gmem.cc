@@ -6,6 +6,22 @@
  * Copyright 1996-2003 Glyph & Cog, LLC
  */
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Takashi Iwai <tiwai@suse.de>
+// Copyright (C) 2007, 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2008 Jonathan Kew <jonathan_kew@sil.org>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -206,6 +222,27 @@ void *greallocn(void *p, int nObjs, int objSize) GMEM_EXCEP {
 #else
     fprintf(stderr, "Bogus memory allocation size\n");
     exit(1);
+#endif
+  }
+  return grealloc(p, n);
+}
+
+void *greallocn_checkoverflow(void *p, int nObjs, int objSize) GMEM_EXCEP {
+  int n;
+
+  if (nObjs == 0) {
+    if (p) {
+      gfree(p);
+    }
+    return NULL;
+  }
+  n = nObjs * objSize;
+  if (objSize <= 0 || nObjs < 0 || nObjs >= INT_MAX / objSize) {
+#if USE_EXCEPTIONS
+    throw GMemException();
+#else
+    fprintf(stderr, "Bogus memory allocation size\n");
+    return NULL;
 #endif
   }
   return grealloc(p, n);

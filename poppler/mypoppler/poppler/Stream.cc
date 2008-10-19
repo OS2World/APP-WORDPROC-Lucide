@@ -6,6 +6,23 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Jeff Muizelaar <jeff@infidigm.net>
+// Copyright (C) 2006-2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2007 Krzysztof Kowalczyk <kkowalczyk@gmail.com>
+// Copyright (C) 2008 Julien Rebetez <julien@fhtagn.net>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -30,7 +47,6 @@
 #include "GfxState.h"
 #include "Stream.h"
 #include "JBIG2Stream.h"
-#include "JPXStream.h"
 #include "Stream-CCITT.h"
 
 #ifdef ENABLE_LIBJPEG
@@ -39,6 +55,12 @@
 
 #ifdef ENABLE_ZLIB
 #include "FlateStream.h"
+#endif
+
+#ifdef ENABLE_LIBOPENJPEG
+#include "JPEG2000Stream.h"
+#else
+#include "JPXStream.h"
 #endif
 
 #ifdef __DJGPP__
@@ -1735,7 +1757,7 @@ int CCITTFaxStream::lookChar() {
 
 short CCITTFaxStream::getTwoDimCode() {
   short code;
-  CCITTCode *p;
+  const CCITTCode *p;
   int n;
 
   code = 0; // make gcc happy
@@ -1765,7 +1787,7 @@ short CCITTFaxStream::getTwoDimCode() {
 
 short CCITTFaxStream::getWhiteCode() {
   short code;
-  CCITTCode *p;
+  const CCITTCode *p;
   int n;
 
   code = 0; // make gcc happy
@@ -1822,7 +1844,7 @@ short CCITTFaxStream::getWhiteCode() {
 
 short CCITTFaxStream::getBlackCode() {
   short code;
-  CCITTCode *p;
+  const CCITTCode *p;
   int n;
 
   code = 0; // make gcc happy
@@ -1984,7 +2006,7 @@ static Guchar dctClip[768];
 static int dctClipInit = 0;
 
 // zig zag decode map
-static int dctZigZag[64] = {
+static const int dctZigZag[64] = {
    0,
    1,  8,
   16,  9,  2,
@@ -2045,7 +2067,6 @@ void DCTStream::unfilteredReset() {
   numQuantTables = 0;
   numDCHuffTables = 0;
   numACHuffTables = 0;
-  colorXform = 0;
   gotJFIFMarker = gFalse;
   gotAdobeMarker = gFalse;
   restartInterval = 0;
@@ -4558,7 +4579,7 @@ void ASCIIHexEncoder::reset() {
 }
 
 GBool ASCIIHexEncoder::fillBuf() {
-  static char *hex = "0123456789abcdef";
+  static const char *hex = "0123456789abcdef";
   int c;
 
   if (eof) {

@@ -1,8 +1,26 @@
- //========================================================================
+//========================================================================
 //
 // XRef.cc
 //
 // Copyright 1996-2003 Glyph & Cog, LLC
+//
+//========================================================================
+
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Dan Sheridan <dan.sheridan@postman.org.uk>
+// Copyright (C) 2005 Brad Hards <bradh@frogmouth.net>
+// Copyright (C) 2006, 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2007-2008 Julien Rebetez <julienr@svn.gnome.org>
+// Copyright (C) 2007 Carlos Garcia Campos <carlosgc@gnome.org>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
 //
 //========================================================================
 
@@ -16,6 +34,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #include "goo/gmem.h"
 #include "Object.h"
 #include "Stream.h"
@@ -904,6 +923,30 @@ Object *XRef::fetch(int num, int gen, Object *obj) {
     if (!obj1.isInt() || obj1.getInt() != num ||
 	!obj2.isInt() || obj2.getInt() != gen ||
 	!obj3.isCmd("obj")) {
+      // some buggy pdf have obj1234 for ints that represent 1234
+      // try to recover here
+      if (obj1.isInt() && obj1.getInt() == num &&
+	  obj2.isInt() && obj2.getInt() == gen &&
+	  obj3.isCmd()) {
+	char *cmd = obj3.getCmd();
+	if (strlen(cmd) > 3 &&
+	    cmd[0] == 'o' &&
+	    cmd[1] == 'b' &&
+	    cmd[2] == 'j') {
+	  char *end_ptr;
+	  long longNumber = strtol(cmd + 3, &end_ptr, 0);
+	  if (longNumber <= INT_MAX && longNumber >= INT_MIN && *end_ptr == '\0') {
+	    int number = longNumber;
+	    error(-1, "Cmd was not obj but %s, assuming the creator meant obj %d", cmd, number);
+	    obj->initInt(number);
+	    obj1.free();
+	    obj2.free();
+	    obj3.free();
+	    delete parser;
+	    break;
+	  }
+	}
+      }
       obj1.free();
       obj2.free();
       obj3.free();

@@ -6,6 +6,22 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2006 Raj Kumar <rkumar@archive.org>
+// Copyright (C) 2006 Paul Walmsley <paul@booyaka.com>
+// Copyright (C) 2006-2008 Albert Astals Cid <aacid@kde.org>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -24,8 +40,8 @@
 
 //------------------------------------------------------------------------
 
-static int contextSize[4] = { 16, 13, 10, 10 };
-static int refContextSize[2] = { 13, 10 };
+static const int contextSize[4] = { 16, 13, 10, 10 };
+static const int refContextSize[2] = { 13, 10 };
 
 //------------------------------------------------------------------------
 // JBIG2HuffmanTable
@@ -42,7 +58,7 @@ struct JBIG2HuffmanTable {
   Guint prefix;
 };
 
-JBIG2HuffmanTable huffTableA[] = {
+static JBIG2HuffmanTable huffTableA[] = {
   {     0, 1,  4,              0x000 },
   {    16, 2,  8,              0x002 },
   {   272, 3, 16,              0x006 },
@@ -50,7 +66,7 @@ JBIG2HuffmanTable huffTableA[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableB[] = {
+static JBIG2HuffmanTable huffTableB[] = {
   {     0, 1,  0,              0x000 },
   {     1, 2,  0,              0x002 },
   {     2, 3,  0,              0x006 },
@@ -61,7 +77,7 @@ JBIG2HuffmanTable huffTableB[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableC[] = {
+static JBIG2HuffmanTable huffTableC[] = {
   {     0, 1,  0,              0x000 },
   {     1, 2,  0,              0x002 },
   {     2, 3,  0,              0x006 },
@@ -74,7 +90,7 @@ JBIG2HuffmanTable huffTableC[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableD[] = {
+static JBIG2HuffmanTable huffTableD[] = {
   {     1, 1,  0,              0x000 },
   {     2, 2,  0,              0x002 },
   {     3, 3,  0,              0x006 },
@@ -84,7 +100,7 @@ JBIG2HuffmanTable huffTableD[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableE[] = {
+static JBIG2HuffmanTable huffTableE[] = {
   {     1, 1,  0,              0x000 },
   {     2, 2,  0,              0x002 },
   {     3, 3,  0,              0x006 },
@@ -96,7 +112,7 @@ JBIG2HuffmanTable huffTableE[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableF[] = {
+static JBIG2HuffmanTable huffTableF[] = {
   {     0, 2,  7,              0x000 },
   {   128, 3,  7,              0x002 },
   {   256, 3,  8,              0x003 },
@@ -114,7 +130,7 @@ JBIG2HuffmanTable huffTableF[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableG[] = {
+static JBIG2HuffmanTable huffTableG[] = {
   {  -512, 3,  8,              0x000 },
   {   256, 3,  8,              0x001 },
   {   512, 3,  9,              0x002 },
@@ -133,7 +149,7 @@ JBIG2HuffmanTable huffTableG[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableH[] = {
+static JBIG2HuffmanTable huffTableH[] = {
   {     0, 2,  1,              0x000 },
   {     0, 2, jbig2HuffmanOOB, 0x001 },
   {     4, 3,  4,              0x004 },
@@ -158,7 +174,7 @@ JBIG2HuffmanTable huffTableH[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableI[] = {
+static JBIG2HuffmanTable huffTableI[] = {
   {     0, 2, jbig2HuffmanOOB, 0x000 },
   {    -1, 3,  1,              0x002 },
   {     1, 3,  1,              0x003 },
@@ -184,7 +200,7 @@ JBIG2HuffmanTable huffTableI[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableJ[] = {
+static JBIG2HuffmanTable huffTableJ[] = {
   {    -2, 2,  2,              0x000 },
   {     6, 2,  6,              0x001 },
   {     0, 2, jbig2HuffmanOOB, 0x002 },
@@ -209,7 +225,7 @@ JBIG2HuffmanTable huffTableJ[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableK[] = {
+static JBIG2HuffmanTable huffTableK[] = {
   {     1, 1,  0,              0x000 },
   {     2, 2,  1,              0x002 },
   {     4, 4,  0,              0x00c },
@@ -226,7 +242,7 @@ JBIG2HuffmanTable huffTableK[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableL[] = {
+static JBIG2HuffmanTable huffTableL[] = {
   {     1, 1,  0,              0x000 },
   {     2, 2,  0,              0x002 },
   {     3, 3,  1,              0x006 },
@@ -243,7 +259,7 @@ JBIG2HuffmanTable huffTableL[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableM[] = {
+static JBIG2HuffmanTable huffTableM[] = {
   {     1, 1,  0,              0x000 },
   {     2, 3,  0,              0x004 },
   {     7, 3,  3,              0x005 },
@@ -260,7 +276,7 @@ JBIG2HuffmanTable huffTableM[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableN[] = {
+static JBIG2HuffmanTable huffTableN[] = {
   {     0, 1,  0,              0x000 },
   {    -2, 3,  0,              0x004 },
   {    -1, 3,  0,              0x005 },
@@ -269,7 +285,7 @@ JBIG2HuffmanTable huffTableN[] = {
   {     0, 0, jbig2HuffmanEOT, 0     }
 };
 
-JBIG2HuffmanTable huffTableO[] = {
+static JBIG2HuffmanTable huffTableO[] = {
   {     0, 1,  0,              0x000 },
   {    -1, 3,  0,              0x004 },
   {     1, 3,  0,              0x005 },
@@ -471,7 +487,7 @@ void JBIG2MMRDecoder::reset() {
 }
 
 int JBIG2MMRDecoder::get2DCode() {
-  CCITTCode *p;
+  const CCITTCode *p;
 
   if (bufLen == 0) {
     buf = str->getChar() & 0xff;
@@ -498,7 +514,7 @@ int JBIG2MMRDecoder::get2DCode() {
 }
 
 int JBIG2MMRDecoder::getWhiteCode() {
-  CCITTCode *p;
+  const CCITTCode *p;
   Guint code;
 
   if (bufLen == 0) {
@@ -541,7 +557,7 @@ int JBIG2MMRDecoder::getWhiteCode() {
 }
 
 int JBIG2MMRDecoder::getBlackCode() {
-  CCITTCode *p;
+  const CCITTCode *p;
   Guint code;
 
   if (bufLen == 0) {
@@ -1550,7 +1566,7 @@ GBool JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
   inputSymbolDict = NULL;
   for (i = 0; i < nRefSegs; ++i) {
     seg = findSegment(refSegs[i]);
-    if (seg->getType() == jbig2SegSymbolDict) {
+    if (seg != NULL && seg->getType() == jbig2SegSymbolDict) {
       inputSymbolDict = (JBIG2SymbolDict *)seg;
       for (j = 0; j < inputSymbolDict->getSize(); ++j) {
 	bitmaps[k++] = inputSymbolDict->getBitmap(j);
@@ -2383,7 +2399,7 @@ void JBIG2Stream::readHalftoneRegionSeg(Guint segNum, GBool imm,
     return;
   }
   seg = findSegment(refSegs[0]);
-  if (seg->getType() != jbig2SegPatternDict) {
+  if (seg == NULL || seg->getType() != jbig2SegPatternDict) {
     error(getPos(), "Bad symbol dictionary reference in JBIG2 halftone segment");
     return;
   }
@@ -2969,7 +2985,7 @@ void JBIG2Stream::readGenericRefinementRegionSeg(Guint segNum, GBool imm,
   }
   if (nRefSegs == 1) {
     seg = findSegment(refSegs[0]);
-    if (seg->getType() != jbig2SegBitmap) {
+    if (seg == NULL || seg->getType() != jbig2SegBitmap) {
       error(getPos(), "Bad bitmap reference in JBIG2 generic refinement segment");
       return;
     }

@@ -6,6 +6,22 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Kristian Høgsberg <krh@redhat.com>
+// Copyright (C) 2006, 2007 Jeff Muizelaar <jeff@infidigm.net>
+// Copyright (C) 2006 Carlos Garcia Campos <carlosgc@gnome.org>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #ifndef GFXSTATE_H
 #define GFXSTATE_H
 

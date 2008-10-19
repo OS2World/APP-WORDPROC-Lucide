@@ -2,7 +2,8 @@
 //
 // ABWOutputDev.cc
 //
-// Jauco Noordzij
+// Copyright 2006-2007 Jauco Noordzij <jauco@jauco.nl>
+// Copyright 2007 Dominic Lachowicz <cinamod@hotmail.com>
 //
 // Based somewhat on HtmlOutputDev.cc
 //
@@ -733,7 +734,7 @@ void ABWOutputDev::cleanUpNode(xmlNodePtr N_parent, bool aggregateInfo){
   if (N_parent->children && xmlStrcasecmp(N_parent->children->name,BAD_CAST "line") == 0 && xmlGetProp(N_parent->children,BAD_CAST "alignment") != NULL)
     xmlSetProp(N_parent, BAD_CAST "alignment", xmlGetProp(N_parent->children,BAD_CAST "alignment"));
 
-   delete styles;
+   delete[] styles;
 }
 
 void ABWOutputDev::generateParagraphs() {

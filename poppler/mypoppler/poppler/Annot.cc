@@ -6,6 +6,28 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2006 Scott Turner <scotty1024@mac.com>
+// Copyright (C) 2007, 2008 Julien Rebetez <julienr@svn.gnome.org>
+// Copyright (C) 2007, 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2007, 2008 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2007, 2008 Iñigo Martínez <inigomartinez@gmail.com>
+// Copyright (C) 2007 Jeff Muizelaar <jeff@infidigm.net>
+// Copyright (C) 2008 Pino Toscano <pino@kde.org>
+// Copyright (C) 2008 Michael Vrable <mvrable@cs.ucsd.edu>
+// Copyright (C) 2008 Hugo Mercier <hmercier31@gmail.com>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -30,6 +52,9 @@
 #include "Page.h"
 #include "XRef.h"
 #include "Movie.h"
+#include "OptionalContent.h"
+#include "Sound.h"
+#include "FileSpec.h"
 #include <string.h>
 
 #define annotFlagHidden    0x0002
@@ -92,7 +117,7 @@ AnnotLineEndingStyle parseAnnotLineEndingStyle(GooString *string) {
   }  
 }
 
-AnnotExternalDataType parseAnnotExternalData(Dict* dict) {
+static AnnotExternalDataType parseAnnotExternalData(Dict* dict) {
   Object obj1;
   AnnotExternalDataType type;
 
@@ -111,6 +136,35 @@ AnnotExternalDataType parseAnnotExternalData(Dict* dict) {
   obj1.free();
 
   return type;
+}
+
+PDFRectangle *parseDiffRectangle(Array *array, PDFRectangle *rect) {
+  PDFRectangle *newRect = NULL;
+  if (array->getLength() == 4) {
+    // deltas
+    Object obj1;
+    double dx1 = (array->get(0, &obj1)->isNum() ? obj1.getNum() : 0);
+    obj1.free();
+    double dy1 = (array->get(1, &obj1)->isNum() ? obj1.getNum() : 0);
+    obj1.free();
+    double dx2 = (array->get(2, &obj1)->isNum() ? obj1.getNum() : 0);
+    obj1.free();
+    double dy2 = (array->get(3, &obj1)->isNum() ? obj1.getNum() : 0);
+    obj1.free();
+
+    // checking that the numbers are valid (i.e. >= 0),
+    // and that applying the differences still give us a valid rect
+    if (dx1 >= 0 && dy1 >= 0 && dx2 >= 0 && dy2
+        && (rect->x2 - rect->x1 - dx1 - dx2) >= 0
+        && (rect->y2 - rect->y1 - dy1 - dy2) >= 0) {
+      newRect = new PDFRectangle();
+      newRect->x1 = rect->x1 + dx1;
+      newRect->y1 = rect->y1 + dy1;
+      newRect->x2 = rect->x2 - dx2;
+      newRect->y2 = rect->y2 - dy2;
+    }
+  }
+  return newRect;
 }
 
 //------------------------------------------------------------------------
@@ -142,14 +196,102 @@ AnnotBorderEffect::AnnotBorderEffect(Dict *dict) {
 }
 
 //------------------------------------------------------------------------
+// AnnotPath
+//------------------------------------------------------------------------
+
+AnnotPath::AnnotPath() {
+  coords = NULL;
+  coordsLength = 0;
+}
+
+AnnotPath::AnnotPath(Array *array) {
+  coords = NULL;
+  coordsLength = 0;
+  parsePathArray(array);
+}
+
+AnnotPath::AnnotPath(AnnotCoord **coords, int coordsLength) {
+  this->coords = coords;
+  this->coordsLength = coordsLength;
+}
+
+AnnotPath::~AnnotPath() {
+  if (coords) {
+    for (int i = 0; i < coordsLength; ++i)
+      delete coords[i];
+    gfree(coords);
+  }
+}
+
+double AnnotPath::getX(int coord) const {
+  if (coord >= 0 && coord < coordsLength)
+    return coords[coord]->getX();
+  return 0;
+}
+
+double AnnotPath::getY(int coord) const {
+  if (coord >= 0 && coord < coordsLength)
+    return coords[coord]->getY();
+  return 0;
+}
+
+AnnotCoord *AnnotPath::getCoord(int coord) const {
+  if (coord >= 0 && coord < coordsLength)
+    return coords[coord];
+  return NULL;
+}
+
+void AnnotPath::parsePathArray(Array *array) {
+  int tempLength;
+  AnnotCoord **tempCoords;
+  GBool correct = gTrue;
+
+  if (array->getLength() % 2) {
+    error(-1, "Bad Annot Path");
+    return;
+  }
+
+  tempLength = array->getLength() / 2;
+  tempCoords = (AnnotCoord **) gmallocn (tempLength, sizeof(AnnotCoord *));
+  memset(tempCoords, 0, tempLength * sizeof(AnnotCoord *));
+  for (int i = 0; i < tempLength && correct; i++) {
+    Object obj1;
+    double x = 0, y = 0;
+
+    if (array->get(i * 2, &obj1)->isNum()) {
+      x = obj1.getNum();
+    } else {
+      correct = gFalse;
+    }
+    obj1.free();
+
+    if (array->get((i * 2) + 1, &obj1)->isNum()) {
+      y = obj1.getNum();
+    } else {
+      correct = gFalse;
+    }
+    obj1.free();
+
+    if (!correct) {
+      for (int j = i - 1; j >= 0; j--)
+        delete tempCoords[j];
+      gfree (tempCoords);
+      return;
+    }
+
+    tempCoords[i] = new AnnotCoord(x, y);
+  }
+
+  coords = tempCoords;
+  coordsLength = tempLength;
+}
+
+//------------------------------------------------------------------------
 // AnnotCalloutLine
 //------------------------------------------------------------------------
 
-AnnotCalloutLine::AnnotCalloutLine(double x1, double y1, double x2, double y2) {
-  this->x1 = x1;
-  this->y1 = y1;
-  this->x2 = x2;
-  this->y2 = y2;
+AnnotCalloutLine::AnnotCalloutLine(double x1, double y1, double x2, double y2)
+    :  coord1(x1, y1), coord2(x2, y2) {
 }
 
 //------------------------------------------------------------------------
@@ -157,9 +299,8 @@ AnnotCalloutLine::AnnotCalloutLine(double x1, double y1, double x2, double y2) {
 //------------------------------------------------------------------------
 
 AnnotCalloutMultiLine::AnnotCalloutMultiLine(double x1, double y1, double x2,
-    double y2, double x3, double y3) : AnnotCalloutLine(x1, y1, x2, y2) {
-  this->x3 = x3;
-  this->y3 = y3;
+                                             double y2, double x3, double y3)
+    : AnnotCalloutLine(x1, y1, x2, y2), coord3(x3, y3) {
 }
 
 //------------------------------------------------------------------------
@@ -233,78 +374,55 @@ AnnotQuadrilaterals::~AnnotQuadrilaterals() {
 
 double AnnotQuadrilaterals::getX1(int quadrilateral) {
   if (quadrilateral >= 0  && quadrilateral < quadrilateralsLength)
-    return quadrilaterals[quadrilateral]->x1;
+    return quadrilaterals[quadrilateral]->coord1.getX();
   return 0;
 }
 
 double AnnotQuadrilaterals::getY1(int quadrilateral) {
   if (quadrilateral >= 0  && quadrilateral < quadrilateralsLength)
-    return quadrilaterals[quadrilateral]->y1;
+    return quadrilaterals[quadrilateral]->coord1.getY();
   return 0;
 }
 
 double AnnotQuadrilaterals::getX2(int quadrilateral) {
   if (quadrilateral >= 0  && quadrilateral < quadrilateralsLength)
-    return quadrilaterals[quadrilateral]->x2;
+    return quadrilaterals[quadrilateral]->coord2.getX();
   return 0;
 }
 
 double AnnotQuadrilaterals::getY2(int quadrilateral) {
   if (quadrilateral >= 0  && quadrilateral < quadrilateralsLength)
-    return quadrilaterals[quadrilateral]->y2;
+    return quadrilaterals[quadrilateral]->coord2.getY();
   return 0;
 }
 
 double AnnotQuadrilaterals::getX3(int quadrilateral) {
   if (quadrilateral >= 0  && quadrilateral < quadrilateralsLength)
-    return quadrilaterals[quadrilateral]->x3;
+    return quadrilaterals[quadrilateral]->coord3.getX();
   return 0;
 }
 
 double AnnotQuadrilaterals::getY3(int quadrilateral) {
   if (quadrilateral >= 0  && quadrilateral < quadrilateralsLength)
-    return quadrilaterals[quadrilateral]->y3;
+    return quadrilaterals[quadrilateral]->coord3.getY();
   return 0;
 }
 
 double AnnotQuadrilaterals::getX4(int quadrilateral) {
   if (quadrilateral >= 0  && quadrilateral < quadrilateralsLength)
-    return quadrilaterals[quadrilateral]->x4;
+    return quadrilaterals[quadrilateral]->coord4.getX();
   return 0;
 }
 
 double AnnotQuadrilaterals::getY4(int quadrilateral) {
   if (quadrilateral >= 0  && quadrilateral < quadrilateralsLength)
-    return quadrilaterals[quadrilateral]->y4;
+    return quadrilaterals[quadrilateral]->coord4.getY();
   return 0;
 }
 
 AnnotQuadrilaterals::AnnotQuadrilateral::AnnotQuadrilateral(double x1, double y1,
-        double x2, double y2, double x3, double y3, double x4, double y4) {
-  this->x1 = x1;
-  this->y1 = y1;
-  this->x2 = x2;
-  this->y2 = y2;
-  this->x3 = x3;
-  this->y3 = y3;
-  this->x4 = x4;
-  this->y4 = y4;
-}
-
-//------------------------------------------------------------------------
-// AnnotQuadPoints
-//------------------------------------------------------------------------
-
-AnnotQuadPoints::AnnotQuadPoints(double x1, double y1, double x2, double y2,
-    double x3, double y3, double x4, double y4) {
-  this->x1 = x1;
-  this->y1 = y1;
-  this->x2 = x2;
-  this->y2 = y2;
-  this->x3 = x3;
-  this->y3 = y3;
-  this->x4 = x4;
-  this->y4 = y4;
+    double x2, double y2, double x3, double y3, double x4, double y4)
+    : coord1(x1, y1), coord2(x2, y2), coord3(x3, y3), coord4(x4, y4) {
 }
 
 //------------------------------------------------------------------------
@@ -696,7 +814,7 @@ Annot::Annot(XRef *xrefA, Dict *dict, Catalog* catalog, Object *obj) {
 }
 
 void Annot::initialize(XRef *xrefA, Dict *dict, Catalog *catalog) {
-  Object apObj, asObj, obj1, obj2, obj3;
+  Object asObj, obj1, obj2, obj3;
 
   appRef.num = 0;
   appRef.gen = 65535;
@@ -839,17 +957,13 @@ void Annot::initialize(XRef *xrefA, Dict *dict, Catalog *catalog) {
     treeKey = 0;
   }
   obj1.free();
-
-  /* TODO: optional content should be parsed */
-  optionalContent = NULL;
   
-  /*if (dict->lookup("OC", &obj1)->isDict()) {
-    optionalContent = NULL;
+  if (dict->lookup("OC", &obj1)->isDict()) {
+    optionalContent = new OCGs(&obj1, xrefA);
   } else {
     optionalContent = NULL;
   }
   obj1.free();
-  */
 }
 
 double Annot::getXMin() {
@@ -1096,9 +1210,6 @@ AnnotMarkup::~AnnotMarkup() {
   if (date)
     delete date;
 
-  if (inReplyTo)
-    delete inReplyTo;
-
   if (subject)
     delete subject;
 }
@@ -1134,10 +1245,11 @@ void AnnotMarkup::initialize(XRef *xrefA, Dict *dict, Catalog *catalog, Object *
   }
   obj1.free();
 
-  if (dict->lookup("IRT", &obj1)->isDict()) {
-    inReplyTo = new Dict(obj1.getDict());
+  if (dict->lookupNF("IRT", &obj1)->isRef()) {
+    inReplyTo = obj1.getRef();
   } else {
-    inReplyTo = NULL;
+    inReplyTo.num = 0;
+    inReplyTo.gen = 0;
   }
   obj1.free();
 
@@ -1184,6 +1296,10 @@ AnnotText::AnnotText(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
   initialize (xrefA, catalog, dict);
 }
 
+AnnotText::~AnnotText() {
+  delete icon;
+}
+
 void AnnotText::setModified(GooString *date) {
   if (date) {
     delete modified;
@@ -1201,26 +1317,9 @@ void AnnotText::initialize(XRef *xrefA, Catalog *catalog, Dict *dict) {
   obj1.free();
 
   if (dict->lookup("Name", &obj1)->isName()) {
-    GooString *iconName = new GooString(obj1.getName());
-
-    if (!iconName->cmp("Comment")) {
-      icon = iconComment;
-    } else if (!iconName->cmp("Key")) {
-      icon = iconKey;
-    } else if (!iconName->cmp("Help")) {
-      icon = iconHelp;
-    } else if (!iconName->cmp("NewParagraph")) {
-      icon = iconNewParagraph;
-    } else if (!iconName->cmp("Paragraph")) {
-      icon = iconParagraph;
-    } else if (!iconName->cmp("Insert")) {
-      icon = iconInsert;
-    } else {
-      icon = iconNote;
-    }
-    delete iconName;
+    icon = new GooString(obj1.getName());
   } else {
-    icon = iconNote;
+    icon = new GooString("Note");
   }
   obj1.free();
 
@@ -1248,7 +1347,6 @@ void AnnotText::initialize(XRef *xrefA, Catalog *catalog, Dict *dict) {
       } else {
         state = stateUnknown;
       }
-
     } else {
       state = stateUnknown;
     }
@@ -1284,7 +1382,6 @@ void AnnotText::initialize(XRef *xrefA, Catalog *catalog, Dict *dict) {
     } else {
       state = stateUnknown;
     }
-
   } else {
     state = stateUnknown;
   }
@@ -1306,7 +1403,9 @@ AnnotLink::~AnnotLink() {
   /*
   if (actionDict)
     delete actionDict;
-
+  */
+  dest.free();
+  /*
   if (uriAction)
     delete uriAction;
   */
@@ -1324,6 +1423,7 @@ void AnnotLink::initialize(XRef *xrefA, Catalog *catalog, Dict *dict) {
   }
   obj1.free();
   */
+  dict->lookup("Dest", &dest);
   if (dict->lookup("H", &obj1)->isName()) {
     GooString *effect = new GooString(obj1.getName());
 
@@ -1481,39 +1581,8 @@ void AnnotFreeText::initialize(XRef *xrefA, Catalog *catalog, Dict *dict) {
   }
   obj1.free();
 
-  if (dict->lookup("RD", &obj1)->isArray() && obj1.arrayGetLength() == 4) {
-    Object obj2;
-    rectangle = new PDFRectangle();
-
-    (obj1.arrayGet(0, &obj2)->isNum() ? rectangle->x1 = obj2.getNum() :
-      rectangle->x1 = 0);
-    obj2.free();
-    (obj1.arrayGet(1, &obj2)->isNum() ? rectangle->y1 = obj2.getNum() :
-      rectangle->y1 = 0);
-    obj2.free();
-    (obj1.arrayGet(2, &obj2)->isNum() ? rectangle->x2 = obj2.getNum() :
-      rectangle->x2 = 1);
-    obj2.free();
-    (obj1.arrayGet(3, &obj2)->isNum() ? rectangle->y2 = obj2.getNum() :
-      rectangle->y2 = 1);
-    obj2.free();
-
-    if (rectangle->x1 > rectangle->x2) {
-      double t = rectangle->x1;
-      rectangle->x1 = rectangle->x2;
-      rectangle->x2 = t;
-    }
-    if (rectangle->y1 > rectangle->y2) {
-      double t = rectangle->y1;
-      rectangle->y1 = rectangle->y2;
-      rectangle->y2 = t;
-    }
-
-    if ((rectangle->x1 + rectangle->x2) > (rect->x2 - rect->x1))
-      rectangle->x1 = rectangle->x2 = 0;
-
-    if ((rectangle->y1 + rectangle->y2) > (rect->y2 - rect->y1))
-      rectangle->y1 = rectangle->y2 = 0;
+  if (dict->lookup("RD", &obj1)->isArray()) {
+    rectangle = parseDiffRectangle(obj1.getArray(), rect);
   } else {
     rectangle = NULL;
   }
@@ -1540,6 +1609,9 @@ AnnotLine::AnnotLine(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
 }
 
 AnnotLine::~AnnotLine() {
+  delete coord1;
+  delete coord2;
+
   if (interiorColor)
     delete interiorColor;
 
@@ -1552,6 +1624,7 @@ void AnnotLine::initialize(XRef *xrefA, Catalog *catalog, Dict *dict) {
 
   if (dict->lookup("L", &obj1)->isArray() && obj1.arrayGetLength() == 4) {
     Object obj2;
+    double x1, y1, x2, y2;
 
     (obj1.arrayGet(0, &obj2)->isNum() ? x1 = obj2.getNum() : x1 = 0);
     obj2.free();
@@ -1562,8 +1635,11 @@ void AnnotLine::initialize(XRef *xrefA, Catalog *catalog, Dict *dict) {
     (obj1.arrayGet(3, &obj2)->isNum() ? y2 = obj2.getNum() : y2 = 0);
     obj2.free();
 
+    coord1 = new AnnotCoord(x1, y1);
+    coord2 = new AnnotCoord(x2, y2);
   } else {
-    x1 = y1 = x2 = y2 = 0;
+    coord1 = new AnnotCoord();
+    coord2 = new AnnotCoord();
   }
   obj1.free();
 
@@ -1686,8 +1762,29 @@ void AnnotLine::initialize(XRef *xrefA, Catalog *catalog, Dict *dict) {
 // AnnotTextMarkup
 //------------------------------------------------------------------------
 
+AnnotTextMarkup::AnnotTextMarkup(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
+  AnnotMarkup(xrefA, dict, catalog, obj) {
+  // the real type will be read in initialize()
+  type = typeHighlight;
+  initialize(xrefA, catalog, dict);
+}
+
 void AnnotTextMarkup::initialize(XRef *xrefA, Catalog *catalog, Dict *dict) {
   Object obj1;
+
+  if (dict->lookup("Subtype", &obj1)->isName()) {
+    GooString typeName(obj1.getName());
+    if (!typeName.cmp("Highlight")) {
+      type = typeHighlight;
+    } else if (!typeName.cmp("Underline")) {
+      type = typeUnderline;
+    } else if (!typeName.cmp("Squiggly")) {
+      type = typeSquiggly;
+    } else if (!typeName.cmp("StrikeOut")) {
+      type = typeStrikeOut;
+    }
+  }
+  obj1.free();
 
   if(dict->lookup("QuadPoints", &obj1)->isArray()) {
     quadrilaterals = new AnnotQuadrilaterals(obj1.getArray(), rect);
@@ -1731,15 +1828,16 @@ AnnotWidget::~AnnotWidget() {
 void AnnotWidget::initialize(XRef *xrefA, Catalog *catalog, Dict *dict) {
   Object obj1;
 
-  form = catalog->getForm ();
-  widget = form->findWidgetByRef (ref);
+  if ((form = catalog->getForm ())) {
+    widget = form->findWidgetByRef (ref);
 
-  // check if field apperances need to be regenerated
-  // Only text or choice fields needs to have appearance regenerated
-  // see section 8.6.2 "Variable Text" of PDFReference
-  regen = gFalse;
-  if (widget != NULL && (widget->getType () == formText || widget->getType () == formChoice)) {
-    regen = form->getNeedAppearances ();
+    // check if field apperances need to be regenerated
+    // Only text or choice fields needs to have appearance regenerated
+    // see section 8.6.2 "Variable Text" of PDFReference
+    regen = gFalse;
+    if (widget != NULL && (widget->getType () == formText || widget->getType () == formChoice)) {
+      regen = form->getNeedAppearances ();
+    }
   }
 
   // If field doesn't have an AP we'll have to generate it
@@ -3063,9 +3161,10 @@ void AnnotMovie::initialize(XRef *xrefA, Catalog *catalog, Dict* dict) {
   FWPosY = 0.5;
 
   if (dict->lookup("Movie", &movieDict)->isDict()) {
-    if (movieDict.dictLookup("F", &obj1)->isString()) {
-      fileName = obj1.getString()->copy();
-    }
+    Object obj2;
+    getFileSpecNameForPlatform(movieDict.dictLookup("F", &obj1), &obj2);
+    fileName = obj2.getString()->copy();
+    obj2.free();
     obj1.free();
 
     if (movieDict.dictLookup("Aspect", &obj1)->isArray()) {
@@ -3309,6 +3408,440 @@ void AnnotScreen::initialize(XRef *xrefA, Catalog *catalog, Dict* dict) {
 }
 
 //------------------------------------------------------------------------
+// AnnotStamp
+//------------------------------------------------------------------------
+ 
+AnnotStamp::AnnotStamp(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
+  AnnotMarkup(xrefA, dict, catalog, obj) {
+  type = typeStamp;
+  initialize(xrefA, catalog, dict);
+}
+
+AnnotStamp::~AnnotStamp() {
+  delete icon;
+}
+
+void AnnotStamp::initialize(XRef *xrefA, Catalog *catalog, Dict* dict) {
+  Object obj1;
+
+  if (dict->lookup("Name", &obj1)->isName()) {
+    icon = new GooString(obj1.getName());
+  } else {
+    icon = new GooString("Draft");
+  }
+  obj1.free();
+
+}
+
+//------------------------------------------------------------------------
+// AnnotGeometry
+//------------------------------------------------------------------------
+
+AnnotGeometry::AnnotGeometry(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
+  AnnotMarkup(xrefA, dict, catalog, obj) {
+  // the real type will be read in initialize()
+  type = typeSquare;
+  initialize(xrefA, catalog, dict);
+}
+
+AnnotGeometry::~AnnotGeometry() {
+  delete interiorColor;
+  delete borderEffect;
+  delete geometryRect;
+}
+
+void AnnotGeometry::initialize(XRef *xrefA, Catalog *catalog, Dict* dict) {
+  Object obj1;
+
+  if (dict->lookup("Subtype", &obj1)->isName()) {
+    GooString typeName(obj1.getName());
+    if (!typeName.cmp("Square")) {
+      type = typeSquare;
+    } else if (!typeName.cmp("Circle")) {
+      type = typeCircle;
+    }
+  }
+  obj1.free();
+
+  if (dict->lookup("IC", &obj1)->isArray()) {
+    interiorColor = new AnnotColor(obj1.getArray());
+  } else {
+    interiorColor = NULL;
+  }
+  obj1.free();
+
+  if (dict->lookup("BE", &obj1)->isDict()) {
+    borderEffect = new AnnotBorderEffect(obj1.getDict());
+  } else {
+    borderEffect = NULL;
+  }
+  obj1.free();
+
+  geometryRect = NULL;
+  if (dict->lookup("RD", &obj1)->isArray()) {
+    geometryRect = parseDiffRectangle(obj1.getArray(), rect);
+  }
+  obj1.free();
+
+}
+
+//------------------------------------------------------------------------
+// AnnotPolygon
+//------------------------------------------------------------------------
+
+AnnotPolygon::AnnotPolygon(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
+  AnnotMarkup(xrefA, dict, catalog, obj) {
+  // the real type will be read in initialize()
+  type = typePolygon;
+  initialize(xrefA, catalog, dict);
+}
+
+AnnotPolygon::~AnnotPolygon() {
+  delete vertices;
+
+  if (interiorColor)
+    delete interiorColor;
+
+  if (borderEffect)
+    delete borderEffect;
+}
+
+void AnnotPolygon::initialize(XRef *xrefA, Catalog *catalog, Dict* dict) {
+  Object obj1;
+
+  if (dict->lookup("Subtype", &obj1)->isName()) {
+    GooString typeName(obj1.getName());
+    if (!typeName.cmp("Polygon")) {
+      type = typePolygon;
+    } else if (!typeName.cmp("PolyLine")) {
+      type = typePolyLine;
+    }
+  }
+  obj1.free();
+
+  if (dict->lookup("Vertices", &obj1)->isArray()) {
+    vertices = new AnnotPath(obj1.getArray());
+  } else {
+    vertices = new AnnotPath();
+    error(-1, "Bad Annot Polygon Vertices");
+    ok = gFalse;
+  }
+  obj1.free();
+
+  if (dict->lookup("LE", &obj1)->isArray() && obj1.arrayGetLength() == 2) {
+    Object obj2;
+
+    if(obj1.arrayGet(0, &obj2)->isString())
+      startStyle = parseAnnotLineEndingStyle(obj2.getString());
+    else
+      startStyle = annotLineEndingNone;
+    obj2.free();
+
+    if(obj1.arrayGet(1, &obj2)->isString())
+      endStyle = parseAnnotLineEndingStyle(obj2.getString());
+    else
+      endStyle = annotLineEndingNone;
+    obj2.free();
+
+  } else {
+    startStyle = endStyle = annotLineEndingNone;
+  }
+  obj1.free();
+
+  if (dict->lookup("IC", &obj1)->isArray()) {
+    interiorColor = new AnnotColor(obj1.getArray());
+  } else {
+    interiorColor = NULL;
+  }
+  obj1.free();
+
+  if (dict->lookup("BE", &obj1)->isDict()) {
+    borderEffect = new AnnotBorderEffect(obj1.getDict());
+  } else {
+    borderEffect = NULL;
+  }
+  obj1.free();
+
+  if (dict->lookup("IT", &obj1)->isName()) {
+    GooString *intentName = new GooString(obj1.getName());
+
+    if(!intentName->cmp("PolygonCloud")) {
+      intent = polygonCloud;
+    } else if(!intentName->cmp("PolyLineDimension")) {
+      intent = polylineDimension;
+    } else {
+      intent = polygonDimension;
+    }
+    delete intentName;
+  } else {
+    intent = polygonCloud;
+  }
+  obj1.free();
+}
+
+//------------------------------------------------------------------------
+// AnnotCaret
+//------------------------------------------------------------------------
+
+AnnotCaret::AnnotCaret(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
+  AnnotMarkup(xrefA, dict, catalog, obj) {
+  type = typeCaret;
+  initialize(xrefA, catalog, dict);
+}
+
+AnnotCaret::~AnnotCaret() {
+  delete caretRect;
+}
+
+void AnnotCaret::initialize(XRef *xrefA, Catalog *catalog, Dict* dict) {
+  Object obj1;
+
+  symbol = symbolNone;
+  if (dict->lookup("Sy", &obj1)->isName()) {
+    GooString typeName(obj1.getName());
+    if (!typeName.cmp("P")) {
+      symbol = symbolP;
+    } else if (!typeName.cmp("None")) {
+      symbol = symbolNone;
+    }
+  }
+  obj1.free();
+
+  if (dict->lookup("RD", &obj1)->isArray()) {
+    caretRect = parseDiffRectangle(obj1.getArray(), rect);
+  } else {
+    caretRect = NULL;
+  }
+  obj1.free();
+
+}
+
+//------------------------------------------------------------------------
+// AnnotInk
+//------------------------------------------------------------------------
+
+AnnotInk::AnnotInk(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
+  AnnotMarkup(xrefA, dict, catalog, obj) {
+  type = typeInk;
+  initialize(xrefA, catalog, dict);
+}
+
+AnnotInk::~AnnotInk() {
+  if (inkList) {
+    for (int i = 0; i < inkListLength; ++i)
+      delete inkList[i];
+    gfree(inkList);
+  }
+}
+
+void AnnotInk::initialize(XRef *xrefA, Catalog *catalog, Dict* dict) {
+  Object obj1;
+
+  if (dict->lookup("InkList", &obj1)->isArray()) {
+    Array *array = obj1.getArray();
+    inkListLength = array->getLength();
+    inkList = (AnnotPath **) gmallocn ((inkListLength), sizeof(AnnotPath *));
+    memset(inkList, 0, inkListLength * sizeof(AnnotPath *));
+    for (int i = 0; i < inkListLength; i++) {
+      Object obj2;
+      if (array->get(i, &obj2)->isArray())
+        inkList[i] = new AnnotPath(obj2.getArray());
+      obj2.free();
+    }
+  } else {
+    inkListLength = 0;
+    inkList = NULL;
+    error(-1, "Bad Annot Ink List");
+    ok = gFalse;
+  }
+  obj1.free();
+}
+
+//------------------------------------------------------------------------
+// AnnotFileAttachment
+//------------------------------------------------------------------------
+
+AnnotFileAttachment::AnnotFileAttachment(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
+  AnnotMarkup(xrefA, dict, catalog, obj) {
+  type = typeFileAttachment;
+  initialize(xrefA, catalog, dict);
+}
+
+AnnotFileAttachment::~AnnotFileAttachment() {
+  file.free();
+
+  if (name)
+    delete name;
+}
+
+void AnnotFileAttachment::initialize(XRef *xrefA, Catalog *catalog, Dict* dict) {
+  Object obj1;
+
+  if (dict->lookup("FS", &obj1)->isDict()) {
+    obj1.copy(&file);
+  } else {
+    error(-1, "Bad Annot File Attachment");
+    ok = gFalse;
+  }
+  obj1.free();
+
+  if (dict->lookup("Name", &obj1)->isName()) {
+    name = new GooString(obj1.getName());
+  } else {
+    name = new GooString("PushPin");
+  }
+  obj1.free();
+}
+
+//------------------------------------------------------------------------
+// AnnotSound
+//------------------------------------------------------------------------
+
+AnnotSound::AnnotSound(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
+  AnnotMarkup(xrefA, dict, catalog, obj) {
+  type = typeSound;
+  initialize(xrefA, catalog, dict);
+}
+
+AnnotSound::~AnnotSound() {
+  delete sound;
+
+  delete name;
+}
+
+void AnnotSound::initialize(XRef *xrefA, Catalog *catalog, Dict* dict) {
+  Object obj1;
+
+  sound = Sound::parseSound(dict->lookup("Sound", &obj1));
+  if (!sound) {
+    error(-1, "Bad Annot Sound");
+    ok = gFalse;
+  }
+  obj1.free();
+
+  if (dict->lookup("Name", &obj1)->isName()) {
+    name = new GooString(obj1.getName());
+  } else {
+    name = new GooString("Speaker");
+  }
+  obj1.free();
+}
+
+//------------------------------------------------------------------------
+// Annot3D
+//------------------------------------------------------------------------
+
+Annot3D::Annot3D(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj) :
+  Annot(xrefA, dict, catalog, obj) {
+  type = type3D;
+  initialize(xrefA, catalog, dict);
+}
+
+Annot3D::~Annot3D() {
+  if (activation)
+    delete activation;
+}
+
+void Annot3D::initialize(XRef *xrefA, Catalog *catalog, Dict* dict) {
+  Object obj1;
+
+  if (dict->lookup("3DA", &obj1)->isDict()) {
+    activation = new Activation(obj1.getDict());
+  } else {
+    activation = NULL;
+  }
+  obj1.free();
+}
+
+Annot3D::Activation::Activation(Dict *dict) {
+  Object obj1;
+
+  if (dict->lookup("A", &obj1)->isName()) {
+    GooString *name = new GooString(obj1.getName());
+
+    if(!name->cmp("PO")) {
+      aTrigger = aTriggerPageOpened;
+    } else if(!name->cmp("PV")) {
+      aTrigger = aTriggerPageVisible;
+    } else if(!name->cmp("XA")) {
+      aTrigger = aTriggerUserAction;
+    } else {
+      aTrigger = aTriggerUnknown;
+    }
+    delete name;
+  } else {
+    aTrigger = aTriggerUnknown;
+  }
+  obj1.free();
+
+  if(dict->lookup("AIS", &obj1)->isName()) {
+    GooString *name = new GooString(obj1.getName());
+
+    if(!name->cmp("I")) {
+      aState = aStateEnabled;
+    } else if(!name->cmp("L")) {
+      aState = aStateDisabled;
+    } else {
+      aState = aStateUnknown;
+    }
+    delete name;
+  } else {
+    aState = aStateUnknown;
+  }
+  obj1.free();
+
+  if(dict->lookup("D", &obj1)->isName()) {
+    GooString *name = new GooString(obj1.getName());
+
+    if(!name->cmp("PC")) {
+      dTrigger = dTriggerPageClosed;
+    } else if(!name->cmp("PI")) {
+      dTrigger = dTriggerPageInvisible;
+    } else if(!name->cmp("XD")) {
+      dTrigger = dTriggerUserAction;
+    } else {
+      dTrigger = dTriggerUnknown;
+    }
+    delete name;
+  } else {
+    dTrigger = dTriggerUnknown;
+  }
+  obj1.free();
+
+  if(dict->lookup("DIS", &obj1)->isName()) {
+    GooString *name = new GooString(obj1.getName());
+
+    if(!name->cmp("U")) {
+      dState = dStateUninstantiaded;
+    } else if(!name->cmp("I")) {
+      dState = dStateInstantiated;
+    } else if(!name->cmp("L")) {
+      dState = dStateLive;
+    } else {
+      dState = dStateUnknown;
+    }
+    delete name;
+  } else {
+    dState = dStateUnknown;
+  }
+  obj1.free();
+
+  if (dict->lookup("TB", &obj1)->isBool()) {
+    displayToolbar = obj1.getBool();
+  } else {
+    displayToolbar = gTrue;
+  }
+  obj1.free();
+
+  if (dict->lookup("NP", &obj1)->isBool()) {
+    displayNavigation = obj1.getBool();
+  } else {
+    displayNavigation = gFalse;
+  }
+  obj1.free();
+}
+
+//------------------------------------------------------------------------
 // Annots
 //------------------------------------------------------------------------
 
@@ -3363,31 +3896,31 @@ Annot *Annots::createAnnot(XRef *xref, Dict* dict, Catalog *catalog, Object *obj
     } else if (!typeName->cmp("Line")) {
       annot = new AnnotLine(xref, dict, catalog, obj);
     } else if (!typeName->cmp("Square")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotGeometry(xref, dict, catalog, obj);
     } else if (!typeName->cmp("Circle")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotGeometry(xref, dict, catalog, obj);
     } else if (!typeName->cmp("Polygon")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotPolygon(xref, dict, catalog, obj);
     } else if (!typeName->cmp("PolyLine")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotPolygon(xref, dict, catalog, obj);
     } else if (!typeName->cmp("Highlight")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotTextMarkup(xref, dict, catalog, obj);
     } else if (!typeName->cmp("Underline")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotTextMarkup(xref, dict, catalog, obj);
     } else if (!typeName->cmp("Squiggly")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotTextMarkup(xref, dict, catalog, obj);
     } else if (!typeName->cmp("StrikeOut")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotTextMarkup(xref, dict, catalog, obj);
     } else if (!typeName->cmp("Stamp")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotStamp(xref, dict, catalog, obj);
     } else if (!typeName->cmp("Caret")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotCaret(xref, dict, catalog, obj);
     } else if (!typeName->cmp("Ink")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotInk(xref, dict, catalog, obj);
     } else if (!typeName->cmp("FileAttachment")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotFileAttachment(xref, dict, catalog, obj);
     } else if (!typeName->cmp("Sound")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new AnnotSound(xref, dict, catalog, obj);
     } else if(!typeName->cmp("Movie")) {
       annot = new AnnotMovie(xref, dict, catalog, obj);
     } else if(!typeName->cmp("Widget")) {
@@ -3401,7 +3934,7 @@ Annot *Annots::createAnnot(XRef *xref, Dict* dict, Catalog *catalog, Object *obj
     } else if (!typeName->cmp("Watermark")) {
       annot = new Annot(xref, dict, catalog, obj);
     } else if (!typeName->cmp("3D")) {
-      annot = new Annot(xref, dict, catalog, obj);
+      annot = new Annot3D(xref, dict, catalog, obj);
     } else {
       annot = new Annot(xref, dict, catalog, obj);
     }

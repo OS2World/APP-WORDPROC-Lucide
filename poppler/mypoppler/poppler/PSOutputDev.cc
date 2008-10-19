@@ -6,6 +6,24 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Martin Kretzschmar <martink@gnome.org>
+// Copyright (C) 2005, 2006 Kristian Høgsberg <krh@redhat.com>
+// Copyright (C) 2006-2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2006 Jeff Muizelaar <jeff@infidigm.net>
+// Copyright (C) 2007, 2008 Brad Hards <bradh@kde.org>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -36,6 +54,7 @@
 #include "Annot.h"
 #include "XRef.h"
 #include "PreScanOutputDev.h"
+#include "FileSpec.h"
 #if HAVE_SPLASH
 #  include "splash/Splash.h"
 #  include "splash/SplashBitmap.h"
@@ -753,7 +772,7 @@ struct PSSubstFont {
   double mWidth;		// width of 'm' character
 };
 
-static char *psFonts[] = {
+static const char *psFonts[] = {
   "Courier",
   "Courier-Bold",
   "Courier-Oblique",
@@ -771,7 +790,7 @@ static char *psFonts[] = {
   NULL
 };
 
-static PSSubstFont psSubstFonts[] = {
+static const PSSubstFont psSubstFonts[] = {
   {"Helvetica",             0.833},
   {"Helvetica-Oblique",     0.833},
   {"Helvetica-Bold",        0.889},
@@ -1330,7 +1349,7 @@ void PSOutputDev::writeXpdfProcset() {
   char **p;
   char *q;
 
-  writePSFmt("%%BeginResource: procset xpdf {0:s} 0\n", xpdfVersion);
+  writePSFmt("%%BeginResource: procset xpdf {0:s} 0\n", "3.00");
   writePSFmt("%%Copyright: {0:s}\n", xpdfCopyright);
   lev1 = lev2 = lev3 = sep = nonSep = gTrue;
   for (p = prolog; *p; ++p) {
@@ -1851,7 +1870,7 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
 }
 
 void PSOutputDev::setupEmbeddedType1Font(Ref *id, GooString *psName) {
-  static char hexChar[17] = "0123456789abcdef";
+  static const char hexChar[17] = "0123456789abcdef";
   Object refObj, strObj, obj1, obj2, obj3;
   Dict *dict;
   int length1, length2, length3;
@@ -4360,6 +4379,8 @@ void PSOutputDev::doImageL1(Object *ref, GfxImageColorMap *colorMap,
       str->close();
       delete str;
     } else {
+      // make sure the image is setup, it sometimes is not like on bug #17645
+      setupImage(ref->getRef(), str);
       // set up to use the array already created by setupImages()
       writePSFmt("ImData_{0:d}_{1:d} 0\n", ref->getRefNum(), ref->getRefGen());
     }
@@ -4821,6 +4842,8 @@ void PSOutputDev::doImageL2(Object *ref, GfxImageColorMap *colorMap,
       str2->close();
       delete str2;
     } else {
+      // make sure the image is setup, it sometimes is not like on bug #17645
+      setupImage(ref->getRef(), str);
       // set up to use the array already created by setupImages()
       writePSFmt("ImData_{0:d}_{1:d} 0\n", ref->getRefNum(), ref->getRefGen());
     }
@@ -5089,6 +5112,8 @@ void PSOutputDev::doImageL3(Object *ref, GfxImageColorMap *colorMap,
       str2->close();
       delete str2;
     } else {
+      // make sure the image is setup, it sometimes is not like on bug #17645
+      setupImage(ref->getRef(), str);
       // set up to use the array already created by setupImages()
       writePSFmt("ImData_{0:d}_{1:d} 0\n", ref->getRefNum(), ref->getRefGen());
     }
@@ -5629,7 +5654,7 @@ void PSOutputDev::opiBegin20(GfxState *state, Dict *dict) {
   writePS("%%Distilled\n");
 
   dict->lookup("F", &obj1);
-  if (getFileSpec(&obj1, &obj2)) {
+  if (getFileSpecName(&obj1, &obj2)) {
     writePSFmt("%%ImageFileName: {0:t}\n", obj2.getString());
     obj2.free();
   }
@@ -5745,7 +5770,7 @@ void PSOutputDev::opiBegin13(GfxState *state, Dict *dict) {
   writePS("opiMatrix setmatrix\n");
 
   dict->lookup("F", &obj1);
-  if (getFileSpec(&obj1, &obj2)) {
+  if (getFileSpecName(&obj1, &obj2)) {
     writePSFmt("%ALDImageFileName: {0:t}\n", obj2.getString());
     obj2.free();
   }
@@ -5995,36 +6020,6 @@ void PSOutputDev::opiEnd(GfxState *state, Dict *opiDict) {
       dict.free();
     }
   }
-}
-
-GBool PSOutputDev::getFileSpec(Object *fileSpec, Object *fileName) {
-  if (fileSpec->isString()) {
-    fileSpec->copy(fileName);
-    return gTrue;
-  }
-  if (fileSpec->isDict()) {
-    fileSpec->dictLookup("DOS", fileName);
-    if (fileName->isString()) {
-      return gTrue;
-    }
-    fileName->free();
-    fileSpec->dictLookup("Mac", fileName);
-    if (fileName->isString()) {
-      return gTrue;
-    }
-    fileName->free();
-    fileSpec->dictLookup("Unix", fileName);
-    if (fileName->isString()) {
-      return gTrue;
-    }
-    fileName->free();
-    fileSpec->dictLookup("F", fileName);
-    if (fileName->isString()) {
-      return gTrue;
-    }
-    fileName->free();
-  }
-  return gFalse;
 }
 #endif // OPI_SUPPORT
 

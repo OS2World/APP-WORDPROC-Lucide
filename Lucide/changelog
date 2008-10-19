@@ -1,5 +1,5 @@
 1.XX:
-  - PDF plugin: Poppler (pdf rendering) library updated to version 0.8.7.
+  - PDF plugin: Poppler (pdf rendering) library updated to version 0.10.0.
   - PDF plugin: freetype library updated to version 2.3.7.
 
 1.20:

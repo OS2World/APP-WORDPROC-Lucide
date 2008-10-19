@@ -6,6 +6,27 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2006 Scott Turner <scotty1024@mac.com>
+// Copyright (C) 2007, 2008 Julien Rebetez <julienr@svn.gnome.org>
+// Copyright (C) 2007, 2008 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2007, 2008 Iñigo Martínez <inigomartinez@gmail.com>
+// Copyright (C) 2008 Michael Vrable <mvrable@cs.ucsd.edu>
+// Copyright (C) 2008 Hugo Mercier <hmercier31@gmail.com>
+// Copyright (C) 2008 Pino Toscano <pino@kde.org>
+// Copyright (C) 2008 Tomas Are Haavet <tomasare@gmail.com>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #ifndef ANNOT_H
 #define ANNOT_H
 
@@ -23,6 +44,8 @@ class Form;
 class FormWidget;
 class PDFRectangle;
 class Movie;
+class OCGs;
+class Sound;
 
 enum AnnotLineEndingStyle {
   annotLineEndingSquare,        // Square
@@ -43,6 +66,46 @@ enum AnnotExternalDataType {
 };
 
 //------------------------------------------------------------------------
+// AnnotCoord
+//------------------------------------------------------------------------
+
+class AnnotCoord {
+public:
+
+  AnnotCoord() : x(0), y(0) { }
+  AnnotCoord(double _x, double _y) : x(_x), y(_y) { }
+
+  double getX() const { return x; }
+  double getY() const { return y; }
+  
+protected:
+
+  double x, y;
+};
+
+//------------------------------------------------------------------------
+// AnnotPath
+//------------------------------------------------------------------------
+
+class AnnotPath {
+public:
+  AnnotPath();
+  AnnotPath(Array *array);
+  AnnotPath(AnnotCoord **coords, int coordLength);
+  ~AnnotPath();
+
+  double getX(int coord) const;
+  double getY(int coord) const;
+  AnnotCoord *getCoord(int coord) const;
+  int getCoordsLength() const { return coordsLength; }
+protected:
+  AnnotCoord **coords;
+  int coordsLength;
+
+  void parsePathArray(Array *array);
+};
+  
+//------------------------------------------------------------------------
 // AnnotCalloutLine
 //------------------------------------------------------------------------
 
@@ -52,14 +115,14 @@ public:
   AnnotCalloutLine(double x1, double y1, double x2, double y2);
   virtual ~AnnotCalloutLine() { }
 
-  double getX1() const { return x1; }
-  double getY1() const { return y1; }
-  double getX2() const { return x2; }
-  double getY2() const { return y2; }
+  double getX1() const { return coord1.getX(); }
+  double getY1() const { return coord1.getY(); }
+  double getX2() const { return coord2.getX(); }
+  double getY2() const { return coord2.getY(); }
   
 protected:
 
-  double x1, y1, x2, y2;
+  AnnotCoord coord1, coord2;
 };
 
 //------------------------------------------------------------------------
@@ -72,12 +135,12 @@ public:
   AnnotCalloutMultiLine(double x1, double y1, double x2, double y2,
     double x3, double y3);
 
-  double getX3() const { return x3; }
-  double getY3() const { return y3; }
+  double getX3() const { return coord3.getX(); }
+  double getY3() const { return coord3.getY(); }
 
 protected:
 
-  double x3, y3;
+  AnnotCoord coord3;
 };
 
 //------------------------------------------------------------------------
@@ -113,13 +176,13 @@ class AnnotQuadrilaterals {
     AnnotQuadrilateral(double x1, double y1, double x2, double y2, double x3,
       double y3, double x4, double y4);
 
-    double x1, y1, x2, y2, x3, y3, x4, y4;
+    AnnotCoord coord1, coord2, coord3, coord4;
   };
 
 public:
 
   AnnotQuadrilaterals(Array *array, PDFRectangle *rect);
-  virtual ~AnnotQuadrilaterals();
+  ~AnnotQuadrilaterals();
 
   double getX1(int quadrilateral);
   double getY1(int quadrilateral);
@@ -137,29 +200,6 @@ protected:
 };
 
 //------------------------------------------------------------------------
-// AnnotQuadPoints
-//------------------------------------------------------------------------
-
-class AnnotQuadPoints {
-public:
-  
-  AnnotQuadPoints(double x1, double y1, double x2, double y2, double x3,
-      double y3, double x4, double y4);
-
-  double getX1() const { return x1; }
-  double getY1() const { return y1; }
-  double getX2() const { return x2; }
-  double getY2() const { return y2; }
-  double getX3() const { return x3; }
-  double getY3() const { return y3; }
-  double getX4() const { return x4; }
-  double getY4() const { return y4; }
-
-protected:
-  double x1, y1, x2, y2, x3, y3, x4, y4;
-};
-
-//------------------------------------------------------------------------
 // AnnotBorder
 //------------------------------------------------------------------------
 
@@ -168,7 +208,7 @@ public:
   enum AnnotBorderType {
     typeUnknown,
     typeArray,
-    typeBS,
+    typeBS
   };
 
   enum AnnotBorderStyle {
@@ -176,7 +216,7 @@ public:
     borderDashed,     // Dashed
     borderBeveled,    // Beveled
     borderInset,      // Inset
-    borderUnderlined, // Underlined
+    borderUnderlined  // Underlined
   };
 
   AnnotBorder();
@@ -205,8 +245,8 @@ public:
   AnnotBorderArray();
   AnnotBorderArray(Array *array);
 
-  virtual double getHorizontalCorner() const { return horizontalCorner; }
-  virtual double getVerticalCorner() const { return verticalCorner; }
+  double getHorizontalCorner() const { return horizontalCorner; }
+  double getVerticalCorner() const { return verticalCorner; }
 
 protected:
   static const int DASH_LIMIT = 10; // implementation note 82 in Appendix H.
@@ -469,7 +509,7 @@ public:
   AnnotBorder *getBorder() const { return border; }
   AnnotColor *getColor() const { return color; }
   int getTreeKey() const { return treeKey; }
-  Dict *getOptionalContent() const { return optionalContent; }
+  OCGs *getOptionalContent() const { return optionalContent; }
 
   int getId() { return ref.num; }
 
@@ -502,7 +542,7 @@ protected:
                          //   for the normal appearance
   GooString *appearState;           // AS
   int treeKey;                      // Struct Parent;
-  Dict *optionalContent;            // OC
+  OCGs *optionalContent;            // OC
 
   XRef *xref;			// the xref table for this PDF file
   Ref ref;                      // object ref identifying this annotation
@@ -522,7 +562,7 @@ protected:
 class AnnotPopup: public Annot {
 public:
   AnnotPopup(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
-  virtual ~AnnotPopup();
+  ~AnnotPopup();
 
   Dict *getParent() const { return parent; }
   GBool getOpen() const { return open; }
@@ -554,7 +594,7 @@ public:
   double getOpacity() const { return opacity; }
   // getRC
   GooString *getDate() const { return date; }
-  Dict *getInReplyTo() const { return inReplyTo; }
+  int getInReplyToID() const { return inReplyTo.num; }
   GooString *getSubject() const { return subject; }
   AnnotMarkupReplyType getReplyTo() const { return replyTo; }
   AnnotExternalDataType getExData() const { return exData; }
@@ -565,7 +605,7 @@ protected:
   double opacity;               // CA           (Default 1.0)
   // RC
   GooString *date;              // CreationDate
-  Dict *inReplyTo;              // IRT
+  Ref inReplyTo;                // IRT
   GooString *subject;           // Subj
   AnnotMarkupReplyType replyTo; // RT           (Default R)
   // this object is overrided by the custom intent fields defined in some
@@ -583,16 +623,6 @@ private:
 
 class AnnotText: public AnnotMarkup {
 public:
-  enum AnnotTextIcon {
-    iconComment,      // Comment
-    iconKey,          // Key
-    iconNote,         // Note
-    iconHelp,         // Help
-    iconNewParagraph, // NewParagraph
-    iconParagraph,    // Paragraph
-    iconInsert        // Insert
-  };
-
   enum AnnotTextState {
     stateUnknown,
     // Marked state model
@@ -607,10 +637,11 @@ public:
   };
 
   AnnotText(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
+  ~AnnotText();
 
   // getters
   GBool getOpen() const { return open; }
-  AnnotTextIcon getIcon() const { return icon; }
+  GooString *getIcon() const { return icon; }
   AnnotTextState getState() const { return state; }
 
   // setters
@@ -621,7 +652,7 @@ private:
   void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
 
   GBool open;                       // Open       (Default false)
-  AnnotTextIcon icon;               // Name       (Default Note)
+  GooString *icon;                  // Name       (Default Note)
   AnnotTextState state;             // State      (Default Umarked if
                                     //             StateModel Marked
                                     //             None if StareModel Review)
@@ -769,7 +800,7 @@ public:
 
   // getters
   Dict *getActionDict() const { return actionDict; }
-  // getDest
+  Object *getDest() { return &dest; }
   AnnotLinkEffect getLinkEffect() const { return linkEffect; }
   Dict *getUriAction() const { return uriAction; }
   AnnotQuadrilaterals *getQuadrilaterals() const { return quadrilaterals; }
@@ -779,7 +810,7 @@ protected:
   void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
 
   Dict *actionDict;                    // A
-  //Dest
+  Object dest;                         // Dest
   AnnotLinkEffect linkEffect;          // H          (Default I)
   Dict *uriAction;                     // PA
 
@@ -806,7 +837,7 @@ public:
   };
 
   AnnotFreeText(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
-  virtual ~AnnotFreeText();
+  ~AnnotFreeText();
 
   // getters
   GooString *getAppearanceString() const { return appearanceString; }
@@ -857,7 +888,7 @@ public:
   };
 
   AnnotLine(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
-  virtual ~AnnotLine();
+  ~AnnotLine();
 
   // getters
   AnnotLineEndingStyle getStartStyle() const { return startStyle; }
@@ -872,13 +903,17 @@ public:
   Dict *getMeasure() const { return measure; }
   double getCaptionTextHorizontal() const { return captionTextHorizontal; }
   double getCaptionTextVertical() const { return captionTextVertical; }
+  double getX1() const { return coord1->getX(); }
+  double getY1() const { return coord1->getY(); }
+  double getX2() const { return coord2->getX(); }
+  double getY2() const { return coord2->getY(); }
 
 protected:
 
   void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
 
   // required
-  double x1, y1, x2, y2;            // L
+  AnnotCoord *coord1, *coord2;
   
   // optional
   // inherited  from Annot
@@ -904,7 +939,7 @@ protected:
 class AnnotTextMarkup: public AnnotMarkup {
 public:
 
-  AnnotTextMarkup(XRef *xrefA, Catalog *catalog, Dict *dict);
+  AnnotTextMarkup(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
   virtual ~AnnotTextMarkup();
 
   AnnotQuadrilaterals *getQuadrilaterals() const { return quadrilaterals; }
@@ -914,6 +949,196 @@ protected:
   void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
   
   AnnotQuadrilaterals *quadrilaterals; // QuadPoints
+};
+
+//------------------------------------------------------------------------
+// AnnotStamp
+//------------------------------------------------------------------------
+
+class AnnotStamp: public AnnotMarkup {
+public:
+
+  AnnotStamp(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
+  ~AnnotStamp();
+
+  // getters
+  GooString *getIcon() const { return icon; }
+
+private:
+
+  void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
+
+  GooString *icon;                  // Name       (Default Draft)
+};
+
+//------------------------------------------------------------------------
+// AnnotGeometry
+//------------------------------------------------------------------------
+
+class AnnotGeometry: public AnnotMarkup {
+public:
+
+  AnnotGeometry(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
+  ~AnnotGeometry();
+
+  // getters
+  AnnotColor *getInteriorColor() const { return interiorColor; }
+  AnnotBorderEffect *getBorderEffect() const { return borderEffect; }
+  PDFRectangle *getGeometryRect() const { return geometryRect; }
+
+private:
+
+  void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
+
+  AnnotColor *interiorColor;        // IC
+  AnnotBorderEffect *borderEffect;  // BE
+  PDFRectangle *geometryRect;       // RD (combined with Rect)
+};
+
+//------------------------------------------------------------------------
+// AnnotPolygon
+//------------------------------------------------------------------------
+
+class AnnotPolygon: public AnnotMarkup {
+public:
+
+  enum AnnotPolygonIntent {
+    polygonCloud,      // PolygonCloud
+    polylineDimension, // PolyLineDimension
+    polygonDimension   // PolygonDimension
+  };
+
+  AnnotPolygon(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
+  ~AnnotPolygon();
+
+  // getters
+  AnnotPath *getVertices() const { return vertices; }
+  AnnotLineEndingStyle getStartStyle() const { return startStyle; }
+  AnnotLineEndingStyle getEndStyle() const { return endStyle; }
+  AnnotColor *getInteriorColor() const { return interiorColor; }
+  AnnotBorderEffect *getBorderEffect() const { return borderEffect; }
+  AnnotPolygonIntent getIntent() const { return intent; }
+
+private:
+
+  void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
+
+  // required
+  AnnotPath *vertices;              // Vertices
+
+  // optional
+  AnnotLineEndingStyle startStyle;  // LE       (Default [/None /None])
+  AnnotLineEndingStyle endStyle;    //
+  // inherited  from Annot
+  // AnnotBorderBS border;          // BS
+  AnnotColor *interiorColor;        // IC
+  AnnotBorderEffect *borderEffect;  // BE
+  AnnotPolygonIntent intent;        // IT
+  // Measure
+};
+
+//------------------------------------------------------------------------
+// AnnotCaret
+//------------------------------------------------------------------------
+
+class AnnotCaret: public AnnotMarkup {
+public:
+
+  enum AnnotCaretSymbol {
+    symbolNone,     // None
+    symbolP         // P
+  };
+
+  AnnotCaret(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
+  ~AnnotCaret();
+
+  // getters
+  AnnotCaretSymbol getSymbol() const { return symbol; }
+  PDFRectangle *getCaretRect() const { return caretRect; }
+
+private:
+
+  void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
+
+  AnnotCaretSymbol symbol;       // Sy         (Default None)
+  PDFRectangle *caretRect;       // RD (combined with Rect)
+};
+
+//------------------------------------------------------------------------
+// AnnotInk
+//------------------------------------------------------------------------
+
+class AnnotInk: public AnnotMarkup {
+public:
+
+  AnnotInk(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
+  ~AnnotInk();
+
+  // getters
+  AnnotPath **getInkList() const { return inkList; }
+  int getInkListLength() const { return inkListLength; }
+
+private:
+
+  void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
+
+  // required
+  AnnotPath **inkList;       // InkList
+  int inkListLength;
+
+  // optional
+  // inherited from Annot
+  // AnnotBorderBS border;  // BS
+};
+
+//------------------------------------------------------------------------
+// AnnotFileAttachment
+//------------------------------------------------------------------------
+
+class AnnotFileAttachment: public AnnotMarkup {
+public:
+
+  AnnotFileAttachment(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
+  ~AnnotFileAttachment();
+
+  // getters
+  Object *getFile() { return &file; }
+  GooString *getName() const { return name; }
+
+private:
+
+  void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
+
+  // required
+  Object file;      // FS
+
+  // optional
+  GooString *name;  // Name
+};
+
+//------------------------------------------------------------------------
+// AnnotSound
+//------------------------------------------------------------------------
+
+class AnnotSound: public AnnotMarkup {
+public:
+
+  AnnotSound(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
+  ~AnnotSound();
+
+  // getters
+  Sound *getSound() { return sound; }
+  GooString *getName() const { return name; }
+
+private:
+
+  void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
+
+  // required
+  Sound *sound;                  // Sound
+
+  // optional
+  GooString *name;               // Name
 };
 
 //------------------------------------------------------------------------
@@ -969,6 +1194,64 @@ private:
   // AnnotBorderBS border;                // BS
   Dict *parent;                           // Parent
   GBool regen;
+};
+
+//------------------------------------------------------------------------
+// Annot3D
+//------------------------------------------------------------------------
+
+class Annot3D: public Annot {
+  class Activation {
+  public:
+    enum ActivationATrigger {
+      aTriggerUnknown,
+      aTriggerPageOpened,  // PO
+      aTriggerPageVisible, // PV
+      aTriggerUserAction   // XA
+    };
+
+    enum ActivationAState {
+      aStateUnknown,
+      aStateEnabled, // I
+      aStateDisabled // L
+    };
+
+    enum ActivationDTrigger {
+      dTriggerUnknown,
+      dTriggerPageClosed,    // PC
+      dTriggerPageInvisible, // PI
+      dTriggerUserAction     // XD
+    };
+
+    enum ActivationDState {
+      dStateUnknown,
+      dStateUninstantiaded, // U
+      dStateInstantiated,   // I
+      dStateLive            // L
+    };
+
+    Activation(Dict *dict);
+  private:
+    
+    ActivationATrigger aTrigger;  // A   (Default XA)
+    ActivationAState aState;      // AIS (Default L)
+    ActivationDTrigger dTrigger;  // D   (Default PI)
+    ActivationDState dState;      // DIS (Default U)
+    GBool displayToolbar;         // TB  (Default true)
+    GBool displayNavigation;      // NP  (Default false);
+  };
+public:
+
+  Annot3D(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
+  ~Annot3D();
+
+  // getters
+
+private:
+
+  void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
+
+  Activation *activation;  // 3DA
 };
 
 //------------------------------------------------------------------------

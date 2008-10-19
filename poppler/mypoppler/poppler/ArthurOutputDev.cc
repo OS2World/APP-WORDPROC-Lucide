@@ -3,7 +3,22 @@
 // ArthurOutputDev.cc
 //
 // Copyright 2003 Glyph & Cog, LLC
-// Copyright 2004 Red Hat, Inc
+//
+//========================================================================
+
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Brad Hards <bradh@frogmouth.net>
+// Copyright (C) 2005-2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2008 Pino Toscano <pino@kde.org>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
 //
 //========================================================================
 
@@ -90,7 +105,7 @@ void ArthurOutputDev::startDoc(XRef *xrefA) {
 #if HAVE_FREETYPE_FREETYPE_H || HAVE_FREETYPE_H
   globalParams->getEnableFreeType(),
 #endif
-  globalParams->getAntialias());
+  m_painter->testRenderHint(QPainter::TextAntialiasing));
 }
 
 void ArthurOutputDev::startPage(int pageNum, GfxState *state)
@@ -126,16 +141,7 @@ void ArthurOutputDev::restoreState(GfxState *state)
 
 void ArthurOutputDev::updateAll(GfxState *state)
 {
-  updateLineDash(state);
-  updateLineJoin(state);
-  updateLineCap(state);
-  updateLineWidth(state);
-  updateFlatness(state);
-  updateMiterLimit(state);
-  updateFillColor(state);
-  updateStrokeColor(state);
-  updateFillOpacity(state);
-  updateStrokeOpacity(state);
+  OutputDev::updateAll(state);
   m_needFontUpdate = gTrue;
 }
 
@@ -240,10 +246,6 @@ void ArthurOutputDev::updateStrokeOpacity(GfxState *state)
 
 void ArthurOutputDev::updateFont(GfxState *state)
 {
-#ifdef __GNUC__
-#warning fix this, probably update with updated code from SplashOutputdev
-#endif
-/*
   GfxFont *gfxFont;
   GfxFontType fontType;
   SplashOutFontFileID *id;
@@ -252,15 +254,16 @@ void ArthurOutputDev::updateFont(GfxState *state)
   FoFiTrueType *ff;
   Ref embRef;
   Object refObj, strObj;
-  GooString *fileName, *substName;
+  GooString *fileName;
   char *tmpBuf;
   int tmpBufLen;
   Gushort *codeToGID;
   DisplayFontParam *dfp;
-  double m11, m12, m21, m22, w1, w2;
+  double *textMat;
+  double m11, m12, m21, m22, fontSize;
   SplashCoord mat[4];
-  char *name;
-  int c, substIdx, n, code;
+  int substIdx, n;
+  int faceIndex = 0;
 
   m_needFontUpdate = false;
   m_font = NULL;
@@ -310,6 +313,7 @@ void ArthurOutputDev::updateFont(GfxState *state)
       case displayFontTT:
 	fileName = dfp->tt.fileName;
 	fontType = gfxFont->isCIDFont() ? fontCIDType2 : fontTrueType;
+	faceIndex = dfp->tt.faceIndex;
 	break;
       }
     }
@@ -344,16 +348,35 @@ void ArthurOutputDev::updateFont(GfxState *state)
 	goto err2;
       }
       break;
-    case fontTrueType:
-      if (!(ff = FoFiTrueType::load(fileName->getCString()))) {
+    case fontType1COT:
+      if (!(fontFile = m_fontEngine->loadOpenTypeT1CFont(
+			   id,
+			   fontsrc,
+			   ((Gfx8BitFont *)gfxFont)->getEncoding()))) {
+	error(-1, "Couldn't create a font for '%s'",
+	      gfxFont->getName() ? gfxFont->getName()->getCString()
+	                         : "(unnamed)");
 	goto err2;
       }
-      codeToGID = ((Gfx8BitFont *)gfxFont)->getCodeToGIDMap(ff);
-      delete ff;
+      break;
+    case fontTrueType:
+    case fontTrueTypeOT:
+	if (fileName)
+	 ff = FoFiTrueType::load(fileName->getCString());
+	else
+	ff = FoFiTrueType::make(tmpBuf, tmpBufLen);
+      if (ff) {
+	codeToGID = ((Gfx8BitFont *)gfxFont)->getCodeToGIDMap(ff);
+	n = 256;
+	delete ff;
+      } else {
+	codeToGID = NULL;
+	n = 0;
+      }
       if (!(fontFile = m_fontEngine->loadTrueTypeFont(
 			   id,
 			   fontsrc,
-			   codeToGID, 256))) {
+			   codeToGID, n))) {
 	error(-1, "Couldn't create a font for '%s'",
 	      gfxFont->getName() ? gfxFont->getName()->getCString()
 	                         : "(unnamed)");
@@ -371,15 +394,41 @@ void ArthurOutputDev::updateFont(GfxState *state)
 	goto err2;
       }
       break;
+    case fontCIDType0COT:
+      if (!(fontFile = m_fontEngine->loadOpenTypeCFFFont(
+			   id,
+			   fontsrc))) {
+	error(-1, "Couldn't create a font for '%s'",
+	      gfxFont->getName() ? gfxFont->getName()->getCString()
+	                         : "(unnamed)");
+	goto err2;
+      }
+      break;
     case fontCIDType2:
-      n = ((GfxCIDFont *)gfxFont)->getCIDToGIDLen();
-      codeToGID = (Gushort *)gmallocn(n, sizeof(Gushort));
-      memcpy(codeToGID, ((GfxCIDFont *)gfxFont)->getCIDToGID(),
-	     n * sizeof(Gushort));
+    case fontCIDType2OT:
+      codeToGID = NULL;
+      n = 0;
+      if (((GfxCIDFont *)gfxFont)->getCIDToGID()) {
+	n = ((GfxCIDFont *)gfxFont)->getCIDToGIDLen();
+	if (n) {
+	  codeToGID = (Gushort *)gmallocn(n, sizeof(Gushort));
+	  memcpy(codeToGID, ((GfxCIDFont *)gfxFont)->getCIDToGID(),
+		  n * sizeof(Gushort));
+	}
+      } else {
+	if (fileName)
+	  ff = FoFiTrueType::load(fileName->getCString());
+	else
+	  ff = FoFiTrueType::make(tmpBuf, tmpBufLen);
+	if (! ff)
+	  goto err2;
+	codeToGID = ((GfxCIDFont *)gfxFont)->getCodeToGIDMap(ff, &n);
+	delete ff;
+      }
       if (!(fontFile = m_fontEngine->loadTrueTypeFont(
 			   id,
 			   fontsrc,
-			   codeToGID, n))) {
+			   codeToGID, n, faceIndex))) {
 	error(-1, "Couldn't create a font for '%s'",
 	      gfxFont->getName() ? gfxFont->getName()->getCString()
 	                         : "(unnamed)");
@@ -393,20 +442,34 @@ void ArthurOutputDev::updateFont(GfxState *state)
   }
 
   // get the font matrix
-  state->getFontTransMat(&m11, &m12, &m21, &m22);
-  m11 *= state->getHorizScaling();
-  m12 *= state->getHorizScaling();
+  textMat = state->getTextMat();
+  fontSize = state->getFontSize();
+  m11 = textMat[0] * fontSize * state->getHorizScaling();
+  m12 = textMat[1] * fontSize * state->getHorizScaling();
+  m21 = textMat[2] * fontSize;
+  m22 = textMat[3] * fontSize;
+
+  SplashCoord matrix[6];
+  {
+  QMatrix painterMatrix = m_painter->worldMatrix();
+  matrix[0] = painterMatrix.m11();
+  matrix[1] = painterMatrix.m12();
+  matrix[2] = painterMatrix.m21();
+  matrix[3] = painterMatrix.m22();
+  matrix[4] = painterMatrix.dx();
+  matrix[5] = painterMatrix.dy();
+  }
 
   // create the scaled font
   mat[0] = m11;  mat[1] = -m12;
   mat[2] = m21;  mat[3] = -m22;
-  m_font = m_fontEngine->getFont(fontFile, mat);
+  m_font = m_fontEngine->getFont(fontFile, mat, matrix);
 
   return;
 
  err2:
   delete id;
- err1:*/
+ err1:
   return;
 }
 

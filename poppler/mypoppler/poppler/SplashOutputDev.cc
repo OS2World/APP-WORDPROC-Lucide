@@ -6,6 +6,25 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Takashi Iwai <tiwai@suse.de>
+// Copyright (C) 2006 Stefan Schweizer <genstef@gentoo.org>
+// Copyright (C) 2006-2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2006 Krzysztof Kowalczyk <kkowalczyk@gmail.com>
+// Copyright (C) 2006 Scott Turner <scotty1024@mac.com>
+// Copyright (C) 2007 Koji Otani <sho@bbr.jp>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -395,7 +414,7 @@ static void splashOutBlendLuminosity(SplashColorPtr src, SplashColorPtr dest,
 }
 
 // NB: This must match the GfxBlendMode enum defined in GfxState.h.
-SplashBlendFunc splashOutBlendFuncs[] = {
+static const SplashBlendFunc splashOutBlendFuncs[] = {
   NULL,
   &splashOutBlendMultiply,
   &splashOutBlendScreen,
@@ -497,10 +516,25 @@ T3FontCache::T3FontCache(Ref *fontIDA, double m11A, double m12A,
     cacheSets = 4;
   } else if (glyphSize <= 1024) {
     cacheSets = 2;
+  } else if (glyphSize <= 2048) {
+    cacheSets = 1;
+    cacheAssoc = 4;
+  } else if (glyphSize <= 4096) {
+    cacheSets = 1;
+    cacheAssoc = 2;
   } else {
     cacheSets = 1;
+    cacheAssoc = 1;
   }
-  cacheData = (Guchar *)gmallocn_checkoverflow(cacheSets * cacheAssoc, glyphSize);
+  if (glyphSize < 10485760 / cacheAssoc / cacheSets) {
+    cacheData = (Guchar *)gmallocn_checkoverflow(cacheSets * cacheAssoc, glyphSize);
+  } else {
+    error(-1, "Not creating cacheData for T3FontCache, it asked for too much memory.\n"
+              "       This could teoretically result in wrong rendering,\n"
+              "       but most probably the document is bogus.\n"
+              "       Please report a bug if you think the rendering may be wrong because of this.");
+    cacheData = NULL;
+  }
   if (cacheData != NULL)
   {
     cacheTags = (T3FontCacheTag *)gmallocn(cacheSets * cacheAssoc,
@@ -966,6 +1000,7 @@ void SplashOutputDev::doUpdateFont(GfxState *state) {
   int substIdx, n;
   int faceIndex = 0;
   GBool recreateFont = gFalse;
+  GBool doAdjustFontMatrix = gFalse;
 
   needFontUpdate = gFalse;
   font = NULL;
@@ -1020,6 +1055,7 @@ void SplashOutputDev::doUpdateFont(GfxState *state) {
 	faceIndex = dfp->tt.faceIndex;
 	break;
       }
+      doAdjustFontMatrix = gTrue;
     }
 
     fontsrc = new SplashFontSrc;
@@ -1148,7 +1184,7 @@ void SplashOutputDev::doUpdateFont(GfxState *state) {
       // this shouldn't happen
       goto err2;
     }
-    fontFile->doAdjustMatrix = gTrue;
+    fontFile->doAdjustMatrix = doAdjustFontMatrix;
   }
 
   // get the font matrix
@@ -1572,6 +1608,9 @@ void SplashOutputDev::type3D1(GfxState *state, double wx, double wy,
     }
     return;
   }
+
+  if (t3Font->cacheTags == NULL)
+    return;
 
   // allocate a cache entry
   i = (t3GlyphStack->code & (t3Font->cacheSets - 1)) * t3Font->cacheAssoc;

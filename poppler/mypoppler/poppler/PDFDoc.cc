@@ -6,6 +6,24 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005, 2006, 2008 Brad Hards <bradh@frogmouth.net>
+// Copyright (C) 2005, 2007, 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2008 Julien Rebetez <julienr@svn.gnome.org>
+// Copyright (C) 2008 Pino Toscano <pino@kde.org>
+// Copyright (C) 2008 Carlos Garcia Campos <carlosgc@gnome.org>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -461,6 +479,17 @@ GBool PDFDoc::saveAs(GooString *name, PDFWriteMode mode) {
 }
 
 GBool PDFDoc::saveAs(OutStream *outStr, PDFWriteMode mode) {
+
+  // we don't support files with Encrypt at the moment
+  Object obj;
+  xref->getTrailerDict()->getDict()->lookupNF("Encrypt", &obj);
+  if (!obj.isNull())
+  {
+    obj.free();
+    return gFalse;
+  }
+  obj.free();
+
   if (mode == writeForceRewrite) {
     saveCompleteRewrite(outStr);
   } else if (mode == writeForceIncremental) {

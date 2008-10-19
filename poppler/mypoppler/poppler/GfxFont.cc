@@ -6,6 +6,25 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// Copyright (C) 2005, 2006, 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2005, 2006 Kristian Høgsberg <krh@redhat.com>
+// Copyright (C) 2006 Takashi Iwai <tiwai@suse.de>
+// Copyright (C) 2007 Julien Rebetez <julienr@svn.gnome.org>
+// Copyright (C) 2007 Jeff Muizelaar <jeff@infidigm.net>
+// Copyright (C) 2007 Koji Otani <sho@bbr.jp>
+// Copyright (C) 2007 Ed Catmur <ed@catmur.co.uk>
+// Copyright (C) 2008 Jonathan Kew <jonathan_kew@sil.org>
+// Copyright (C) 2008 Ed Avis <eda@waniasset.com>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -42,7 +61,7 @@ struct StdFontMapEntry {
 // the proper Base14 names.  This table is from implementation note 44
 // in the PDF 1.4 spec, with some additions based on empirical
 // evidence.
-static StdFontMapEntry stdFontMap[] = {
+static const StdFontMapEntry stdFontMap[] = {
   { "Arial",                        "Helvetica" },
   { "Arial,Bold",                   "Helvetica-Bold" },
   { "Arial,BoldItalic",             "Helvetica-BoldOblique" },
@@ -481,7 +500,7 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GooString *nameA,
   int len;
   FoFiType1 *ffT1;
   FoFiType1C *ffT1C;
-  int code, code2;
+  int code;
   char *charName;
   GBool missing, hex;
   Unicode toUnicode[256];
@@ -1373,7 +1392,7 @@ GfxCIDFont::GfxCIDFont(XRef *xref, char *tagA, Ref idA, GooString *nameA,
 	  "Adobe-Korea1",
 	};
 	for (size_t i = 0; i < sizeof(knownCollections)/sizeof(knownCollections[0]); i++) {
-	  if (collection->cmp(knownCollections[i])) {
+	  if (collection->cmp(knownCollections[i]) == 0) {
 	    error(-1, "Missing language pack for '%s' mapping", collection->getCString());
 	    delete collection;
 	    goto err2;
@@ -1728,7 +1747,7 @@ Gushort GfxCIDFont::mapCodeToGID(FoFiTrueType *ff, int cmapi,
 Gushort *GfxCIDFont::getCodeToGIDMap(FoFiTrueType *ff, int *mapsizep) {
 #define N_UCS_CANDIDATES 2
   /* space characters */
-  static unsigned long spaces[] = { 
+  static const unsigned long spaces[] = { 
     0x2000,0x2001,0x2002,0x2003,0x2004,0x2005,0x2006,0x2007,
     0x2008,0x2009,0x200A,0x00A0,0x200B,0x2060,0x3000,0xFEFF,
     0
@@ -1950,7 +1969,7 @@ Gushort *GfxCIDFont::getCodeToGIDMap(FoFiTrueType *ff, int *mapsizep) {
     }
     if (gid == 0) {
       /* special handling space characters */
-      unsigned long *p;
+      const unsigned long *p;
 
       if (humap != 0) unicode = humap[code];
       if (unicode != 0) {

@@ -7,6 +7,28 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005-2008 Jeff Muizelaar <jeff@infidigm.net>
+// Copyright (C) 2005, 2006 Kristian Høgsberg <krh@redhat.com>
+// Copyright (C) 2005 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2005 Nickolay V. Shmyrev <nshmyrev@yandex.ru>
+// Copyright (C) 2006-2008 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2008 Carl Worth <cworth@cworth.org>
+// Copyright (C) 2008 Adrian Johnson <ajohnson@redneon.com>
+// Copyright (C) 2008 Michael Vrable <mvrable@cs.ucsd.edu>
+// Copyright (C) 2008 Chris Wilson <chris@chris-wilson.co.uk>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -630,6 +652,9 @@ GBool CairoOutputDev::beginType3Char(GfxState *state, double x, double y,
     cairo_set_matrix(cairo_shape, &orig_matrix);
     cairo_transform(cairo_shape, &matrix);
   }
+  cairo_pattern_destroy(stroke_pattern);
+  cairo_pattern_reference(fill_pattern);
+  stroke_pattern = fill_pattern;
   return gFalse;
 }
 

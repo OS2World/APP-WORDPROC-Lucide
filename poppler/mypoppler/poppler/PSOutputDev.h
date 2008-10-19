@@ -6,6 +6,23 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Martin Kretzschmar <martink@gnome.org>
+// Copyright (C) 2005 Kristian Høgsberg <krh@redhat.com>
+// Copyright (C) 2006, 2007 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2007 Brad Hards <bradh@kde.org>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #ifndef PSOUTPUTDEV_H
 #define PSOUTPUTDEV_H
 
@@ -302,7 +319,6 @@ private:
   void opiBegin13(GfxState *state, Dict *dict);
   void opiTransform(GfxState *state, double x0, double y0,
 		    double *x1, double *y1);
-  GBool getFileSpec(Object *fileSpec, Object *fileName);
 #endif
   void cvtFunction(Function *func);
   void writePSChar(char c);

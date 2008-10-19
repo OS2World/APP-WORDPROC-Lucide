@@ -6,6 +6,25 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Kristian Høgsberg <krh@redhat.com>
+// Copyright (C) 2005 Jeff Muizelaar <jeff@infidigm.net>
+// Copyright (C) 2006 Pino Toscano <pino@kde.org>
+// Copyright (C) 2006 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2007 Julien Rebetez <julienr@svn.gnome.org>
+// Copyright (C) 2008 Iñigo Martínez <inigomartinez@gmail.com>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #ifndef PAGE_H
 #define PAGE_H
 

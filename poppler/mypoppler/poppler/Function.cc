@@ -6,6 +6,21 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2006, 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2006 Jeff Muizelaar <jeff@infidigm.net>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -650,6 +665,8 @@ StitchingFunction::StitchingFunction(Object *funcObj, Dict *dict) {
 StitchingFunction::StitchingFunction(StitchingFunction *func) {
   int i;
 
+  memcpy(this, func, sizeof(StitchingFunction));
+
   k = func->k;
   funcs = (Function **)gmallocn(k, sizeof(Function *));
   for (i = 0; i < k; ++i) {
@@ -753,7 +770,7 @@ enum PSOp {
 // Note: 'if' and 'ifelse' are parsed separately.
 // The rest are listed here in alphabetical order.
 // The index in this table is equivalent to the entry in PSOp.
-char *psOpNames[] = {
+static const char *psOpNames[] = {
   "abs",
   "add",
   "and",

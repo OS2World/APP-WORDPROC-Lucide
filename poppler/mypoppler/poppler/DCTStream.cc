@@ -2,7 +2,10 @@
 //
 // DCTStream.cc
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// This file is licensed under the GPLv2 or later
+//
+// Copyright 2005 Jeff Muizelaar <jeff@infidigm.net>
+// Copyright 2005-2008 Albert Astals Cid <aacid@kde.org>
 //
 //========================================================================
 
@@ -16,6 +19,7 @@ static boolean str_fill_input_buffer(j_decompress_ptr cinfo)
 {
   int c;
   struct str_src_mgr * src = (struct str_src_mgr *)cinfo->src;
+  if (src->abort) return FALSE;
   if (src->index == 0) {
     c = 0xFF;
     src->index++;
@@ -62,7 +66,7 @@ DCTStream::~DCTStream() {
   delete str;
 }
 
-void exitErrorHandler(jpeg_common_struct *error) {
+static void exitErrorHandler(jpeg_common_struct *error) {
   j_decompress_ptr cinfo = (j_decompress_ptr)error;
   str_src_mgr * src = (struct str_src_mgr *)cinfo->src;
   src->abort = true;

@@ -6,6 +6,21 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2006, 2008 Pino Toscano <pino@kde.org>
+// Copyright (C) 2008 Hugo Mercier <hmercier31@gmail.com>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #ifndef LINK_H
 #define LINK_H
 
@@ -34,6 +49,7 @@ enum LinkActionKind {
   actionMovie,			// movie action
   actionRendition,
   actionSound,			// sound action
+  actionJavaScript,		// JavaScript action
   actionUnknown			// anything else
 };
 
@@ -54,10 +70,6 @@ public:
 
   // Parse an action dictionary.
   static LinkAction *parseAction(Object *obj, GooString *baseURI = NULL);
-
-  // Extract a file name from a file specification (string or
-  // dictionary).
-  static GooString *getFileSpecName(Object *fileSpecObj);
 };
 
 //------------------------------------------------------------------------
@@ -356,6 +368,28 @@ private:
   GBool repeat;
   GBool mix;
   Sound *sound;
+};
+
+//------------------------------------------------------------------------
+// LinkJavaScript
+//------------------------------------------------------------------------
+
+class LinkJavaScript: public LinkAction {
+public:
+
+  // Build a LinkJavaScript given the action name.
+  LinkJavaScript(Object *jsObj);
+
+  virtual ~LinkJavaScript();
+
+  virtual GBool isOk() { return js != NULL; }
+
+  virtual LinkActionKind getKind() { return actionJavaScript; }
+  GooString *getScript() { return js; }
+
+private:
+
+  GooString *js;
 };
 
 //------------------------------------------------------------------------

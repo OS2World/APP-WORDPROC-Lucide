@@ -6,6 +6,25 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Kristian Høgsberg <krh@redhat.com>
+// Copyright (C) 2005, 2007 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2005 Jonathan Blandford <jrb@redhat.com>
+// Copyright (C) 2005, 2006, 2008 Brad Hards <bradh@frogmouth.net>
+// Copyright (C) 2007 Julien Rebetez <julienr@svn.gnome.org>
+// Copyright (C) 2008 Pino Toscano <pino@kde.org>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #ifndef CATALOG_H
 #define CATALOG_H
 
@@ -77,6 +96,7 @@ public:
   {
     objStr.copy(&m_objStr);
   }
+  EmbFile(Object *efDict, GooString *description = 0);
 
   ~EmbFile()
   {
@@ -160,6 +180,12 @@ public:
   // Get the i'th file embedded (at the Document level) in the document
   EmbFile *embeddedFile(int i);
 
+  // Get the number of javascript scripts
+  int numJS() { return jsNameTree.numEntries(); }
+
+  // Get the i'th JavaScript script (at the Document level) in the document
+  GooString *getJS(int i);
+
   // Convert between page indices and page labels.
   GBool labelToIndex(GooString *label, int *index);
   GBool indexToLabel(int index, GooString *label);
@@ -205,6 +231,7 @@ private:
   Object dests;			// named destination dictionary
   NameTree destNameTree;	// named destination name-tree
   NameTree embeddedFileNameTree;  // embedded file name-tree
+  NameTree jsNameTree;		// Java Script name-tree
   GooString *baseURI;		// base URI for URI-type links
   Object metadata;		// metadata stream
   Object structTreeRoot;	// structure tree root dictionary

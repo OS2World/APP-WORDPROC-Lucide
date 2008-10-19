@@ -6,6 +6,32 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// All changes made under the Poppler project to this file are licensed
+// under GPL version 2 or later
+//
+// Copyright (C) 2005 Jonathan Blandford <jrb@redhat.com>
+// Copyright (C) 2005-2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2006 Thorkild Stray <thorkild@ifi.uio.no>
+// Copyright (C) 2006 Kristian Høgsberg <krh@redhat.com>
+// Copyright (C) 2006-2008 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2006, 2007 Jeff Muizelaar <jeff@infidigm.net>
+// Copyright (C) 2007, 2008 Brad Hards <bradh@kde.org>
+// Copyright (C) 2007 Adrian Johnson <ajohnson@redneon.com>
+// Copyright (C) 2007, 2008 Iñigo Martínez <inigomartinez@gmail.com>
+// Copyright (C) 2007 Koji Otani <sho@bbr.jp>
+// Copyright (C) 2007 Krzysztof Kowalczyk <kkowalczyk@gmail.com>
+// Copyright (C) 2008 Pino Toscano <pino@kde.org>
+// Copyright (C) 2008 Michael Vrable <mvrable@cs.ucsd.edu>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -4129,8 +4155,10 @@ void Gfx::opEndIgnoreUndef(Object args[], int numArgs) {
 
 void Gfx::opBeginMarkedContent(Object args[], int numArgs) {
   // TODO: we really need to be adding this to the markedContentStack
+  OCGs *contentConfig = catalog->getOptContentConfig();
+	
   char* name0 = args[0].getName();
-  if ( strncmp( name0, "OC", 2) == 0 ) {
+  if ( strncmp( name0, "OC", 2) == 0 && contentConfig) {
     if ( numArgs >= 2 ) {
       if (!args[1].isName()) {
 	error(getPos(), "Unexpected MC Type: %i", args[1].getType());
@@ -4139,7 +4167,7 @@ void Gfx::opBeginMarkedContent(Object args[], int numArgs) {
       Object markedContent;
       if ( res->lookupMarkedContentNF( name1, &markedContent ) ) {
 	if ( markedContent.isRef() ) {
-	  bool visible = catalog->getOptContentConfig()->optContentIsVisible( &markedContent );
+	  bool visible = contentConfig->optContentIsVisible( &markedContent );
 	  ocSuppressed = !(visible);
        }
       } else {

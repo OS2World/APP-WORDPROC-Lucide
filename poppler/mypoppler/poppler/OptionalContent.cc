@@ -1,8 +1,12 @@
 //========================================================================
 //
-// OptionalContent.h
+// OptionalContent.cc
 //
 // Copyright 2007 Brad Hards <bradh@kde.org>
+// Copyright 2008 Pino Toscano <pino@kde.org>
+// Copyright 2008 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright 2008 Mark Kaplan <mkaplan@finjan.com>
 //
 // Released under the GPL (version 2, or later, at your option)
 //
@@ -26,13 +30,6 @@
 OCGs::OCGs(Object *ocgObject, XRef *xref) :
   m_orderArray(0), m_rBGroupsArray(), m_xref(xref)
 {
-  optionalContentGroups = NULL;
-
-  if (!ocgObject->isDict()) {
-    // This isn't an error - OCProperties is optional.
-    return;
-  }
-
   // we need to parse the dictionary here, and build optionalContentGroups
   optionalContentGroups = new GooList();
 
@@ -144,17 +141,12 @@ OCGs::OCGs(Object *ocgObject, XRef *xref) :
 
 OCGs::~OCGs()
 {
-  if (optionalContentGroups) {
-    deleteGooList(optionalContentGroups, OptionalContentGroup);
-  }
+  deleteGooList(optionalContentGroups, OptionalContentGroup);
 }
 
 
 bool OCGs::hasOCGs()
 {
-  if (!optionalContentGroups) {
-    return false;
-  }
   return ( optionalContentGroups->getLength() > 0 );
 }
 
@@ -162,13 +154,10 @@ OptionalContentGroup* OCGs::findOcgByRef( const Ref &ref)
 {
   //TODO: make this more efficient
   OptionalContentGroup *ocg = NULL;
-  if (optionalContentGroups != NULL)
-  {
-    for (int i=0; i < optionalContentGroups->getLength(); ++i) {
-      ocg = (OptionalContentGroup*)optionalContentGroups->get(i);
-      if ( (ocg->ref().num == ref.num) && (ocg->ref().gen == ref.gen) ) {
-        return ocg;
-      }
+  for (int i=0; i < optionalContentGroups->getLength(); ++i) {
+    ocg = (OptionalContentGroup*)optionalContentGroups->get(i);
+    if ( (ocg->ref().num == ref.num) && (ocg->ref().gen == ref.gen) ) {
+      return ocg;
     }
   }
 
@@ -296,7 +285,7 @@ bool OCGs::anyOff( Array *ocgArray )
 
 //------------------------------------------------------------------------
 
-OptionalContentGroup::OptionalContentGroup(Dict *ocgDict, XRef *xrefA)
+OptionalContentGroup::OptionalContentGroup(Dict *ocgDict, XRef *xrefA) : m_name(NULL)
 {
   Object ocgName;
   ocgDict->lookupNF("Name", &ocgName);

@@ -6,6 +6,25 @@
 //
 //========================================================================
 
+//========================================================================
+//
+// Modified under the Poppler project - http://poppler.freedesktop.org
+//
+// Copyright (C) 2005 Martin Kretzschmar <martink@gnome.org>
+// Copyright (C) 2005, 2006 Kristian Høgsberg <krh@redhat.com>
+// Copyright (C) 2005, 2007, 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2005 Jonathan Blandford <jrb@redhat.com>
+// Copyright (C) 2006, 2007 Jeff Muizelaar <jeff@infidigm.net>
+// Copyright (C) 2006 Takashi Iwai <tiwai@suse.de>
+// Copyright (C) 2006 Ed Catmur <ed@catmur.co.uk>
+// Copyright (C) 2007 Krzysztof Kowalczyk <kkowalczyk@gmail.com>
+// Copyright (C) 2007 Jonathan Kew <jonathan_kew@sil.org>
+//
+// To see a description of the changes please see the Changelog file that
+// came with your tarball or type make ChangeLog if you are building from git
+//
+//========================================================================
+
 #include <config.h>
 
 #ifdef USE_GCC_PRAGMAS
@@ -907,7 +926,7 @@ FILE *GlobalParams::findToUnicodeFile(GooString *name) {
   return NULL;
 }
 
-GBool findModifier(const char *name, const char *modifier, const char **start)
+static GBool findModifier(const char *name, const char *modifier, const char **start)
 {
   const char *match;
 
@@ -1063,15 +1082,15 @@ static FcPattern *buildFcPattern(GfxFont *font)
   if (weight != -1) FcPatternAddInteger(p, FC_WEIGHT, weight);
   if (width != -1) FcPatternAddInteger(p, FC_WIDTH, width);
   if (spacing != -1) FcPatternAddInteger(p, FC_SPACING, spacing);*/
-  
+
   p = FcPatternBuild(NULL,
-                    FC_FAMILY, FcTypeString, family,
-                    FC_SLANT, FcTypeInteger, slant, 
-                    FC_WEIGHT, FcTypeInteger, weight,
-                    FC_WIDTH, FcTypeInteger, width, 
-                    FC_SPACING, FcTypeInteger, spacing,
-                    FC_LANG, FcTypeString, lang,
-                    NULL);
+                     FC_FAMILY, FcTypeString, family,
+                     FC_SLANT, FcTypeInteger, slant, 
+                     FC_WEIGHT, FcTypeInteger, weight,
+                     FC_WIDTH, FcTypeInteger, width, 
+                     FC_SPACING, FcTypeInteger, spacing,
+                     FC_LANG, FcTypeString, lang,
+                     NULL);
   
   if (deleteFamily)
     delete[] family;
@@ -1542,6 +1561,25 @@ CMap *GlobalParams::getCMap(GooString *collection, GooString *cMapName) {
 
 UnicodeMap *GlobalParams::getTextEncoding() {
   return getUnicodeMap2(textEncoding);
+}
+
+GooList *GlobalParams::getEncodingNames()
+{
+  GooList *result = new GooList;
+  GooHashIter *iter;
+  GooString *key;
+  void *val;
+  residentUnicodeMaps->startIter(&iter);
+  while (residentUnicodeMaps->getNext(&iter, &key, &val)) {
+    result->append(key);
+  }
+  residentUnicodeMaps->killIter(&iter);
+  unicodeMaps->startIter(&iter);
+  while (unicodeMaps->getNext(&iter, &key, &val)) {
+    result->append(key);
+  }
+  unicodeMaps->killIter(&iter);
+  return result;
 }
 
 //------------------------------------------------------------------------
