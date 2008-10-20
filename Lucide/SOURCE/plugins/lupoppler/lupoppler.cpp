@@ -60,7 +60,7 @@
 #include "lupoppler.xih"
 #include "cpconv.h"
 
-#define WORKAROUND_RGB4
+//#define CONV_RGB_4TO3
 
 #ifdef __GNUC__
 #define __min(a,b)  (((a) < (b)) ? (a) : (b))
@@ -214,7 +214,7 @@ static char *somstrdup( const char *s )
 
 SOM_Scope short  SOMLINK getBpp(LuPopplerDocument *somSelf,  Environment *ev)
 {
-    return 3;
+    return 4;
 }
 
 SOM_Scope boolean  SOMLINK isScalable(LuPopplerDocument *somSelf,
@@ -297,7 +297,7 @@ static void copy_page_to_pixbuf( Environment *ev, SplashBitmap *bitmap, LuPixbuf
         dst = pixbuf_data + i * pixbuf_rowstride;
         src = ((char *)color_ptr) + j * splash_rowstride;
         
-#if !defined( WORKAROUND_RGB4 )
+#if !defined( CONV_RGB_4TO3 )
         memcpy( dst, src, rowstride );
 #else
         // source 4 Bpp, dest 3 Bpp
