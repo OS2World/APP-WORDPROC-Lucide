@@ -314,6 +314,36 @@ void Lucide::createThumbnail( LuDocument *doc )
     getTmpDir( tmpgif );
     strcat( tmpgif, "LUTHUMB.TMP" );
 
+    // Workaround: GIF mmio proc hangs on 32-bit images, convert to 24 bit
+    if ( bpp == 4 )
+    {
+        LuPixbuf *pb = new LuPixbuf( ev, rx, ry, 3 );
+
+        char *src = (char *)pixbuf->getDataPtr( ev );
+        char *dst = (char *)pb->getDataPtr( ev );
+        int src_rowstride = pixbuf->getRowSize( ev );
+        int dst_rowstride = pb->getRowSize( ev );
+
+        int i, j, l, m;
+        for ( i = 0; i < ry; i++ )
+        {
+            char *src_line = src + ( i * src_rowstride );
+            char *dst_line = dst + ( i * dst_rowstride );
+
+            // source 4 Bpp, dest 3 Bpp
+            for ( j = 0, l = 0, m = 0; j < rx; j++ ) {
+                dst_line[ l++ ] = src_line[ m++ ];
+                dst_line[ l++ ] = src_line[ m++ ];
+                dst_line[ l++ ] = src_line[ m++ ];
+                m++;
+            }
+        }
+
+        delete pixbuf;
+        pixbuf = pb;
+        bpp = 3;
+    }
+
     bool saved = saveToImage( tmpgif, "GIFC", rx, ry, pixbuf->getRowSize( ev ),
                               bpp * 8, (char *)pixbuf->getDataPtr( ev ) );
     delete pixbuf;
