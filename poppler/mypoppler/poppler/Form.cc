@@ -5,7 +5,7 @@
 // This file is licensed under the GPLv2 or later
 //
 // Copyright 2006-2008 Julien Rebetez <julienr@svn.gnome.org>
-// Copyright 2007 Albert Astals Cid <aacid@kde.org>
+// Copyright 2007-2008 Albert Astals Cid <aacid@kde.org>
 // Copyright 2007-2008 Carlos Garcia Campos <carlosgc@gnome.org>
 // Copyright 2007 Adrian Johnson <ajohnson@redneon.com>
 // Copyright 2007 Iñigo Martínez <inigomartinez@gmail.com>
@@ -452,7 +452,7 @@ void FormWidgetChoice::loadDefaults ()
           continue;
         }
         obj2.arrayGet(0, &obj3);
-        obj2.arrayGet(0, &obj4);
+        obj2.arrayGet(1, &obj4);
         parent->_setChoiceExportVal(i, obj3.getString()->copy());
         parent->_setChoiceOptionName(i, obj4.getString()->copy());
         obj3.free();

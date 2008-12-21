@@ -12,7 +12,7 @@
 //
 // Copyright (C) 2005-2007 Kristian Høgsberg <krh@redhat.com>
 // Copyright (C) 2005 Nickolay V. Shmyrev <nshmyrev@yandex.ru>
-// Copyright (C) 2006, 2007 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2006-2008 Carlos Garcia Campos <carlosgc@gnome.org>
 // Copyright (C) 2006, 2007 Ed Catmur <ed@catmur.co.uk>
 // Copyright (C) 2006 Jeff Muizelaar <jeff@infidigm.net>
 // Copyright (C) 2007, 2008 Adrian Johnson <ajohnson@redneon.com>
@@ -1941,6 +1941,7 @@ void TextPage::updateFont(GfxState *state) {
 }
 
 void TextPage::beginWord(GfxState *state, double x0, double y0) {
+  GfxFont *gfxFont;
   double *fontm;
   double m[4], m2[4];
   int rot;
@@ -1955,7 +1956,8 @@ void TextPage::beginWord(GfxState *state, double x0, double y0) {
 
   // compute the rotation
   state->getFontTransMat(&m[0], &m[1], &m[2], &m[3]);
-  if (state->getFont()->getType() == fontType3) {
+  gfxFont = state->getFont();
+  if (gfxFont && gfxFont->getType() == fontType3) {
     fontm = state->getFont()->getFontMatrix();
     m2[0] = fontm[0] * m[0] + fontm[1] * m[2];
     m2[1] = fontm[0] * m[1] + fontm[1] * m[3];
@@ -3810,7 +3812,7 @@ void TextLine::visitSelection(TextSelectionVisitor *visitor,
   
   child_selection = *selection;
   if (style == selectionStyleWord) {
-    child_selection.x1 = begin->xMin;
+    child_selection.x1 = begin ? begin->xMin : xMin;
     if (end && end->xMax != -1) {
       child_selection.x2 = current->xMax;
     } else {
