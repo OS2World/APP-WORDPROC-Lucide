@@ -635,11 +635,14 @@ void PDFDoc::writeDictionnary (Dict* dict, OutStream* outStr)
   Object obj1;
   outStr->printf("<<");
   for (int i=0; i<dict->getLength(); i++) {
-    outStr->printf("/%s ", dict->getKey(i));
+    GooString keyName(dict->getKey(i));
+    GooString *keyNameToPrint = keyName.sanitizedName(gFalse /* non ps mode */);
+    outStr->printf("/%s ", keyNameToPrint->getCString());
+    delete keyNameToPrint;
     writeObject(dict->getValNF(i, &obj1), NULL, outStr);
     obj1.free();
   }
-  outStr->printf(">>");
+  outStr->printf(">> ");
 }
 
 void PDFDoc::writeStream (Stream* str, OutStream* outStr)
@@ -711,7 +714,7 @@ Guint PDFDoc::writeObject (Object* obj, Ref* ref, OutStream* outStr)
   int tmp;
 
   if(ref) 
-    outStr->printf("%i %i obj", ref->num, ref->gen);
+    outStr->printf("%i %i obj ", ref->num, ref->gen);
 
   switch (obj->getType()) {
     case objBool:
@@ -727,8 +730,13 @@ Guint PDFDoc::writeObject (Object* obj, Ref* ref, OutStream* outStr)
       writeString(obj->getString(), outStr);
       break;
     case objName:
-      outStr->printf("/%s ", obj->getName());
+    {
+      GooString name(obj->getName());
+      GooString *nameToPrint = name.sanitizedName(gFalse /* non ps mode */);
+      outStr->printf("/%s ", nameToPrint->getCString());
+      delete nameToPrint;
       break;
+    }
     case objNull:
       outStr->printf( "null");
       break;
@@ -739,7 +747,7 @@ Guint PDFDoc::writeObject (Object* obj, Ref* ref, OutStream* outStr)
         writeObject(array->getNF(i, &obj1), NULL,outStr);
         obj1.free();
       }
-      outStr->printf("]");
+      outStr->printf("] ");
       break;
     case objDict:
       writeDictionnary (obj->getDict(),outStr);

@@ -15,13 +15,14 @@
 //
 // Copyright (C) 2006 Scott Turner <scotty1024@mac.com>
 // Copyright (C) 2007, 2008 Julien Rebetez <julienr@svn.gnome.org>
-// Copyright (C) 2007, 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2007-2009 Albert Astals Cid <aacid@kde.org>
 // Copyright (C) 2007, 2008 Carlos Garcia Campos <carlosgc@gnome.org>
 // Copyright (C) 2007, 2008 Iñigo Martínez <inigomartinez@gmail.com>
 // Copyright (C) 2007 Jeff Muizelaar <jeff@infidigm.net>
 // Copyright (C) 2008 Pino Toscano <pino@kde.org>
 // Copyright (C) 2008 Michael Vrable <mvrable@cs.ucsd.edu>
 // Copyright (C) 2008 Hugo Mercier <hmercier31@gmail.com>
+// Copyright (C) 2009 Ilya Gorenbein <igorenbein@finjan.com>
 //
 // To see a description of the changes please see the Changelog file that
 // came with your tarball or type make ChangeLog if you are building from git
@@ -2139,6 +2140,7 @@ void AnnotWidget::drawText(GooString *text, GooString *da, GfxFontDict *fontDict
   double fontSize, fontSize2, borderWidth, x, xPrev, y, w, wMax;
   int tfPos, tmPos, i, j;
   GBool freeText = gFalse;      // true if text should be freed before return
+  GBool freeFont = gFalse;
 
   //~ if there is no MK entry, this should use the existing content stream,
   //~ and only replace the marked content portion of it
@@ -2173,7 +2175,6 @@ void AnnotWidget::drawText(GooString *text, GooString *da, GfxFontDict *fontDict
   }
 
   // force ZapfDingbats
-  //~ this should create the font if needed (?)
   if (forceZapfDingbats) {
     if (tfPos >= 0) {
       tok = (GooString *)daToks->get(tfPos);
@@ -2190,7 +2191,20 @@ void AnnotWidget::drawText(GooString *text, GooString *da, GfxFontDict *fontDict
     tok = (GooString *)daToks->get(tfPos);
     if (tok->getLength() >= 1 && tok->getChar(0) == '/') {
       if (!fontDict || !(font = fontDict->lookup(tok->getCString() + 1))) {
-        error(-1, "Unknown font in field's DA string");
+        if (forceZapfDingbats) {
+          // We are forcing ZaDb but the font does not exist
+          // so create a fake one
+          Ref r; // dummy Ref, it's not used at all in this codepath
+          r.num = 0;
+          r.gen = 0;
+          Dict *d = new Dict(xref);
+          font = new Gfx8BitFont(xref, "ZaDb", r, new GooString("ZapfDingbats"), fontType1, d);
+          delete d;
+          freeFont = gTrue;
+          addDingbatsResource = gTrue;
+        } else {
+          error(-1, "Unknown font in field's DA string");
+        }
       }
     } else {
       error(-1, "Invalid font name in 'Tf' operator in field's DA string");
@@ -2495,6 +2509,9 @@ void AnnotWidget::drawText(GooString *text, GooString *da, GfxFontDict *fontDict
     delete text;
   }
   delete convertedText;
+  if (freeFont) {
+    font->decRefCnt();
+  }
 }
 
 // Draw the variable text or caption for a field.
@@ -3056,6 +3073,9 @@ void AnnotWidget::generateFieldAppearance() {
       appRef = obj2.getRef();
     }
 
+    obj2.free();
+    obj1.free();
+
     // this annot doesn't have an AP yet, create one
     if (appRef.num == 0)
       appRef = xref->addIndirectObject(&appearance);
@@ -3098,12 +3118,41 @@ void AnnotWidget::draw(Gfx *gfx, GBool printing) {
     return;
   }
 
+  addDingbatsResource = gFalse;
   generateFieldAppearance ();
 
   // draw the appearance stream
   appearance.fetch(xref, &obj);
+  if (addDingbatsResource) {
+    // We are forcing ZaDb but the font does not exist
+    // so create a fake one
+    Object baseFontObj, subtypeObj;
+    baseFontObj.initName("ZapfDingbats");
+    subtypeObj.initName("Type1");
+
+    Object fontDictObj;
+    Dict *fontDict = new Dict(xref);
+    fontDict->decRef();
+    fontDict->add(copyString("BaseFont"), &baseFontObj);
+    fontDict->add(copyString("Subtype"), &subtypeObj);
+    fontDictObj.initDict(fontDict);
+
+    Object fontsDictObj;
+    Dict *fontsDict = new Dict(xref);
+    fontsDict->decRef();
+    fontsDict->add(copyString("ZaDb"), &fontDictObj);
+    fontsDictObj.initDict(fontsDict);
+
+    Dict *dict = new Dict(xref);
+    dict->add(copyString("Font"), &fontsDictObj);
+    gfx->pushResources(dict);
+    delete dict;
+  }
   gfx->drawAnnot(&obj, (AnnotBorder *)NULL, color,
 		 rect->x1, rect->y1, rect->x2, rect->y2);
+  if (addDingbatsResource) {
+    gfx->popResources();
+  }
   obj.free();
 }
 
@@ -3388,6 +3437,9 @@ AnnotScreen::~AnnotScreen() {
     delete title;
   if (appearCharacs)
     delete appearCharacs;
+
+  action.free();
+  additionAction.free();
 }
 
 void AnnotScreen::initialize(XRef *xrefA, Catalog *catalog, Dict* dict) {
