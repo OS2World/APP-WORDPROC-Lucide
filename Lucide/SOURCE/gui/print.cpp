@@ -400,7 +400,7 @@ bool LucidePrinting::doPsPrint( HAB lhab )
         int rd = 0;
         while ( ( rc != DEVESC_ERROR ) && ( rd = fread( buf, 1, PS_PRINT_BUF_SIZE, f ) ) != 0 )
         {
-            rc = DevEscape( hdcPrinter, DEVESC_RAWDATA, rd, (char *)buf, NULL, NULL );
+            rc = DevEscape( hdcPrinter, DEVESC_RAWDATA, rd, (PBYTE)buf, NULL, NULL );
             if ( ( rc == DEVESC_ERROR ) || abortPrinting ) {
                 splerr = true;
                 break;

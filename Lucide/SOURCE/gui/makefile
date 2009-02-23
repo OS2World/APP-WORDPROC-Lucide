@@ -150,6 +150,7 @@ MAKE.CFG: makefile
 -oh
 -bm
 -sg
+-wcd=919
 -5
 -fp5
 -DVERSION="$(VERSION)"  

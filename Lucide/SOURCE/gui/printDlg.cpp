@@ -283,8 +283,8 @@ bool PrintDlg::isPortraitOrientation()
 
         LONG outSz = psetup->QueueInfo.pDriverData->cb;
         LONG rc = DevEscape( hdcPrinterInfo, DEVESC_QUERYJOBPROPERTIES,
-                             sizeof( DJP_ITEM ) * 2, (PCHAR)djp,
-                             &outSz, (PCHAR)psetup->QueueInfo.pDriverData );
+                             sizeof( DJP_ITEM ) * 2, (PBYTE)djp,
+                             &outSz, (PBYTE)psetup->QueueInfo.pDriverData );
 
         if ( ( rc == DEV_OK ) || ( rc == DEV_WARNING ) )
         {
@@ -327,8 +327,8 @@ void PrintDlg::setPortraitOrientation( bool portrait, HWND hwnd )
 
         LONG outSz = psetup->QueueInfo.pDriverData->cb;
         DevEscape( hdcPrinterInfo, DEVESC_SETJOBPROPERTIES,
-                   sizeof( DJP_ITEM ) * 2, (PCHAR)djp,
-                   &outSz, (PCHAR)psetup->QueueInfo.pDriverData );
+                   sizeof( DJP_ITEM ) * 2, (PBYTE)djp,
+                   &outSz, (PBYTE)psetup->QueueInfo.pDriverData );
 
         DevCloseDC( hdcPrinterInfo );
 
@@ -360,8 +360,8 @@ int PrintDlg::queryCopies() // currently unused
 
         LONG outSz = psetup->QueueInfo.pDriverData->cb;
         LONG rc = DevEscape( hdcPrinterInfo, DEVESC_QUERYJOBPROPERTIES,
-                             sizeof( DJP_ITEM ) * 2, (PCHAR)djp,
-                             &outSz, (PCHAR)psetup->QueueInfo.pDriverData );
+                             sizeof( DJP_ITEM ) * 2, (PBYTE)djp,
+                             &outSz, (PBYTE)psetup->QueueInfo.pDriverData );
 
         if ( ( rc == DEV_OK ) || ( rc == DEV_WARNING ) ) {
             rVal = djp[0].ulValue;
@@ -395,8 +395,8 @@ void PrintDlg::setCopies( int copies )  // currently unused
 
         LONG outSz = psetup->QueueInfo.pDriverData->cb;
         DevEscape( hdcPrinterInfo, DEVESC_SETJOBPROPERTIES,
-                   sizeof( DJP_ITEM ) * 2, (PCHAR)djp,
-                   &outSz, (PCHAR)psetup->QueueInfo.pDriverData );
+                   sizeof( DJP_ITEM ) * 2, (PBYTE)djp,
+                   &outSz, (PBYTE)psetup->QueueInfo.pDriverData );
 
         DevCloseDC( hdcPrinterInfo );
     }
