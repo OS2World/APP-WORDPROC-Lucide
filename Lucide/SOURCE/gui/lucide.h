@@ -41,7 +41,7 @@
 class LuDocument;
 class ProgressDlg;
 
-enum PgLayout { SinglePage = 0, Continuous = 1 };
+enum PgLayout { SinglePage = 0, Continuous = 1, TwoPages = 2 };
 enum ActiveWindow { AwIndex, AwView };
 enum FileList { ListFirst, ListPrevious, ListNext, ListLast };
 

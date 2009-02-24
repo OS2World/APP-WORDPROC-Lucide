@@ -98,8 +98,8 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     drawareas   = NULL;
     drawareaIndex = 0;
     closed        = true;
+    layout        = SinglePage;
     // continuous view
-    continuous  = false;
     pagesizes   = NULL;
     realVscrollMax = 0;
     VScrollStep = 1;
@@ -296,13 +296,13 @@ void DocumentViewer::close()
 }
 
 // sets the page layout
-void DocumentViewer::setPageLayout( PgLayout layout )
+void DocumentViewer::setPageLayout( PgLayout _layout )
 {
-    continuous = ( layout == Continuous );
+    layout = _layout;
     if ( doc != NULL ) {
         long pg = currentpage;
         drawPage();
-        if ( continuous ) {
+        if ( isContinuous() ) {
             goToPage( pg );
         }
     }
@@ -345,7 +345,7 @@ void DocumentViewer::goToPage( long page )
         return;
     }
 
-    if ( continuous && ( doc != NULL ) )
+    if ( isContinuous() && ( doc != NULL ) )
     {
         bool needRedraw = ( page == currentpage );
         double pgpos = pagenumToPos( page ) / VScrollStep;
@@ -449,7 +449,7 @@ void DocumentViewer::setFullscreen( bool _fullscreen )
 // copy selected text to clipboard
 void DocumentViewer::copyToClipbrd()
 {
-    if ( continuous )
+    if ( isContinuous() )
     {
         std::string txt = "";
         for ( long i = 0; i < totalpages; i++ ) {
@@ -468,7 +468,7 @@ void DocumentViewer::copyToClipbrd()
 // select all text (continuous view) or current page (single page view)
 void DocumentViewer::selectAll()
 {
-    if ( continuous )
+    if ( isContinuous() )
     {
         for ( long i = 0; i < totalpages; i++ )
         {
@@ -593,7 +593,7 @@ void DocumentViewer::adjustSize()
         }
 
         if ( zoom == -1 ) { // fit width
-            realzoom = (double)cxClient / ( continuous ? fullwidth : width );
+            realzoom = (double)cxClient / ( isContinuous() ? fullwidth : width );
         }
         else if ( zoom == -2 ) { // fit page
             realzoom = __min( (double)cxClient / width, (double)cyClient / height );
@@ -612,7 +612,7 @@ void DocumentViewer::adjustSize()
 // page redraw
 void DocumentViewer::drawPage()
 {
-    if ( !continuous )
+    if ( !isContinuous() )
     {
         LuDocument::freeRectangles( ev, selrects[ currentpage ] );
         selrects[ currentpage ] = NULL;
@@ -753,7 +753,7 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
     }
     else
     {
-        sHscrollMax = (SHORT)__max( 0, ( continuous ? fullwidth : width ) - cxClient );
+        sHscrollMax = (SHORT)__max( 0, ( isContinuous() ? fullwidth : width ) - cxClient );
         sHscrollPos = __min( sHscrollPos, sHscrollMax );
 
         WinSendMsg( hWndHscroll, SBM_SETSCROLLBAR,
@@ -763,7 +763,7 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
         WinEnableWindow( hWndHscroll, (BOOL)( sHscrollMax != 0 ) );
 
         VScrollStep = 1;
-        if ( continuous )
+        if ( isContinuous() )
         {
             realVscrollMax = __max( 0, fullheight - cyClient );
             ULONG ssize = realVscrollMax / VScrollStep;
@@ -784,7 +784,7 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
 
         WinSendMsg( hWndVscroll, SBM_SETSCROLLBAR,
                     MPFROMSHORT(sVscrollPos), MPFROM2SHORT(0, sVscrollMax) );
-        if ( continuous ) {
+        if ( isContinuous() ) {
             WinSendMsg( hWndVscroll, SBM_SETTHUMBSIZE,
                         MPFROM2SHORT( cyClient/VScrollStep, fullheight/VScrollStep ), MPVOID );
         }
@@ -1447,7 +1447,7 @@ void DocumentViewer::winPosToDocPos( PageDrawArea *pda, LuRectangle *r )
 // converts document position to window position
 void DocumentViewer::docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl )
 {
-    double yplus = continuous ? pagenumToPos( pagenum ) : 0;
+    double yplus = isContinuous() ? pagenumToPos( pagenum ) : 0;
     double w = pagesizes[ pagenum ].x;
     double h = pagesizes[ pagenum ].y;
 
@@ -1489,7 +1489,7 @@ void DocumentViewer::docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl )
         rcl->xLeft  += xPos;
         rcl->xRight += xPos;
     }
-    if ( !continuous )
+    if ( !isContinuous() )
     {
         LONG ph = h * realzoom;
         if ( ph < cyClient ) {
@@ -1625,7 +1625,7 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
             selectionEnd.x = xpos;
             selectionEnd.y = ypos;
 
-            if ( continuous )
+            if ( isContinuous() )
             {
                 scrollToPos( hwnd, NULLHANDLE, xpos, ypos, true );
 
@@ -1704,7 +1704,7 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
         else if ( links != NULL )
         {
             long pg = currentpage;
-            if ( continuous ) {
+            if ( isContinuous() ) {
                 double tmp;
                 pg = posToPagenum( ypos, &tmp );
             }
@@ -1764,7 +1764,7 @@ BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
         }
 
         long pg = currentpage;
-        if ( continuous ) {
+        if ( isContinuous() ) {
             double tmp;
             pg = posToPagenum( ypos, &tmp );
         }
@@ -1848,7 +1848,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                 }
                 else
                 {
-                    bool dojump = ( !continuous && ( sVscrollPos == 0 )
+                    bool dojump = ( !isContinuous() && ( sVscrollPos == 0 )
                                         && ( currentpage > 0 ) );
 
                     if ( fullscreen || dojump ) {
@@ -1873,7 +1873,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                 }
                 else
                 {
-                    bool dojump = ( !continuous && ( sVscrollPos == sVscrollMax ) );
+                    bool dojump = ( !isContinuous() && ( sVscrollPos == sVscrollMax ) );
 
                     if ( fullscreen || dojump ) {
                         goToPage( currentpage + 1 );
@@ -1940,7 +1940,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
 // handles WM_BUTTON1DOWN
 void DocumentViewer::wmButton1Down( HWND hwnd, SHORT xpos, SHORT ypos )
 {
-    if ( continuous && ( doc != NULL ) )
+    if ( isContinuous() && ( doc != NULL ) )
     {
         // clear selection
         RECTL rcl = { 0 };
@@ -2103,13 +2103,13 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
 
         case WM_PAINT:
             if ( _this->enableAsynchDraw ) {
-                if ( _this->continuous ) {
+                if ( _this->isContinuous() ) {
                     _this->wmPaintContAsynch( hwnd );
                 } else {
                     _this->wmPaintAsynch( hwnd );
                 }
             } else {
-                if ( _this->continuous ) {
+                if ( _this->isContinuous() ) {
                     _this->wmPaintCont( hwnd );
                 } else {
                     _this->wmPaint( hwnd );

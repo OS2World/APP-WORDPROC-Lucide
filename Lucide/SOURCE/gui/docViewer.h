@@ -60,7 +60,7 @@ class DocumentViewer
         virtual ~DocumentViewer();
 
         void setPageLayout( PgLayout layout );
-        PgLayout getPageLayout() { return ( continuous ? Continuous : SinglePage ); }
+        PgLayout getPageLayout() { return layout; }
 
         HWND getFrameHWND() { return hWndDocFrame; }
         HWND getViewHWND() { return hWndDoc; }
@@ -122,6 +122,7 @@ class DocumentViewer
         long posToPagenum( LONG yPosWin, double *pageRest );
         double pagenumToPos( long pagenum );
         bool isRotated() { return ( (rotation==90) || (rotation==270) ); }
+        bool isContinuous() { return ( layout == Continuous ); };
 
         static MRESULT EXPENTRY docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
         static MRESULT EXPENTRY docFrameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
@@ -162,6 +163,7 @@ class DocumentViewer
         int drawareaIndex;
         bool closed;
         bool drawPS;
+        PgLayout layout;
         
         // fullscreen
         bool fullscreen;
@@ -173,7 +175,6 @@ class DocumentViewer
         double zoomSave;
 
         // continuous view
-        bool continuous;
         LuSize *pagesizes;
         SHORT VScrollStep;
         RECTL savedRcl;
