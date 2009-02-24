@@ -16,6 +16,7 @@ MENU_LAST=Last\tShift+End
 MENU_RECENT_FILES=~Recent files
 MENU_CLEAR_LIST=~Clear list
 MENU_SAVE_AS=~Save As...
+MENU_CLOSE=~Close
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Pa~ge setup...
 MENU_PRINT=~Print...\tCtrl+P

@@ -62,9 +62,10 @@
 #define CM_NEW_WINDOW   101
 #define CM_OPEN         102
 #define CM_SAVEAS       103
-#define CM_PRINT        104
-#define CM_PLUGINSLIST  105
-#define CM_EXIT         106
+#define CM_CLOSE        104
+#define CM_PRINT        105
+#define CM_PLUGINSLIST  106
+#define CM_EXIT         107
 
 #define CM_FILEFIRST    151
 #define CM_FILEPREVIOUS 152

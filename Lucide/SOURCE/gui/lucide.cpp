@@ -262,6 +262,7 @@ void Lucide::checkMenus( bool initial )
         }
 
         WinEnableMenuItem( hWndMenu, CM_SAVEAS, FALSE );
+        WinEnableMenuItem( hWndMenu, CM_CLOSE, FALSE );
         WinEnableMenuItem( hWndMenu, CM_PRINT, FALSE );
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_PRINT), (MPARAM)FALSE );
         WinEnableMenuItem( hWndMenu, CM_DOCINFO, FALSE );
@@ -312,6 +313,7 @@ void Lucide::checkMenus( bool initial )
     WinEnableMenuItem( hWndMenu, CM_PRINT, TRUE );
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_PRINT), (MPARAM)TRUE );
     WinEnableMenuItem( hWndMenu, CM_SAVEAS, doc->isSaveable( ev ) );
+    WinEnableMenuItem( hWndMenu, CM_CLOSE, TRUE );
     setOfPages( doc->getPageCount( ev ) );
     WinEnableMenuItem( hWndMenu, CM_FONTSINFO, doc->isHaveFontInfo( ev ) );
     WinEnableMenuItem( hWndMenu, CM_DOCINFO, TRUE );
@@ -364,11 +366,13 @@ void Lucide::setPageLayout( PgLayout layout )
 
 void Lucide::closeDocument()
 {
-    docViewer->close();
-    delete doc;
-    doc = NULL;
-    WinSetWindowText( hWndFrame, title );
-    checkMenus( false );
+    if ( doc != NULL ) {    
+        docViewer->close();
+        delete doc;
+        doc = NULL;
+        WinSetWindowText( hWndFrame, title );
+        checkMenus( false );
+    }
 
     if ( thumbnailData != NULL ) {
         writeThumbnail( docFullName );
@@ -959,6 +963,10 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
                 case CM_SAVEAS:
                     Lucide::saveDocumentAs();
+                    return (MRESULT)FALSE;
+                    
+                case CM_CLOSE:
+                    Lucide::closeDocument();
                     return (MRESULT)FALSE;
 
                 case CM_PRINT:

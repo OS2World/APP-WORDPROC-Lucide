@@ -13,7 +13,10 @@ MENU_FIRST=Первый\tShift+Home
 MENU_PREVIOUS=Предыдущий\tShift+PgUp
 MENU_NEXT=Следующий\tShift+PgDn
 MENU_LAST=Последний\tShift+End
+MENU_RECENT_FILES=Не~давние файлы
+MENU_CLEAR_LIST=~Очистить
 MENU_SAVE_AS=~Сохранить как...
+MENU_CLOSE=~Закрыть
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Па~раметры страницы...
 MENU_PRINT=~Печать...\tCtrl+P
