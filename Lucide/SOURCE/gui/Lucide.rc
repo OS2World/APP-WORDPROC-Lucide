@@ -21,6 +21,8 @@ BITMAP IDB_MGLASS       "bitmaps\\mglass.bmp"
 POINTER IDP_HAND        "bitmaps\\hand.ptr"
 POINTER IDP_ZOOM_IN     "bitmaps\\zoom_in.ptr"
 POINTER IDP_ZOOM_OUT    "bitmaps\\zoom_out.ptr"
+POINTER IDP_HAND_CLOSED "bitmaps\\hand_closed.ptr"
+
 
 MENU IDM_MAINMENU
 BEGIN

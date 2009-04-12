@@ -92,8 +92,8 @@ class DocumentViewer
         void adjustSize();
 		void countPagesizes();
 
-        MRESULT vertScroll( HWND hwnd, MPARAM mp2, HRGN hrgn );
-        MRESULT horizScroll( HWND hwnd, MPARAM mp2, HRGN hrgn );
+        MRESULT vertScroll( HWND hwnd, MPARAM mp2 );
+        MRESULT horizScroll( HWND hwnd, MPARAM mp2 );
         MRESULT wmDragOver( PDRAGINFO dragInfo );
 		void wmDrop( PDRAGINFO dragInfo );
 		void wmSize( HWND hwnd, MPARAM mp2 );
@@ -103,6 +103,8 @@ class DocumentViewer
         void wmPaintContAsynch( HWND hwnd );
         void wmButton1Down( HWND hwnd, SHORT xpos, SHORT ypos );
         void wmButton1Up();
+        void wmButton2Down( HWND hwnd, SHORT xpos, SHORT ypos );
+        void wmButton2Up();
         BOOL wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmClick( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 );
@@ -113,7 +115,7 @@ class DocumentViewer
         void rotateRectangle( long pagenum, LuRectangle *r );
         HRGN rectsToRegion( long pagenum, HPS hps, LuDocument_LuRectSequence *rects );
         void drawSelection( long pagenum, HPS hps, PRECTL r );
-        void scrollToPos( HWND hwnd, HRGN hrgn, LONG xpos, LONG ypos, bool withSelection );
+        void scrollToPos( HWND hwnd, LONG xpos, LONG ypos, bool withSelection );
         void freeRects( LuDocument_LuRectSequence **rects );
         void freeLinks();
         void drawFound( long pagenum, HPS hps, PRECTL r );
@@ -164,6 +166,11 @@ class DocumentViewer
         bool closed;
         bool drawPS;
         PgLayout layout;
+
+        // mouse drag using right button
+        bool docDraggingStarted;
+        POINTL docDraggingStart;
+        POINTL docDraggingEnd;
         
         // fullscreen
         bool fullscreen;
@@ -207,6 +214,7 @@ class DocumentViewer
         
         // pointers
         HPOINTER handPtr;
+        HPOINTER handClosedPtr;
         HPOINTER zoomInPtr;
         HPOINTER zoomOutPtr;
 };

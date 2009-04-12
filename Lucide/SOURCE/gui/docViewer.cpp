@@ -63,6 +63,7 @@ typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 #define PAGEBACK_COLOR  0xFFFFFFL
 #define VERT_SPACE      2
 #define NO_MOUSE_TIMER  1
+#define SB_PAGEDRAG     100
 
 // DocumentViewer constructor
 DocumentViewer::DocumentViewer( HWND hWndFrame )
@@ -105,6 +106,10 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     VScrollStep = 1;
     WinSetRectEmpty( hab, &savedRcl );
     drawPS = false;
+    // mouse drag using right button
+    docDraggingStarted = false;
+    docDraggingStart.x = 0;  docDraggingStart.y = 0;
+    docDraggingEnd.x = 0;  docDraggingEnd.y = 0;
     // fullscreen
     fullscreen     = false;
     secondsNoMouse = 0;
@@ -127,6 +132,7 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     haveLinks = false;
     links = NULL;
     handPtr = WinLoadPointer( HWND_DESKTOP, _hmod, IDP_HAND );
+    handClosedPtr = WinLoadPointer( HWND_DESKTOP, _hmod, IDP_HAND_CLOSED );
     zoomInPtr = WinLoadPointer( HWND_DESKTOP, _hmod, IDP_ZOOM_IN );
     zoomOutPtr = WinLoadPointer( HWND_DESKTOP, _hmod, IDP_ZOOM_OUT );
     // search
@@ -169,6 +175,7 @@ DocumentViewer::~DocumentViewer()
     }
 
     WinDestroyPointer( handPtr );
+    WinDestroyPointer( handClosedPtr );
     WinDestroyPointer( zoomInPtr );
     WinDestroyPointer( zoomOutPtr );
 
@@ -349,7 +356,7 @@ void DocumentViewer::goToPage( long page )
     {
         bool needRedraw = ( page == currentpage );
         double pgpos = pagenumToPos( page ) / VScrollStep;
-        vertScroll( hWndDoc, MPFROM2SHORT( pgpos, SB_SLIDERPOSITION ), NULLHANDLE );
+        vertScroll( hWndDoc, MPFROM2SHORT( pgpos, SB_SLIDERPOSITION ) );
         if ( needRedraw ) {
             drawPage();
         }
@@ -553,7 +560,7 @@ void DocumentViewer::searchthread( void *p )
             if ( _this->foundrects[i]->_length > 0 ) {
                 RECTL r;
                 _this->docPosToWinPos( i, &(_this->foundrects[i]->_buffer[0]), &r );
-                _this->scrollToPos( _this->hWndDoc, NULLHANDLE, r.xLeft, r.yBottom, false );
+                _this->scrollToPos( _this->hWndDoc, r.xLeft, r.yBottom, false );
             }
             break;
         }
@@ -632,7 +639,7 @@ void DocumentViewer::drawPage()
 
 
 // handles vertical scrolling
-MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2, HRGN hrgn )
+MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2 )
 {
     if ( fullscreen ) {
         return ( MRFROMLONG( 0 ) );
@@ -658,15 +665,21 @@ MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2, HRGN hrgn )
         case SB_SLIDERPOSITION:
             sVscrollInc = ( SHORT1FROMMP( mp2 ) - sVscrollPos ) * VScrollStep;
             break;
+        case SB_PAGEDRAG:
+            sVscrollInc = (SHORT)SHORT1FROMMP( mp2 );
+            break;
     }
 
-    sVscrollInc = __max( -sVscrollPos * VScrollStep, __min( sVscrollInc,
+    if ( SHORT2FROMMP( mp2 ) != SB_PAGEDRAG ) { 
+        sVscrollInc = __max( -sVscrollPos * VScrollStep, __min( sVscrollInc,
                               ( sVscrollMax - sVscrollPos ) * VScrollStep ) );
-    sVscrollInc = ( sVscrollInc / VScrollStep ) * VScrollStep;
+        sVscrollInc = ( sVscrollInc / VScrollStep ) * VScrollStep;
+    }
+
     if ( sVscrollInc != 0 )
     {
         sVscrollPos += (SHORT)( sVscrollInc / VScrollStep );
-        WinScrollWindow( hwnd, 0, sVscrollInc, NULL, NULL, hrgn, NULL, SW_INVALIDATERGN );
+        WinScrollWindow( hwnd, 0, sVscrollInc, NULL, NULL, NULLHANDLE, NULL, SW_INVALIDATERGN );
         WinSendMsg( hWndVscroll, SBM_SETPOS, MPFROMSHORT( sVscrollPos ), MPVOID );
         WinUpdateWindow( hwnd );
         sVscrollInc = 0;
@@ -675,7 +688,7 @@ MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2, HRGN hrgn )
 }
 
 // handles horizontal scrolling
-MRESULT DocumentViewer::horizScroll( HWND hwnd, MPARAM mp2, HRGN hrgn )
+MRESULT DocumentViewer::horizScroll( HWND hwnd, MPARAM mp2 )
 {
     if ( fullscreen ) {
         return ( MRFROMLONG( 0 ) );
@@ -708,7 +721,7 @@ MRESULT DocumentViewer::horizScroll( HWND hwnd, MPARAM mp2, HRGN hrgn )
     if ( sHscrollInc != 0 )
     {
         sHscrollPos += (SHORT)sHscrollInc;
-        WinScrollWindow( hwnd, -sHscrollInc, 0, NULL, NULL, hrgn, NULL, SW_INVALIDATERGN );
+        WinScrollWindow( hwnd, -sHscrollInc, 0, NULL, NULL, NULLHANDLE, NULL, SW_INVALIDATERGN );
         WinSendMsg( hWndHscroll, SBM_SETPOS, MPFROMSHORT( sHscrollPos ), MPVOID );
         WinUpdateWindow( hwnd );
         sHscrollInc = 0;
@@ -795,7 +808,7 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
         WinEnableWindow( hWndVscroll, (BOOL)( sVscrollMax != 0 ) );
 
         SHORT realScrollPos = (SHORT)(sVscrollMax * relativeScrollPos);
-        vertScroll( hWndDoc, MPFROM2SHORT( realScrollPos, SB_SLIDERPOSITION ), NULLHANDLE );
+        vertScroll( hWndDoc, MPFROM2SHORT( realScrollPos, SB_SLIDERPOSITION ) );
     }
 }
 
@@ -1551,7 +1564,7 @@ void DocumentViewer::drawFound( long pagenum, HPS hps, PRECTL r )
 }
 
 // scrolls window to specified pos (optionally with text selection)
-void DocumentViewer::scrollToPos( HWND hwnd, HRGN hrgn, LONG xpos, LONG ypos,
+void DocumentViewer::scrollToPos( HWND hwnd, LONG xpos, LONG ypos,
                                   bool withSelection )
 {
     SHORT xinc = 0;
@@ -1570,7 +1583,7 @@ void DocumentViewer::scrollToPos( HWND hwnd, HRGN hrgn, LONG xpos, LONG ypos,
     }
 
     if ( xinc != 0 ) {
-        horizScroll( hwnd, MPFROM2SHORT( sHscrollPos + xinc, SB_SLIDERPOSITION ), hrgn );
+        horizScroll( hwnd, MPFROM2SHORT( sHscrollPos + xinc, SB_SLIDERPOSITION ) );
         if ( withSelection ) {
             selectionStart.x -= xinc;
         }
@@ -1585,7 +1598,7 @@ void DocumentViewer::scrollToPos( HWND hwnd, HRGN hrgn, LONG xpos, LONG ypos,
         }
 
         vertScroll( hwnd, MPFROM2SHORT( ( ( sVscrollPos * VScrollStep ) + yinc ) / VScrollStep,
-                                        SB_SLIDERPOSITION ), hrgn );
+                                        SB_SLIDERPOSITION ) );
         if ( withSelection ) {
             selectionStart.y += yinc;
         }
@@ -1627,7 +1640,7 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
 
             if ( isContinuous() )
             {
-                scrollToPos( hwnd, NULLHANDLE, xpos, ypos, true );
+                scrollToPos( hwnd, xpos, ypos, true );
 
                 RECTL selRect = {
                     selectionStart.x < selectionEnd.x ? selectionStart.x : selectionEnd.x,
@@ -1666,9 +1679,8 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
                 winPosToDocPos( &selectionStart, &selectionEnd, &(selection[currentpage]) );
 
                 HPS hps = WinGetPS( hwnd );
-                HRGN scrolledRegion = NULLHANDLE; //GpiCreateRegion( hps, 0, NULL );
 
-                scrollToPos( hwnd, scrolledRegion, xpos, ypos, true );
+                scrollToPos( hwnd, xpos, ypos, true );
 
                 // 127/191/255
                 //LONG lclr = ( 127 << 16 ) | ( 191 << 8 ) | 255;
@@ -1692,14 +1704,27 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
                 }
                 HRGN selectRegion = rectsToRegion( currentpage, hps, selrects[ currentpage ] );
                 GpiCombineRegion( hps, selectRegion, selectRegion, clearRegion, CRGN_XOR );
-                //GpiCombineRegion( hps, selectRegion, selectRegion, scrolledRegion, CRGN_DIFF );
                 GpiPaintRegion( hps, selectRegion );
                 GpiDestroyRegion( hps, clearRegion );
                 GpiDestroyRegion( hps, selectRegion );
-                //GpiDestroyRegion( hps, scrolledRegion );
 
                 WinReleasePS( hps );
             }
+        }
+        else if ( docDraggingStarted && ( doc != NULL ) )
+        {
+            WinSetPointer( HWND_DESKTOP, handClosedPtr );
+            docDraggingEnd.x = xpos;
+            docDraggingEnd.y = ypos;
+
+            SHORT vMove = docDraggingEnd.y - docDraggingStart.y;
+            if ( abs( vMove ) > 5 ) 
+            {            
+                vertScroll( hwnd, MPFROM2SHORT( vMove, SB_PAGEDRAG ) );
+                docDraggingStart.x = xpos;
+                docDraggingStart.y = ypos;
+            }
+            return TRUE;
         }
         else if ( links != NULL )
         {
@@ -1818,7 +1843,6 @@ BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
     return FALSE;
 }
 
-
 BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
 {
     USHORT fsflags = SHORT1FROMMP( mp1 );
@@ -1843,7 +1867,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                     if ( fullscreen ) {
                         goToPage( 0 );
                     } else {
-                        vertScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ), NULLHANDLE );
+                        vertScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ) );
                     }
                 }
                 else
@@ -1854,7 +1878,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                     if ( fullscreen || dojump ) {
                         goToPage( currentpage - 1 );
                         if ( dojump ) {
-                            vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ), NULLHANDLE );
+                            vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ) );
                         }
                     } else {
                         WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEUP ) );
@@ -1868,7 +1892,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                     if ( fullscreen ) {
                         goToPage( totalpages - 1 );
                     } else {
-                        vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ), NULLHANDLE );
+                        vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ) );
                     }
                 }
                 else
@@ -1892,11 +1916,11 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                 return TRUE;
 
             case VK_HOME:
-                horizScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ), NULLHANDLE );
+                horizScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ) );
                 return TRUE;
 
             case VK_END:
-                horizScroll( hwnd, MPFROM2SHORT( sHscrollMax, SB_SLIDERPOSITION ), NULLHANDLE );
+                horizScroll( hwnd, MPFROM2SHORT( sHscrollMax, SB_SLIDERPOSITION ) );
                 return TRUE;
         }
     }
@@ -1973,6 +1997,7 @@ void DocumentViewer::wmButton1Down( HWND hwnd, SHORT xpos, SHORT ypos )
     selectionStart.y = ypos;
 }
 
+
 // handles WM_BUTTON1UP
 void DocumentViewer::wmButton1Up()
 {
@@ -1988,6 +2013,30 @@ void DocumentViewer::wmButton1Up()
     }
 
     Lucide::enableCopy( haveSelection );
+}
+
+
+// handles WM_BUTTON2DOWN
+void DocumentViewer::wmButton2Down( HWND hwnd, SHORT xpos, SHORT ypos )
+{
+    if ( doc != NULL )
+    {
+        WinSetCapture( HWND_DESKTOP, hwnd );
+        docDraggingStarted = true;
+        docDraggingStart.x = xpos;
+        docDraggingStart.y = ypos;
+    }
+}
+
+
+// handles WM_BUTTON2UP
+void DocumentViewer::wmButton2Up()
+{
+    if ( docDraggingStarted )
+    {
+        WinSetCapture( HWND_DESKTOP, NULLHANDLE );
+        docDraggingStarted = false;
+    }
 }
 
 
@@ -2094,11 +2143,11 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
             return (MRESULT)FALSE;
 
         case WM_HSCROLL:
-            _this->horizScroll( hwnd, mp2, NULLHANDLE );
+            _this->horizScroll( hwnd, mp2 );
             break;
 
         case WM_VSCROLL:
-            _this->vertScroll( hwnd, mp2, NULLHANDLE );
+            _this->vertScroll( hwnd, mp2 );
             break;
 
         case WM_PAINT:
@@ -2125,6 +2174,14 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
             _this->wmButton1Up();
             break;
 
+        case WM_BUTTON2DOWN:
+            _this->wmButton2Down( hwnd, SHORT1FROMMP( mp1 ), SHORT2FROMMP( mp1 ) );
+            break;
+            
+        case WM_BUTTON2UP:
+            _this->wmButton2Up();
+            break;
+            
         case WM_MOUSEMOVE:
             if ( _this->wmMouseMove( hwnd, SHORT1FROMMP( mp1 ), SHORT2FROMMP( mp1 ) ) ) {
                 return (MRESULT)TRUE;

@@ -41,6 +41,7 @@
 #define IDP_HAND        10
 #define IDP_ZOOM_IN		11
 #define IDP_ZOOM_OUT	12
+#define IDP_HAND_CLOSED	13
 
 #define IDB_OPEN        20
 #define IDB_PRINT       21
