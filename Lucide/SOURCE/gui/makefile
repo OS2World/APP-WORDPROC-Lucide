@@ -1,6 +1,6 @@
 .autodepend
 
-TEST=1
+TEST=0
 VERSION=1.22
 
 !if $(TEST)==1
