@@ -476,7 +476,7 @@ static string buildFontKey( FcPattern *p, bool useDefaultFonts )
         key += "bold";
     }
 
-    if ( p->slant != FC_SLANT_ROMAN ) {
+    if ( (p->slant == FC_SLANT_ITALIC) || (p->slant == FC_SLANT_OBLIQUE) ) {
         key += ' ';
         key += "italic";
     }
