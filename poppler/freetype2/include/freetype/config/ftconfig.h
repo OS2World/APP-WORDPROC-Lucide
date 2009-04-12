@@ -263,7 +263,7 @@ FT_BEGIN_HEADER
 
   /* Watcom doesn't provide 64-bit data types */
 #define FT_LONG64
-#define FT_INT64  long long int
+#define FT_INT64  __int64
 
 #elif defined( __MWERKS__ )    /* Metrowerks CodeWarrior */
 
@@ -359,9 +359,9 @@ FT_BEGIN_HEADER
       "shrl  $16, %%eax\n"
       "shll  $16, %%edx\n"
       "addl  %%edx, %%eax\n"
-      : "=a"(result), "+d"(b)
-      : "a"(a)
-      : "%ecx" );
+      : "=a"(result), "=d"(b)
+      : "a"(a), "d"(b)
+      : "%ecx", "cc" );
     return result;
   }
 
