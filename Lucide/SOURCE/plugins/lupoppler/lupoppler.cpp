@@ -102,7 +102,7 @@ extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 
 extern "C" char * EXPENTRY getDescription()
 {
-    return "PDF plugin, based on poppler library v0.10.5";
+    return "PDF plugin, based on poppler library v0.12.3";
 }
 
 
@@ -296,7 +296,7 @@ static void copy_page_to_pixbuf( Environment *ev, SplashBitmap *bitmap, LuPixbuf
     {
         dst = pixbuf_data + i * pixbuf_rowstride;
         src = ((char *)color_ptr) + j * splash_rowstride;
-        
+
 #if !defined( CONV_RGB_4TO3 )
         memcpy( dst, src, rowstride );
 #else
@@ -1257,7 +1257,7 @@ SOM_Scope LuDocumentInfo*  SOMLINK getDocumentInfo(LuPopplerDocument *somSelf,
     }
 
     char *format = (char *)SOMMalloc( 16 );
-    snprintf( format, 16, "PDF-%.2f", doc->getPDFVersion() );
+    snprintf( format, 16, "PDF-%d.%d", doc->getPDFMajorVersion(), doc->getPDFMinorVersion() );
     info->format = format;
     info->fields_mask |= LU_DOCUMENT_INFO_FORMAT;
 
