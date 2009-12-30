@@ -18,6 +18,7 @@
 // Copyright (C) 2008 Brad Hards <bradh@kde.org>
 // Copyright (C) 2008 Carlos Garcia Campos <carlosgc@gnome.org>
 // Copyright (C) 2009 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2009 Thomas Freitag <Thomas.Freitag@alfa.de>
 //
 // To see a description of the changes please see the Changelog file that
 // came with your tarball or type make ChangeLog if you are building from git
@@ -33,7 +34,9 @@
 
 #include "goo/gtypes.h"
 #include "goo/GooList.h"
+#include "GfxState.h"
 #include "Object.h"
+#include "PopplerCache.h"
 
 class GooString;
 class XRef;
@@ -107,8 +110,8 @@ public:
   GBool lookupXObjectNF(char *name, Object *obj);
   GBool lookupMarkedContentNF(char *name, Object *obj);
   void lookupColorSpace(char *name, Object *obj);
-  GfxPattern *lookupPattern(char *name);
-  GfxShading *lookupShading(char *name);
+  GfxPattern *lookupPattern(char *name, Gfx *gfx);
+  GfxShading *lookupShading(char *name, Gfx *gfx);
   GBool lookupGState(char *name, Object *obj);
 
   GfxResources *getNext() { return next; }
@@ -166,6 +169,10 @@ public:
 
   void pushResources(Dict *resDict);
   void popResources();
+  
+#ifdef USE_CMS
+  PopplerCache *getIccColorSpaceCache();
+#endif
 
 private:
 
@@ -175,6 +182,11 @@ private:
   GBool subPage;		// is this a sub-page object?
   GBool printCommands;		// print the drawing commands (for debugging)
   GBool profileCommands;	// profile the drawing commands (for debugging)
+  GBool textHaveCSPattern;	// in text drawing and text has pattern colorspace
+  GBool drawText;		// in text drawing
+  GBool maskHaveCSPattern;	// in mask drawing and mask has pattern colorspace
+  GfxColorSpace *colorSpaceText;// colorspace after text has filled with pattern
+  GfxColor colorText;		// fill color after after text has filled with pattern
   GfxResources *res;		// resource stack
   int updateLevel;
 
@@ -189,6 +201,10 @@ private:
   MarkedContentStack *mcStack;	// current BMC/EMC stack
 
   Parser *parser;		// parser for page content stream(s)
+ 
+#ifdef USE_CMS
+  PopplerCache iccColorSpaceCache;
+#endif
 
   GBool				// callback to check for an abort
     (*abortCheckCbk)(void *data);

@@ -14,10 +14,13 @@
 // under GPL version 2 or later
 //
 // Copyright (C) 2005, 2006, 2008 Brad Hards <bradh@frogmouth.net>
-// Copyright (C) 2005, 2007, 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2005, 2007-2009 Albert Astals Cid <aacid@kde.org>
 // Copyright (C) 2008 Julien Rebetez <julienr@svn.gnome.org>
 // Copyright (C) 2008 Pino Toscano <pino@kde.org>
 // Copyright (C) 2008 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2009 Eric Toombs <ewtoombs@uwaterloo.ca>
+// Copyright (C) 2009 Kovid Goyal <kovid@kovidgoyal.net>
+// Copyright (C) 2009 Axel Struebing <axel.struebing@freenet.de>
 //
 // To see a description of the changes please see the Changelog file that
 // came with your tarball or type make ChangeLog if you are building from git
@@ -32,13 +35,15 @@
 
 #include <locale.h>
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
 #include <time.h>
-#ifdef WIN32
+#ifdef _WIN32
 #  include <windows.h>
 #endif
+#include "goo/gstrtod.h"
 #include "goo/GooString.h"
 #include "poppler-config.h"
 #include "GlobalParams.h"
@@ -71,7 +76,6 @@
 PDFDoc::PDFDoc(GooString *fileNameA, GooString *ownerPassword,
 	       GooString *userPassword, void *guiDataA) {
   Object obj;
-  GooString *fileName1, *fileName2;
 
   ok = gFalse;
   errCode = errNone;
@@ -87,33 +91,23 @@ PDFDoc::PDFDoc(GooString *fileNameA, GooString *ownerPassword,
 #endif
 
   fileName = fileNameA;
-  fileName1 = fileName;
-
 
   // try to open file
-  fileName2 = NULL;
 #ifdef VMS
-  if (!(file = fopen(fileName1->getCString(), "rb", "ctx=stm"))) {
-    error(-1, "Couldn't open file '%s'", fileName1->getCString());
+  file = fopen(fileName->getCString(), "rb", "ctx=stm");
+#else
+  file = fopen(fileName->getCString(), "rb");
+#endif
+  if (file == NULL) {
+    // fopen() has failed.
+    // Keep a copy of the errno returned by fopen so that it can be 
+    // referred to later.
+    fopenErrno = errno;
+    error(-1, "Couldn't open file '%s': %s.", fileName->getCString(),
+                                              strerror(errno));
     errCode = errOpenFile;
     return;
   }
-#else
-  if (!(file = fopen(fileName1->getCString(), "rb"))) {
-    fileName2 = fileName->copy();
-    fileName2->lowerCase();
-    if (!(file = fopen(fileName2->getCString(), "rb"))) {
-      fileName2->upperCase();
-      if (!(file = fopen(fileName2->getCString(), "rb"))) {
-	error(-1, "Couldn't open file '%s'", fileName->getCString());
-	delete fileName2;
-	errCode = errOpenFile;
-	return;
-      }
-    }
-    delete fileName2;
-  }
-#endif
 
   // create stream
   obj.initNull();
@@ -122,7 +116,7 @@ PDFDoc::PDFDoc(GooString *fileNameA, GooString *ownerPassword,
   ok = setup(ownerPassword, userPassword);
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 PDFDoc::PDFDoc(wchar_t *fileNameA, int fileNameLen, GooString *ownerPassword,
 	       GooString *userPassword, void *guiDataA) {
   OSVERSIONINFO version;
@@ -312,7 +306,8 @@ void PDFDoc::checkHeader() {
   char *p;
   int i;
 
-  pdfVersion = 0;
+  pdfMajorVersion = 0;
+  pdfMinorVersion = 0;
   for (i = 0; i < headerSearchSize; ++i) {
     hdrBuf[i] = str->getChar();
   }
@@ -331,11 +326,7 @@ void PDFDoc::checkHeader() {
     error(-1, "May not be a PDF file (continuing anyway)");
     return;
   }
-  {
-    char *theLocale = setlocale(LC_NUMERIC, "C");
-    pdfVersion = atof(p);
-    setlocale(LC_NUMERIC, theLocale);
-  }
+  sscanf(p, "%d.%d", &pdfMajorVersion, &pdfMinorVersion);
   // We don't do the version check. Don't add it back in.
 }
 
@@ -462,14 +453,14 @@ GBool PDFDoc::isLinearized() {
   return lin;
 }
 
-GBool PDFDoc::saveAs(GooString *name, PDFWriteMode mode) {
+int PDFDoc::saveAs(GooString *name, PDFWriteMode mode) {
   FILE *f;
   OutStream *outStr;
-  GBool res;
+  int res;
 
   if (!(f = fopen(name->getCString(), "wb"))) {
     error(-1, "Couldn't open file '%s'", name->getCString());
-    return gFalse;
+    return errOpenFile;
   }
   outStr = new FileOutStream(f,0);
   res = saveAs(outStr, mode);
@@ -478,7 +469,7 @@ GBool PDFDoc::saveAs(GooString *name, PDFWriteMode mode) {
   return res;
 }
 
-GBool PDFDoc::saveAs(OutStream *outStr, PDFWriteMode mode) {
+int PDFDoc::saveAs(OutStream *outStr, PDFWriteMode mode) {
 
   // we don't support files with Encrypt at the moment
   Object obj;
@@ -486,7 +477,7 @@ GBool PDFDoc::saveAs(OutStream *outStr, PDFWriteMode mode) {
   if (!obj.isNull())
   {
     obj.free();
-    return gFalse;
+    return errEncrypted;
   }
   obj.free();
 
@@ -511,17 +502,17 @@ GBool PDFDoc::saveAs(OutStream *outStr, PDFWriteMode mode) {
     }
   }
 
-  return gTrue;
+  return errNone;
 }
 
-GBool PDFDoc::saveWithoutChangesAs(GooString *name) {
+int PDFDoc::saveWithoutChangesAs(GooString *name) {
   FILE *f;
   OutStream *outStr;
-  GBool res;
+  int res;
 
   if (!(f = fopen(name->getCString(), "wb"))) {
     error(-1, "Couldn't open file '%s'", name->getCString());
-    return gFalse;
+    return errOpenFile;
   }
   
   outStr = new FileOutStream(f,0);
@@ -533,7 +524,7 @@ GBool PDFDoc::saveWithoutChangesAs(GooString *name) {
   return res;
 }
 
-GBool PDFDoc::saveWithoutChangesAs(OutStream *outStr) {
+int PDFDoc::saveWithoutChangesAs(OutStream *outStr) {
   int c;
   
   str->reset();
@@ -542,7 +533,7 @@ GBool PDFDoc::saveWithoutChangesAs(OutStream *outStr) {
   }
   str->close();
 
-  return gTrue;
+  return errNone;
 }
 
 void PDFDoc::saveIncrementalUpdate (OutStream* outStr)
@@ -590,7 +581,7 @@ void PDFDoc::saveIncrementalUpdate (OutStream* outStr)
 
 void PDFDoc::saveCompleteRewrite (OutStream* outStr)
 {
-  outStr->printf("%%PDF-%.1f\r\n",pdfVersion);
+  outStr->printf("%%PDF-%d.%d\r\n",pdfMajorVersion,pdfMinorVersion);
   XRef *uxref = new XRef();
   uxref->add(0, 65535, 0, gFalse);
   for(int i=0; i<xref->getNumObjects(); i++) {
@@ -694,7 +685,7 @@ void PDFDoc::writeString (GooString* s, OutStream* outStr)
   } else {
     const char* c = s->getCString();
     outStr->printf("(");
-    while(*c!='\0') {
+    for(int i=0; i<s->getLength(); i++) {
       char unescaped = (*c)&0x000000ff;
       //escape if needed
       if (unescaped == '(' || unescaped == ')' || unescaped == '\\')
@@ -724,8 +715,12 @@ Guint PDFDoc::writeObject (Object* obj, Ref* ref, OutStream* outStr)
       outStr->printf("%i ", obj->getInt());
       break;
     case objReal:
-      outStr->printf("%g ", obj->getReal());
+    {
+      GooString s;
+      s.appendf("{0:.10g}", obj->getReal());
+      outStr->printf("%s ", s.getCString());
       break;
+    }
     case objString:
       writeString(obj->getString(), outStr);
       break;
@@ -738,7 +733,7 @@ Guint PDFDoc::writeObject (Object* obj, Ref* ref, OutStream* outStr)
       break;
     }
     case objNull:
-      outStr->printf( "null");
+      outStr->printf( "null ");
       break;
     case objArray:
       array = obj->getArray();
@@ -777,6 +772,18 @@ Guint PDFDoc::writeObject (Object* obj, Ref* ref, OutStream* outStr)
           obj1.free();
         } else {
           //raw stream copy
+          FilterStream *fs = dynamic_cast<FilterStream*>(stream);
+          if (fs) {
+            BaseStream *bs = fs->getBaseStream();
+            if (bs) {
+              Guint streamEnd;
+                if (xref->getStreamEnd(bs->getStart(), &streamEnd)) {
+                  Object val;
+                  val.initInt(streamEnd - bs->getStart());
+                  stream->getDict()->set("Length", &val);
+                }
+              }
+          }
           writeDictionnary (stream->getDict(), outStr);
           writeRawStream (stream, outStr);
         }
@@ -824,7 +831,10 @@ void PDFDoc::writeTrailer (Guint uxrefOffset, int uxrefSize, OutStream* outStr, 
   char buffer[256];
   sprintf(buffer, "%i", (int)time(NULL));
   message.append(buffer);
-  message.append(fileName);
+  if (fileName)
+    message.append(fileName);
+  else
+    message.append("streamwithoutfilename.pdf");
   // file size
   unsigned int fileSize = 0;
   int c;
@@ -855,7 +865,7 @@ void PDFDoc::writeTrailer (Guint uxrefOffset, int uxrefSize, OutStream* outStr, 
   obj1.initString(new GooString((const char*)digest, 16));
 
   //create ID array
-  Object obj2,obj3,obj4;
+  Object obj2,obj3,obj4,obj5;
   obj2.initArray(xref);
 
   if (incrUpdate) {
@@ -888,6 +898,12 @@ void PDFDoc::writeTrailer (Guint uxrefOffset, int uxrefSize, OutStream* outStr, 
     obj1.initInt(xref->getLastXRefPos());
     trailerDict->set("Prev", &obj1);
   }
+  
+  xref->getDocInfoNF(&obj5);
+  if (!obj5.isNull()) {
+    trailerDict->set("Info", &obj5);
+  }
+  
   outStr->printf( "trailer\r\n");
   writeDictionnary(trailerDict, outStr);
   outStr->printf( "\r\nstartxref\r\n");

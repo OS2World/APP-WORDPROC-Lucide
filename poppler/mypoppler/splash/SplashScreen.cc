@@ -47,12 +47,12 @@ static int cmpDistances(const void *p0, const void *p1) {
 // (gamma = 1 / 1.33) is also computed here.
 SplashScreen::SplashScreen(SplashScreenParams *params) {
   Guchar u, black, white;
-  int i;
+  int i; 
 
   if (!params) {
     params = &defaultParams;
   }
-
+  
   switch (params->type) {
 
   case splashScreenDispersed:
@@ -362,7 +362,7 @@ SplashScreen::~SplashScreen() {
 
 int SplashScreen::test(int x, int y, Guchar value) {
   int xx, yy;
-
+  
   if (value < minVal) {
     return 0;
   }

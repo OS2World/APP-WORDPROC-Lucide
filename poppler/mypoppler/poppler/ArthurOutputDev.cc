@@ -14,8 +14,10 @@
 // under GPL version 2 or later
 //
 // Copyright (C) 2005 Brad Hards <bradh@frogmouth.net>
-// Copyright (C) 2005-2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2005-2009 Albert Astals Cid <aacid@kde.org>
 // Copyright (C) 2008 Pino Toscano <pino@kde.org>
+// Copyright (C) 2009 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2009 Petr Gajdos <pgajdos@novell.com>
 //
 // To see a description of the changes please see the Changelog file that
 // came with your tarball or type make ChangeLog if you are building from git
@@ -104,6 +106,7 @@ void ArthurOutputDev::startDoc(XRef *xrefA) {
 #endif
 #if HAVE_FREETYPE_FREETYPE_H || HAVE_FREETYPE_H
   globalParams->getEnableFreeType(),
+  gFalse,
 #endif
   m_painter->testRenderHint(QPainter::TextAntialiasing));
 }
@@ -264,6 +267,7 @@ void ArthurOutputDev::updateFont(GfxState *state)
   SplashCoord mat[4];
   int substIdx, n;
   int faceIndex = 0;
+  SplashCoord matrix[6];
 
   m_needFontUpdate = false;
   m_font = NULL;
@@ -449,7 +453,6 @@ void ArthurOutputDev::updateFont(GfxState *state)
   m21 = textMat[2] * fontSize;
   m22 = textMat[3] * fontSize;
 
-  SplashCoord matrix[6];
   {
   QMatrix painterMatrix = m_painter->worldMatrix();
   matrix[0] = painterMatrix.m11();
@@ -662,7 +665,7 @@ void ArthurOutputDev::endTextObject(GfxState *state)
 
 void ArthurOutputDev::drawImageMask(GfxState *state, Object *ref, Stream *str,
 				    int width, int height, GBool invert,
-				    GBool inlineImg)
+				    GBool interpolate, GBool inlineImg)
 {
   qDebug() << "drawImageMask";
 #if 0
@@ -731,6 +734,7 @@ void ArthurOutputDev::drawImageMask(GfxState *state, Object *ref, Stream *str,
   cairo_pattern_destroy (pattern);
   cairo_surface_destroy (image);
   free (buffer);
+  imgStr->close ();
   delete imgStr;
 #endif
 }
@@ -739,7 +743,7 @@ void ArthurOutputDev::drawImageMask(GfxState *state, Object *ref, Stream *str,
 void ArthurOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
 				int width, int height,
 				GfxImageColorMap *colorMap,
-				int *maskColors, GBool inlineImg)
+				GBool interpolate, int *maskColors, GBool inlineImg)
 {
   unsigned char *buffer;
   unsigned int *dest;
@@ -751,7 +755,7 @@ void ArthurOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
   QMatrix matrix;
   int is_identity_transform;
   
-  buffer = (unsigned char *)gmalloc (width * height * 4);
+  buffer = (unsigned char *)gmallocn3(width, height, 4);
 
   /* TODO: Do we want to cache these? */
   imgStr = new ImageStream(str, width,
@@ -762,8 +766,8 @@ void ArthurOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
   /* ICCBased color space doesn't do any color correction
    * so check its underlying color space as well */
   is_identity_transform = colorMap->getColorSpace()->getMode() == csDeviceRGB ||
-		  colorMap->getColorSpace()->getMode() == csICCBased && 
-		  ((GfxICCBasedColorSpace*)colorMap->getColorSpace())->getAlt()->getMode() == csDeviceRGB;
+		  (colorMap->getColorSpace()->getMode() == csICCBased && 
+		  ((GfxICCBasedColorSpace*)colorMap->getColorSpace())->getAlt()->getMode() == csDeviceRGB);
 
   if (maskColors) {
     for (y = 0; y < height; y++) {

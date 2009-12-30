@@ -60,7 +60,7 @@
 #define pclose _pclose
 #endif
 
-#if defined(VMS) || defined(VMCMS) || defined(DOS) || defined(OS2) || defined(__EMX__) || defined(WIN32) || defined(__DJGPP__) || defined(MACOS)
+#if defined(VMS) || defined(VMCMS) || defined(DOS) || defined(OS2) || defined(__EMX__) || defined(_WIN32) || defined(__DJGPP__) || defined(MACOS)
 #define POPEN_READ_MODE "rb"
 #else
 #define POPEN_READ_MODE "r"
@@ -70,12 +70,8 @@
 // Win32 stuff
 //------------------------------------------------------------------------
 
-#ifdef CDECL
-/* #undef CDECL */
-#endif
-
-#if defined(_MSC_VER) || defined(__BORLANDC__)
-#define CDECL __cdecl
+#if defined(_WIN32) && !defined(_MSC_VER)
+#include <windef.h>
 #else
 #define CDECL
 #endif

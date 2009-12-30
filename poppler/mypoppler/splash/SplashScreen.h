@@ -36,7 +36,6 @@ public:
   GBool isStatic(Guchar value);
 
 private:
-
   void buildDispersedMatrix(int i, int j, int val,
 			    int delta, int offset);
   void buildClusteredMatrix();

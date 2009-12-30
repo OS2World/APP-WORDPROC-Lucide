@@ -12,13 +12,16 @@
 //
 // Copyright (C) 2005 Martin Kretzschmar <martink@gnome.org>
 // Copyright (C) 2005, 2006 Kristian Høgsberg <krh@redhat.com>
-// Copyright (C) 2005, 2007, 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2005, 2007-2009 Albert Astals Cid <aacid@kde.org>
 // Copyright (C) 2005 Jonathan Blandford <jrb@redhat.com>
 // Copyright (C) 2006, 2007 Jeff Muizelaar <jeff@infidigm.net>
 // Copyright (C) 2006 Takashi Iwai <tiwai@suse.de>
 // Copyright (C) 2006 Ed Catmur <ed@catmur.co.uk>
 // Copyright (C) 2007 Krzysztof Kowalczyk <kkowalczyk@gmail.com>
-// Copyright (C) 2007 Jonathan Kew <jonathan_kew@sil.org>
+// Copyright (C) 2007, 2009 Jonathan Kew <jonathan_kew@sil.org>
+// Copyright (C) 2009 Petr Gajdos <pgajdos@novell.com>
+// Copyright (C) 2009 William Bader <williambader@hotmail.com>
+// Copyright (C) 2009 Kovid Goyal <kovid@kovidgoyal.net>
 //
 // To see a description of the changes please see the Changelog file that
 // came with your tarball or type make ChangeLog if you are building from git
@@ -35,11 +38,11 @@
 #include <stdio.h>
 #include <ctype.h>
 #ifdef ENABLE_PLUGINS
-#  ifndef WIN32
+#  ifndef _WIN32
 #    include <dlfcn.h>
 #  endif
 #endif
-#ifdef WIN32
+#ifdef _WIN32
 #  include <shlobj.h>
 #endif
 #include "goo/gmem.h"
@@ -60,7 +63,7 @@
 #include "GlobalParams.h"
 #include "GfxFont.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #  define strcasecmp stricmp
 #endif
 
@@ -89,7 +92,7 @@
 #include "UTF8.h"
 
 #ifdef ENABLE_PLUGINS
-#  ifdef WIN32
+#  ifdef _WIN32
 extern XpdfPluginVecTable xpdfPluginVecTable;
 #  endif
 #endif
@@ -137,7 +140,7 @@ DisplayFontParam::~DisplayFontParam() {
   }
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 
 //------------------------------------------------------------------------
 // WinFontInfo
@@ -380,7 +383,7 @@ int CALLBACK WinFontList::enumFunc2(CONST LOGFONT *font,
   return 1;
 }
 
-#endif // WIN32
+#endif // _WIN32
 
 //------------------------------------------------------------------------
 // PSFontParam
@@ -415,7 +418,7 @@ public:
 
 private:
 
-#ifdef WIN32
+#ifdef _WIN32
   Plugin(HMODULE libA);
   HMODULE lib;
 #else
@@ -429,7 +432,7 @@ Plugin *Plugin::load(char *type, char *name) {
   Plugin *plugin;
   XpdfPluginVecTable *vt;
   XpdfBool (*xpdfInitPlugin)(void);
-#ifdef WIN32
+#ifdef _WIN32
   HMODULE libA;
 #else
   void *dlA;
@@ -440,7 +443,7 @@ Plugin *Plugin::load(char *type, char *name) {
   appendToPath(path, type);
   appendToPath(path, name);
 
-#ifdef WIN32
+#ifdef _WIN32
   path->append(".dll");
   if (!(libA = LoadLibrary(path->getCString()))) {
     error(-1, "Failed to load plugin '%s'",
@@ -474,7 +477,7 @@ Plugin *Plugin::load(char *type, char *name) {
   }
   memcpy(vt, &xpdfPluginVecTable, sizeof(xpdfPluginVecTable));
 
-#ifdef WIN32
+#ifdef _WIN32
   if (!(xpdfInitPlugin = (XpdfBool (*)(void))
 	                     GetProcAddress(libA, "xpdfInitPlugin"))) {
     error(-1, "Failed to find xpdfInitPlugin in plugin '%s'",
@@ -495,7 +498,7 @@ Plugin *Plugin::load(char *type, char *name) {
     goto err2;
   }
 
-#ifdef WIN32
+#ifdef _WIN32
   plugin = new Plugin(libA);
 #else
   plugin = new Plugin(dlA);
@@ -505,7 +508,7 @@ Plugin *Plugin::load(char *type, char *name) {
   return plugin;
 
  err2:
-#ifdef WIN32
+#ifdef _WIN32
   FreeLibrary(libA);
 #else
   dlclose(dlA);
@@ -515,7 +518,7 @@ Plugin *Plugin::load(char *type, char *name) {
   return NULL;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 Plugin::Plugin(HMODULE libA) {
   lib = libA;
 }
@@ -528,7 +531,7 @@ Plugin::Plugin(void *dlA) {
 Plugin::~Plugin() {
   void (*xpdfFreePlugin)(void);
 
-#ifdef WIN32
+#ifdef _WIN32
   if ((xpdfFreePlugin = (void (*)(void))
                             GetProcAddress(lib, "xpdfFreePlugin"))) {
     (*xpdfFreePlugin)();
@@ -548,7 +551,9 @@ Plugin::~Plugin() {
 // parsing
 //------------------------------------------------------------------------
 
-GlobalParams::GlobalParams() {
+GlobalParams::GlobalParams(const char *customPopplerDataDir)
+  : popplerDataDir(customPopplerDataDir)
+{
   UnicodeMap *map;
   int i;
 
@@ -574,7 +579,7 @@ GlobalParams::GlobalParams() {
     }
   }
 
-#ifdef WIN32
+#ifdef _WIN32
   // baseDir will be set by a call to setBaseDir
   baseDir = new GooString();
 #else
@@ -599,11 +604,12 @@ GlobalParams::GlobalParams() {
   psEmbedTrueType = gTrue;
   psEmbedCIDPostScript = gTrue;
   psEmbedCIDTrueType = gTrue;
+  psSubstFonts = gTrue;
   psPreload = gFalse;
   psOPI = gFalse;
   psASCIIHex = gFalse;
   textEncoding = new GooString("UTF-8");
-#if defined(WIN32)
+#if defined(_WIN32)
   textEOL = eolDOS;
 #elif defined(MACOS)
   textEOL = eolMac;
@@ -635,7 +641,8 @@ GlobalParams::GlobalParams() {
   unicodeMapCache = new UnicodeMapCache();
   cMapCache = new CMapCache();
 
-#ifdef WIN32
+#ifdef _WIN32
+  baseFontsInitialized = gFalse;
   winFontList = NULL;
 #endif
 
@@ -673,8 +680,14 @@ GlobalParams::GlobalParams() {
 void GlobalParams::scanEncodingDirs() {
   GDir *dir;
   GDirEntry *entry;
-
-  dir = new GDir(POPPLER_DATADIR "/nameToUnicode", gTrue);
+  const char *dataRoot = popplerDataDir ? popplerDataDir : POPPLER_DATADIR;
+  
+  // allocate buffer large enough to append "/nameToUnicode"
+  size_t bufSize = strlen(dataRoot) + strlen("/nameToUnicode") + 1;
+  char *dataPathBuffer = new char[bufSize];
+  
+  snprintf(dataPathBuffer, bufSize, "%s/nameToUnicode", dataRoot);
+  dir = new GDir(dataPathBuffer, gTrue);
   while (entry = dir->getNextEntry(), entry != NULL) {
     if (!entry->isDir()) {
       parseNameToUnicode(entry->getFullPath());
@@ -683,27 +696,32 @@ void GlobalParams::scanEncodingDirs() {
   }
   delete dir;
 
-  dir = new GDir(POPPLER_DATADIR "/cidToUnicode", gFalse);
+  snprintf(dataPathBuffer, bufSize, "%s/cidToUnicode", dataRoot);
+  dir = new GDir(dataPathBuffer, gFalse);
   while (entry = dir->getNextEntry(), entry != NULL) {
     addCIDToUnicode(entry->getName(), entry->getFullPath());
     delete entry;
   }
   delete dir;
 
-  dir = new GDir(POPPLER_DATADIR "/unicodeMap", gFalse);
+  snprintf(dataPathBuffer, bufSize, "%s/unicodeMap", dataRoot);
+  dir = new GDir(dataPathBuffer, gFalse);
   while (entry = dir->getNextEntry(), entry != NULL) {
     addUnicodeMap(entry->getName(), entry->getFullPath());
     delete entry;
   }
   delete dir;
 
-  dir = new GDir(POPPLER_DATADIR "/cMap", gFalse);
+  snprintf(dataPathBuffer, bufSize, "%s/cMap", dataRoot);
+  dir = new GDir(dataPathBuffer, gFalse);
   while (entry = dir->getNextEntry(), entry != NULL) {
     addCMapDir(entry->getName(), entry->getFullPath());
     toUnicodeDirs->append(entry->getFullPath()->copy());
     delete entry;
   }
   delete dir;
+  
+  delete[] dataPathBuffer;
 }
 
 void GlobalParams::parseNameToUnicode(GooString *name) {
@@ -788,7 +806,7 @@ GlobalParams::~GlobalParams() {
   deleteGooHash(unicodeMaps, GooString);
   deleteGooList(toUnicodeDirs, GooString);
   deleteGooHash(displayFonts, DisplayFontParam);
-#ifdef WIN32
+#ifdef _WIN32
   delete winFontList;
 #endif
   deleteGooHash(psFonts, PSFontParam);
@@ -1274,6 +1292,15 @@ GBool GlobalParams::getPSEmbedCIDTrueType() {
   return e;
 }
 
+GBool GlobalParams::getPSSubstFonts() {
+  GBool e;
+
+  lockGlobalParams;
+  e = psSubstFonts;
+  unlockGlobalParams;
+  return e;
+}
+
 GBool GlobalParams::getPSPreload() {
   GBool preload;
 
@@ -1550,11 +1577,11 @@ UnicodeMap *GlobalParams::getUnicodeMap2(GooString *encodingName) {
   return map;
 }
 
-CMap *GlobalParams::getCMap(GooString *collection, GooString *cMapName) {
+CMap *GlobalParams::getCMap(GooString *collection, GooString *cMapName, Stream *stream) {
   CMap *cMap;
 
   lockCMapCache;
-  cMap = cMapCache->getCMap(collection, cMapName);
+  cMap = cMapCache->getCMap(collection, cMapName, stream);
   unlockCMapCache;
   return cMap;
 }
@@ -1631,6 +1658,12 @@ void GlobalParams::setPSEmbedCIDPostScript(GBool embed) {
 void GlobalParams::setPSEmbedCIDTrueType(GBool embed) {
   lockGlobalParams;
   psEmbedCIDTrueType = embed;
+  unlockGlobalParams;
+}
+
+void GlobalParams::setPSSubstFonts(GBool substFonts) {
+  lockGlobalParams;
+  psSubstFonts = substFonts;
   unlockGlobalParams;
 }
 

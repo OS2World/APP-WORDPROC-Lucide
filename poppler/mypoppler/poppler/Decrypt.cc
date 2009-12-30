@@ -15,6 +15,8 @@
 //
 // Copyright (C) 2008 Julien Rebetez <julien@fhtagn.net>
 // Copyright (C) 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2009 Matthias Franz <matthias@ktug.or.kr>
+// Copyright (C) 2009 David Benjamin <davidben@mit.edu>
 //
 // To see a description of the changes please see the Changelog file that
 // came with your tarball or type make ChangeLog if you are building from git
@@ -75,7 +77,7 @@ GBool Decrypt::makeFileKey(int encVersion, int encRevision, int keyLength,
     md5(test, 32, test);
     if (encRevision == 3) {
       for (i = 0; i < 50; ++i) {
-	md5(test, 16, test);
+	md5(test, keyLength, test);
       }
     }
     if (encRevision == 2) {
@@ -236,6 +238,7 @@ DecryptStream::~DecryptStream() {
 void DecryptStream::reset() {
   int i;
 
+  charactersRead = 0;
   str->reset();
   switch (algo) {
   case cryptRC4:
@@ -251,6 +254,10 @@ void DecryptStream::reset() {
     state.aes.bufIdx = 16;
     break;
   }
+}
+
+int DecryptStream::getPos() {
+  return charactersRead;
 }
 
 int DecryptStream::getChar() {
@@ -287,6 +294,8 @@ int DecryptStream::getChar() {
     }
     break;
   }
+  if (c != EOF)
+    charactersRead++;
   return c;
 }
 

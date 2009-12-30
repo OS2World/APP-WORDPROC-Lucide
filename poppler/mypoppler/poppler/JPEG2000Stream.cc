@@ -4,7 +4,7 @@
 //
 // A JPX stream decoder using OpenJPEG
 //
-// Copyright 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright 2008, 2009 Albert Astals Cid <aacid@kde.org>
 //
 // Licensed under GPLv2 or later
 //
@@ -53,7 +53,13 @@ int JPXStream::getChar() {
 
 void JPXStream::init()
 {
+  Object oLen;
+  if (getDict()) getDict()->lookup("Length", &oLen);
+
   int bufSize = BUFFER_INCREASE;
+  if (oLen.isInt()) bufSize = oLen.getInt();
+  oLen.free();
+
   unsigned char *buf = (unsigned char*)gmallocn(bufSize, sizeof(unsigned char));
   int index = 0;
 
@@ -61,13 +67,13 @@ void JPXStream::init()
   int c = str->getChar();
   while(c != EOF)
   {
-    buf[index] = c;
-    ++index;
     if (index >= bufSize)
     {
       bufSize += BUFFER_INCREASE;
       buf = (unsigned char*)greallocn(buf, bufSize, sizeof(unsigned char));
     }
+    buf[index] = c;
+    ++index;
     c = str->getChar();
   }
 
@@ -80,11 +86,11 @@ void JPXStream::init()
 }
 
 static void libopenjpeg_error_callback(const char *msg, void * /*client_data*/) {
-  error(-1, (char*)msg);
+  error(-1, "%s", msg);
 }
 
 static void libopenjpeg_warning_callback(const char *msg, void * /*client_data*/) {
-  error(-1, (char*)msg);
+  error(-1, "%s", msg);
 }
 
 void JPXStream::init2(unsigned char *buf, int bufLen, OPJ_CODEC_FORMAT format)
