@@ -19,7 +19,7 @@ OBJS3 = DjVuPort.o GMapAreas.o DjVuAnno.o GIFFManager.o DjVuText.o \
     DjVmDir.o DjVmDoc.o DjVmDir0.o DjVmNav.o DjVuNavDir.o
 OBJS4 = DjVuErrorList.o DjVuDocEditor.o DjVuToPS.o DjVuDumpHelper.o \
     DjVuMessageLite.o DjVuMessage.o GUnicode.o UnicodeByteStream.o \
-    XMLParser.o XMLTags.o miniexp.o ddjvuapi.o debug.o
+    XMLParser.o XMLTags.o miniexp.o ddjvuapi.o debug.o atomic.o
 
        
 all: $(LIBS)

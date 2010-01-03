@@ -84,13 +84,13 @@ static LuSignatureCheck lsc  = { 1, &lsl };
 // getSignatureCheck is optional
 extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 {
-	return &lsc;
+    return &lsc;
 }
 
 
 extern "C" char * EXPENTRY getDescription()
 {
-    return "DjVu plugin, based on DjVuLibre v3.5.19";
+    return "DjVu plugin, based on DjVuLibre v3.5.22";
 }
 
 
