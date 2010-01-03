@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DataPool.h,v 1.12 2007/03/25 20:48:29 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DataPool.h,v 1.13 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -98,7 +98,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DataPool.h,v 1.12 2007/03/25 20:48:29 leonb Exp $#
+    @version #$Id: DataPool.h,v 1.13 2007/05/19 03:07:33 leonb Exp $#
 */
 
 //@{
@@ -224,7 +224,7 @@ class ByteStream;
     \end{enumerate}
 */
 
-class DataPool : public GPEnabled
+class DJVUAPI DataPool : public GPEnabled
 {
 public: // Classes used internally by DataPool
 	// These are declared public to support buggy C++ compilers.

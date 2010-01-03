@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GRect.h,v 1.12 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GRect.h,v 1.13 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _GRECT_H_
 #define _GRECT_H_
@@ -77,7 +77,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.12 2007/03/25 20:48:32 leonb Exp $# */
+    #$Id: GRect.h,v 1.13 2007/05/19 03:07:33 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -138,7 +138,7 @@ namespace DJVU {
     intersection of rectangles (\Ref{intersect}) or the smallest rectangle
     enclosing two rectangles (\Ref{recthull}).  */
 
-class GRect 
+class DJVUAPI GRect 
 {
 public:
   /** Constructs an empty rectangle */
@@ -210,7 +210,7 @@ public:
     matching corners of the second rectangle. The scaling operation is
     performed using integer fraction arithmetic in order to maximize
     accuracy. */
-class GRectMapper 
+class DJVUAPI GRectMapper 
 {
 public:
   /** Constructs a rectangle mapper. */

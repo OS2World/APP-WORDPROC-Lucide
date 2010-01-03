@@ -54,7 +54,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: JB2Image.cpp,v 1.13 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

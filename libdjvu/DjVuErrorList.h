@@ -54,7 +54,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DjVuErrorList.h,v 1.10 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVUERRORLIST_H
 #define _DJVUERRORLIST_H

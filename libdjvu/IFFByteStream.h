@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: IFFByteStream.h,v 1.12 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: IFFByteStream.h,v 1.13 2007/05/19 03:07:34 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _IFFBYTESTREAM_H_
 #define _IFFBYTESTREAM_H_
@@ -123,7 +123,7 @@
 // with their re-implementation of ByteStreams.
 
     @version
-    #$Id: IFFByteStream.h,v 1.12 2007/03/25 20:48:32 leonb Exp $# */
+    #$Id: IFFByteStream.h,v 1.13 2007/05/19 03:07:34 leonb Exp $# */
 //@{
 
 
@@ -180,7 +180,7 @@ namespace DJVU {
     \Ref{ByteStream::copy} to transfer the IFF file into a non seekable
     ByteStream.  */
 
-class IFFByteStream : protected ByteStream::Wrapper
+class DJVUAPI IFFByteStream : protected ByteStream::Wrapper
 {
 protected: 
   IFFByteStream(const GP<ByteStream> &bs, const int pos);

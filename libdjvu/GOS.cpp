@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GOS.cpp,v 1.14 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GOS.cpp,v 1.17 2008/03/10 13:58:54 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -74,15 +74,25 @@
 #include <math.h>
 #include <string.h>
 
-#ifdef WIN32
-# include <atlbase.h>
-# include <windows.h>
-# include <direct.h>
+#if defined(__CYGWIN32__)
+# define UNIX 1
 #endif
 
-#ifdef OS2
+#if defined(WIN32) && !defined(UNIX)
+# include <windows.h>
+# include <direct.h>
+# define getcwd _getcwd
+#endif
+
+#if defined(OS2)
 # define INCL_DOS
 # include <os2.h>
+#endif
+
+#if defined(macintosh) && !defined(UNIX)
+# include <unix.h>
+# include <errno.h>
+# include <unistd.h>
 #endif
 
 #if defined(UNIX) || defined(OS2)
@@ -96,11 +106,6 @@
 # include <unistd.h>
 #endif
 
-#ifdef macintosh
-# include <unix.h>
-# include <errno.h>
-# include <unistd.h>
-#endif
 
 // -- TRUE FALSE
 #undef TRUE
@@ -165,14 +170,15 @@ static const char nillchar=0;
 static inline int
 finddirsep(const GUTF8String &fname)
 {
-#if defined(UNIX)
-  return fname.rsearch('/',0);
-#elif defined(WIN32) || defined(OS2)
+/* Lucide */
+#if defined(WIN32) || defined(OS2)
   return fname.rcontains("\\/",0);
+#elif defined(UNIX)
+  return fname.rsearch('/',0);
 #elif defined(macintosh)
   return fname.rcontains(":/",0);
 #else
-#error "Define something here for your operating system"
+# error "Define something here for your operating system"
 #endif  
 }
 
@@ -342,7 +348,7 @@ GOS::cwd(const GUTF8String &dirname)
   GetFullPathName(drv, MAXPATHLEN, string_buffer, &result);
   return GNativeString(string_buffer).getNative2UTF8();//MBCS cvt
 #else
-#error "Define something here for your operating system"
+# error "Define something here for your operating system"
 #endif 
 }
 

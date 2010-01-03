@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: debug.h,v 1.13 2007/03/25 20:48:35 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: debug.h,v 1.14 2007/05/12 18:53:31 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
@@ -67,10 +67,6 @@
 #endif
 
 #include <stdio.h>
-#ifdef WIN32
-# include <atlbase.h> // USES_CONVERSION, A2CT macro
-# include <windows.h> // OutputDebugString
-#endif 
 
 
 #ifdef HAVE_NAMESPACES
@@ -128,7 +124,7 @@ namespace DJVU {
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.13 2007/03/25 20:48:35 leonb Exp $#
+    #$Id: debug.h,v 1.14 2007/05/12 18:53:31 leonb Exp $#
     @author
     Andrew Erofeev <eaf@geocities.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */

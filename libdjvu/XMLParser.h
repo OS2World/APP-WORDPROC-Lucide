@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: XMLParser.h,v 1.10 2007/03/25 20:48:34 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: XMLParser.h,v 1.11 2008/01/27 11:36:27 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _LT_XMLPARSER__
 #define _LT_XMLPARSER__
@@ -88,7 +88,7 @@ class GBitmap;
 
 // this is the base class for using XML to change DjVu Docs.
 
-class lt_XMLParser : public GPEnabled
+class DJVUAPI lt_XMLParser : public GPEnabled
 {
 public:
   class Impl;

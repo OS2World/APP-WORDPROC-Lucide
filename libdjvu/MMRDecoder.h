@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: MMRDecoder.h,v 1.10 2007/03/25 20:48:33 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: MMRDecoder.h,v 1.11 2008/01/27 11:36:27 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _MMRDECODER_H_
 #define _MMRDECODER_H_
@@ -133,7 +133,7 @@ class JB2Image;
     @memo
     CCITT-G4/MMR decoder.
     @version
-    #$Id: MMRDecoder.h,v 1.10 2007/03/25 20:48:33 leonb Exp $#
+    #$Id: MMRDecoder.h,v 1.11 2008/01/27 11:36:27 leonb Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> \\
     Leon Bottou <leonb@research.att.com> */
@@ -150,7 +150,7 @@ class JB2Image;
     the static member function \Ref{MMRDecoder::decode}.  This
     function internally creates an instance of #MMRDecoder# which
     processes the MMR data scanline by scanline.  */
-class MMRDecoder : public GPEnabled
+class DJVUAPI MMRDecoder : public GPEnabled
 {
 protected:
   MMRDecoder(const int width, const int height);

@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GIFFManager.cpp,v 1.9 2007/03/25 20:48:31 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GIFFManager.cpp,v 1.10 2008/08/05 20:50:35 bpearlmutter Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -117,7 +117,7 @@ GIFFChunk::set_name(GUTF8String name)
 
   if (name.contains(".[]")>=0)
     G_THROW( ERR_MSG("GIFFManager.bad_char") );
-   
+
   strncpy(GIFFChunk::name, (const char *)name, 4);
   GIFFChunk::name[4]=0;
   for(int i=strlen(GIFFChunk::name);i<4;i++)
@@ -130,16 +130,16 @@ GIFFChunk::check_name(GUTF8String name)
   GUTF8String type;
   const int colon=name.search(':');
   if(colon>=0)
-  {
-    type=name.substr(0,colon);
-    name=name.substr(colon+1,(unsigned int)-1);
-  }
- 
+    {
+      type=name.substr(0,colon);
+      name=name.substr(colon+1,(unsigned int)-1);
+    }
+
   const GUTF8String sname=(name.substr(0,4)+"    ").substr(0,4);
 
   DEBUG_MSG("GIFFChunk::check_name(): type='" << type << "' name='" << sname << "'\n");
-  return (type==GIFFChunk::type || !type.length() && GIFFChunk::type=="FORM")
-       && sname==GIFFChunk::name;
+  return (type==GIFFChunk::type || (!type.length() && GIFFChunk::type=="FORM"))
+    && sname==GIFFChunk::name;
 }
 
 void

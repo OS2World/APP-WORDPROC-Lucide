@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 // -------------------------------------------------------------------
 */
-/* $Id: miniexp.h,v 1.14 2007/03/25 20:48:35 leonb Exp $ */
+/* $Id: miniexp.h,v 1.22 2008/07/06 00:04:37 leonb Exp $ */
 
 #ifndef MINIEXP_H
 #define MINIEXP_H
@@ -27,6 +27,15 @@ extern "C" {
 # endif
 #endif
 
+#ifndef MINILISPAPI
+# ifdef WIN32
+#  ifdef DLL_EXPORT
+#   define MINILISPAPI __declspec(dllexport)
+#  else
+#   define MINILISPAPI __declspec(dllimport)
+#  endif
+# endif
+#endif
 #ifndef MINILISPAPI
 # define MINILISPAPI /**/
 #endif
@@ -285,7 +294,10 @@ MINILISPAPI miniexp_t miniexp_concat(miniexp_t l);
    can reference an arbitrary lisp expression.  Garbage
    collection preserves all lisp expressions referenced by a
    minivar, as well as all lisp expressions that can be
-   accessed from these.
+   accessed from these. When called automatically, 
+   garbage collection also preserves the sixteen most recently 
+   created miniexps in order to make sure that temporaries do 
+   not vanish in the middle of complicated C expressions.
      
    The minivar class is designed such that C++ program can
    directly use instances of <minivar_t> as normal
@@ -314,7 +326,7 @@ MINILISPAPI miniexp_t miniexp_concat(miniexp_t l);
      garbage collection: miniexp_cons(), miniexp_object(),
      miniexp_string(), miniexp_substring(),
      miniexp_concat(), miniexp_pprin(), miniexp_pprint(),
-     miniexp_gc(), and miniexp_release_gc_lock().  A
+     miniexp_gc(), and minilisp_release_gc_lock().  A
      function that does not cause calls to these functions
      does not need to bother about minivars.
 
@@ -336,8 +348,8 @@ MINILISPAPI miniexp_t miniexp_concat(miniexp_t l);
    Wrappers are provided to allocate minivars and to access
    their value. This is somehow inconvenient.  It might be
    more practical to control the garbage collector
-   invocations with <miniexp_acquire_gc_lock()> and
-   <miniexp_release_gc_lock()>...  */
+   invocations with <minilisp_acquire_gc_lock()> and
+   <minilisp_release_gc_lock()>...  */
    
 
 /* minilisp_gc --
@@ -409,7 +421,7 @@ MINILISPAPI void minilisp_debug(int debugflag);
 /* minilisp_finish --
    Deallocates everything.  This is only useful when using
    development tools designed to check for memory leaks.  
-   No miniexp function can be used after calliang this. */
+   No miniexp function can be used after calling this. */
 
 MINILISPAPI void minilisp_finish(void);
 
@@ -418,7 +430,7 @@ MINILISPAPI void minilisp_finish(void);
 /* INPUT/OUTPUT                                       */
 /* -------------------------------------------------- */
 
-/* Notes about the textual represenation of miniexps.
+/* Notes about the textual representation of miniexps.
 
    - Special characters are:
      * the parenthesis <(> and <)>,
@@ -541,8 +553,8 @@ typedef void minilisp_mark_t(miniexp_t *pp);
 /* minivar_t --
    A class for protected garbage collector variables. */
 
-MINILISPAPI 
-class minivar_t 
+class MINILISPAPI 
+minivar_t 
 {
   miniexp_t data;
   minivar_t *next;
@@ -570,27 +582,30 @@ public:
    The base class for c++ objects 
    represented by object expressions. */
 
-MINILISPAPI 
-class miniobj_t {
+class MINILISPAPI 
+miniobj_t {
  public:
   virtual ~miniobj_t();
 
   /* --- stuff defined by MINIOBJ_DECLARE --- */
   /* classname: a symbol characterizing this class. */
-  static miniexp_t classname;
+  static const miniexp_t classname;
   /* classof: class name symbol for this object. */
   virtual miniexp_t classof() const = 0;
   /* isa -- tests if this is an instance of <classname>. */
   virtual bool isa(miniexp_t classname) const;
 
   /* --- optional stuff --- */
-  /* mark: iterates over miniexps contained by this object
-     for garbage collecting purposes. */
-  virtual void mark(minilisp_mark_t*);
-
   /* pname: returns a printable name for this object.
      The caller must deallocate the result with delete[]. */
   virtual char *pname() const;
+  /* mark: iterates over miniexps contained by this object
+     for garbage collecting purposes. */
+  virtual void mark(minilisp_mark_t*);
+  /* destroy: called by the garbage collector to
+     deallocate the object. Defaults to 'delete this'. */
+  virtual void destroy();
+     
 };
 
 /* MINIOBJ_DECLARE --
@@ -599,12 +614,12 @@ class miniobj_t {
    the mandatory part of miniobj subclasses. */
 
 #define MINIOBJ_DECLARE(cls, supercls, name) \
-  public: static miniexp_t classname; \
+  public: static const miniexp_t classname; \
           virtual miniexp_t classof() const; \
           virtual bool isa(miniexp_t) const; 
 
 #define MINIOBJ_IMPLEMENT(cls, supercls, name)\
-  miniexp_t cls::classname = miniexp_symbol(name);\
+  const miniexp_t cls::classname = miniexp_symbol(name);\
   miniexp_t cls::classof() const {\
     return cls::classname; }\
   bool cls::isa(miniexp_t n) const {\

@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GException.h,v 1.12 2007/03/25 20:48:31 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GException.h,v 1.13 2007/12/26 09:05:26 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _GEXCEPTION_H_
 #define _GEXCEPTION_H_
@@ -118,7 +118,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.12 2007/03/25 20:48:31 leonb Exp $# */
+    #$Id: GException.h,v 1.13 2007/12/26 09:05:26 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -162,7 +162,7 @@ namespace DJVU {
     throwing and catching exceptions (see \Ref{GException.h}). These macros
     only deal with exceptions of type #GException#. */
 
-class GException {
+class DJVUAPI GException {
 public:
   enum source_type { GINTERNAL=0, GEXTERNAL, GAPPLICATION, GOTHER };
   /** Constructs a GException.  This constructor is usually called by macro
@@ -258,7 +258,7 @@ private:
 // Compiler supports ANSI C++ exceptions.
 // Defined exception macros accordingly.
 
-class GExceptionHandler {
+class DJVUAPI GExceptionHandler {
 public:
 #ifndef NO_LIBGCC_HOOKS
   static void exthrow(const GException &) no_return;
@@ -287,7 +287,7 @@ public:
 // Compiler does not support ANSI C++ exceptions.
 // Emulate with setjmp/longjmp.
 
-class GExceptionHandler {
+class DJVUAPI GExceptionHandler {
 public:
   jmp_buf jump;
   GExceptionHandler *next;
@@ -324,10 +324,9 @@ public:
 #endif // !CPP_SUPPORTS_EXCEPTIONS
 
 
-inline void
-G_EXTHROW
-(const GException &ex,const char *msg=0,const char *file=0,int line=0,
-  const char *func=0, const GException::source_type source=GException::GINTERNAL)
+inline void G_EXTHROW(const GException &ex,
+   const char *msg=0,const char *file=0,int line=0, const char *func=0,
+   const GException::source_type source=GException::GINTERNAL)
 {
   G_EMTHROW( (msg||file||line||func)?
       GException(msg?msg:ex.get_cause(),
@@ -338,10 +337,9 @@ G_EXTHROW
   :ex);
 }
 
-inline void
-G_EXTHROW
-(const char msg[],const char *file=0,int line=0,const char *func=0,
-  const GException::source_type source=GException::GINTERNAL )
+inline void G_EXTHROW(const char msg[],
+   const char *file=0,int line=0,const char *func=0,
+   const GException::source_type source=GException::GINTERNAL )
 {
   G_EMTHROW(GException(msg,file,line,func,source));
 }

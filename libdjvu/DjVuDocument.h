@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuDocument.h,v 1.11 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuDocument.h,v 1.13 2008/01/27 11:36:27 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -92,7 +92,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocument.h,v 1.11 2007/03/25 20:48:30 leonb Exp $#
+    @version #$Id: DjVuDocument.h,v 1.13 2008/01/27 11:36:27 leonb Exp $#
 */
 
 //@{
@@ -213,7 +213,7 @@ class ByteStream;
 	     \end{itemize}
     \end{enumerate} */
     
-class DjVuDocument : public DjVuPort
+class DJVUAPI DjVuDocument : public DjVuPort
 {
 public:
       /** Flags describing the document initialization state.
@@ -757,7 +757,7 @@ public:
 	     \item For #INDIRECT# documents this is the name of top-level
 	           index file. All document files will be saved into the
 		   save directory where the index file will resize. */
-   virtual void		save_as(const GURL &where, const bool bundled=0);
+   virtual void		save_as(const GURL &where, bool bundled=0);
       //@}
       /** Returns pointer to the internal directory of the document, if it
 	  is in one of the new formats: #BUNDLED# or #INDIRECT#.

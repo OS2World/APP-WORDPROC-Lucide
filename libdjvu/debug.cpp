@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: debug.cpp,v 1.15 2007/03/25 20:48:35 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: debug.cpp,v 1.17 2008/01/27 09:24:35 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -77,6 +77,11 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <errno.h>
+
+#ifdef WIN32
+# include <windows.h>  // OutputDebugString
+#endif 
+
 
 #ifdef HAVE_NAMESPACES
 namespace DJVU {
@@ -155,8 +160,7 @@ DjVuDebug::format(const char *fmt, ... )
 #ifdef WIN32
       else
         {
-          USES_CONVERSION;
-          OutputDebugString(A2CT((const char *)buffer));
+          OutputDebugStringA((const char *)buffer);
         }
 #endif
     }

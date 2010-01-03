@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuFile.h,v 1.11 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuFile.h,v 1.12 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -104,7 +104,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuFile.h,v 1.11 2007/03/25 20:48:30 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.12 2007/05/19 03:07:33 leonb Exp $#
 */
 
 //@{
@@ -200,7 +200,7 @@ class DjVuNavDir;
     with \Ref{DjVuDocument}. So please review the documentation on this class
     too. */
 
-class DjVuFile : public DjVuPort
+class DJVUAPI DjVuFile : public DjVuPort
 {
 public:
    enum { DECODING=1, DECODE_OK=2, DECODE_FAILED=4, DECODE_STOPPED=8,

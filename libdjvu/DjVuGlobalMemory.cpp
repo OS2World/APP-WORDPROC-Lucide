@@ -54,7 +54,7 @@
 //C- +------------------------------------------------------------------
 // 
 // $Id: DjVuGlobalMemory.cpp,v 1.7 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

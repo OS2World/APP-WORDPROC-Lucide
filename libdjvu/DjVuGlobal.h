@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuGlobal.h,v 1.11 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuGlobal.h,v 1.12 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVUGLOBAL_H
 #define _DJVUGLOBAL_H
@@ -79,9 +79,7 @@ inline void * operator new(size_t, void * ptr) { return ptr; }
 # ifdef DLL_EXPORT
 #  define DJVUAPI __declspec(dllexport)
 # else
-#  ifdef LIBDJVU_DLL_IMPORT 
-#   define DJVUAPI __declspec(dllimport)
-#  endif
+#  define DJVUAPI __declspec(dllimport)
 # endif
 #endif
 #ifndef DJVUAPI
@@ -102,7 +100,7 @@ inline void * operator new(size_t, void * ptr) { return ptr; }
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.11 2007/03/25 20:48:30 leonb Exp $#
+    #$Id: DjVuGlobal.h,v 1.12 2007/05/19 03:07:33 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <docbill@sourceforge.net> -- real work.  */

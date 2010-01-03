@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuImage.h,v 1.10 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuImage.h,v 1.11 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -102,7 +102,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.10 2007/03/25 20:48:30 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.11 2007/05/19 03:07:33 leonb Exp $# */
 //@{
 
 
@@ -137,7 +137,7 @@ public:
     rendering functions then can use the available components to compute a
     pixel representation of the desired segment of the DjVu image. */
 
-class DjVuImage : public DjVuPort
+class DJVUAPI DjVuImage : public DjVuPort
 {
 protected:
   DjVuImage(void);

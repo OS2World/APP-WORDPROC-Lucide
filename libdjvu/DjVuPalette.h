@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuPalette.h,v 1.10 2007/03/25 20:48:31 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuPalette.h,v 1.11 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVUPALETTE_H_
 #define _DJVUPALETTE_H_
@@ -86,7 +86,7 @@ namespace DJVU {
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.10 2007/03/25 20:48:31 leonb Exp $#
+    #$Id: DjVuPalette.h,v 1.11 2007/05/19 03:07:33 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -121,7 +121,7 @@ namespace DJVU {
 #define CALLINGCONVENTION  /* */
 #endif
 
-class DjVuPalette : public GPEnabled
+class DJVUAPI DjVuPalette : public GPEnabled
 {
 protected:
   DjVuPalette(void);

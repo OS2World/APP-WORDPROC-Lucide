@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuInfo.h,v 1.16 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuInfo.h,v 1.17 2008/01/27 11:36:27 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVUINFO_H
 #define _DJVUINFO_H
@@ -75,7 +75,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.16 2007/03/25 20:48:30 leonb Exp $# */
+    #$Id: DjVuInfo.h,v 1.17 2008/01/27 11:36:27 leonb Exp $# */
 //@{
 
 
@@ -125,7 +125,7 @@ class GUTF8String;
     chunk is always the first chunk of a DjVu file.
  */
 
-class DjVuInfo : public GPEnabled
+class DJVUAPI DjVuInfo : public GPEnabled
 {
 protected:
   DjVuInfo(void);

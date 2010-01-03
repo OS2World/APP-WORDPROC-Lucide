@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GScaler.h,v 1.11 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GScaler.h,v 1.12 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _GSCALER_H_
 #define _GSCALER_H_
@@ -100,7 +100,7 @@ namespace DJVU {
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GScaler.h,v 1.11 2007/03/25 20:48:32 leonb Exp $# */
+    #$Id: GScaler.h,v 1.12 2007/05/19 03:07:33 leonb Exp $# */
 //@{
 
 
@@ -116,7 +116,7 @@ namespace DJVU {
     performed by calling function #scale# in class \Ref{GBitmapScaler} and
     \Ref{GPixmapScaler}.  
 */
-class GScaler  : public GPEnabled
+class DJVUAPI GScaler  : public GPEnabled
 {
 protected:  
   GScaler();
@@ -184,7 +184,7 @@ protected:
       return out;
     }
     \end{verbatim} */
-class GBitmapScaler : public GScaler
+class DJVUAPI GBitmapScaler : public GScaler
 {
 protected:
   GBitmapScaler(void);
@@ -258,7 +258,7 @@ protected:
     \end{verbatim}
 
  */
-class GPixmapScaler : public GScaler
+class DJVUAPI GPixmapScaler : public GScaler
 {
 protected:
   GPixmapScaler(void);

@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuMessageLite.cpp,v 1.14 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuMessageLite.cpp,v 1.16 2008/03/10 20:32:45 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -80,7 +80,6 @@
 // #include <stdio.h>
 #ifdef WIN32
 #include <tchar.h>
-#include <atlbase.h>
 #include <windows.h>
 #include <winreg.h>
 #endif
@@ -381,6 +380,8 @@ DjVuMessageLite::InsertArg( GUTF8String &message,
               narg.format((const char *)format,(unsigned int)arg.toInt());
               break;
             case 'f':
+            case 'g':
+            case 'e':
               {
                 int endpos;
                 narg.format((const char *)format, arg.toDouble(0,endpos));

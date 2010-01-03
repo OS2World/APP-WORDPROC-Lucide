@@ -10,7 +10,8 @@
 #undef DIR_BINDIR
 
 /* directory "datadir" */
-#undef DIR_DATADIR
+/* Lucide */
+#define DIR_DATADIR "/djvu/osi"
 
 /* directory "exec_prefix" */
 #undef DIR_EXEC_PREFIX
@@ -28,7 +29,8 @@
 #undef DJVULIBRE_VERSION
 
 /* define if bool is a built-in type */
-#undef HAVE_BOOL
+/* Lucide */
+#define HAVE_BOOL 1
 
 /* Define if cothreads are available. */
 #undef HAVE_COTHREAD
@@ -38,10 +40,12 @@
 
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */
+/* Lucide */
 #define HAVE_DIRENT_H 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-#undef HAVE_DLFCN_H
+/* Lucide */
+#define HAVE_DLFCN_H 1
 
 /* define if the compiler supports exceptions */
 #undef HAVE_EXCEPTIONS
@@ -58,43 +62,53 @@
 /* Define to 1 if you have the `getpwuid' function. */
 #undef HAVE_GETPWUID
 
-/* Define to 1 if you have the `iconv' function. */
+/* Define if you have glib-2.0. */
+#undef HAVE_GLIB
+
+/* Define to 1 if you have the iconv function. */
 #undef HAVE_ICONV
 
 /* Define to 1 if you have the <iconv.h> header file. */
 #undef HAVE_ICONV_H
 
+/* define if the compiler supports intel atomic builtins */
+#undef HAVE_INTEL_ATOMIC_BUILTINS
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
 /* Define to 1 if you have the `iswspace' function. */
-#undef HAVE_ISWSPACE
+/* Lucide */
+#define HAVE_ISWSPACE 1
 
 /* Define if you have the IJG JPEG library. */
 #undef HAVE_JPEG
-
-/* Define to 1 if you have the `iconv' library (-liconv). */
-#undef HAVE_LIBICONV
 
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
 /* Define to 1 if the system has the type `long long int'. */
-#undef HAVE_LONG_LONG_INT
+/* Lucide */
+#define HAVE_LONG_LONG_INT 1
 
 /* Define to 1 if the system has the type `mbstate_t'. */
 #undef HAVE_MBSTATE_T
 
 /* define if the compiler supports member templates */
+/* Lucide */
 #define HAVE_MEMBER_TEMPLATES 1
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define to 1 if you have the `mkstemp' function. */
+#undef HAVE_MKSTEMP
+
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
 
 /* define if the compiler implements namespaces */
+/* Lucide */
 #define HAVE_NAMESPACES 1
 
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
@@ -109,16 +123,25 @@
 /* Define to Qt version if available */
 #undef HAVE_QT
 
+/* Define to 1 if you have the `setenv' function. */
+#undef HAVE_SETENV
+
+/* Define to 1 if you have the `sigaction' function. */
+#undef HAVE_SIGACTION
+
 /* define if the compiler comes with standard includes */
 #undef HAVE_STDINCLUDES
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#undef HAVE_STDINT_H
+/* Lucide */
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
+/* Lucide */
 #define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the `strerror' function. */
+/* Lucide */
 #define HAVE_STRERROR 1
 
 /* Define to 1 if you have the `strftime' function. */
@@ -132,12 +155,14 @@
 
 /* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
    */
+/* Lucide */
 #define HAVE_SYS_DIR_H 1
 
 /* Define to 1 if you have the <sys/ipc.h> header file. */
 #undef HAVE_SYS_IPC_H
 
 /* Define to 1 if you have the <sys/mman.h> header file. */
+/* Lucide */
 #define HAVE_SYS_MMAN_H 1
 
 /* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
@@ -160,6 +185,7 @@
 #undef HAVE_TIFF
 
 /* define if the compiler recognizes typename */
+/* Lucide */
 #define HAVE_TYPENAME 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
@@ -175,15 +201,19 @@
 #undef HAVE_VSNPRINTF
 
 /* Define to 1 if you have the <wchar.h> header file. */
+/* Lucide */
 #define HAVE_WCHAR_H 1
 
 /* Define to 1 if the system has the type `wchar_t'. */
+/* Lucide */
 #define HAVE_WCHAR_T 1
 
 /* Define to 1 if you have the `wcrtomb' function. */
+/* Lucide */
 #define HAVE_WCRTOMB 1
 
 /* Define to 1 if you have the <wctype.h> header file. */
+/* Lucide */
 #define HAVE_WCTYPE_H 1
 
 /* Define to 1 if `fork' works. */
@@ -194,6 +224,9 @@
 
 /* Define to 1 if you have the <X11/extensions/Xext.h> header file. */
 #undef HAVE_X11_EXTENSIONS_XEXT_H
+
+/* Define if you have the Xt include files. */
+#undef HAVE_XT
 
 /* Define to use g++ pragmas interface/implementation */
 #undef NEED_GNUG_PRAGMAS
@@ -217,20 +250,48 @@
 #undef STDC_HEADERS
 
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+/* Lucide */
 #define TIME_WITH_SYS_TIME 1
 
 /* Define to 1 if the X Window System is missing or not being used. */
 #undef X_DISPLAY_MISSING
 
+/* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef was allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT32_T
+
+/* Define to the type of a signed integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int16_t
+
+/* Define to the type of a signed integer type of width exactly 32 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int32_t
+
 /* Define to `int' if <sys/types.h> does not define. */
 #undef pid_t
+
+/* Define to the type of an unsigned integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint16_t
+
+/* Define to the type of an unsigned integer type of width exactly 32 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint32_t
 
 /* Define as `fork' if `vfork' does not work. */
 #undef vfork
 
 
+
 /* - Miscellaneous */
 #define AUTOCONF 1
+#if defined(__CYGWIN32__) || !defined(WIN32)
+# define UNIX 1
+#endif
+
+/* Lucide */
 #undef UNIX
 #define OS2 1
 
@@ -266,22 +327,22 @@
 
 /* - CONTAINERS */
 #ifndef HAVE_MEMBER_TEMPLATES
-#define GCONTAINER_NO_MEMBER_TEMPLATES
+#define GCONTAINER_NO_MEMBER_TEMPLATES 1
 #endif
 #ifndef HAVE_TYPENAME
-#define GCONTAINER_NO_TYPENAME
+#define GCONTAINER_NO_TYPENAME 1
 #endif
 
 /* - COTHREAD */
 #ifdef HAVE_COTHREAD
 #ifndef HAVE_COTHREAD_PATCH
-#define NO_LIBGCC_HOOKS
+#define NO_LIBGCC_HOOKS 1
 #endif
 #endif
 
 /* - JPEG */
 #ifdef HAVE_JPEG
-#define NEED_JPEG_DECODER
+#define NEED_JPEG_DECODER 1
 #endif
 
 /* - MMAP */

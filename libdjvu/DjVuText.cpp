@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuText.cpp,v 1.11 2007/03/25 20:48:31 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuText.cpp,v 1.12 2008/06/17 12:57:48 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -313,7 +313,7 @@ DjVuTXT::has_valid_zones() const
 {
   if (!textUTF8)
     return false;
-  if (page_zone.children.isempty() || page_zone.rect.isempty()) 
+  if (page_zone.rect.isempty()) 
     return false;
   return true;
 }

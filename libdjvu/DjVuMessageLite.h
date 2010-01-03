@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuMessageLite.h,v 1.10 2007/03/25 20:48:31 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuMessageLite.h,v 1.11 2008/01/27 11:36:27 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef __DJVU_MESSAGE_LITE_H__
 #define __DJVU_MESSAGE_LITE_H__
@@ -149,7 +149,7 @@ class ByteStream;
     Annex R) and SHOULD NOT BE ASSUMED TO BE ASCII.
   */
 
-class DjVuMessageLite : public GPEnabled
+class DJVUAPI DjVuMessageLite : public GPEnabled
 {
 protected:
   // Constructor:

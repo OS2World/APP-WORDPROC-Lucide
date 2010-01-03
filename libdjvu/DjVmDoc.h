@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVmDoc.h,v 1.11 2007/03/25 20:48:29 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVmDoc.h,v 1.12 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -87,7 +87,7 @@ class DjVmNav;
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.11 2007/03/25 20:48:29 leonb Exp $#
+    @version #$Id: DjVmDoc.h,v 1.12 2007/05/19 03:07:33 leonb Exp $#
 */
 
 //@{
@@ -116,7 +116,7 @@ class DjVmNav;
     \Ref{insert_file}() and \Ref{delete_file}()). 
 */
 
-class DjVmDoc : public GPEnabled
+class DJVUAPI DjVmDoc : public GPEnabled
 {
       // Internal function.
 protected:   

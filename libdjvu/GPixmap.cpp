@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GPixmap.cpp,v 1.16 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GPixmap.cpp,v 1.18 2009/02/18 07:26:25 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -568,13 +568,13 @@ GPixmap::init(ByteStream &bs)
           for (int x=0; x<ncolumns; x++)
             if (grey)
               {
-                p[x].g = p[x].b = p[x].r = ramp[read_integer(lookahead, bs)];
+                p[x].g = p[x].b = p[x].r = ramp[(int)read_integer(lookahead, bs)];
               }
             else
               {
-                p[x].r = ramp[read_integer(lookahead, bs)];
-                p[x].g = ramp[read_integer(lookahead, bs)];
-                p[x].b = ramp[read_integer(lookahead, bs)];
+                p[x].r = ramp[(int)read_integer(lookahead, bs)];
+                p[x].g = ramp[(int)read_integer(lookahead, bs)];
+                p[x].b = ramp[(int)read_integer(lookahead, bs)];
               }
         }
     }
@@ -1093,7 +1093,7 @@ copy_line(const GPixel *s, int smin, int smax,
   }
   while (x < dmax)              
   {
-    d[x] = s[smax]; 
+    d[x] = s[smax-1]; 
     x++; 
   }
 }

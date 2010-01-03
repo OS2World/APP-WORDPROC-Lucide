@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GBitmap.h,v 1.13 2007/03/25 20:48:31 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GBitmap.h,v 1.14 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -103,7 +103,7 @@ class ByteStream;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.13 2007/03/25 20:48:31 leonb Exp $#
+    #$Id: GBitmap.h,v 1.14 2007/05/19 03:07:33 leonb Exp $#
 
  */
 //@{
@@ -127,7 +127,7 @@ class ByteStream;
     represent white pixels.  You should never write anything into border
     pixels because they are shared between images and between lines.  */
 
-class GBitmap : public GPEnabled
+class DJVUAPI GBitmap : public GPEnabled
 {
 protected:
   GBitmap(void);

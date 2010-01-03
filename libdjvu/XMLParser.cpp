@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: XMLParser.cpp,v 1.11 2007/03/25 20:48:34 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: XMLParser.cpp,v 1.12 2008/08/05 20:50:35 bpearlmutter Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -919,7 +919,7 @@ make_child_layer(
         const GP<lt_XMLTags> t(tag.get_content()[pos].tag);
         const GRect save_rect(self.rect);
         self.rect=default_rect;
-        if(retval=make_child_layer(self, *t, bs, height,ws,hs))
+	if ((retval = make_child_layer(self, *t, bs, height, ws, hs)))
         {
           xmin=min(save_rect.xmin,xmin);
           xmax=max(save_rect.xmax,xmax);

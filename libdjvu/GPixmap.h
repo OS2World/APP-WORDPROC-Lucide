@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GPixmap.h,v 1.9 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GPixmap.h,v 1.10 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
@@ -81,7 +81,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.9 2007/03/25 20:48:32 leonb Exp $# */
+    #$Id: GPixmap.h,v 1.10 2007/05/19 03:07:33 leonb Exp $# */
 //@{
 
 
@@ -108,7 +108,7 @@ class ByteStream;
     be confused with the convention adopted for class \Ref{GBitmap} where the
     pixel values represent an ink level.  */
 
-struct GPixel
+struct DJVUAPI GPixel
 {
   /** Blue component. */
   unsigned char b;
@@ -147,7 +147,7 @@ struct GPixel
     the bottom line of the image.
  */
 
-class GPixmap : public GPEnabled
+class DJVUAPI GPixmap : public GPEnabled
 {
 protected:
   GPixmap(void);

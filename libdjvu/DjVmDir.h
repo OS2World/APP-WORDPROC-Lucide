@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVmDir.h,v 1.12 2007/03/25 20:48:29 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVmDir.h,v 1.14 2007/07/29 16:23:51 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -113,7 +113,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.12 2007/03/25 20:48:29 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.14 2007/07/29 16:23:51 leonb Exp $# */
 //@{
 
 
@@ -151,7 +151,7 @@ class ByteStream;
     directory because some classes (like \Ref{DjVuDocument} and \Ref{DjVmDoc})
     return a pointer to #DjVmDir# in some cases. */
 
-class DjVmDir : public GPEnabled
+class DJVUAPI DjVmDir : public GPEnabled
 {
 protected:
       /** Class \Ref{DjVmDir::File} represents the directory records
@@ -175,9 +175,9 @@ public:
   void encode(const GP<ByteStream> &stream, 
               const bool bundled, const bool do_rename) const;
       /** Tests if directory defines an {\em indirect} document. */
-   bool is_indirect(void) const;
+   inline bool is_indirect(void) const;
       /** Tests if the directory defines a {\em bundled} document. */
-   bool is_bundled(void) const;
+   inline bool is_bundled(void) const;
       /** Translates page numbers to file records. */
    GP<File> page_to_file(int page_num) const;
       /** Translates file names to file records. */
@@ -226,7 +226,7 @@ private: //dummy stuff
    static void encode(ByteStream *);
 };
 
-class DjVmDir::File : public GPEnabled
+class DJVUAPI DjVmDir::File : public GPEnabled
 {
 public:
   // Out of the record: INCLUDE below must be zero and PAGE must be one.

@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: Arrays.h,v 1.12 2007/03/25 20:48:29 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: Arrays.h,v 1.13 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _ARRAYS_H_
 #define _ARRAYS_H_
@@ -125,7 +125,7 @@ namespace DJVU {
     @author 
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.12 2007/03/25 20:48:29 leonb Exp $# */
+    #$Id: Arrays.h,v 1.13 2007/05/19 03:07:33 leonb Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -184,7 +184,7 @@ private:
 // data bounds, etc. It copes with data elements with the help of five
 // static functions which pointers are supposed to be passed to the
 // constructor.
-class ArrayRep : public _ArrayRep
+class DJVUAPI ArrayRep : public _ArrayRep
 {
 public:
    ArrayRep(int elsize,
@@ -304,7 +304,7 @@ ArrayRep::touch(int n)
     and \Ref{TArray} instead.
     */
     
-class ArrayBase : protected _ArrayBase
+class DJVUAPI ArrayBase : protected _ArrayBase
 {
 protected:
    void		check(void);

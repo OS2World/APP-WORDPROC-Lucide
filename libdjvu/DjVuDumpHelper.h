@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuDumpHelper.h,v 1.10 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuDumpHelper.h,v 1.11 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVUDUMPHELPER_H
 #define _DJVUDUMPHELPER_H
@@ -77,7 +77,7 @@
     L\'eon Bottou <leonb@research.att.com> -- as a separate program.\\
     Andrei Erofeev <eaf@geocities.com> -- as a class.
     @version
-    #$Id: DjVuDumpHelper.h,v 1.10 2007/03/25 20:48:30 leonb Exp $# */
+    #$Id: DjVuDumpHelper.h,v 1.11 2007/05/19 03:07:33 leonb Exp $# */
 //@{
 
 
@@ -99,7 +99,7 @@ class ByteStream;
     Based upon old \Ref{djvudump.cpp} code.
  */
 
-class DjVuDumpHelper
+class DJVUAPI DjVuDumpHelper
 {
 public:
       /// Default constructor

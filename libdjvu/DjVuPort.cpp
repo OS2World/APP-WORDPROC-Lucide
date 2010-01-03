@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuPort.cpp,v 1.11 2007/03/25 20:48:31 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuPort.cpp,v 1.13 2008/08/03 14:16:53 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -264,6 +264,8 @@ DjVuPortcaster::is_port_alive(DjVuPort *port)
    GPosition pos=cont_map.contains(port);
    if (pos && cont_map[pos] && ((DjVuPort *) port)->get_count()>0)
       gp_port=port;
+   if (gp_port && gp_port->get_count() <= 0)
+      gp_port = 0;
    return gp_port;
 }
 

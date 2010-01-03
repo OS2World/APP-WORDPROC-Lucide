@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVmNav.h,v 1.2 2007/03/25 20:48:29 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVmNav.h,v 1.3 2008/01/27 11:36:27 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVMNAV_H
 #define _DJVMNAV_H
@@ -85,7 +85,7 @@ class ByteStream;
     This is a list of DjVuBookMarks.
 **/
 
-class DjVmNav : public GPEnabled
+class DJVUAPI DjVmNav : public GPEnabled
 {
 public:
    /** Class \Ref{DjVmNav::DjVuBookMark} represents a entry in the 
@@ -120,7 +120,7 @@ private:
     contains a count of immediate children, a display string and a url.
 **/
 
-class DjVmNav::DjVuBookMark : public GPEnabled
+class DJVUAPI DjVmNav::DjVuBookMark : public GPEnabled
 {
 protected:
   /** Default constructor. */

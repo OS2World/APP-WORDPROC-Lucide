@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuDocEditor.h,v 1.10 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuDocEditor.h,v 1.12 2008/09/28 12:46:14 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -84,7 +84,7 @@ namespace DJVU {
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.10 2007/03/25 20:48:30 leonb Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.12 2008/09/28 12:46:14 leonb Exp $#
 */
 
 //@{
@@ -103,7 +103,7 @@ namespace DJVU {
     \end{enumerate}
 */
 
-class DjVuDocEditor : public DjVuDocument
+class DJVUAPI DjVuDocEditor : public DjVuDocument
 {
 public:
    static int	thumbnails_per_file;
@@ -403,7 +403,6 @@ private:
    bool		initialized;
    GURL		doc_url;
    GP<DataPool>	doc_pool;
-   GURL		tmp_doc_url;
    int		orig_doc_type;
    int		orig_doc_pages;
 

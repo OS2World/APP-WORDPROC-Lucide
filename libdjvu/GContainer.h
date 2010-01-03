@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GContainer.h,v 1.19 2007/03/25 20:48:31 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GContainer.h,v 1.21 2008/01/07 11:48:52 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _GCONTAINER_H_
 #define _GCONTAINER_H_
@@ -132,7 +132,7 @@ namespace DJVU {
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.19 2007/03/25 20:48:31 leonb Exp $# */
+    #$Id: GContainer.h,v 1.21 2008/01/07 11:48:52 leonb Exp $# */
 //@{
 
 
@@ -281,14 +281,14 @@ protected:
       { return (void*)( ((T*)base) + n ); }
     // Template based default constructor
     static void init(void* dst, int n) 
-      { T* d = (T*)dst;   while (--n>=0) { new ((void*)d) T; d++; } }
+      { T* d = (T*)dst; while (--n>=0) { new ((void*)d) T; d++; } }
     // Template based copy constructor
     static void copy(void* dst, const void* src, int n, int zap)
-      { T* d = (T*)dst; const T *s = (const T*)src; 
-        while (--n>=0) { new ((void*)d) T(*s); if (zap) { s->T::~T(); }; d++; s++; } }
+      { T* d = (T*)dst; T* s = (T*)src; while (--n>=0) { 
+          new ((void*)d) T(*s); if (zap) { s->~T(); }; d++; s++; } }
     // Template based destructor
     static void fini(void* dst, int n) 
-      { T* d = (T*)dst; while (--n>=0) { d->T::~T(); d++; } }
+      { T* d = (T*)dst; while (--n>=0) { d->~T(); d++; } }
   };
   // --- Base class for list nodes
   struct Node
@@ -388,7 +388,7 @@ GCONT NormTraits<T>::traits()
     @memo Dynamic arrays.  */
 //@{
 
-class GArrayBase : public GCont
+class DJVUAPI GArrayBase : public GCont
 {
 public:
   // -- CONSTRUCTORS
@@ -763,7 +763,7 @@ public:
     (using member function #del# or by other means.)
 */
 
-class GPosition : protected GCont
+class DJVUAPI GPosition : protected GCont
 {
 public:
   /** Creates a null GPosition object. */
@@ -804,7 +804,7 @@ protected:
 };
 
 
-class GListBase : public GCont
+class DJVUAPI GListBase : public GCont
 {
 protected:
   GListBase(const Traits& traits);
@@ -1073,7 +1073,7 @@ public:
 */
 //@{
 
-class GSetBase : public GCont
+class DJVUAPI GSetBase : public GCont
 {
 protected:
   GSetBase(const Traits &traits);

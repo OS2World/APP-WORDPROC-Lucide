@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuMessage.h,v 1.10 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuMessage.h,v 1.11 2008/01/27 11:36:27 leonb Exp $
+// $Name: release_3_5_22 $
 
 
 #ifndef __DJVU_MESSAGE_H__
@@ -83,7 +83,7 @@ namespace DJVU {
 
 class GURL;
 
-class DjVuMessage : public DjVuMessageLite
+class DJVUAPI DjVuMessage : public DjVuMessageLite
 {
 protected:
   void init(void);

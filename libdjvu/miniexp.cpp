@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 // -------------------------------------------------------------------
 */
-/* $Id: miniexp.cpp,v 1.14 2007/03/25 20:48:35 leonb Exp $ */
+/* $Id: miniexp.cpp,v 1.23 2008/08/05 20:50:35 bpearlmutter Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -259,8 +259,9 @@ collect_free(block_t *b, void **&freelist, int &count, bool destroy)
       for (unsigned int i=1; i<nptrs_chunk/2; i++)
         if (! c[i])
           {
-            if (destroy && m[i+i]==m[i+i+1]) 
-              delete (miniobj_t*)m[i+i];
+            miniobj_t *obj = (miniobj_t*)m[i+i];
+            if (destroy && obj && m[i+i]==m[i+i+1]) 
+              obj->destroy();
             m[i+i] = (void*)freelist;
             m[i+i+1] = 0;
             freelist = &m[i+i];
@@ -312,42 +313,109 @@ new_obj_block(void)
 }
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
-static void gc_mark_object(void **v)
-  __attribute__((noinline));
+static void gc_mark_object(void **v) __attribute__((noinline));
 #else
 static void gc_mark_object(void **v);
 #endif
 
+static bool
+gc_mark_check(void *p)
+{
+  if (((size_t)p) & 2)
+    return false;
+  void **v = (void**)(((size_t)p) & ~(size_t)3); 
+  if (! v)
+    return false;
+  char *m = markbyte(v);
+  if (*m)
+    return false;
+  *m = 1;
+  if (! (((size_t)p) & 1))
+    return true;
+  gc_mark_object((void**)v);
+  return false;
+}
+
+static void
+gc_mark_pair(void **v)
+{
+#ifndef MINIEXP_POINTER_REVERSAL
+  // This is a simple recursive code.
+  // Despite the tail recursion for the cdrs,
+  // it consume a stack space that grows like
+  // the longest chain of cars.
+  for(;;)
+    {
+      if (gc_mark_check(v[0]))
+        gc_mark_pair((void**)v[0]);
+      if (! gc_mark_check(v[1]))
+        break;
+      v = (void**)v[1];
+    }
+#else
+  // This is the classic pointer reversion code
+  // It saves stack memory by temporarily reversing the pointers. 
+  // This is a bit slower because of all these nonlocal writes.
+  // But it could be useful for memory-starved applications.
+  // That makes no sense for most uses of miniexp.
+  // I leave the code here because of its academic interest.
+  void **w = 0;
+ docar:
+  if (gc_mark_check(v[0]))
+    { // reverse car pointer
+      void **p = (void**)v[0];
+      v[0] = (void*)w;
+      w = (void**)(((size_t)v)|(size_t)1);
+      v = p;
+      goto docar;
+    }
+ docdr:
+  if (gc_mark_check(v[1]))
+    { // reverse cdr pointer
+      void **p = (void**)v[1];
+      v[1] = (void*)w;
+      w = v;
+      v = p;
+      goto docar;
+    }
+ doup:
+  if (w)
+    {
+      if (((size_t)w)&1)
+        { // undo car reversion
+          void **p = (void**)(((size_t)w)&~(size_t)1);
+          w = (void**)p[0];
+          p[0] = (void*)v;
+          v = p;
+          goto docdr;
+        }
+      else
+        { // undo cdr reversion
+          void **p = w;
+          w = (void**)p[1];
+          p[1] = (void*)v;
+          v = p;
+          goto doup;
+        }
+    }
+#endif
+}
+
 static void
 gc_mark(miniexp_t *pp)
 {
-  for(;;)
-    {
-      miniexp_t p = *pp;
-      if (((size_t)p) & 2) return;
-      void **v = (void**)(((size_t)p) & ~(size_t)3);
-      if (! v) return;
-      char *m = markbyte(v);
-      if (*m) return;
-      (*m) = 1;
-      if (((size_t)p) & 1)
-        { // object
-          gc_mark_object(v);
-          return;
-        }
-      else
-        { // pair
-          gc_mark((miniexp_t*)&v[0]);
-          pp = (miniexp_t*)&v[1];
-        }
-    }
+  void **v = (void**)*pp;
+  if (gc_mark_check((void**)*pp))
+    gc_mark_pair(v);
 }
 
 static void
 gc_mark_object(void **v)
 {
+  ASSERT(v[0] == v[1]);
   miniobj_t *obj = (miniobj_t*)v[0];
-  if (obj) obj->mark(gc_mark);
+  if (obj) 
+    obj->mark(gc_mark);
 }
 
 static void
@@ -366,9 +434,9 @@ gc_run(void)
       // mark
       minivar_t::mark(gc_mark);
       for (int i=0; i<recentsize; i++)
-        {
-          miniexp_t p = (miniexp_t)gc.recent[i];
-          gc_mark(&p);
+        { // extra cast for strict aliasing rules?
+          char *s = (char*)&gc.recent[i];
+          gc_mark((miniexp_t*)s);
         }
       // sweep
       gc.objs_free = gc.pairs_free = 0;
@@ -395,13 +463,12 @@ gc_alloc_pair(void *a, void *d)
         new_pair_block();
     }
   else if (gc.debug)
-    minilisp_gc();
+    gc_run();
   void **p = gc.pairs_freelist;
   gc.pairs_freelist = (void**)p[0];
   gc.pairs_free -= 1;
   p[0] = a;
   p[1] = d;
-  gc.recent[(++gc.recentindex) & (recentsize-1)] = p;
   return p;
 }
 
@@ -415,12 +482,11 @@ gc_alloc_object(void *obj)
         new_obj_block();
     }
   else if (gc.debug)
-    minilisp_gc();
+    gc_run();
   void **p = gc.objs_freelist;
   gc.objs_freelist = (void**)p[0];
   gc.objs_free -= 1;
   p[0] = p[1] = obj;
-  gc.recent[(++gc.recentindex) & (recentsize-1)] = p;
   return p;
 }
 
@@ -621,9 +687,8 @@ miniexp_nth(int n, miniexp_t l)
 miniexp_t 
 miniexp_cons(miniexp_t a, miniexp_t d)
 {
-  gc.recent[(gc.recentindex+1) & (recentsize-1)] = (void**)a;
-  gc.recent[(gc.recentindex+2) & (recentsize-1)] = (void**)d;
   miniexp_t r = (miniexp_t)gc_alloc_pair((void*)a, (void*)d); 
+  gc.recent[(++gc.recentindex) & (recentsize-1)] = (void**)r;
   return r;
 }
 
@@ -672,7 +737,7 @@ miniobj_t::~miniobj_t()
 {
 }
 
-miniexp_t miniobj_t::classname = 0;
+const miniexp_t miniobj_t::classname = 0;
 
 bool
 miniobj_t::isa(miniexp_t) const
@@ -683,6 +748,12 @@ miniobj_t::isa(miniexp_t) const
 void 
 miniobj_t::mark(minilisp_mark_t*)
 {
+}
+
+void 
+miniobj_t::destroy()
+{
+  delete this;
 }
 
 char *
@@ -698,7 +769,9 @@ miniexp_t
 miniexp_object(miniobj_t *obj)
 {
   void **v = gc_alloc_object((void*)obj);
-  return (miniexp_t)(((size_t)v)|(size_t)1);
+  v = (void**)(((size_t)v)|((size_t)1));
+  gc.recent[(++gc.recentindex) & (recentsize-1)] = v;
+  return (miniexp_t)(v);
 }
 
 miniexp_t 
@@ -793,8 +866,8 @@ print_c_string(const char *s, char *d, bool eightbits)
       if (char_quoted(c, eightbits))
         {
           char letter = 0;
-          static char *tr1 = "\"\\tnrbf";
-          static char *tr2 = "\"\\\t\n\r\b\f";
+          static const char *tr1 = "\"\\tnrbf";
+          static const char *tr2 = "\"\\\t\n\r\b\f";
           { // extra nesting for windows
             for (int i=0; tr2[i]; i++)
               if (c == tr2[i])
@@ -1021,7 +1094,7 @@ printer_t::print(miniexp_t p)
       while (miniexp_consp(p))
         {
           skip -= 1;
-          if (multiline || newline() && skip<0 && tab>indent)
+	  if (multiline || (newline() && skip<0 && tab>indent))
             {
               mlput("\n"); 
               mltab(indent); 
@@ -1041,7 +1114,7 @@ printer_t::print(miniexp_t p)
       if (p)
         {
           skip -= 1;
-          if (multiline || newline() && skip<0 && tab>indent)
+	  if (multiline || (newline() && skip<0 && tab>indent))
             {
               mlput("\n"); 
               mltab(indent); 
@@ -1288,7 +1361,7 @@ read_c_string(int &c)
   c = minilisp_getc();
   for(;;)
     {
-      if (c==EOF || isascii(c) && !isprint(c))
+      if (c==EOF || (isascii(c) && !isprint(c)))
         return read_error(c);
       else if (c=='\"')
         break;
@@ -1340,8 +1413,8 @@ read_c_string(int &c)
                   c = d;
                 }
             }
-          static char *tr1 = "tnrbfva";
-          static char *tr2 = "\t\n\r\b\f\013\007";
+          static const char *tr1 = "tnrbfva";
+          static const char *tr2 = "\t\n\r\b\f\013\007";
           { // extra nesting for windows
             for (int i=0; tr1[i]; i++)
               if (c == tr1[i])
@@ -1368,7 +1441,7 @@ read_quoted_symbol(int &c)
   for(;;)
     {
       c = minilisp_getc();
-      if (c==EOF || isascii(c) && !isprint(c))
+      if (c==EOF || (isascii(c) && !isprint(c)))
         return read_error(c);
       if (c=='|')
         break;

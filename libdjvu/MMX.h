@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: MMX.h,v 1.10 2007/03/25 20:48:34 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: MMX.h,v 1.11 2007/05/18 19:50:41 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _MMX_H_
 #define _MMX_H_
@@ -107,7 +107,7 @@ namespace DJVU {
     @memo
     Essential support for MMX.
     @version 
-    #$Id: MMX.h,v 1.10 2007/03/25 20:48:34 leonb Exp $#
+    #$Id: MMX.h,v 1.11 2007/05/18 19:50:41 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation */
 //@{
@@ -156,9 +156,9 @@ class MMXControl
 #define MMXir(op,imm,dst) \
   __asm__ volatile( #op " %0,%%" #dst : : "i" (imm) : "memory") 
 #define MMXar(op,addr,dst) \
-  __asm__ volatile( #op " %0,%%" #dst : : "m" (*(int*)(addr)) : "memory") 
+  __asm__ volatile( #op " %0,%%" #dst : : "m" (*(addr)) : "memory") 
 #define MMXra(op,src,addr) \
-  __asm__ volatile( #op " %%" #src ",%0" : : "m" (*(int*)(addr)) : "memory") 
+  __asm__ volatile( #op " %%" #src ",%0" : : "m" (*(addr)) : "memory") 
 #define MMX 1
 #endif
 

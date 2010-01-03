@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: JB2Image.h,v 1.11 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: JB2Image.h,v 1.13 2008/01/27 11:36:27 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -158,7 +158,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.11 2007/03/25 20:48:32 leonb Exp $#
+    #$Id: JB2Image.h,v 1.13 2008/01/27 11:36:27 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -197,7 +197,7 @@ class ByteStream;
     coordinates are relative to the bottom left corner of the image.  Member
     #shapeno# is the subscript of the shape to be rendered.  */
 
-class JB2Blit {
+class DJVUAPI JB2Blit {
 public:
   /** Horizontal coordinate of the blit. */
   unsigned short left;
@@ -214,7 +214,7 @@ public:
     image representing the shape pixels.  Member #parent# is the subscript of
     the parent shape.  */
 
-class JB2Shape
+class DJVUAPI JB2Shape
 { 
 public: 
   /** Subscript of the parent shape.  The parent shape must always be located
@@ -249,7 +249,7 @@ typedef GP<JB2Dict> JB2DecoderCallback ( void* );
 
 /** Dictionary of JB2 shapes. */
 
-class JB2Dict : public GPEnabled
+class DJVUAPI JB2Dict : public GPEnabled
 {
 protected:
   JB2Dict(void);
@@ -344,7 +344,7 @@ private:
     to render anti-aliased images, or use function \Ref{encode} to generate
     JB2 data. */
 
-class JB2Image : public JB2Dict
+class DJVUAPI JB2Image : public JB2Dict
 {
 protected:
   JB2Image(void);

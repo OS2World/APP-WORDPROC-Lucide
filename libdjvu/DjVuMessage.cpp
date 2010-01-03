@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuMessage.cpp,v 1.19 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuMessage.cpp,v 1.24 2008/01/27 17:32:56 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -77,7 +77,6 @@
 #include <stdlib.h>
 #ifdef WIN32
 # include <tchar.h>
-# include <atlbase.h>
 # include <windows.h>
 # include <winreg.h>
 #endif
@@ -121,11 +120,10 @@ static const char localestring[]="locale";
 
 // directory names for searching messages
 #ifdef AUTOCONF
-// !!! ER !!! static const char DjVuDataDir[] = DIR_DATADIR "/djvu/osi";
+static const char DjVuDataDir[] = DIR_DATADIR "/djvu/osi";
+#endif /* AUTOCONF */
 static const char ModuleDjVuDir[] ="share/djvu/osi";
-#else /* !AUTOCONF */
-static const char ModuleDjVuDir[] ="profiles";
-#endif /* !AUTOCONF */
+static const char ProfilesDjVuDir[] ="profiles";
 static const char LocalDjVuDir[] =".DjVu";      // relative to ${HOME}
 #ifdef LT_DEFAULT_PREFIX
 static const char DjVuPrefixDir[] = LT_DEFAULT_PREFIX "/profiles";
@@ -151,34 +149,25 @@ static GURL
 RegOpenReadConfig ( HKEY hParentKey )
 {
   GURL retval;
-   // To do:  This needs to be shared with SetProfile.cpp
   LPCTSTR path = registrypath;
-
   HKEY hKey = 0;
-  // MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED,argv[1],strlen(argv[1])+1,wszSrcFile,sizeof(wszSrcFile));
   if (RegOpenKeyEx(hParentKey, path, 0,
-              KEY_READ, &hKey) == ERROR_SUCCESS )
+		   KEY_READ, &hKey) == ERROR_SUCCESS )
   {
-    TCHAR path[1024];
-    // Success
-    TCHAR *szPathValue = path;
-    LPCTSTR lpszEntry = (LPCTSTR &)TEXT("");
-    DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
+    CHAR path[1024];
+    CHAR *szPathValue = path;
+    LPCSTR lpszEntry = "";
+    DWORD dwCount = (sizeof(path)/sizeof(CHAR))-1;
     DWORD dwType;
-
-    LONG lResult = RegQueryValueEx(hKey, lpszEntry, NULL,
-             &dwType, (LPBYTE) szPathValue, &dwCount);
-
+    LONG lResult = RegQueryValueExA(hKey, lpszEntry, NULL,
+			&dwType, (LPBYTE)szPathValue, &dwCount);
     RegCloseKey(hKey);
-
     if ((lResult == ERROR_SUCCESS))
     {
       szPathValue[dwCount] = 0;
-      USES_CONVERSION;
-      retval=GURL::Filename::Native(T2CA(path));
+      retval=GURL::Filename::Native(path);
     }
   } 
-//  if (hKey)  RegCloseKey(hKey); 
   return retval;
 }
 
@@ -186,11 +175,10 @@ static GURL
 GetModulePath( void )
 {
   const GUTF8String cwd(GOS::cwd());
-  TCHAR path[1024];
-  DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
-  GetModuleFileName(0, path, dwCount);
-  USES_CONVERSION;
-  GURL retval=GURL::Filename::Native(T2CA(path)).base();
+  CHAR path[1024];
+  DWORD dwCount = (sizeof(path)/sizeof(CHAR))-1;
+  GetModuleFileNameA(0, path, dwCount);
+  GURL retval=GURL::Filename::Native(path).base();
   GOS::cwd(cwd);
   return retval;
 }
@@ -292,17 +280,22 @@ DjVuMessage::GetProfilePaths(void)
       appendPath(GURL::UTF8(DebugModuleDjVuDir,mpath),pathsmap,paths);
 #endif
       appendPath(mpath,pathsmap,paths);
+      appendPath(GURL::UTF8(ModuleDjVuDir,mpath),pathsmap,paths);
+      appendPath(GURL::UTF8(ProfilesDjVuDir,mpath),pathsmap,paths);
       mpath=mpath.base();
       appendPath(GURL::UTF8(ModuleDjVuDir,mpath),pathsmap,paths);
+      appendPath(GURL::UTF8(ProfilesDjVuDir,mpath),pathsmap,paths);
       mpath=mpath.base();
       appendPath(GURL::UTF8(ModuleDjVuDir,mpath),pathsmap,paths);
+      appendPath(GURL::UTF8(ProfilesDjVuDir,mpath),pathsmap,paths);
       mpath=mpath.base();
       appendPath(GURL::UTF8(ModuleDjVuDir,mpath),pathsmap,paths);
+      appendPath(GURL::UTF8(ProfilesDjVuDir,mpath),pathsmap,paths);
     }
 #endif
 #if defined(AUTOCONF)
-    // ER !!! GURL dpath = GURL::Filename::UTF8(DjVuDataDir);
-    // !!! appendPath(dpath,pathsmap,paths);
+    GURL dpath = GURL::Filename::UTF8(DjVuDataDir);
+    appendPath(dpath,pathsmap,paths);
 #endif
 #ifdef WIN32
     appendPath(RegOpenReadConfig(HKEY_CURRENT_USER),pathsmap,paths);

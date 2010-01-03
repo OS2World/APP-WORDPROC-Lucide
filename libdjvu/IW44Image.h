@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: IW44Image.h,v 1.12 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: IW44Image.h,v 1.13 2007/05/19 03:07:34 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef IW44IMAGE_H_
 #define IW44IMAGE_H_
@@ -162,7 +162,7 @@
 // Only superficial changes.  The meat is mine.
 
     @version
-    #$Id: IW44Image.h,v 1.12 2007/03/25 20:48:32 leonb Exp $# */
+    #$Id: IW44Image.h,v 1.13 2007/05/19 03:07:34 leonb Exp $# */
 //@{
 
 
@@ -190,7 +190,7 @@ class GPixmap;
     for encoding each chunk of an IW44 file.  Chunk data is generated until
     meeting either the slice target, the size target or the decibel target.  */
 
-struct IWEncoderParms 
+struct DJVUAPI IWEncoderParms 
 {
   /** Slice target.  Data generation for the current chunk stops if the total
       number of slices (in this chunk and all the previous chunks) reaches
@@ -225,7 +225,7 @@ struct IWEncoderParms
     therefore not possible to make multiple copies of instances of this
     class. */
 
-class IW44Image : public GPEnabled
+class DJVUAPI IW44Image : public GPEnabled
 {
 public:
   /** Chrominance processing selector.  The following constants may be used as
@@ -395,7 +395,7 @@ private:
     members. It is therefore not possible to make multiple copies of instances
     of this class. */
 
-class IWBitmap : public IW44Image
+class DJVUAPI IWBitmap : public IW44Image
 {
 public:
   friend class IW44Image;
@@ -473,7 +473,7 @@ private:
     therefore not possible to make multiple copies of instances of this
     class. */
 
-class IWPixmap : public IW44Image
+class DJVUAPI IWPixmap : public IW44Image
 {
 public:
   friend class IW44Image;

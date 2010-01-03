@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GOS.h,v 1.9 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GOS.h,v 1.10 2008/01/27 11:36:27 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _GOS_H_
 #define _GOS_H_
@@ -82,7 +82,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.9 2007/03/25 20:48:32 leonb Exp $#
+    #$Id: GOS.h,v 1.10 2008/01/27 11:36:27 leonb Exp $#
 */
 //@{
 
@@ -100,7 +100,7 @@ namespace DJVU {
 class GURL;
 
 /** Operating System dependent functions. */
-class GOS 
+class DJVUAPI GOS 
 {
  public:
   // -----------------------------------------

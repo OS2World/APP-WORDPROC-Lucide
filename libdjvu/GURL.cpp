@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GURL.cpp,v 1.24 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GURL.cpp,v 1.29 2008/01/27 16:16:26 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -82,7 +82,7 @@
 #include <string.h>
 
 #ifdef WIN32
-# include <atlbase.h>
+# include <tchar.h>
 # include <windows.h>
 # include <direct.h>
 #endif /* WIN32 */
@@ -161,6 +161,7 @@
 #include <unistd.h>
 #endif
 
+/* Lucide */
 #ifdef OS2
 #define _tcsrchr strrchr
 #endif
@@ -486,12 +487,14 @@ GURL::operator=(const GURL & url_in)
 GUTF8String
 GURL::protocol(const GUTF8String& url)
 {
-   const char * const url_ptr=url;
-   const char * ptr=url_ptr;
-   for(char c=*ptr;
-     c && (isalnum(c) || c == '+' || c == '-' || c == '.');
-     c=*(++ptr)) EMPTY_LOOP;
-   return(*ptr==colon)?GUTF8String(url_ptr, ptr-url_ptr):GUTF8String();
+  const char * const url_ptr=url;
+  const char * ptr=url_ptr;
+  for(char c=*ptr;
+      c && (isalnum(c) || c == '+' || c == '-' || c == '.');
+      c=*(++ptr)) EMPTY_LOOP;
+  if (ptr[0]==colon && ptr[1]=='/' && ptr[2]=='/')
+    return GUTF8String(url_ptr, ptr-url_ptr);
+  return GUTF8String();
 }
 
 GUTF8String
@@ -1102,7 +1105,7 @@ GURL::encode_reserved(const GUTF8String &gs)
     if ( (ss>='a' && ss<='z') ||
          (ss>='A' && ss<='Z') ||
          (ss>='0' && ss<='9') ||
-         (strchr("$-_.+!*'(),:~=", ss)) ) 
+         (strchr("$-_.+!*'(),~:=", ss)) ) 
     {
       *d = ss;
       continue;
@@ -1416,10 +1419,7 @@ GURL::is_file(void) const
     DWORD dwAttrib;
     dwAttrib = GetFileAttributesW(wfilename);
     if((dwAttrib|1) == 0xFFFFFFFF)
-      {
-        USES_CONVERSION ;
-        dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
-      }
+        dwAttrib = GetFileAttributesA(NativeFilename());
     retval=!( dwAttrib & FILE_ATTRIBUTE_DIRECTORY );
 #else
 # error "Define something here for your operating system"
@@ -1453,10 +1453,7 @@ GURL::is_local_path(void) const
     DWORD dwAttrib;
     dwAttrib = GetFileAttributesW(wfilename);
     if((dwAttrib|1) == 0xFFFFFFFF)
-      {
-        USES_CONVERSION ;
-        dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
-      }
+        dwAttrib = GetFileAttributesA(NativeFilename());
     retval=( (dwAttrib|1) != 0xFFFFFFFF);
 #endif
   }
@@ -1494,10 +1491,7 @@ GURL::is_dir(void) const
     DWORD dwAttrib;
     dwAttrib = GetFileAttributesW(wfilename);
     if((dwAttrib|1) == 0xFFFFFFFF)
-      {
-        USES_CONVERSION ;
-        dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
-      }
+        dwAttrib = GetFileAttributesA(NativeFilename());
     retval=((dwAttrib != 0xFFFFFFFF)&&( dwAttrib & FILE_ATTRIBUTE_DIRECTORY ));
 #else
 # error "Define something here for your operating system"
@@ -1540,17 +1534,17 @@ GURL::mkdir() const
     retval = baseURL.mkdir();
   if(!retval)
     {
+/* Lucide */
 #if defined(UNIX) || defined(OS2)
       if (is_dir())
         retval = 0;
       else 
         retval = ::mkdir(NativeFilename(), 0755);
 #elif defined(WIN32)
-      USES_CONVERSION;
       if (is_dir())
         retval = 0;
       else 
-        retval = CreateDirectory(A2CT(NativeFilename()), NULL);
+        retval = CreateDirectoryA(NativeFilename(), NULL);
 #else
 # error "Define something here for your operating system"
 #endif
@@ -1567,17 +1561,17 @@ GURL::deletefile(void) const
   int retval = -1;
   if(is_local_file_url())
     {
+/* Lucide */
 #if defined(UNIX) || defined(OS2)
       if (is_dir())
         retval = ::rmdir(NativeFilename());
       else
         retval = ::unlink(NativeFilename());
 #elif defined(WIN32)
-      USES_CONVERSION;
       if (is_dir())
-        retval = ::RemoveDirectory(A2CT(NativeFilename()));
+        retval = ::RemoveDirectoryA(NativeFilename());
       else
-        retval = ::DeleteFile(A2CT(NativeFilename()));
+        retval = ::DeleteFile(NativeFilename());
 #else
 # error "Define something here for your operating system"
 #endif
@@ -1769,7 +1763,8 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
       EMPTY_LOOP;
     *s = 0;
   }
-#elif defined(WIN32) || defined(OS2) // WIN32 implementation (ER: and OS/2)
+/* Lucide */
+#elif defined (WIN32) || defined(OS2) // WIN32 implementation
   // Handle base
   strcpy(string_buffer, (char const *)(from ? expand_name(from) : GOS::cwd()));
   //  GNativeString native;
@@ -1807,7 +1802,8 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
           drv[1]=colon;
           drv[2]= dot ;
           drv[3]=0;
-          // !!! ER todo !!! GetFullPathName(drv, maxlen, string_buffer, &s);
+/* Lucide */ /* ToDo */
+          // GetFullPathName(drv, maxlen, string_buffer, &s);
           strcpy(string_buffer,(const char *)GUTF8String(string_buffer).getNative2UTF8());
           s = string_buffer;
         }
@@ -1829,18 +1825,19 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
       }
     }
     // Process path components
-    for(;*fname== slash || *fname==backslash;fname++)
-      EMPTY_LOOP;
     while(*fname)
     {
+      for(;*fname== slash || *fname==backslash;fname++)
+        EMPTY_LOOP;
       if (fname[0]== dot )
       {
         if (fname[1]== slash || fname[1]==backslash || !fname[1])
         {
           fname++;
           continue;
-        }else if ((fname[1] == dot)
-          && (fname[2]== slash || fname[2]==backslash || !fname[2]))
+        }
+		else if ((fname[1] == dot)
+                 && (fname[2]== slash || fname[2]==backslash || !fname[2]))
         {
           fname += 2;
           char *back=_tcsrchr(string_buffer,backslash);
@@ -1855,99 +1852,21 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
           s = string_buffer;
           continue;
         }
-        char* s2=s;//MBCS DBCS
-        for(;*s;s++) 
-          EMPTY_LOOP;
-        char* back = _tcsrchr(s2,backslash);//MBCS DBCS
-        if ((s>string_buffer)&&(*(s-1)!= slash)&&
-            (back == NULL || (back!=NULL && s-1 != back) ))//MBCS DBCS
-        {
-          *s = backslash;
-          s++;
-        }
-        while (*fname && *fname!= slash && *fname!=backslash)
-        {
-          *s = *fname++;
-          if ((size_t)((++s)-string_buffer) > maxlen)
-            G_THROW( ERR_MSG("GURL.big_name") );
-        }
-        *s = 0;
       }
       char* s2=s;//MBCS DBCS
       for(;*s;s++) 
         EMPTY_LOOP;
-      char* back = _tcsrchr(s2,backslash);//MBCS DBCS
-      if ((s>string_buffer)&&(*(s-1)!= slash)
-          &&(back == NULL || (back!=NULL && s-1 != back) ))//MBCS DBCS
-      {
-        *s = backslash;
-        s++;
-      }
+	  if (s > string_buffer && s[-1] != slash && s[-1] != backslash)
+        *s++ = backslash;
       while (*fname && (*fname!= slash) && (*fname!=backslash))
       {
-        *s = *fname++;
-        if ((size_t)((++s)-string_buffer) > maxlen)
+        if (s > string_buffer + maxlen)
           G_THROW( ERR_MSG("GURL.big_name") );
+        *s++ = *fname++;
       }
       *s = 0;
-      for(;(*fname== slash)||(*fname==backslash);fname++)
-        EMPTY_LOOP;
     }
   }
-#elif defined(macintosh) // MACINTOSH implementation
-  strcpy(string_buffer, (const char *)(from?from:GOS::cwd()));
-  
-  if (!GStringRep::cmp(fname, string_buffer,strlen(string_buffer)) || is_file(fname))
-  {
-    strcpy(string_buffer, "");//please don't expand, the logic of filename is chaos.
-  }
-  
-  // Process path components
-  char *s = string_buffer + strlen(string_buffer);
-  if(fname)
-  {
-    for(;fname[0]==colon;fname++)
-      EMPTY_LOOP;
-    while(fname[0])
-    {
-      if (fname[0]== dot )
-      {
-        if (fname[1]==colon || !fname[1])
-        {
-          fname++;
-          continue;
-        }
-        if ((fname[1]== dot )
-          &&(fname[2]==colon || fname[2]==0))
-        {
-          fname +=2;
-          for(;(s>string_buffer+1)&&(*(s-1)==colon);s--)
-            EMPTY_LOOP;
-          for(;(s>string_buffer+1)&&(*(s-1)!=colon);s--)
-            EMPTY_LOOP;
-          continue;
-        }
-      }
-      if ((s==string_buffer)||(*(s-1)!=colon))
-      {
-        *s = colon;
-        s++;
-      }
-      while (*fname!=0 && *fname!=colon)
-      {
-        *s = *fname++;
-        if ((++s)-string_buffer > maxlen)
-          G_THROW( ERR_MSG("GURL.big_name") );
-      }
-      *s = 0;
-      for(;fname[0]==colon;fname++)
-        EMPTY_LOOP;
-    }
-  }
-  for(;(s>string_buffer+1) && (*(s-1)==colon);s--)
-    EMPTY_LOOP;
-  *s = 0;
-  return ((string_buffer[0]==colon)?(string_buffer+1):string_buffer);
 #else
 # error "Define something here for your operating system"
 #endif  

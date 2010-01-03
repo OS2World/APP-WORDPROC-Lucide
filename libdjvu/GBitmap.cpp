@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GBitmap.cpp,v 1.13 2007/03/25 20:48:31 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GBitmap.cpp,v 1.14 2007/07/14 01:21:56 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -71,7 +71,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.13 2007/03/25 20:48:31 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.14 2007/07/14 01:21:56 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -809,7 +809,7 @@ GBitmap::read_pgm_text(ByteStream &bs, int maxval)
   for (int n = nrows-1; n>=0; n--) 
     {
       for (int c = 0; c<ncolumns; c++)
-        row[c] = ramp[read_integer(lookahead, bs)];
+        row[c] = ramp[(int)read_integer(lookahead, bs)];
       row -= bytes_per_row;
     }
 }

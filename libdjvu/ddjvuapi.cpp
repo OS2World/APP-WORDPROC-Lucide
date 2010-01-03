@@ -53,7 +53,7 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 
-/* $Id: ddjvuapi.cpp,v 1.85 2007/03/25 20:48:35 leonb Exp $ */
+/* $Id: ddjvuapi.cpp,v 1.91 2009/05/17 23:57:42 leonb Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -121,11 +121,10 @@ using namespace DJVU;
 #include "miniexp.h"
 #include "ddjvuapi.h"
 
-#if HAVE_STDINT_H
+#if !defined(AUTOCONF) || HAVE_STDINT_H
 # include <stdint.h>
-#else
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
+#elif HAVE_INTTYPES_H
+# include <inttypes.h>
 #endif
 
 
@@ -1248,8 +1247,11 @@ ddjvu_document_get_fileinfo_imp(ddjvu_document_t *document, int fileno,
           myinfo.id = (nav) ? (const char *) nav->page_to_name(fileno) : 0;
           myinfo.name = myinfo.title = myinfo.id;
           GP<DjVuFile> file = doc->get_djvu_file(fileno, true);
-          GP<DataPool> pool = (file) ? file->get_init_data_pool() : 0;
-          myinfo.size = (pool) ? pool->get_length() : -1;
+          GP<DataPool> pool; 
+          if (file) 
+            pool = file->get_init_data_pool();
+          if (pool)
+            myinfo.size = pool->get_length();
           memcpy(info, &myinfo, infosz);
           return DDJVU_JOB_OK;
         }
@@ -3336,7 +3338,10 @@ ddjvu_document_save(ddjvu_document_t *document, FILE *output,
           optv += 1;
         }
       // go
-      job->obs = (indirect) ? 0 : ByteStream::create(output, "wb", false);
+      if (!indirect)
+        job->obs = ByteStream::create(output, "wb", false);
+      else 
+        job->obs = 0;
       job->start();
     }
   G_CATCH(ex)
@@ -3458,7 +3463,7 @@ ddjvu_document_get_outline(ddjvu_document_t *document)
 // S-Expressions (text)
 
 static struct zone_names_s {
-  char *name;
+  const char *name;
   DjVuTXT::ZoneType ztype;
   char separator;
 } zone_names[] = {
@@ -3525,6 +3530,9 @@ ddjvu_document_get_pagetext(ddjvu_document_t *document, int pageno,
 {
   G_TRY
     {
+      ddjvu_status_t status = document->status();
+      if (status != DDJVU_JOB_OK)
+        return miniexp_status(status);
       DjVuDocument *doc = document->doc;
       if (doc)
         {
@@ -3752,7 +3760,11 @@ get_file_anno(GP<DjVuFile> file)
           if (! file->are_incl_files_created())
             file->process_incl_chunks();
           if (! file->are_incl_files_created())
-            return miniexp_status(DDJVU_JOB_FAILED);
+            {
+              if (file->get_flags() & DjVuFile::STOPPED)
+                return miniexp_status(DDJVU_JOB_STOPPED);
+              return miniexp_status(DDJVU_JOB_FAILED);
+            }
         }
       return miniexp_dummy;
     }
@@ -3766,6 +3778,9 @@ ddjvu_document_get_pageanno(ddjvu_document_t *document, int pageno)
 {
   G_TRY
     {
+      ddjvu_status_t status = document->status();
+      if (status != DDJVU_JOB_OK)
+        return miniexp_status(status);
       DjVuDocument *doc = document->doc;
       if (doc)
         {
@@ -3790,6 +3805,9 @@ ddjvu_document_get_anno(ddjvu_document_t *document, int compat)
 {
   G_TRY
     {
+      ddjvu_status_t status = document->status();
+      if (status != DDJVU_JOB_OK)
+        return miniexp_status(status);
       DjVuDocument *doc = document->doc;
       if (doc)
         {
@@ -3824,6 +3842,7 @@ ddjvu_document_get_anno(ddjvu_document_t *document, int compat)
                   return get_file_anno(doc->get_djvu_file(id));
                 }
             }
+          return miniexp_nil;
         }
     }
   G_CATCH(ex)
@@ -3831,7 +3850,7 @@ ddjvu_document_get_anno(ddjvu_document_t *document, int compat)
       ERROR1(document, ex);
     }
   G_ENDCATCH;
-  return miniexp_nil;
+  return miniexp_status(DDJVU_JOB_FAILED);
 }
 
 

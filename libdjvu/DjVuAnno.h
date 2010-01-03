@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuAnno.h,v 1.9 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuAnno.h,v 1.10 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -87,7 +87,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.9 2007/03/25 20:48:30 leonb Exp $# */
+    #$Id: DjVuAnno.h,v 1.10 2007/05/19 03:07:33 leonb Exp $# */
 //@{
 
 
@@ -112,7 +112,7 @@ class ByteStream;
     encoding are normally done by \Ref{DjVuANT::decode}() and
     \Ref{DjVuANT::encode}() functions. */
 
-class DjVuANT : public GPEnabled
+class DJVUAPI DjVuANT : public GPEnabled
 {
 protected:
       /// Constructs an empty annotation object.
@@ -234,7 +234,7 @@ private:
     #encode()# and #decode()# functions of the proper annotation structure
     (like \Ref{ANT}). The real work of encoding and decoding is done by
     lower-level classes. */
-class DjVuAnno : public GPEnabled
+class DJVUAPI DjVuAnno : public GPEnabled
 {
 protected:
    DjVuAnno(void) {}

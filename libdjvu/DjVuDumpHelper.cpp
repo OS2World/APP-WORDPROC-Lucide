@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: DjVuDumpHelper.cpp,v 1.10 2007/03/25 20:48:30 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: DjVuDumpHelper.cpp,v 1.11 2008/02/26 05:07:40 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -124,7 +124,11 @@ static void
 display_fgbz(ByteStream & out_str, IFFByteStream &iff,
 	     GUTF8String, size_t, DjVmInfo&, int)
 {
-  out_str.format( "JB2 colors data");
+  GP<ByteStream> gbs = iff.get_bytestream();
+  int version = gbs->read8();
+  int size = gbs->read16();
+  out_str.format( "JB2 colors data, v%d, %d colors", 
+                  version & 0x7f, size);
 }
 
 static void
@@ -158,7 +162,8 @@ display_iw4(ByteStream & out_str, IFFByteStream &iff,
       unsigned char yhi = gbs->read8();
       unsigned char ylo = gbs->read8();
       out_str.format( ", v%d.%d (%s), %dx%d", major & 0x7f, minor,
-                      (major & 0x80 ? "b&w" : "color"), (xhi<<8)+xlo, (yhi<<8)+ylo );
+                      (major & 0x80 ? "b&w" : "color"), 
+                      (xhi<<8)+xlo, (yhi<<8)+ylo );
     }
 }
 

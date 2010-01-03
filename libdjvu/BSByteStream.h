@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: BSByteStream.h,v 1.9 2007/03/25 20:48:29 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: BSByteStream.h,v 1.10 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _BSBYTESTREAM_H
 #define _BSBYTESTREAM_H
@@ -144,7 +144,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.9 2007/03/25 20:48:29 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.10 2007/05/19 03:07:33 leonb Exp $# */
 //@{
 
 
@@ -198,7 +198,7 @@ namespace DJVU {
     BSByteStream object and before re-using the ByteStream object (see
     \Ref{IFFByteStream}.)
 */
-class BSByteStream : public ByteStream
+class DJVUAPI BSByteStream : public ByteStream
 {
 public:
 // Limits on block sizes

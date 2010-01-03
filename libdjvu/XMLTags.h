@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: XMLTags.h,v 1.10 2007/03/25 20:48:34 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: XMLTags.h,v 1.11 2008/01/27 11:36:27 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _LT_XMLTAGS__
 #define _LT_XMLTAGS__
@@ -85,7 +85,7 @@ class ByteStream;
 class XMLByteStream;
 class GURL;
 
-class lt_XMLTags : public GPEnabled
+class DJVUAPI lt_XMLTags : public GPEnabled
 {
 protected:
   lt_XMLTags();

@@ -53,8 +53,8 @@
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
 // 
-// $Id: GURL.h,v 1.11 2007/03/25 20:48:32 leonb Exp $
-// $Name: release_3_5_19 $
+// $Id: GURL.h,v 1.13 2008/01/27 11:36:27 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -91,7 +91,7 @@ namespace DJVU {
 // mixture of code for syntactically parsing the urls (which is was)
 // and file status code (only for local file: urls).
 
-    @version #$Id: GURL.h,v 1.11 2007/03/25 20:48:32 leonb Exp $#
+    @version #$Id: GURL.h,v 1.13 2008/01/27 11:36:27 leonb Exp $#
 */
 
 //@{
@@ -116,7 +116,7 @@ namespace DJVU {
     All other URLs are modified to contain only forward slashes.
 */
 
-class GURL
+class DJVUAPI GURL
 {
 public:
   class Filename;
@@ -370,21 +370,21 @@ public:
   static GUTF8String expand_name(const GUTF8String &filename, const char *fromdirname=0);
 };
 
-class GURL::UTF8 : public GURL
+class DJVUAPI GURL::UTF8 : public GURL
 {
 public:
   UTF8(const GUTF8String &xurl);
   UTF8(const GUTF8String &xurl, const GURL &codebase);
 };
 
-class GURL::Native : public GURL
+class DJVUAPI GURL::Native : public GURL
 {
 public:
   Native(const GNativeString &xurl);
   Native(const GNativeString &xurl, const GURL &codebase);
 };
 
-class GURL::Filename : public GURL
+class DJVUAPI GURL::Filename : public GURL
 {
 public:
   Filename(const GUTF8String &filename);
@@ -393,13 +393,13 @@ public:
   class Native;
 };
 
-class GURL::Filename::UTF8 : public GURL::Filename
+class DJVUAPI GURL::Filename::UTF8 : public GURL::Filename
 {
 public:
   UTF8(const GUTF8String &filename);
 };
 
-class GURL::Filename::Native : public GURL::Filename
+class DJVUAPI GURL::Filename::Native : public GURL::Filename
 {
 public:
   Native(const GNativeString &filename);
