@@ -1,5 +1,5 @@
 /* jconfig.wat --- jconfig.h for Watcom C/C++ on MS-DOS or OS/2. */
-/* see jconfig.doc for explanations */
+/* see jconfig.txt for explanations */
 
 #define HAVE_PROTOTYPES 1
 #define HAVE_UNSIGNED_CHAR 1
@@ -34,6 +34,5 @@
 #undef NEED_SIGNAL_CATCHER	/* Define this if you use jmemname.c */
 #undef DONT_USE_B_MODE
 #undef PROGRESS_REPORT		/* optional */
-
 
 #endif /* JPEG_CJPEG_DJPEG */
