@@ -101,7 +101,7 @@ extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 
 extern "C" char * EXPENTRY getDescription()
 {
-    return "Jpeg plugin, based on IJG JPEG Library v6b";
+    return "Jpeg plugin, based on IJG JPEG Library v7";
 }
 
 
