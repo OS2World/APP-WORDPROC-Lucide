@@ -670,7 +670,7 @@ MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2 )
             break;
     }
 
-    if ( SHORT2FROMMP( mp2 ) != SB_PAGEDRAG ) { 
+    if ( SHORT2FROMMP( mp2 ) != SB_PAGEDRAG ) {
         sVscrollInc = __max( -sVscrollPos * VScrollStep, __min( sVscrollInc,
                               ( sVscrollMax - sVscrollPos ) * VScrollStep ) );
         sVscrollInc = ( sVscrollInc / VScrollStep ) * VScrollStep;
@@ -713,6 +713,9 @@ MRESULT DocumentViewer::horizScroll( HWND hwnd, MPARAM mp2 )
         case SB_SLIDERTRACK:
         case SB_SLIDERPOSITION:
             sHscrollInc = SHORT1FROMMP( mp2 ) - sHscrollPos;
+            break;
+        case SB_PAGEDRAG:
+            sHscrollInc = (SHORT)SHORT1FROMMP( mp2 );
             break;
     }
 
@@ -1716,12 +1719,18 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
             WinSetPointer( HWND_DESKTOP, handClosedPtr );
             docDraggingEnd.x = xpos;
             docDraggingEnd.y = ypos;
+ 
+            SHORT hMove = docDraggingEnd.x - docDraggingStart.x;
+            if ( abs( hMove ) > 5 )
+            {
+                horizScroll( hwnd, MPFROM2SHORT( hMove, SB_PAGEDRAG ) );
+                docDraggingStart.x = xpos;
+            }
 
             SHORT vMove = docDraggingEnd.y - docDraggingStart.y;
-            if ( abs( vMove ) > 5 ) 
-            {            
+            if ( abs( vMove ) > 5 )
+            {
                 vertScroll( hwnd, MPFROM2SHORT( vMove, SB_PAGEDRAG ) );
-                docDraggingStart.x = xpos;
                 docDraggingStart.y = ypos;
             }
             return TRUE;
@@ -1839,6 +1848,17 @@ BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
                 }
             }
         }
+    }
+    return FALSE;
+}
+
+// handles WM_BUTTON2CLICK
+BOOL DocumentViewer::wmRightClick( HWND hwnd, SHORT xpos, SHORT ypos )
+{
+    if ( zoomMode )
+    {
+        zoomInOut( false );
+        return TRUE;
     }
     return FALSE;
 }
@@ -2177,11 +2197,11 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
         case WM_BUTTON2DOWN:
             _this->wmButton2Down( hwnd, SHORT1FROMMP( mp1 ), SHORT2FROMMP( mp1 ) );
             break;
-            
+
         case WM_BUTTON2UP:
             _this->wmButton2Up();
             break;
-            
+
         case WM_MOUSEMOVE:
             if ( _this->wmMouseMove( hwnd, SHORT1FROMMP( mp1 ), SHORT2FROMMP( mp1 ) ) ) {
                 return (MRESULT)TRUE;
@@ -2190,6 +2210,12 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
 
         case WM_BUTTON1CLICK:
             if ( _this->wmClick( hwnd, SHORT1FROMMP( mp1 ), SHORT2FROMMP( mp1 ) ) ) {
+                return (MRESULT)TRUE;
+            }
+            break;
+
+        case WM_BUTTON2CLICK:
+            if ( _this->wmRightClick( hwnd, SHORT1FROMMP( mp1 ), SHORT2FROMMP( mp1 ) ) ) {
                 return (MRESULT)TRUE;
             }
             break;

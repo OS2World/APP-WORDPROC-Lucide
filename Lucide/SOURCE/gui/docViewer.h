@@ -21,12 +21,12 @@
  * Alternatively, the contents of this file may be used under the terms of
  * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
  * in which case the provisions of the LGPL are applicable instead of those
- * above. If you wish to allow use of your version of this file only under the 
+ * above. If you wish to allow use of your version of this file only under the
  * terms of the LGPL, and not to allow others to use your version of this file
  * under the terms of the CDDL, indicate your decision by deleting the
  * provisions above and replace them with the notice and other provisions
  * required by the LGPL. If you do not delete the provisions above, a recipient
- * may use your version of this file under the terms of any one of the CDDL 
+ * may use your version of this file under the terms of any one of the CDDL
  * or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
@@ -90,13 +90,13 @@ class DocumentViewer
 
         void drawPage();
         void adjustSize();
-		void countPagesizes();
+        void countPagesizes();
 
         MRESULT vertScroll( HWND hwnd, MPARAM mp2 );
         MRESULT horizScroll( HWND hwnd, MPARAM mp2 );
         MRESULT wmDragOver( PDRAGINFO dragInfo );
-		void wmDrop( PDRAGINFO dragInfo );
-		void wmSize( HWND hwnd, MPARAM mp2 );
+        void wmDrop( PDRAGINFO dragInfo );
+        void wmSize( HWND hwnd, MPARAM mp2 );
         void wmPaint( HWND hwnd );
         void wmPaintCont( HWND hwnd );
         void wmPaintAsynch( HWND hwnd );
@@ -107,8 +107,9 @@ class DocumentViewer
         void wmButton2Up();
         BOOL wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmClick( HWND hwnd, SHORT xpos, SHORT ypos );
+        BOOL wmRightClick( HWND hwnd, SHORT xpos, SHORT ypos );
         BOOL wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 );
-		void wmTimer( USHORT idTimer );
+        void wmTimer( USHORT idTimer );
         void winPosToDocPos( PPOINTL startpoint, PPOINTL endpoint, LuRectangle *r );
         void winPosToDocPos( PageDrawArea *pda, LuRectangle *r );
         void docPosToWinPos( long pagenum, LuRectangle *r, PRECTL rcl );
@@ -171,7 +172,7 @@ class DocumentViewer
         bool docDraggingStarted;
         POINTL docDraggingStart;
         POINTL docDraggingEnd;
-        
+
         // fullscreen
         bool fullscreen;
         long secondsNoMouse;
@@ -211,7 +212,7 @@ class DocumentViewer
         bool caseSensitive;
         bool continueSearch;
         bool abortSearch;
-        
+
         // pointers
         HPOINTER handPtr;
         HPOINTER handClosedPtr;
