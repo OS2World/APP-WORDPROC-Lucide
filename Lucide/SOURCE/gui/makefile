@@ -1,12 +1,12 @@
 .autodepend
 
-TEST=0
-VERSION=1.22
+TEST=1
+VERSION=1.30 beta1
 
 !if $(TEST)==1
-	BMODE=os2v2
+    BMODE=os2v2
 !else
-	BMODE=os2v2_pm
+    BMODE=os2v2_pm
 !endif
 
 OBJDIR = ..\..\OBJS
@@ -19,10 +19,10 @@ EXEDIR = ..\..\BIN
 
 
 .CPP.OBJ:
-     WPP386 @make.cfg -xs -fo$@ $<
+    WPP386 @make.cfg -xs -fo$@ $<
 
 .C.OBJ:
-     WCC386 @make.cfg -fo$@ $<
+    WCC386 @make.cfg $(CFLAGS) -fo$@ $<
 
 .idl.xh:
     sc -c -s"xc;xih;xh" ..\plugins\ludoc $<
@@ -79,6 +79,7 @@ lib ..\plugins\ludoc\ludoc
 lib somtk
 lib libconv
 lib libuls
+lib PMPRINTF
 export LucideMain
 | tmpmake.lnk >NUL
     wlink @tmpmake.lnk

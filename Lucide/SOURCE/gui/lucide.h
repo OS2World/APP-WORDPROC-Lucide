@@ -37,6 +37,11 @@
 
 #include "globals.h"
 
+// debug support
+#ifdef __TEST__
+#define   _PMPRINTF_
+#endif
+#include  "PMPRINTF.H"
 
 class LuDocument;
 class ProgressDlg;
@@ -60,16 +65,16 @@ class Lucide
 {
     private:
     
-		static ProgressDlg *loadProgressDlg;
-		static char docFullName[ CCHMAXPATH ];
-		static char docDirName[ CCHMAXPATHCOMP ];
-		static char *password;
-		static bool docLoaded;
-		static long loadErrorCode;
-		static char *loadError;
-		static bool isMaxview;
-		static bool isFullscreen;
-		static LuWindowPos winPos;
+        static ProgressDlg *loadProgressDlg;
+        static char docFullName[ CCHMAXPATH ];
+        static char docDirName[ CCHMAXPATHCOMP ];
+        static char *password;
+        static bool docLoaded;
+        static long loadErrorCode;
+        static char *loadError;
+        static bool isMaxview;
+        static bool isFullscreen;
+        static LuWindowPos winPos;
     
         static void setOfPages( long pages );
         static void enableZoomMenus();
@@ -82,11 +87,11 @@ class Lucide
         static int thumbnailDataLen;
 
     public:
-		static char docFileName[ CCHMAXPATHCOMP ];
+        static char docFileName[ CCHMAXPATHCOMP ];
         static bool dontSwitchPage;
         static SHORT splitterPos;
         static bool showIndex;
-		static ActiveWindow activeWindow;
+        static ActiveWindow activeWindow;
         
         static void newWindow( char *file, bool addDir );
         static void openDocument();
