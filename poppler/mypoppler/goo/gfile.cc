@@ -348,7 +348,8 @@ GBool isAbsolutePath(char *path) {
   return strchr(path, ':') ||
 	 (path[0] == '[' && path[1] != '.' && path[1] != '-');
 
-#elif defined(__EMX__) || defined(_WIN32)
+/* Lucide */
+#elif defined(__EMX__) || defined(_WIN32) || defined(OS2)
   //---------- OS/2+EMX and Win32 ----------
   return path[0] == '/' || path[0] == '\\' || path[1] == ':';
 
@@ -402,7 +403,7 @@ GooString *makePathAbsolute(GooString *path) {
   path->del(0, 1);
   return path;
 
-  /* Lucide */
+/* Lucide */
 #elif defined(OS2)
   //---------- OS/2 -----------
   char buf[_MAX_PATH];
@@ -514,7 +515,8 @@ GBool openTempFile(GooString **name, FILE **f, char *mode) {
   }
   delete s;
   return gFalse;
-#elif defined(VMS) || defined(__EMX__) || defined(ACORN) || defined(MACOS)
+/* Lucide */
+#elif defined(VMS) || defined(__EMX__) || defined(ACORN) || defined(MACOS) || defined(OS2)
   //---------- non-Unix ----------
   char *s;
 
