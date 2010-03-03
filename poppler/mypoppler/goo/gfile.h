@@ -61,6 +61,7 @@ extern "C" {
 #    if HAVE_NDIR_H
 #      include <ndir.h>
 #    endif
+/* Lucide */
 #    if HAVE_DIRECT_H
 #      include <direct.h>
 #    endif
@@ -128,9 +129,9 @@ public:
 
 private:
 
-  GooString *name;              // dir/file name
+  GooString *name;		// dir/file name
   GooString *fullPath;
-  GBool dir;                    // is it a directory?
+  GBool dir;			// is it a directory?
 };
 
 class GDir {
@@ -143,17 +144,17 @@ public:
 
 private:
 
-  GooString *path;              // directory path
-  GBool doStat;                 // call stat() for each entry?
+  GooString *path;		// directory path
+  GBool doStat;			// call stat() for each entry?
 #if defined(_WIN32)
   WIN32_FIND_DATA ffd;
   HANDLE hnd;
 #elif defined(ACORN)
 #elif defined(MACOS)
 #else
-  DIR *dir;                     // the DIR structure from opendir()
+  DIR *dir;			// the DIR structure from opendir()
 #ifdef VMS
-  GBool needParent;             // need to return an entry for [-]
+  GBool needParent;		// need to return an entry for [-]
 #endif
 #endif
 };

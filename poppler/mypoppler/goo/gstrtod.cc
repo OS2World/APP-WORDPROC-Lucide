@@ -1,5 +1,5 @@
 /* This file is part of Libspectre.
- *
+ * 
  * Copyright (C) 2007 Albert Astals Cid <aacid@kde.org>
  * Copyright (C) 2007 Carlos Garcia Campos <carlosgc@gnome.org>
  *
@@ -22,6 +22,7 @@
 
 #include "gstrtod.h"
 
+/* Lucide */
 #include <locale.h>
 #include <errno.h>
 #include <stdlib>
@@ -31,7 +32,7 @@
   (c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t' || c == '\v')
 #define ascii_isdigit(c) \
   (c >= '0' && c <= '9')
-
+  
 double gatof(const char *nptr)
 {
   return gstrtod(nptr, NULL);
@@ -62,15 +63,15 @@ double gstrtod(const char *nptr, char **endptr)
     /* Skip leading space */
     while (ascii_isspace (*p))
       p++;
-
+    
     /* Skip leading optional sign */
     if (*p == '+' || *p == '-')
       p++;
-
+    
     if (ascii_isdigit (*p) || *p == '.') {
       while (ascii_isdigit (*p))
         p++;
-
+      
       if (*p == '.')
         decimal_point_pos = p++;
 
@@ -91,10 +92,10 @@ double gstrtod(const char *nptr, char **endptr)
 
   if (decimal_point_pos) {
     char *copy, *c;
-
+    
     /* We need to convert the '.' to the locale specific decimal point */
     copy = (char *) malloc (end - nptr + 1 + decimal_point_len);
-
+    
     c = copy;
     memcpy (c, nptr, decimal_point_pos - nptr);
     c += decimal_point_pos - nptr;
@@ -118,11 +119,11 @@ double gstrtod(const char *nptr, char **endptr)
     free (copy);
   } else if (end) {
     char *copy;
-
+    
     copy = (char *) malloc (end - (char *)nptr + 1);
     memcpy (copy, nptr, end - nptr);
     *(copy + (end - (char *)nptr)) = 0;
-
+    
     errno = 0;
     val = strtod (copy, &fail_pos);
     strtod_errno = errno;

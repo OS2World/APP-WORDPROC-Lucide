@@ -33,6 +33,7 @@
 #include "SplashErrorCodes.h"
 #include "SplashBitmap.h"
 #include "poppler/Error.h"
+/* Lucide */
 #include "goo/PNGWriter.h"
 
 //------------------------------------------------------------------------
@@ -40,8 +41,8 @@
 //------------------------------------------------------------------------
 
 SplashBitmap::SplashBitmap(int widthA, int heightA, int rowPad,
-                           SplashColorMode modeA, GBool alphaA,
-                           GBool topDown) {
+			   SplashColorMode modeA, GBool alphaA,
+			   GBool topDown) {
   width = widthA;
   height = heightA;
   mode = modeA;
@@ -121,7 +122,7 @@ SplashError SplashBitmap::writePNMFile(char *fileName) {
   }
 
   e = this->writePNMFile(f);
-
+  
   fclose(f);
   return e;
 }
@@ -139,8 +140,8 @@ SplashError SplashBitmap::writePNMFile(FILE *f) {
     for (y = 0; y < height; ++y) {
       p = row;
       for (x = 0; x < width; x += 8) {
-        fputc(*p ^ 0xff, f);
-        ++p;
+	fputc(*p ^ 0xff, f);
+	++p;
       }
       row += rowSize;
     }
@@ -152,8 +153,8 @@ SplashError SplashBitmap::writePNMFile(FILE *f) {
     for (y = 0; y < height; ++y) {
       p = row;
       for (x = 0; x < width; ++x) {
-        fputc(*p, f);
-        ++p;
+	fputc(*p, f);
+	++p;
       }
       row += rowSize;
     }
@@ -165,10 +166,10 @@ SplashError SplashBitmap::writePNMFile(FILE *f) {
     for (y = 0; y < height; ++y) {
       p = row;
       for (x = 0; x < width; ++x) {
-        fputc(splashRGB8R(p), f);
-        fputc(splashRGB8G(p), f);
-        fputc(splashRGB8B(p), f);
-        p += 3;
+	fputc(splashRGB8R(p), f);
+	fputc(splashRGB8G(p), f);
+	fputc(splashRGB8B(p), f);
+	p += 3;
       }
       row += rowSize;
     }
@@ -180,10 +181,10 @@ SplashError SplashBitmap::writePNMFile(FILE *f) {
     for (y = 0; y < height; ++y) {
       p = row;
       for (x = 0; x < width; ++x) {
-        fputc(splashBGR8R(p), f);
-        fputc(splashBGR8G(p), f);
-        fputc(splashBGR8B(p), f);
-        p += 4;
+	fputc(splashBGR8R(p), f);
+	fputc(splashBGR8G(p), f);
+	fputc(splashBGR8B(p), f);
+	p += 4;
       }
       row += rowSize;
     }
@@ -196,10 +197,10 @@ SplashError SplashBitmap::writePNMFile(FILE *f) {
     for (y = 0; y < height; ++y) {
       p = row;
       for (x = 0; x < width; ++x) {
-        fputc(splashBGR8R(p), f);
-        fputc(splashBGR8G(p), f);
-        fputc(splashBGR8B(p), f);
-        p += 3;
+	fputc(splashBGR8R(p), f);
+	fputc(splashBGR8G(p), f);
+	fputc(splashBGR8B(p), f);
+	p += 3;
       }
       row += rowSize;
     }
@@ -276,7 +277,7 @@ SplashError SplashBitmap::writePNGFile(char *fileName) {
   }
 
   e = writePNGFile(f);
-
+  
   fclose(f);
   return e;
 }
@@ -316,7 +317,7 @@ SplashError SplashBitmap::writePNGFile(FILE *f) {
       delete[] row_pointers;
     }
     break;
-
+    
     case splashModeMono8:
     {
       png_byte *row = new png_byte[3 * width];
@@ -337,7 +338,7 @@ SplashError SplashBitmap::writePNGFile(FILE *f) {
       delete[] row;
     }
     break;
-
+    
     case splashModeMono1:
     {
       png_byte *row = new png_byte[3 * width];
@@ -358,12 +359,12 @@ SplashError SplashBitmap::writePNGFile(FILE *f) {
       delete[] row;
     }
     break;
-
+    
     default:
     // can't happen
     break;
   }
-
+  
   if (writer->close()) {
     delete writer;
     return splashErrGeneric;

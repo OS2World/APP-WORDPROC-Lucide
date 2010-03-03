@@ -1091,7 +1091,8 @@ static FcPattern *buildFcPattern(GfxFont *font)
     else lang = "xx";
   }
   else lang = "xx";
-  
+
+/* Lucide */  
   /*p = FcPatternBuild(NULL,
                     FC_FAMILY, FcTypeString, family,
                     FC_LANG, FcTypeString, lang,
