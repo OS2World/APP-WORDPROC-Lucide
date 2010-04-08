@@ -30,6 +30,11 @@ In order to build Lucide, you will need the following tools:
 
   - RC.EXE version 4 or 5 which should be located in a directory listed in PATH.
 
+  - LxLite 1.3.3 or above should also be located in PATH, otherwise packing the
+    resulting EXEs and DLLs will be disabled. You can take LxLite here:
+    
+      http://www.os2site.com/sw/util/archiver/lxlt133.zip
+
 
 
 SETTING UP THE ENVIRONMENT
