@@ -10,5 +10,16 @@ include $(KBUILD_PATH)/subheader.kmk
 include $(PATH_SUB_CURRENT)/plugins/Makefile.kmk
 include $(PATH_SUB_CURRENT)/gui/Makefile.kmk
 
+#
+# Target lists
+#
+INSTALLS += Lucide_doc
+
+#
+# Lucide documentation
+#
+Lucide_doc_INST		 = $(notdir $(PATH_BIN))
+Lucide_doc_SOURCES	:= changelog readme $(wildcard $(PATH_SUB_CURRENT)/readme_*.txt)
+
 include $(FILE_KBUILD_SUB_FOOTER)
 
