@@ -971,7 +971,7 @@ static char *unicode_to_char( Unicode *unicode, int len )
 
 static char *newstrFromUTF8( const char *s, void *objUtf8, void *objSys )
 {
-    return uniConvertString( s, strlen( s ), &objUtf8, &objSys, NULL );
+    return uniConvertString( s, strlen( s ), objUtf8, objSys, NULL );
 }
 
 static void add_item( Environment *ev, PDFDoc *doc, LuIndexNode *n, GooList *items,
