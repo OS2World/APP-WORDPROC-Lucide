@@ -1,0 +1,54 @@
+## @file
+#
+SUB_DEPTH = ../..
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Poppler library tool
+#
+TEMPLATE_PopplerLib				 = Poppler library tool
+TEMPLATE_PopplerLib_EXTENDS		 = LucideCxx
+TEMPLATE_PopplerLib_EXTENDS_BY	 = appending
+TEMPLATE_PopplerLib_CXXFLAGS	 =
+#TEMPLATE_PopplerLib_TOOL		 = OPENWATCOM
+#TEMPLATE_PopplerLib_CXXFLAGS	 = -zq -zp=8 -bm -ot -ox -xs -oh -xr -sg -5 -fp5
+TEMPLATE_PopplerLib_DEFS		 =
+TEMPLATE_PopplerLib_INCS		 = .
+
+# @todo Turn off the warning. Better is to fix poppler
+TEMPLATE_PopplerLib_CXXFLAGS	+= -Wno-write-strings
+
+#
+# Target lists
+#
+LIBRARIES += fofi goo splash poppler
+
+#
+# Poppler library (in parts)
+#
+
+fofi_TEMPLATE	= PopplerLib
+fofi_SOURCES	= $(wildcard $(fofi_PATH)/fofi/*.cc)
+
+goo_TEMPLATE	= PopplerLib
+goo_SOURCES		= $(wildcard $(goo_PATH)/goo/*.cc)
+
+splash_TEMPLATE	= PopplerLib
+splash_INCS		= ../freetype2/include
+splash_SOURCES	= $(wildcard $(splash_PATH)/splash/*.cc)
+
+poppler_TEMPLATE	= PopplerLib
+poppler_INCS		= goo ../fc-emulate-os2 ../../libjpeg
+poppler_SOURCES		= $(filter-out \
+	$(addprefix $(poppler_PATH)/poppler/,                                     \
+		ABWOutputDev.cc                                                       \
+		ArthurOutputDev.cc                                                    \
+		CairoFontEngine.cc                                                    \
+		CairoOutputDev.cc                                                     \
+		FlateStream.cc                                                        \
+		GlobalParamsWin.cc                                                    \
+		JPEG2000Stream.cc)                                                    \
+	,$(wildcard $(poppler_PATH)/poppler/*.cc))
+
+include $(FILE_KBUILD_SUB_FOOTER)
+

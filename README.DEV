@@ -1,0 +1,83 @@
+This file contains instructions on building Lucide.
+
+
+
+REQUIREMENTS
+
+In order to build Lucide, you will need the following tools:
+
+  - kBuild version 0.1.5 (r2206) or later. Get it with the following command:
+
+      svn co http://svn.netlabs.org/repos/kbuild/trunk/kBuild -r 2206
+
+  - GCC compiler version 3.3.5 or 4.4.2 for OS/2 and the patched OpenWatcom
+    linker. The GCC compiler must be set up to use the OpenWatcom linker for
+    linking.
+
+    If you do not have a working GCC environment with the above requirements, it
+    is recommended to download a ready-to-use GCC 4.2.2 distribution from here:
+
+      ftp://ftp.netlabs.org/pub/qt4/tools/gcc-4_4_2-complete-20091205.zip
+
+    Follow the installation instructions contained in the README file inside
+    this ZIP archive to set up the GCC environment.
+
+  - SOM SDK 2.x. The one that is part of the OS/2 Tooklit version 4.5 is known
+    to work and recommended. Note that installing the Toolkit is not required
+    (though it will also work) -- you may simply extract the "som" subdirectory
+    (with all its contents) out of the Toolkit and place it to some directory.
+    You don't need to put any statements in CONFIG.SYS in this case.
+
+  - RC.EXE version 4 or 5 which should be located in a directory listed in PATH.
+
+
+
+SETTING UP THE ENVIRONMENT
+
+Copy "LocalEnv.cmd.tpl" to "LocalEnv.cmd" and adjust the copy to match your
+environment. Each option in "LocalEnv.cmd.tpl" has a comment describing what it
+does.
+
+You may also want to adjust the configuration of the Lucide build according to
+your needs. To do so, copy "LocalConfig.kmk.tpl" to "LocalConfig.kmk" and adjust
+the copy to match your requirements. Each option in "LocalConfig.kmk.tpl" has a
+comment descriping what it does.
+
+Now, start "env.cmd" to setup the environment and type "kmk" in the root
+directory of the Lucide source tree to start kBuild and build the release
+version of Lucide and all plugins.
+
+If you are a developer, you may prefer to use the "se.cmd" script instead of
+starting "env.cmd" in each new shell. This script will allow you to run "kmk"
+in the correct environment from any directory inside the Lucide source tree by
+simply typing "se kmk" in that directory. This is especially handy if you use
+e.g. File Commander as your development IDE. The "se.cmd" script may be taken
+at:
+
+  ftp://ftp.netlabs.org/pub/qt4/tools/se10.zip
+
+
+
+USEFUL KBUILD VARIABLES
+
+These are the frequently used variables that change the Lucide build or
+behavior. You may set them in the OS/2 environment or put to your
+"LocalConfig.kmk" or pass to "kmk" as command line arguments in the form of
+"VARIABLE=VALUE".
+
+  * BUILD_TYPE
+
+    Build type. May be set to "release" (default) or "debug".
+
+    Note that you may also pass "debug" or "release" as the first argument to
+    the "env.cmd" script to set the build type to "debug".
+
+    Hint: If you use "se.cmd", you may pass arguments to "env.cmd" and start
+    "kmk" in one step, like that: "se @(debug) kmk".
+
+  * KBUILD_VERBOSE
+
+    Level of kBuild verbosity, 1 to 3 (default is nothing which means almost
+    quiet). The highest level will make kBuild print every command it executes
+    which is useful when something does not work like you want.
+

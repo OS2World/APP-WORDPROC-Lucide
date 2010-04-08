@@ -1,0 +1,59 @@
+#ifndef lupifield_idl
+#define lupifield_idl
+
+#include <luifield.idl>
+#include <lupoppler.idl>
+
+interface Page;         // declared in poppler/Page.h
+interface FormWidget;   // declared in poppler/Form.h
+
+/**
+ * LuPopplerInputField represents a PDF input field.
+ *
+ * This interface exposes the FormWidget poppler class.
+ */
+interface LuPopplerInputField : LuInputField
+{
+    void init_widget( inout somInitCtrl ctrl, in LuPopplerDocument aDoc,
+                      in long aPagenum, in Page aPage,
+                      in FormWidget aFormWidget );
+
+#ifdef __SOMIDL__
+
+    implementation
+    {
+        releaseorder: init_widget;
+
+        init_widget: init;
+        somDestruct: override;
+
+        getType: override;
+        getRectangle: override;
+        getID: override;
+        isModified: override;
+        isReadOnly: override;
+
+        LuPopplerDocument doc;
+        long pagenum;
+        Page page;
+        FormWidget widget;
+        LuRectangle rect;
+
+        passthru C_h_before =  ""
+            ""
+            "#include <lupoppler.h>"
+            "#include <Form.h>"
+            "";
+
+        passthru C_xh_before =  ""
+            ""
+            "#include <lupoppler.xh>"
+            "#include <Form.h>"
+            "";
+    };
+
+#endif // __SOMIDL__
+
+};
+
+#endif // lupifield_idl

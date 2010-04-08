@@ -1,0 +1,112 @@
+#ifndef luichoice_idl
+#define luichoice_idl
+
+#include <somobj.idl>
+#include <luifield.idl>
+
+/**
+ * LuInputChoice represents a choice box.
+ */
+interface LuInputChoice : LuInputField
+{
+    /**
+     * Returns the number of options in the choice box.
+     *
+     * To be overriden. By default, returns 0.
+     */
+    long getCount();
+
+    /**
+     * Returns the display name corresponding to the option with the given
+     * (zero-based) number.
+     *
+     * To be overriden. By default, does nothing.
+     */
+    string getChoice(in long aNumber);
+
+    /**
+     * Selects the option with the given (zero-based) number.
+     *
+     * To be overriden. By default, does nothing.
+     */
+    void select(in long aNumber);
+
+    /**
+     * Toggles the selection of the option with the given (zero-based) number.
+     *
+     * To be overriden. By default, does nothing.
+     */
+    void toggle(in long aNumber);
+
+    /**
+     * Deselects all options.
+     *
+     * To be overriden. By default, does nothing.
+     */
+    void deselectAll();
+
+    /**
+     * Sets the custom text for this choice box. Does nothing if isEditable()
+     * is FALSE.
+     *
+     * To be overriden. By default, does nothing.
+     */
+    void setChoiceText(in string aText);
+
+    /**
+     * Returns the custom text set for this choice box or a NULL string
+     * if isEditable() is FALSE.
+     *
+     * To be overriden. By default, returns NULL.
+     */
+    string getChoiceText();
+
+    /**
+     * Returns TRUE if the option with the given (zero-based) number is
+     * selected.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isSelected(in long aNumber);
+
+    /**
+     * Returns TRUE if this is a combo box FALSE if this is a list box.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isComboBox();
+
+    /**
+     * Returns TRUE if the choice box is editable. See setChoiceText().
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isEditable();
+
+    /**
+     * Returns TRUE if multiple options may be selected in this choice box.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isMultiSelectable();
+
+    /**
+     * Returns TRUE if the text field may be spellchecked.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isSpellCheckable();
+
+#ifdef __SOMIDL__
+
+    implementation
+    {
+        releaseorder: getCount, getChoice, select, toggle, deselectAll,
+                      setChoiceText, getChoiceText, isSelected, isComboBox,
+                      isEditable, isMultiSelectable, isSpellCheckable;
+    };
+
+#endif // __SOMIDL__
+};
+
+#endif // luichoice_idl

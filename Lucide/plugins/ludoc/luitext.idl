@@ -1,0 +1,94 @@
+#ifndef luitext_idl
+#define luitext_idl
+
+#include <somobj.idl>
+#include <luifield.idl>
+
+/**
+ * LuInputText represents a text field.
+ */
+interface LuInputText : LuInputField
+{
+    /**
+     * Returns the contents of the text field as a zero-terminated UTF-8 string.
+     *
+     * To be overriden. By default, returns NULL.
+     */
+    string getContents();
+
+    /**
+     * Sets the contents of the text field using a zero-terminated UTF-8 string.
+     *
+     * TO be overriden. By default, does nothing.
+     */
+    void setContents(in string aContents);
+
+    /**
+     * Returns TRUE if this is a multi-line text field.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isMultiLine();
+
+    /**
+     * Returns TRUE if this is a password entry field.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isPassword();
+
+    /**
+     * Returns TRUE if this is a file name entry field.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isFileName();
+
+    /**
+     * Returns TRUE if the text field may be spellchecked.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isSpellCheckable();
+
+    /**
+     * Returns TRUE if the is text field may be scrolled.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isScrollable();
+
+    /**
+     * Returns TRUE if the text field uses comb formatting.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isComb();
+
+    /**
+     * Returns TRUE if the text field uses rich text formatting.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isRichText();
+
+    /**
+     * Returns the maximum length of the text field.
+     *
+     * To be overriden. By default, returns 0.
+     */
+    long getMaximumLength();
+
+#ifdef __SOMIDL__
+
+    implementation
+    {
+        releaseorder: getContents, setContents, isMultiLine, isPassword,
+                      isFileName, isSpellCheckable, isScrollable, isComb,
+                      isRichText, getMaximumLength;
+    };
+
+#endif // __SOMIDL__
+};
+
+#endif // luitext_idl

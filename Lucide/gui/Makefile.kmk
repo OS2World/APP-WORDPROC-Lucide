@@ -1,0 +1,76 @@
+## @file
+#
+
+SUB_DEPTH = ../..
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Target lists
+#
+DLLS		+= Lucide_dll
+PROGRAMS	+= Lucide
+INSTALLS	+= Lucide_lng
+
+#
+# Lucide DLL
+#
+Lucide_dll_TEMPLATE	 = SomDll
+Lucide_dll_NAME		 = Lucide
+Lucide_dll_INCS		 = \
+	os2tk                                                                     \
+	lupoppler                                                                 \
+	../plugins/ludoc $(PATH_Lucide_dll)/../ludoc
+Lucide_dll_CXXFLAGS	 = -DVERSION="\"$(VERSION)\""
+Lucide_dll_DEFS.debug	 = __TEST__
+Lucide_dll_SOURCES	 = \
+	lucide.cpp                                                                \
+	luutils.cpp                                                               \
+	clipbrd.cpp                                                               \
+	pmsplitter.cpp                                                            \
+	pmtoolbar.cpp                                                             \
+	toolbar.cpp                                                               \
+	pluginman.cpp                                                             \
+	pluginViewDlg.cpp                                                         \
+	fontsInfoDlg.cpp                                                          \
+	docInfoDlg.cpp                                                            \
+	findDlg.cpp                                                               \
+	progressDlg.cpp                                                           \
+	aboutDlg.cpp                                                              \
+	printDlg.cpp                                                              \
+	print.cpp                                                                 \
+	settingsDlg.cpp                                                           \
+	lusettings.cpp                                                            \
+	docViewer.cpp                                                             \
+	indexWindow.cpp                                                           \
+	linklab.c                                                                 \
+	wwbtn.c                                                                   \
+	intern.cpp                                                                \
+	messages.cpp                                                              \
+	stbrowser.c                                                               \
+	pipemon.cpp                                                               \
+	lucidethumbs.cpp                                                          \
+	passwordDlg.cpp                                                           \
+	recent.cpp                                                                \
+	lcdfdlg.cpp                                                               \
+	Lucide.rc
+Lucide_dll_LIBPATH	 = $(PATH_LIB)
+Lucide_dll_LIBS		 = \
+	ludoc.lib
+
+#
+# Lucide GUI application
+#
+Lucide_TEMPLATE	 = LucideC-PM
+Lucide_INCS		 =
+Lucide_CFLAGS	 = -DVERSION="\"$(VERSION)\""
+Lucide_DEFS.debug	 = __TEST__
+Lucide_SOURCES	 = lcd.c lcd.rc
+
+#
+# Lucide language files
+#
+Lucide_lng_INST		 = $(notdir $(PATH_BIN))
+Lucide_lng_SOURCES	:= $(wildcard $(PATH_SUB_CURRENT)/../lng/*.lng)
+
+include $(FILE_KBUILD_SUB_FOOTER)
+

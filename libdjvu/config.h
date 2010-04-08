@@ -130,7 +130,11 @@
 #undef HAVE_SIGACTION
 
 /* define if the compiler comes with standard includes */
+#if defined(__WATCOM__)
 #undef HAVE_STDINCLUDES
+#else
+#define HAVE_STDINCLUDES 1
+#endif
 
 /* Define to 1 if you have the <stdint.h> header file. */
 /* Lucide */

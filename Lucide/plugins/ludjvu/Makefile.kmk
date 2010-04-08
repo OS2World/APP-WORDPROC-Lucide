@@ -1,0 +1,30 @@
+## @file
+#
+
+SUB_DEPTH = ../../..
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Target lists
+#
+DLLS		+= ludjvu
+
+#
+# LuDjvuDocument SOM Class
+#
+ludjvu_TEMPLATE	 = SomDll
+ludjvu_INCS		 = \
+	ludjvu                                                                    \
+	../ludoc $(PATH_ludjvu)/../ludoc                                          \
+	../../../libdjvu
+ludjvu_SOURCES	 = \
+	ludjvu.idl                                                                \
+	ludjvu.def
+ludjvu_IDLSOURCES	 = \
+	ludjvu.cpp
+ludjvu_LIBS		 = \
+	$(PATH_LIB)/ludoc$(SUFF_LIB) \
+	$(PATH_LIB)/djvu$(SUFF_LIB)
+
+include $(FILE_KBUILD_SUB_FOOTER)
+

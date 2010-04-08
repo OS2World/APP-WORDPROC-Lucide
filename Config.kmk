@@ -1,0 +1,398 @@
+## @file
+# Global Project Configuration File
+#
+
+#------------------------------------------------------------------------------
+# Global definitions
+#------------------------------------------------------------------------------
+
+#
+# Lucide version string
+#
+VERSION		= 1.30 beta1
+
+#------------------------------------------------------------------------------
+# Common libraries referenced by components
+#------------------------------------------------------------------------------
+
+#
+# poppler
+#
+LIB_POPPLER_LIBS	=  $(patsubst %,$(PATH_LIB)/%$(SUFF_LIB), \
+	fofi goo poppler splash fontconfig freetype2 jpeg)
+
+#------------------------------------------------------------------------------
+# General Stuff
+#------------------------------------------------------------------------------
+
+#
+# Lucide C Compiler template
+#
+TEMPLATE_LucideC			 = Lucide C Compiler
+TEMPLATE_LucideC_TOOL		 = GCC3OMF
+TEMPLATE_LucideC_CFLAGS		 =
+TEMPLATE_LucideC_DEFS		 = OS2
+
+#
+# Lucide C++ Compiler template
+#
+TEMPLATE_LucideCxx			 = Lucide C++ Compiler
+TEMPLATE_LucideCxx_TOOL		 = GXX3OMF
+TEMPLATE_LucideCxx_CXXFLAGS	 =
+TEMPLATE_LucideCxx_DEFS		 = OS2
+
+#
+# Lucide C PM application template
+#
+TEMPLATE_LucideC-PM				 = Lucide C PM application
+TEMPLATE_LucideC-PM_EXTENDS		 = LucideC
+TEMPLATE_LucideC-PM_EXTENDS_BY	 = appending
+TEMPLATE_LucideC-PM_LDFLAGS.release	 = -Zlinker /PM:PM -Zno-fork
+TEMPLATE_LucideC-PM_LDFLAGS.debug	 = -Zlinker /PM:VIO
+
+#
+# Lucide C++ PM application template
+#
+TEMPLATE_LucideCxx-PM				 = Lucide C++ PM application
+TEMPLATE_LucideCxx-PM_EXTENDS		 = LucideCxx
+TEMPLATE_LucideCxx-PM_EXTENDS_BY	 = appending
+TEMPLATE_LucideCxx-PM_LDFLAGS		 = $(TEMPLATE_LucideC-PM_LDFLAGS)
+
+#------------------------------------------------------------------------------
+# GCC Stuff
+#------------------------------------------------------------------------------
+
+#
+# Add RC support to GXX3OMF and GCC3OMF
+# (@todo create a new tool as extension to reuse the existing LINK commands)
+#
+
+TOOL_GXX3OMF_RC					?= rc$(HOSTSUFF_EXE)
+TOOL_GXX3OMF_RCOBJSUFF			?= .res
+
+TOOL_GXX3OMF_COMPILE_RC_DEPEND	 =
+TOOL_GXX3OMF_COMPILE_RC_DEPORD	 =
+TOOL_GXX3OMF_COMPILE_RC_OUTPUT	 =
+TOOL_GXX3OMF_COMPILE_RC_OUTPUT_MAYBE	 =
+define TOOL_GXX3OMF_COMPILE_RC_CMDS
+	$(QUIET)cd $(subst /,\\,$(patsubst %/,%,$(dir $(source)))) && \
+		$(TOOL_GXX3OMF_RC) -n -r \
+		$(flags) \
+		$(addprefix -i ,$(incs) $(subst ;, ,$(C_INCLUDE_PATH))) \
+		$(addprefix -D ,$(defs)) \
+		$(source) $(obj)
+endef
+
+override define TOOL_GXX3OMF_LINK_DLL_CMDS
+	$(QUIET)$(APPEND) -n $(outbase).rsp\
+		$(TOOL_GXX3OMF_LDFLAGS.dll)\
+		$(flags)\
+		-o $(out)\
+		$(filter-out %.res,$(objs))\
+		$(foreach p,$(libpath), -L$(p))\
+		$(othersrc)\
+		$(foreach lib,$(libs), $(if $(findstring $(lib),$(subst /,x,$(lib))), -l$(patsubst lib%,%,$(lib)), $(lib)))\
+		-Zmap=$(outbase).map
+	$(QUIET)$(TOOL_GXX3OMF_LD) @$(outbase).rsp
+	$(if $(filter %.res,$(objs)), \
+		$(QUIET)$(TOOL_GXX3OMF_RC) $(filter %.res,$(objs)) $(out))
+endef
+
+override define TOOL_GXX3OMF_LINK_PROGRAM_CMDS
+	$(QUIET)$(APPEND) -n $(outbase).rsp\
+		$(flags)\
+		-o $(out)\
+		$(filter-out %.res,$(objs))\
+		$(foreach p,$(libpath), -L$(p))\
+		$(othersrc)\
+		$(foreach lib,$(libs), $(if $(findstring $(lib),$(subst /,x,$(lib))), -l$(patsubst lib%,%,$(lib)), $(lib)))\
+		-Zmap=$(outbase).map
+	$(QUIET)$(TOOL_GXX3OMF_LD) @$(outbase).rsp
+	$(if $(filter %.res,$(objs)), \
+		$(QUIET)$(TOOL_GXX3OMF_RC) $(filter %.res,$(objs)) $(out))
+endef
+
+TOOL_GCC3OMF_RC					?= $(TOOL_GXX3OMF_RC)
+TOOL_GCC3OMF_RCOBJSUFF			?= $(TOOL_GXX3OMF_RCOBJSUFF)
+
+TOOL_GCC3OMF_COMPILE_RC_DEPEND			 = $(TOOL_GXX3OMF_COMPILE_RC_DEPEND)
+TOOL_GCC3OMF_COMPILE_RC_DEPORD			 = $(TOOL_GXX3OMF_COMPILE_RC_DEPORD)
+TOOL_GCC3OMF_COMPILE_RC_OUTPUT			 = $(TOOL_GXX3OMF_COMPILE_RC_OUTPUT)
+TOOL_GCC3OMF_COMPILE_RC_OUTPUT_MAYBE     = $(TOOL_GXX3OMF_COMPILE_RC_OUTPUT_MAYBE)
+TOOL_GCC3OMF_COMPILE_RC_CMDS			 = $(TOOL_GXX3OMF_COMPILE_RC_CMDS)
+
+override define TOOL_GCC3OMF_LINK_DLL_CMDS
+	$(QUIET)$(APPEND) -n $(outbase).rsp\
+		$(TOOL_GCC3OMF_LDFLAGS.dll)\
+		$(flags)\
+		-o $(out)\
+		$(filter-out %.res,$(objs))\
+		$(foreach p,$(libpath), -L$(p))\
+		$(othersrc)\
+		$(foreach lib,$(libs), $(if $(findstring $(lib),$(subst /,x,$(lib))), -l$(patsubst lib%,%,$(lib)), $(lib)))\
+		-Zmap=$(outbase).map
+	$(QUIET)$(TOOL_GCC3OMF_LD) @$(outbase).rsp
+	$(if $(filter %.res,$(objs)), \
+		$(QUIET)$(TOOL_GCC3OMF_RC) $(filter %.res,$(objs)) $(out))
+endef
+
+override define TOOL_GCC3OMF_LINK_PROGRAM_CMDS
+	$(QUIET)$(APPEND) -n $(outbase).rsp\
+		$(flags)\
+		-o $(out)\
+		$(filter-out %.res,$(objs))\
+		$(foreach p,$(libpath), -L$(p))\
+		$(othersrc)\
+		$(foreach lib,$(libs), $(if $(findstring $(lib),$(subst /,x,$(lib))), -l$(patsubst lib%,%,$(lib)), $(lib)))\
+		-Zmap=$(outbase).map
+	$(QUIET)$(TOOL_GCC3OMF_LD) @$(outbase).rsp
+	$(if $(filter %.res,$(objs)), \
+		$(QUIET)$(TOOL_GCC3OMF_RC) $(filter %.res,$(objs)) $(out))
+endef
+
+#------------------------------------------------------------------------------
+# SOM Stuff
+#------------------------------------------------------------------------------
+
+# Paths: SOM SDK (defaults to the one from the OS/2 Toolkit installation)
+PATH_SDK_SOM				?= $(subst \,/,$(SOMBASE))
+ifeq ($(PATH_SDK_SOM),)
+$(error PATH_SDK_SOM is not set!)
+endif
+PATH_SDK_SOM_INCS			?= $(PATH_SDK_SOM)/include
+PATH_SDK_SOM_LIBPATH		?= $(PATH_SDK_SOM)/lib
+
+# Paths: SOM Tool
+PATH_TOOL_SOM_BIN			?= $(PATH_SDK_SOM)/bin
+PATH_TOOL_SOM_DLL			?= $(PATH_SDK_SOM)/lib
+PATH_TOOL_SOM_MSG			?= $(PATH_SDK_SOM)/msg
+PATH_TOOL_SOM_INC			?= $(PATH_SDK_SOM)/include
+
+#
+# SOM SDK
+#
+SDK_SOM					   	:= System Object Model Toolkit
+SDK_SOM_INCS				?= $(PATH_SDK_SOM_INCS)
+SDK_SOM_LIBPATH				?= $(PATH_SDK_SOM_LIBPATH)
+SDK_SOM_LIBS				?= somtk
+
+#
+# SOM Tool
+#
+# Notes: A valud value of the -s option must always be specified in IDLFLAGS;
+# the output of the first emitter is taken as the main output file and will be
+# sent to the compiler. All generated output go to $(dir $(outbase)) except the
+# output files ecplicitly listed in $(target)_IDLSOURCES which stay where they
+# are.
+#
+TOOL_SOM					:= System Object Model Tooklit
+TOOL_SOM_IDL				?= $(PATH_TOOL_SOM_BIN)/sc$(HOSTSUFF_EXE)
+TOOL_SOM_IDLFLAGS           ?=
+TOOL_SOM_IDL_OUTPUT			 = $(addprefix $(outbase).,$(wordlist 2,1000,$(TOOL_SOM_IDL_EMITTERS)))
+TOOL_SOM_IDL_OUTPUT_MAYBE	 =
+TOOL_SOM_IDL_DEPEND			 =
+TOOL_SOM_IDL_DEPORD			 =
+# IDL-specific properties
+TOOL_SOM_IDL_OUT			 = $(outbase).$(if $(filter xc,$(firstword $(TOOL_SOM_IDL_EMITTERS))),cpp,$(firstword $(TOOL_SOM_IDL_EMITTERS)))
+# SOM-specific properties
+TOOL_SOM_IDL_EMITTERS		 = $(subst ;, ,$(patsubst -s"%",%,$(filter -s"%",$(flags))))
+
+## Compile an IDL file.
+#
+# @param    $(target)   Normalized main target name.
+# @param    $(source)   Source filename (relative).
+# @param    $(out)      Object file name. This shall be (re)created by the compilation.
+# @param    $(dep)      Dependcy file. This may be (re)created by the compilation.
+# @param    $(flags)    Flags.
+# @param    $(defs)     Definitions.
+# @param    $(incs)     Includes.
+# @param    $(outbase)  Output basename (full). Use this for list files and such.
+#
+define TOOL_SOM_IDL_CMDS
+	$(QUIET)$(REDIRECT) \
+	-E 'PATH=$(PATH_TOOL_SOM_BIN);$(PATH)' \
+	-E 'BEGINLIBPATH=$(PATH_TOOL_SOM_DLL);$(BEGINLIBPATH)' \
+	-E 'DPATH=$(PATH_TOOL_SOM_MSG);$(DPATH)' \
+	-E 'SMINCLUDE=$(PATH_TOOL_SOM_INC);$(INCLUDE)' \
+	-E 'INCLUDE=' \
+	-E 'LIB=' \
+	-- \
+	$(TOOL_SOM_IDL) $(flags) \
+	$(addprefix -I, $(incs)) \
+	$(addprefix -D, $(defs)) \
+	-d $(dir $(outbase)) $(source)
+endef
+
+#
+# SOM Unit
+#
+
+# Add our target properties
+PROPS_TOOLS += IDLTOOL
+PROPS_SINGLE += IDLTOOL
+PROPS_ACCUMULATE_R += IDLFLAGS
+
+# Add ourselves to the default source handlers
+KBUILD_SRC_HANDLERS += \
+  .idl:def_src_handler_idl_idl
+
+# wrapper the compile command dependency check.
+ifndef NO_COMPILE_CMDS_DEPS
+ _UNIT_SOM_IDL_CMDS_DEP = $$(comp-cmds-ex $$($(target)_$(subst :,_,$(source))_SOM_IDL_CMDS_PREV_),$$(commands $(out)),FORCE)
+else
+ _UNIT_SOM_IDL_CMDS_DEP =
+endif
+
+##
+# Generates the rules for running IDL comiler on a specific source file.
+#
+# @param    lots
+#
+define def_idl_rule
+
+$(out) + $(output) +| $(output_maybe) : \
+		$(deps) \
+		$(value _UNIT_SOM_IDL_CMDS_DEP) \
+		| \
+		$(orderdeps)
+	%$$(call MSG_COMPILE,$(target),$(source),$$@,$(type))
+	$$(QUIET)$$(RM) -f -- $(dep) $(out) $(output) $(output_maybe)
+	$(foreach f,$(out) $(output) $(output_maybe),\
+		$(if $(findstring $(notdir $f),$(notdir $($(target)_IDLSOURCES))),\
+			$$(QUIET)$(CP) --ignore-non-existing \
+				$(abspathex $(filter %$(notdir $f),$($(target)_IDLSOURCES)),$($(target)_PATH)) \
+				$f))
+
+$(cmds)
+
+	$(foreach f,$(out) $(output) $(output_maybe),\
+		$(if $(findstring $(notdir $f),$(notdir $($(target)_IDLSOURCES))),\
+			$$(QUIET)$(CP) --changed \
+				$f \
+				$(abspathex $(filter %$(notdir $f),$($(target)_IDLSOURCES)),$($(target)_PATH))))
+
+ifndef NO_COMPILE_CMDS_DEPS
+	%$$(QUIET2)$$(APPEND) '$(dep)'
+	%$$(QUIET2)$$(APPEND) '$(dep)' 'define $(target)_$(subst :,_,$(source))_SOM_IDL_CMDS_PREV_'
+	%$$(QUIET2)$$(APPEND) -c '$(dep)' '$(out)'
+	%$$(QUIET2)$$(APPEND) '$(dep)' 'endef'
+endif
+
+# if the generated file is listed in IDLSOURCES, add it to _GEN_SOURCES_ from
+# there (we did a copy trick for it), otherwise add it only of it's $(out)
+$(foreach f,$(out) $(output) $(output_maybe),\
+	$(if $(findstring $(notdir $f),$(notdir $($(target)_IDLSOURCES))),\
+		$(eval $(target)_GEN_SOURCES_ += $(filter %$(notdir $f),$($(target)_IDLSOURCES))),\
+		$(if $(findstring $f,$(out)),$(eval $(target)_GEN_SOURCES_ += $f))))
+
+# update globals and target properties.
+_OUT_FILES += $(out) $(output) $(output_maybe)
+#$(target)_GEN_SOURCES_ += $(out)
+$(target)_INTERMEDIATES += $(intermediates)
+
+endef # def_idl_rule
+
+##
+# Handler for .idl files listed in the SOURCES properties.
+#
+# .idl files are transformed into C/C++ header files and maybe to source files
+# compiled by the compiler.
+#
+# @param    target      The target file.
+# @param    source      The source file.
+# @param    lots more
+# @returns  quite a bit.
+#
+define def_src_handler_idl_idl
+
+local type 	:= IDL
+
+# Figure out all the props.
+local tool 	:= $(kb-src-tool dummy_var)
+ifeq ($(tool),)
+$(error kBuild: $(target) / $(sources) does not have IDLTOOL defined!)
+endif
+ifndef TOOL_$(tool)_IDL_CMDS
+$(error kBuild: TOOL_$(tool)_IDL_CMDS isn't defined! target=$(target) source=$(source))
+endif
+local outbase 	:= $(kb-obj-base outbase)
+local flags		:= $(kb-src-prop IDLFLAGS,dummy_var,left-to-right,) # rest depends on flags
+local out 		:= $(TOOL_$(tool)_IDL_OUT)
+ifeq ($(out),)
+$(error kBuild: TOOL_$(tool)_IDL_OUT isn't defined! target=$(target) source=$(source))
+endif
+local incs		:= $(kb-src-prop INCS,dummy_var,left-to-right,$(defpath))
+local defs		:= $(kb-src-prop DEFS,dummy_var,left-to-right,)
+local deps 		:= $(kb-src-prop DEPS,dummy_var,left-to-right,$(defpath))
+local orderdeps := $(call DIRDEP,$(dir $(outbase))) $(kb-src-prop ORDERDEPS,dummy_var,left-to-right)
+
+# default path + source dep.
+ifneq ($(defpath),)
+local source    := $(abspathex $(source),$(defpath))
+endif
+local deps      += $(source)
+
+# dependency file.
+local dep 		:= $(out)$(SUFF_DEP)
+ifndef NO_COMPILE_CMDS_DEPS
+ _DEPFILES_INCLUDED += $(dep)
+ $(eval includedep $(dep))
+endif
+
+# Call the tool.
+local cmds 			:= $(TOOL_$(tool)_IDL_CMDS)
+local output 		:= $(TOOL_$(tool)_IDL_OUTPUT)
+local output_maybe	:= $(TOOL_$(tool)_IDL_OUTPUT_MAYBE)
+local deps 			+= $(TOOL_$(tool)_IDL_DEPEND)
+local orderdeps 	+= $(TOOL_$(tool)_IDL_DEPORD)
+
+# Whether it generates a header file depends on flags.
+local intermediates := $(filter %.xh %.xih,$(output))
+
+# Let the target include the generated files.
+ifeq ($(filter $(patsubst %/,%,$(dir $(outbase))),$($(target)_INCS)),)
+$(target)_INCS 		+= $(patsubst %/,%,$(dir $(outbase)))
+endif
+
+# Make sure the .idl directory is searched.
+ifeq ($(filter $(patsubst %/,%,$(dir $(source))),$($(target)_INCS)),)
+$(target)_INCS 		+= $(patsubst %/,%,$(dir $(source)))
+endif
+
+# Generate the rule.
+$(eval $(def_idl_rule))
+
+endef # def_src_handler_idl_idl
+
+#
+# Lucide SOM class DLL template
+#
+TEMPLATE_SomDll              = Lucide SOM class DLL
+TEMPLATE_SomDll_EXTENDS		 = LucideCxx
+TEMPLATE_SomDll_EXTENDS_BY	 = appending
+TEMPLATE_SomDll_CXXFLAGS	 = -Wno-write-strings # SOM compiler is loose here
+TEMPLATE_SomDll_DEFS		 = SOMLINK=_System
+TEMPLATE_SomDll_SDKS		 = SOM
+TEMPLATE_SomDll_IDLTOOL		 = SOM
+TEMPLATE_SomDll_IDLFLAGS	 = -c -s"xc;xh;xih"
+
+#------------------------------------------------------------------------------
+# Other Stuff
+#------------------------------------------------------------------------------
+
+#
+# Include a site-specific config for local overrides
+#
+ifndef LOCALCFG
+ LOCALCFG := $(wildcard $(PATH_ROOT)/LocalConfig.kmk)
+ ifneq ($(LOCALCFG),)
+  include $(LOCALCFG)
+ endif
+endif
+
+#
+# Replace the built-in install command with good old copy because the former
+# strips EAs on OS/2 which kills file icons we attach with RC
+#
+INSTALL := $(PATH_ROOT)/tools/install.cmd
+

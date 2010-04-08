@@ -1,1 +1,0 @@
-wcl386 -zq -zp=4 -bm -ox -I.. -Ipoppler -DOS2 test.cpp poppler.lib

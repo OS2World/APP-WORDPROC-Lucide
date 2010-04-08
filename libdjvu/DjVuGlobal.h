@@ -69,7 +69,7 @@
 # ifndef __WCEALT_H__
 inline void * operator new(size_t, void * ptr) { return ptr; }
 # endif
-#elif defined(AUTOCONF) && defined(HAVE_STDINCLUDES)
+#elif (defined(AUTOCONF) || defined(OS2)) && defined(HAVE_STDINCLUDES)
 # include <new>
 #else
 # include <new.h>

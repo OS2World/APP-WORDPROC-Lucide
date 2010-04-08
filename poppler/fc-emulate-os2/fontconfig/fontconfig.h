@@ -22,10 +22,10 @@
 #ifndef _ERFONTCONFIG_H_
 #define _ERFONTCONFIG_H_
 
-typedef unsigned char   FcChar8;
-typedef unsigned short  FcChar16;
-typedef unsigned int    FcChar32;
-typedef int             FcBool;
+typedef char    FcChar8;
+typedef short   FcChar16;
+typedef int     FcChar32;
+typedef int     FcBool;
 
 
 #define FcTrue      1

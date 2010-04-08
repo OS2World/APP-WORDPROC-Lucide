@@ -1,0 +1,21 @@
+## @file
+#
+SUB_DEPTH = ..
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Target lists
+#
+LIBRARIES += djvu
+
+#
+# djvu library
+#
+djvu_TEMPLATE	 = LucideCxx
+djvu_CXXFLAGS	 =
+djvu_DEFS		 = HAVE_CONFIG_H
+djvu_INCS		 =
+djvu_SOURCES	 = $(wildcard $(djvu_PATH)/*.cpp)
+
+include $(FILE_KBUILD_SUB_FOOTER)
+

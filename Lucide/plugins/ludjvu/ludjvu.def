@@ -1,0 +1,15 @@
+LIBRARY ludjvu
+
+EXPORTS
+    ;
+    LuDjvuDocumentNewClass
+    LuDjvuDocumentClassData = _LuDjvuDocumentClassData
+    _LuDjvuDocumentClassData
+    LuDjvuDocumentCClassData = _LuDjvuDocumentCClassData
+    _LuDjvuDocumentCClassData
+    ;
+    createObject
+    getSupportedExtensions
+    getDescription
+    getSignatureCheck
+

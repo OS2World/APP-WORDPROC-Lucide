@@ -1,0 +1,31 @@
+## @file
+#
+
+SUB_DEPTH = ../../..
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Target lists
+#
+DLLS		+= lujpeg
+
+#
+# LuJpegDocument SOM Class
+#
+lujpeg_TEMPLATE	 = SomDll
+lujpeg_INCS		 = \
+	lujpeg                                                                    \
+	../ludoc $(PATH_lujpeg)/../ludoc                                          \
+	../../../libjpeg
+lujpeg_SOURCES	 = \
+	jpscale.cpp                                                               \
+	lujpeg.idl                                                                \
+	lujpeg.def
+lujpeg_IDLSOURCES	 = \
+	lujpeg.cpp
+lujpeg_LIBS		 = \
+	$(PATH_LIB)/ludoc$(SUFF_LIB) \
+	$(PATH_LIB)/jpeg$(SUFF_LIB)
+
+include $(FILE_KBUILD_SUB_FOOTER)
+

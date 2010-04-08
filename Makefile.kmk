@@ -1,0 +1,17 @@
+## @file
+# Top-Level Makefile
+#
+
+SUB_DEPTH = .
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Include sub-makefiles
+#
+include $(PATH_SUB_CURRENT)/poppler/Makefile.kmk
+include $(PATH_SUB_CURRENT)/libdjvu/Makefile.kmk
+include $(PATH_SUB_CURRENT)/libjpeg/Makefile.kmk
+include $(PATH_SUB_CURRENT)/Lucide/Makefile.kmk
+
+include $(FILE_KBUILD_SUB_FOOTER)
+

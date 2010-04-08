@@ -1,0 +1,15 @@
+NAME lupplr
+
+EXPORTS
+    ;
+    LuPopplerDocumentNewClass
+    LuPopplerDocumentClassData = _LuPopplerDocumentClassData
+    _LuPopplerDocumentClassData
+    LuPopplerDocumentCClassData = _LuPopplerDocumentCClassData
+    _LuPopplerDocumentCClassData
+    ;
+    createObject
+    getSupportedExtensions
+    getDescription
+    getSignatureCheck
+

@@ -1,0 +1,43 @@
+#ifndef lupichoice_idl
+#define lupichoice_idl
+
+#include <luichoice.idl>
+
+/**
+ * LuPopplerInputChoice represents a choice box in the PDF docuemnt.
+ *
+ * This interface exposes the FormWidgetChoice poppler class.
+ */
+interface LuPopplerInputChoice : LuInputChoice
+{
+
+#ifdef __SOMIDL__
+
+    implementation
+    {
+        getCount: override;
+        getChoice: override;
+        select: override;
+        toggle: override;
+        deselectAll: override;
+        setChoiceText: override;
+        getChoiceText: override;
+        isSelected: override;
+        isComboBox: override;
+        isEditable: override;
+        isMultiSelectable: override;
+        isSpellCheckable: override;
+
+        long mCount;
+        string mChoiceText;
+        boolean mIsComboBox;
+        boolean mIsEditable;
+        boolean mIsMultiSelectable;
+        boolean mIsSpellCheckable;
+    };
+
+#endif // __SOMIDL__
+
+};
+
+#endif // lupichoice_idl

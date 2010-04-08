@@ -1,0 +1,40 @@
+## @file
+#
+
+SUB_DEPTH = ../../..
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Target lists
+#
+DLLS		+= lupoppler
+
+#
+# LuPopplerDocument SOM Class
+#
+lupoppler_TEMPLATE	 = SomDll
+lupoppler_NAME		 = lupplr
+lupoppler_INCS		 = \
+	../ludoc $(PATH_lupoppler)/../ludoc                                       \
+	../../../poppler/mypoppler                                                \
+	../../../poppler/mypoppler/poppler                                        \
+	../../../poppler/fc-emulate-os2
+lupoppler_SOURCES	 = \
+	lupoppler.idl                                                             \
+	lupifield.idl                                                             \
+	lupibutton.idl                                                            \
+	lupitext.idl                                                              \
+	lupichoice.idl                                                            \
+	lupoppler.def
+lupoppler_IDLSOURCES	 = \
+	lupoppler.cpp                                                             \
+	lupifield.cpp                                                             \
+	lupibutton.cpp                                                            \
+	lupitext.cpp                                                              \
+	lupichoice.cpp
+lupoppler_LIBS		 = \
+	$(PATH_LIB)/ludoc$(SUFF_LIB) \
+	$(LIB_POPPLER_LIBS)
+
+include $(FILE_KBUILD_SUB_FOOTER)
+

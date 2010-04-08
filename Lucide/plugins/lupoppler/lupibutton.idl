@@ -1,0 +1,52 @@
+#ifndef luibutton_idl
+#define lupibutton_idl
+
+#include <luibutton.idl>
+#include <lupifield.idl>
+
+interface FormWidgetButton; // declared in poppler/Form.h
+
+/**
+ * LuPopplerInputButton represents a form button in the PDF document.
+ *
+ * This interface exposes the FormWidgetButton poppler class.
+ */
+interface LuPopplerInputButton : LuPopplerInputField, LuInputButton
+{
+    void init_widgetButton( inout somInitCtrl ctrl, in LuPopplerDocument aDoc,
+                            in long aPagenum, in Page aPage,
+                            in FormWidgetButton aFormWidgetButton );
+
+#ifdef __SOMIDL__
+
+    implementation
+    {
+        releaseorder: init_widgetButton;
+
+        init_widgetButton: init;
+        somDestruct: override;
+
+        getButtonType: override;
+        getState: override;
+        setState: override;
+        getText: override;
+        getSiblings: override;
+
+        FormWidgetButton widget;
+
+        passthru C_h_before =  ""
+            ""
+            "#include <Form.h>"
+            "";
+
+        passthru C_xh_before =  ""
+            ""
+            "#include <Form.h>"
+            "";
+    };
+
+#endif // __SOMIDL__
+};
+
+#endif // lupibutton_idl
+

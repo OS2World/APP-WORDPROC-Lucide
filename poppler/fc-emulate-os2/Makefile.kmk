@@ -1,0 +1,24 @@
+## @file
+#
+SUB_DEPTH = ../..
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Target lists
+#
+LIBRARIES += fontconfig
+
+#
+# fontconfig emulation library
+#
+fontconfig_TEMPLATE	 = LucideCxx
+fontconfig_CXXFLAGS	 =
+#fontconfig_TOOL	 = OPENWATCOM
+#fontconfig_CXXFLAGS = -zq -zp=8 -bm -sg -ot -ox -xs -oh -xr -5 -fp5
+fontconfig_DEFS		 =
+fontconfig_INCS		 = ../freetype2/include
+fontconfig_SOURCES	 = \
+	fontconfig/fontconfig.cpp
+
+include $(FILE_KBUILD_SUB_FOOTER)
+

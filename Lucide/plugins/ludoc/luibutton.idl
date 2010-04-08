@@ -1,0 +1,81 @@
+#ifndef luibutton_idl
+#define luibutton_idl
+
+#include <somobj.idl>
+#include <luifield.idl>
+
+/**
+ * LuInputButton represents a button.
+ */
+interface LuInputButton : LuInputField
+{
+    typedef sequence <unsigned long> SiblingSequence;
+
+    /**
+     * Possible values for getButtonType().
+     */
+    enum ButtonType {
+        Undefined, Check, Push, Radio
+    };
+
+    /**
+     * Returns the button type.
+     *
+     * To be overriden. By default, returns Undefined.
+     */
+    ButtonType getButtonType();
+
+    /**
+     * Returns TRUE if the button is checked (for Check and Radio buttons)
+     * and and FALSE otherwise.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean getState();
+
+    /**
+     * Sets the checked state of the button (for Check and Radio buttons).
+     *
+     * To be overriden. By default, does nothing.
+     */
+    void setState(in boolean aState);
+
+    /**
+     * Returns the text of the button. For Check buttons, it's the text of the
+     * On state.
+     *
+     * To be overriden. By default, returns NULL.
+     */
+    string getText();
+
+    /**
+     * Returns a sequence of IDs of the buttons in the same radio group as this
+     * Radio button. For other button types, returns NULL.
+     *
+     * Note: The returned sequence and elements must be allocated with
+     * SOMMalloc().
+     */
+    SiblingSequence *getSiblings();
+
+    /**
+     * Frees the siblings sequence returned by getSiblings().
+     *
+     * Subclasses should never override this method.
+     */
+    void freeSiblings(in SiblingSequence aSiblings);
+
+#ifdef __SOMIDL__
+
+    implementation
+    {
+        releaseorder: getButtonType, getState, setState, getText, getSiblings,
+                      freeSiblings;
+
+        freeSiblings: procedure, noself;
+    };
+
+#endif // __SOMIDL__
+};
+
+#endif // luibutton_idl
+

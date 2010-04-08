@@ -1,0 +1,15 @@
+## @file
+#
+
+SUB_DEPTH = ..
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Include sub-makefiles
+#
+include $(PATH_SUB_CURRENT)/freetype2/Makefile.kmk
+include $(PATH_SUB_CURRENT)/fc-emulate-os2/Makefile.kmk
+include $(PATH_SUB_CURRENT)/mypoppler/Makefile.kmk
+
+include $(FILE_KBUILD_SUB_FOOTER)
+

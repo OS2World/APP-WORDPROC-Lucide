@@ -1,0 +1,45 @@
+## @file
+#
+
+SUB_DEPTH = ../../..
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Target lists
+#
+DLLS		+= ludoc
+IMPORT_LIBS	+= ludoc_imp
+
+#
+# LuDocument SOM Class
+#
+ludoc_TEMPLATE	= SomDll
+ludoc_INCS		= .
+ludoc_SOURCES	= \
+	ludoc.idl                                                                 \
+	lupixbuf.idl                                                              \
+	luinode.idl                                                               \
+	luifield.idl                                                              \
+	luibutton.idl                                                             \
+	luitext.idl                                                               \
+	luichoice.idl                                                             \
+	cpconv.cpp                                                                \
+	ludoc.def
+ludoc_IDLSOURCES	= \
+	ludoc.cpp                                                                 \
+	lupixbuf.cpp                                                              \
+	luinode.cpp                                                               \
+	luifield.cpp                                                              \
+	luibutton.cpp                                                             \
+	luitext.cpp                                                               \
+	luichoice.cpp
+
+#
+# LuDocument Import Library
+#
+ludoc_imp_TEMPLATE	 = SomDll
+ludoc_imp_NAME		 = ludoc
+ludoc_imp_SOURCES	 = ludoc.def
+
+include $(FILE_KBUILD_SUB_FOOTER)
+

@@ -1,0 +1,253 @@
+#
+# Lucide language file, RU
+#
+
+#
+# Main menu
+#
+MENU_DOCUMENT=~Документ
+MENU_NEW_WINDOW=~Новое окно
+MENU_OPEN=~Открыть...\tCtrl+O
+MENU_NEXT_PREVIOUS=Следующий/П~редыдущий
+MENU_FIRST=Первый\tShift+Home
+MENU_PREVIOUS=Предыдущий\tShift+PgUp
+MENU_NEXT=Следующий\tShift+PgDn
+MENU_LAST=Последний\tShift+End
+MENU_RECENT_FILES=Не~давние файлы
+MENU_CLEAR_LIST=~Очистить
+MENU_SAVE_AS=~Сохранить как...
+MENU_CLOSE=~Закрыть
+# MENU_PAGE_SETUP: to delete
+MENU_PAGE_SETUP=Па~раметры страницы...
+MENU_PRINT=~Печать...\tCtrl+P
+MENU_PLUGINS_LIST=Список п~лагинов...
+MENU_EXIT=В~ыход\tCtrl+X
+MENU_EDIT=~Правка
+MENU_COPY=~Копировать\tCtrl+Insert
+MENU_SELECT_ALL=Выделить ~всё\tCtrl+/
+MENU_FIND=~Искать...\tCtrl+F
+MENU_FINDAGAIN=Искать ~далее\tCtrl+G
+MENU_SETTINGS=~Настройка
+MENU_VIEW=П~росмотр
+MENU_FIT_WINDOW=По размеру ~страницы\tCtrl+0
+MENU_ACTUAL_SIZE=~Реальный размер\tCtrl+1
+MENU_FIT_WIDTH=По ~ширине\tCtrl+2
+# - unused - MENU_ZOOM_IN_OUT=Пр~иблизить/отдалить
+MENU_ZOOM_IN=Приблизить\tCtrl++
+MENU_ZOOM_OUT=Отдалить\tCtrl+-
+MENU_FIRST_PAGE=~Первая страница
+MENU_PREV_PAGE=Пред~ыдущая страница\t-
+MENU_NEXT_PAGE=С~ледующая страница\t+
+MENU_LAST_PAGE=Посл~едняя страница
+MENU_GO_TO_PAGE=Перейти ~на страницу...\tCtrl+N
+MENU_ROTATE_CW=Повернуть на 90° по ~ч.с.\tCtrl+Shift++
+MENU_ROTATE_CCW=Повернуть на 90° проти~в ч.с.\tCtrl+Shift+-
+MENU_SINGLE_PAGE=~Одиночная страница
+MENU_CONTINUOUS=Пос~ледовательно
+MENU_DOCUMENT_INFO=Информация о ~документе...
+MENU_FONTS_INFO=Информация о ~шрифтах...
+MENU_WINDOW=~Окно
+MENU_SHOW_NAV_PANE=~Отображать панель навигации
+MENU_MAXVIEW=~Масимально развернуть\tF11
+MENU_FULLSCREEN=~Полноэкранный режим\tCtrl+L
+MENU_HELP=~Справка
+MENU_PRODUCT_INFORMATION=~О программе
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=Открыть документ...
+TBHINT_PRINT=Печать...
+TBHINT_SHOW_NAV_PANE=Отобразить/скрыть панель навигации
+TBHINT_FIRST_PAGE=Первая страница
+TBHINT_PREV_PAGE=Предыдущая страница
+TBHINT_NEXT_PAGE=Следующая страница
+TBHINT_LAST_PAGE=Последняя страница
+TBHINT_ACTUAL_SIZE=Реальный размер
+TBHINT_FIT_WINDOW=По размеру страницы
+TBHINT_FIT_WIDTH=По ширине
+TBHINT_FIND=Искать...
+TBHINT_FINDAGAIN=Искать далее
+TBHINT_ZOOM_IN_OUT=Приблизить/отдалить
+# toolbar's page number
+TB_PAGENUM=из %d
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=%APPNAME% - просмотр документов
+MSGS_NO_SUIT_PLUG=Не могу найти подходящий плагин для просмотра этого документа!
+MSGS_FILE_LOAD_ERROR=Ошибка загрузки файла!
+MSGS_LOADING_DOCUMENT=Загрузка документа, пожалуйста подождите...
+MSGS_CREATING_THUMBNAIL=Создание эскиза, пожалуйста подождите...
+MSGS_WARNING=Предупреждение!
+MSGS_OVERWRITE_FILE=Файл уже существует. Перезаписать?
+MSGS_FILE_SAVE_ERROR=Ошибка сохранения файла!
+MSGS_PAGE=Страница
+MSGS_ERROR_STARTING_BROWSER=Ошибка запуска браузера!
+MSGS_CLOSE_MODIFIED_DOCUMENT=Документ был изменён. Сохранить?
+
+MSGS_LDERR=Ошибка загрузки файла: %s!
+MSGS_LDERR_OUT_OF_MEMORY=Недостаточно памяти
+MSGS_LDERR_OPEN_ERROR=Ошибка открытия
+MSGS_LDERR_READ_ERROR=Ошибка чтения
+MSGS_LDERR_DAMAGED=Файл повреждён
+MSGS_LDERR_WRONG_FORMAT=Неверный формат
+MSGS_LDERR_ENCRYPTED=Файл зашифрован
+
+MSGS_RERR_OUT_OF_MEMORY=Недостаточно памяти
+MSGS_RERR_CORRUPTED_PAGE_DATA=Страница испорчена
+MSGS_RERR_FONT_NOT_FOUND=Фонт %s не найден
+
+#
+# "Plugins list" dialog
+#
+PLUGLIST_PLUGINS_LIST=Список плагинов
+PLUGLIST_CLOSE=~Закрыть
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Имя
+PLUGLIST_SUPP_EXTS=Поддерживаемые расширения
+PLUGLIST_PLUGIN_DESC=Описание
+
+#
+# "Font info" dialog
+#
+FONTINFO_FONTINFO=Информация о шрифтах
+FONTINFO_CLOSE=~Закрыть
+FONTINFO_ENUMERATING=Определяю шрифты, пожалуйста подождите...
+# List columns titles
+FONTINFO_NAME=Имя
+FONTINFO_TYPE=Тип
+FONTINFO_EMBEDDED=Встроенный?
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=Не встроенный
+FONTINFO_EMBED_EMBEDDED=Встроенный
+FONTINFO_EMBED_EMBEDDED_SUBSET=Встроенное подмножество
+
+#
+# "Document info" dialog
+#
+DOCINFO_DOCUMENT_INFO=Информация о документе
+DOCINFO_CLOSE=~Закрыть
+# Document info keys
+DOCINFO_TITLE=Заголовок:
+DOCINFO_FORMAT=Формат:
+DOCINFO_AUTHOR=Автор:
+DOCINFO_SUBJECT=Тема:
+DOCINFO_KEYWORDS=Ключевые слова:
+DOCINFO_CREATOR=Создатель:
+DOCINFO_PRODUCER=Изготовитель:
+DOCINFO_CREATION_DATE=Создан:
+DOCINFO_MOD_DATE=Модифицирован:
+
+#
+# "Find" dialog
+#
+FIND_FIND=Поиск
+FIND_FIND_WHAT=~Что искать
+FIND_MATCH_CASE=~Различать прописные и заглавные буквы
+FIND_OK=ОК
+FIND_CANCEL=Отказ
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=Поиск на странице %d из %d...
+FIND_NOT_FOUND=Не найдено!
+
+#
+# "Progress" dialog
+#
+PDLG_PROGRESS=Прогресс
+PDLG_CANCEL=~Отказ
+
+#
+# About dialog
+#
+AD_ABOUT=О программе
+AD_DESCRIPTION=Plugin-based document viewer with support for various file formats
+AD_COPYRIGHTS=(c) by Eugene Romanenko, netlabs.org in co-operation with Serenity Systems International
+AD_OK=~ОК
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Настройка
+SD_DEFAULT_PAGE_LAYOUT=Тип ~просмотра по умолчанию
+SD_DEFAULT_ZOOM=~Масштаб по умолчанию
+SD_SINGLE_PAGE=Одиночная страница
+SD_CONTINUOUS=Последовательно
+SD_OK=ОК
+SD_CANCEL=Отказ
+
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=Перейти к странице
+GTP_PAGE=Страница
+GTP_OF=из %d
+GTP_OK=ОК
+GTP_CANCEL=Отказ
+
+#
+# Print dialog
+#
+PD_TITLE=Печать
+PD_PRINTER=Принтер
+PD_NAME_LABEL=~Имя
+PD_JOB_PROPERTIES=~Свойства
+PD_DRIVER_LABEL=Драйвер
+PD_PRINT_RANGE_AND_COPIES=Диапазон и копии
+PD_RANGE_ALL=~Все
+PD_RANGE_CURRENT_PAGE=~Текущую страницу
+PD_RANGE_PAGES=~Страницы
+PD_FROM=~От
+PD_TO=~До
+PD_NUMBER_OF_COPIES=~Количество копий
+PD_RANGE_EVEN_ODD_LABEL=Диапазон печати
+PD_RANGE_EVEN_ODD=Все страницы
+PD_RANGE_ODD=Только нечётные
+PD_RANGE_EVEN=Только чётные
+PD_PRINT_TYPE=Тип печати
+PD_TYPE_POSTSCRIPT=Post~script
+PD_PRINT_TO_FILE=Печать в файл
+PD_TYPE_ASIMAGE=Как ~изображение
+PD_HIGHER_IMAGE_QUALITY=~Повысить качество изображения (медленнее и требует больше памяти)
+PD_PAGE_ORIENTATION=Ориентация страницы
+PD_PORTRAIT=Книжная
+PD_LANDSCAPE=Альбомная
+PD_MARGINS=Отступы (мм)
+PD_IGNORE_PRINTER_MARGINS=Игнорировать отступы принтера
+PD_MLEFT=Слева
+PD_MRIGHT=Справа
+PD_MTOP=Сверху
+PD_MBOTTOM=Снизу
+PD_SELECTED_FORM=Выбранная форма
+PD_BTNPRINT=~Печать
+PD_BTNCANCEL=~Отказ
+PD_WRONG_MARGINS=Некорректные отступы!
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=Печатаю страницу %d (%d из %d)...
+PRINT_GENERATING_POSTSCRIPT=Генерация postscript-файла...
+PRINT_SPOOLING_POSTSCRIPT=Отправка postscript-данных...
+PRINT_FAILED=Ошибка печати!
+
+#
+# Password dialog
+#
+PSW_TITLE=Документ зашифрован!
+PSW_PASSWORD=~Пароль
+PSW_OK=ОК
+PSW_CANCEL=Отказ
+
+#
+# Open file dialog
+#
+FDLG_OPEN=Открыть
+#FDLG_FILENAME=File~name
+#FDLG_DRIVE=D~rive
+#FDLG_FILETYPE=File ~Type
+#FDLG_FILE=~File
+#FDLG_DIRECTORY=~Directory
+#FDLG_OK=~OK
+FDLG_CANCEL=Отказ
+FDLG_NO_PREVIEW_AVAILABLE=Предпросмотр недоступен
+FDLG_ALL_SUPPORTED_TYPES=<Все поддерживаемые типы>

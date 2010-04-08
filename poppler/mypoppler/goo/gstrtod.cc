@@ -25,7 +25,7 @@
 /* Lucide */
 #include <locale.h>
 #include <errno.h>
-#include <stdlib>
+#include <stdlib.h>
 #include <string.h>
 
 #define ascii_isspace(c) \

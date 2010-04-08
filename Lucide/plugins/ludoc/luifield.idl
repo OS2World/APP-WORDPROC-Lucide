@@ -1,0 +1,75 @@
+#ifndef luifield_idl
+#define luifield_idl
+
+#include <somobj.idl>
+#include <lutypes.h>
+
+/**
+ * LuInputField represents a generic interface for document input fields.
+ */
+interface LuInputField : SOMObject
+{
+    /**
+     * Possible values for getType().
+     */
+    enum Type {
+        Undefined, Button, Text, Choice, Signature
+    };
+
+    /**
+     * Returns the type of the input field.
+     *
+     * To be overriden. By default, returns Undefined.
+     */
+    Type getType();
+
+    /**
+     * Returns the bounding rectangle of the input field.
+     *
+     * To be overriden. By default, returns NULL.
+     *
+     * Note: the returned pointer must be valid until the object destriction.
+     */
+    LuRectangle *getRectangle();
+
+    /**
+     * Returns the ID of the input field.
+     */
+    unsigned long getID();
+
+    /**
+     * Returns TRUE if the input field was modified.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isModified();
+
+    /**
+     * Returns TRUE if the input field is read-only.
+     *
+     * To be overriden. By default, returns FALSE.
+     */
+    boolean isReadOnly();
+
+#ifdef __SOMIDL__
+
+    implementation
+    {
+        releaseorder: getType, getRectangle, getID, isModified, isReadOnly;
+
+        passthru C_h_before =  ""
+            ""
+            "#include <lutypes.h>"
+            "";
+
+        passthru C_xh_before =  ""
+            ""
+            "#include <lutypes.h>"
+            "";
+    };
+
+#endif // __SOMIDL__
+
+};
+
+#endif // luifield_idl

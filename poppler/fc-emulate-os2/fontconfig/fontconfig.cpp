@@ -21,6 +21,9 @@
 
 #define INCL_DOS
 #define INCL_WIN
+#if defined(__EMX__)
+#define OS2EMX_PLAIN_CHAR
+#endif
 #include <os2.h>
 
 #include <map>
@@ -28,8 +31,14 @@
 using namespace std;
 
 #include <stdio.h>
-#include <dos.h>
 #include <string.h>
+
+#if defined( __WATCOMC__ )
+#include <dos.h>
+#else
+#include <io.h>
+#include <sys/stat.h>
+#endif
 
 #include "fontconfig.h"
 
@@ -246,7 +255,8 @@ static void ftLoad( char *fn )
     }
 
     string key = familyName;
-    if ( stricmp( styleName.c_str(), "regular" ) != 0 ) {
+    if ( stricmp( styleName.c_str(), "regular" ) != 0 &&
+         stricmp( styleName.c_str(), "book" ) != 0 ) {
         key += ' ';
         key += styleName;
     }
@@ -277,7 +287,12 @@ static string getFcfName()
     char drive[ _MAX_DRIVE ];
     char dir[ _MAX_DIR ];
     char fname[ _MAX_FNAME ];
+#if defined( __WATCOMC__ )
     _splitpath( __argv[0], drive, dir, fname, NULL );
+#else
+    _execname( fullpath, sizeof(fullpath) );
+    _splitpath( fullpath, drive, dir, fname, NULL );
+#endif
     strlwr( fname );
     _makepath( fullpath, drive, dir, fname, ".fcf" );
     return fullpath;
@@ -434,6 +449,7 @@ FcBool FcInit()
 #define DEFAULT_SERIF_FONT          "times new roman"
 #define DEFAULT_SANSSERIF_FONT      "helvetica"
 #define DEFAULT_MONOSPACED_FONT     "courier"
+#define DEFAULT_SYMBOL_FONT         "symbol set"
 
 static bool isSansserif( const char *family )
 {
@@ -444,41 +460,69 @@ static bool isSansserif( const char *family )
              ( strcmp( family, "verdana" ) == 0 ) );
 }
 
-static string buildFontKey( FcPattern *p, bool useDefaultFonts )
+static string buildFontKey( FcPattern *p )
 {
     string key = p->family;
 
-    if ( useDefaultFonts )
-    {
+    // From http://en.wikipedia.org/wiki/Portable_Document_Format:
+    //
+    // There are fourteen typefaces that have a special significance to PDF
+    // documents:
+    //
+    //  * Times (v3) (in regular, italic, bold, and bold italic)
+    //  * Courier (in regular, oblique, bold and bold oblique)
+    //  * Helvetica (v3) (in regular, oblique, bold and bold oblique)
+    //  * Symbol
+    //  * Zapf Dingbats
+    //
+    // These fonts, sometimes referred to as the "base fourteen fonts" should
+    // always be present (actually present or a close substitute) and so need
+    // not be embedded in a PDF.[46]  PDF viewers must know about the metrics
+    // of these fonts. Other fonts may be substituted if they are not embedded
+    // in a PDF.
+    //
+    // The following code is based on this information and guarantees that we
+    // always return a valid font for those (except Zapf Dingbats for which we
+    // don't have a pre-installed OS/2 font).
+
+    bool ignoreStyle = false;
+
+    if ( fontmap->find( key ) == fontmap->end() ) {
+        // not found: try substitutions
         if ( p->spacing == FC_MONO ) {
             key = DEFAULT_MONOSPACED_FONT;
-        }
-        else
-        {
+        } else {
             if ( isSansserif( p->family ) ) {
                 key = DEFAULT_SANSSERIF_FONT;
-            }
-            else {
-                key = DEFAULT_SERIF_FONT;
+            } else {
+                if ( key == "symbol" ) {
+                    ignoreStyle = true;
+                    key = "opensymbol";
+                    if ( fontmap->find( key ) == fontmap->end() )
+                        key = DEFAULT_SYMBOL_FONT;
+                } else if ( key == "zapfdingbats" || key == "zapf dingbats" ) {
+                    ignoreStyle = true;
+                    key = "dejavu sans";
+                    // last resort, quite meaningless but we must provide something
+                    if ( fontmap->find( key ) == fontmap->end() )
+                        key = DEFAULT_SYMBOL_FONT;
+                } else {
+                    key = DEFAULT_SERIF_FONT;
+                }
             }
         }
+
     }
-    else
-    {
-        // use 'Symbol Set' (SYMB.PFB) instead of 'Symbol'
-        if ( strcmp( p->family, "symbol" ) == 0 ) {
-            key = "symbol set";
+
+    if ( !ignoreStyle ) {
+        if ( p->weight > FC_WEIGHT_NORMAL ) {
+            key += ' ';
+            key += "bold";
         }
-    }
-
-    if ( p->weight > FC_WEIGHT_NORMAL ) {
-        key += ' ';
-        key += "bold";
-    }
-
-    if ( (p->slant == FC_SLANT_ITALIC) || (p->slant == FC_SLANT_OBLIQUE) ) {
-        key += ' ';
-        key += "italic";
+        if ( (p->slant == FC_SLANT_ITALIC) || (p->slant == FC_SLANT_OBLIQUE) ) {
+            key += ' ';
+            key += "italic";
+        }
     }
 
     return key;
@@ -496,15 +540,8 @@ FcFontSet *FcFontSort( FcConfig *config, FcPattern *p, FcBool trim,
     pat->lang     = newstrdup( p->lang );
     pat->filename = NULL;
 
-    string key = buildFontKey( pat, false );
-
-    if ( fontmap->find( key ) == fontmap->end() ) {
-        key = buildFontKey( pat, true );
-        pat->filename = newstrdup( (*fontmap)[ key ].c_str() );
-    }
-    else {
-        pat->filename = newstrdup( (*fontmap)[ key ].c_str() );
-    }
+    string key = buildFontKey( pat );
+    pat->filename = newstrdup( (*fontmap)[ key ].c_str() );
 
 //printf( "MATCHED STYLE: %s, FILENAME: %s\n", key.c_str(), pat->filename );
 

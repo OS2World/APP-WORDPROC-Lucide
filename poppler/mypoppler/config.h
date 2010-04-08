@@ -13,9 +13,12 @@
 /* Use cairo for rendering. */
 #undef HAVE_CAIRO
 
-/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
-   */
+/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'. */
+#if defined(__WATCOMC__)
 #undef HAVE_DIRENT_H
+#else
+#define HAVE_DIRENT_H 1
+#endif
 
 #define HAVE_DIRECT_H 1
 

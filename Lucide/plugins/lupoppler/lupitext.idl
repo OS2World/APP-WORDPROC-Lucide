@@ -1,0 +1,58 @@
+#ifndef lupitext_idl
+#define lupitext_idl
+
+#include <luitext.idl>
+#include <lupifield.idl>
+
+interface FormWidgetText; // declared in poppler/Form.h
+
+/**
+ * LuPopplerInputText represents a text field in the PDF document.
+ *
+ * This interface exposes the FormWidgetText poppler class.
+ */
+interface LuPopplerInputText : LuPopplerInputField, LuInputText
+{
+    void init_widgetText( inout somInitCtrl ctrl, in LuPopplerDocument aDoc,
+                          in long aPagenum, in Page aPage,
+                          in FormWidgetText aFormWidgetText );
+
+#ifdef __SOMIDL__
+
+    implementation
+    {
+        releaseorder: init_widgetText;
+
+        init_widgetText: init;
+        somDestruct: override;
+
+        getContents: override;
+        setContents: override;
+        isMultiLine: override;
+        isPassword: override;
+        isFileName: override;
+        isSpellCheckable: override;
+        isScrollable: override;
+        isComb: override;
+        isRichText: override;
+        getMaximumLength: override;
+
+        FormWidgetText widget;
+        string contents;
+
+        passthru C_h_before =  ""
+            ""
+            "#include <Form.h>"
+            "";
+
+        passthru C_xh_before =  ""
+            ""
+            "#include <Form.h>"
+            "";
+    };
+
+#endif // __SOMIDL__
+
+};
+
+#endif // lupitext_idl
