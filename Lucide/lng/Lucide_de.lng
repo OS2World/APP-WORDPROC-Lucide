@@ -16,7 +16,7 @@ MENU_LAST=~Letzte\tUmschalt+Ende
 MENU_RECENT_FILES=~Wiederholen
 MENU_CLEAR_LIST=~Liste l”schen
 MENU_SAVE_AS=~Sichern unter...
-MENU_CLOSE=~Schlieáen
+MENU_CLOSE=S~chlieáen
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Seitenein~richtung...
 MENU_PRINT=~Drucken...\tStrg+P
