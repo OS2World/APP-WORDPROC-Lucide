@@ -19,7 +19,9 @@ INSTALLS += Lucide_doc
 # Lucide documentation
 #
 Lucide_doc_INST		 = $(notdir $(PATH_BIN))
-Lucide_doc_SOURCES	:= changelog readme $(wildcard $(PATH_SUB_CURRENT)/readme_*.txt)
+Lucide_doc_SOURCES	:= \
+	changelog readme $(wildcard $(PATH_SUB_CURRENT)/readme_*.txt) \
+	gui/bitmaps/Lucide.ico
 
 include $(FILE_KBUILD_SUB_FOOTER)
 
