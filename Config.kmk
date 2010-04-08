@@ -9,7 +9,7 @@
 #
 # Lucide version string
 #
-VERSION		= 1.30 beta1
+VERSION		= 1.30
 
 #------------------------------------------------------------------------------
 # Common libraries referenced by components
