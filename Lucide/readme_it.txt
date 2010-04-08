@@ -58,4 +58,5 @@ http://www.ecomstation.com
 :: Copyright ::
 
 (c) 2006 by Eugene Romanenko, netlabs.org
+(c) 2010 by Dmitry A. Kuminov, netlabs.org
     in co-operation with Serenity Systems International
