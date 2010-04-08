@@ -62,6 +62,7 @@ PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, const char *fname, long _c
     memset( pcurForm, 0, sizeof( HCINFO ) );
     psetup      = new PrintSetup;
     memset( psetup, 0, sizeof( PrintSetup ) );
+    pQueueInfo  = NULL;
 }
 
 PrintDlg::~PrintDlg()
