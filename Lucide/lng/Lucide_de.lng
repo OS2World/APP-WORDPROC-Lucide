@@ -85,6 +85,7 @@ MSGS_OVERWRITE_FILE=Datei existiert bereits. šberschreiben?
 MSGS_FILE_SAVE_ERROR=Fehler beim Schreiben der Datei!
 MSGS_PAGE=Seite
 MSGS_ERROR_STARTING_BROWSER=Fehler beim Starten des Browsers!
+MSGS_CLOSE_MODIFIED_DOCUMENT=Dokument wurde ge„ndert. Sichern?
 
 MSGS_LDERR=Lesefehler: %s!
 MSGS_LDERR_OUT_OF_MEMORY=Speichermangel
@@ -213,6 +214,7 @@ PD_PAGE_ORIENTATION=Seitenausrichtung
 PD_PORTRAIT=H~ochformat
 PD_LANDSCAPE=~Querformat
 PD_MARGINS=Seitenr„nder (mm)
+PD_IGNORE_PRINTER_MARGINS=Seitenr„nder ignorieren
 PD_MLEFT=Links
 PD_MRIGHT=Rechts
 PD_MTOP=Oben
