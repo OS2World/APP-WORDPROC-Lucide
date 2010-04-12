@@ -54,13 +54,17 @@
 
 #include "lujpeg.xih"
 
-#define HAVE_BOOLEAN
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <setjmp.h>
+
+// jpeglib defines boolean as int while SOM defines it as unsigned char,
+// work this around (note that you need to use jpeg_boolean in this source if
+// you need to refer to the jpeglib's definition of it)
+#define boolean jpeg_boolean
 #include <jpeglib.h>
+#undef boolean
 
 
 void resample( Environment *ev,
