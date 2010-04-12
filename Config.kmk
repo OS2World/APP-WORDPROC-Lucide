@@ -98,7 +98,8 @@ override define TOOL_GXX3OMF_LINK_DLL_CMDS
 	$(QUIET)$(TOOL_GXX3OMF_LD) @$(outbase).rsp
 	$(if $(filter %.res,$(objs)), \
 		$(QUIET)$(TOOL_GXX3OMF_RC) $(filter %.res,$(objs)) $(out))
-	-$(QUIET)$(TOOL_GXX3OMF_EXEPACK) $(out)
+	$(if $(filter-out debug,$(BUILD_TYPE)), \
+		-$(QUIET)$(TOOL_GXX3OMF_EXEPACK) $(out))
 endef
 
 override define TOOL_GXX3OMF_LINK_PROGRAM_CMDS
@@ -113,7 +114,8 @@ override define TOOL_GXX3OMF_LINK_PROGRAM_CMDS
 	$(QUIET)$(TOOL_GXX3OMF_LD) @$(outbase).rsp
 	$(if $(filter %.res,$(objs)), \
 		$(QUIET)$(TOOL_GXX3OMF_RC) $(filter %.res,$(objs)) $(out))
-	-$(QUIET)$(TOOL_GXX3OMF_EXEPACK) $(out)
+	$(if $(filter-out debug,$(BUILD_TYPE)), \
+		-$(QUIET)$(TOOL_GXX3OMF_EXEPACK) $(out))
 endef
 
 TOOL_GCC3OMF_RC					?= $(TOOL_GXX3OMF_RC)
@@ -140,7 +142,8 @@ override define TOOL_GCC3OMF_LINK_DLL_CMDS
 	$(QUIET)$(TOOL_GCC3OMF_LD) @$(outbase).rsp
 	$(if $(filter %.res,$(objs)), \
 		$(QUIET)$(TOOL_GCC3OMF_RC) $(filter %.res,$(objs)) $(out))
-	-$(QUIET)$(TOOL_GCC3OMF_EXEPACK) $(out)
+	$(if $(filter-out debug,$(BUILD_TYPE)), \
+		-$(QUIET)$(TOOL_GCC3OMF_EXEPACK) $(out))
 endef
 
 override define TOOL_GCC3OMF_LINK_PROGRAM_CMDS
@@ -155,7 +158,8 @@ override define TOOL_GCC3OMF_LINK_PROGRAM_CMDS
 	$(QUIET)$(TOOL_GCC3OMF_LD) @$(outbase).rsp
 	$(if $(filter %.res,$(objs)), \
 		$(QUIET)$(TOOL_GCC3OMF_RC) $(filter %.res,$(objs)) $(out))
-	-$(QUIET)$(TOOL_GCC3OMF_EXEPACK) $(out)
+	$(if $(filter-out debug,$(BUILD_TYPE)), \
+		-$(QUIET)$(TOOL_GCC3OMF_EXEPACK) $(out))
 endef
 
 #------------------------------------------------------------------------------
