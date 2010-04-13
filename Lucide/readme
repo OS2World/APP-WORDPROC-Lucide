@@ -1,4 +1,4 @@
-:: About Lucide ::
+:: About Lucide Version 1.3 ::
 
 Lucide is a plugin-based document viewer with support for various file formats.
 
@@ -19,13 +19,22 @@ to easily add more plugins.
          JPG                   Scaling
   --------------------------------------------------------------------------
 
-DJVU plugin requires Innotek LIBC 0.6.3:
-  
-  - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.3-csd3.zip (zip format)
-    or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_3-csd3.wpi (WarpIn format)
 
-Optional: to place unicode text to clipboard in OpenOffice.org-compatible
-format you need to install UClip package (enhanced OS/2 clipboard support):
+:: Requirements ::
+
+Lucide requires the following:
+
+  - libc 0.6.3:
+    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.3-csd3.zip (zip format)
+      or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_3-csd3.wpi (WarpIn format)
+  - gcc442.dll:
+    - http://download.smedley.info/gcc442.zip (zip format)
+      or ftp://ftp.netlabs.org/pub/qt4/gcc-lib-4_4_2-20091204.wpi (WarpIn format)
+
+
+Optional: to place unicode text to the clipboard in OpenOffice.org-compatible
+format you need to install UClip package (enhanced OS/2 clipboard support, 
+installed by default in eComStation 2.0 RC1 and up):
 
   - http://hobbes.nmsu.edu/cgi-bin/h-search?key=UClip
 
@@ -49,20 +58,14 @@ Please make sure you select the correct version and component for your ticket.
 General: even/odd printing unavailable for postscript printing.
           ( http://svn.netlabs.org/lucide/ticket/87#comment:4 )
 
-PDF plugin: text selection in multicolumn documents may work incorrectly
-            and Lucide may even crash. It's a problem of poppler PDF rendering
-            library.
-             ( http://svn.netlabs.org/lucide/ticket/98 )
-             ( https://bugs.freedesktop.org/show_bug.cgi?id=4006#c1 )
-
 
 :: Pipe commands ::
 
-First instance of Lucide will create named pipe \PIPE\LUCIDE. You may
-send following commands to pipe:
+The first instance of Lucide will create a named pipe \PIPE\LUCIDE. 
+You may send following commands to this pipe:
 
-$prev              - will switch to previous page
-$next              - will switch to next page
+$prev              - will switch to the previous page
+$next              - will switch to the next page
 $switchfullscreen  - will switch to fullscreen (even if minimized)
 $minimize          - will mimimize Lucide (even if fullscreen)
 $rotate            - will rotate 90ø CW
@@ -70,15 +73,27 @@ $zoomin            - will zoom in
 $zoomout           - will zoom out
 $zoomoriginal      - will zoom to actual size
 
-This may be useful for presentations with remote control.
+This can be useful for presentations with a remote control.
 
 
-:: License ::
+:: License till version 1.21 ::
 
-Lucide is licensed for use with eComStation only. You are not allowed to
-distribute the product by uploading it to public Internet servers or by any
-other means make it publicly available.
+Lucide version 1.21 and earlier are licensed for use with eComStation only. 
+You are not allowed to distribute the product by uploading it to public 
+Internet servers or make it publicly available by any other means.
 
+
+:: License for version 1.3.0 and better ::
+
+Starting with version 1.3.0 Mensys BV and Serenity Systems International 
+have agreed in opensourcing Lucide, while still investing in the product.
+Netlabs.org would like to express it's gratitude toward Mensys BV and 
+Serenity Systems International.
+
+Lucide as of version 1.3.0 is released and distributed under CDDL/LGPL.
+
+
+:: Plugin License ::
 The plugins are released under CDDL/LGPL or GPL, depending on the plugin. See
 http://svn.netlabs.org/lucide/ for more information and source code.
 
@@ -94,3 +109,4 @@ http://www.ecomstation.com
 (c) 2006-2007 by Eugene Romanenko, netlabs.org
 (c) 2010 by Dmitry A. Kuminov, netlabs.org
     in co-operation with Serenity Systems International
+
