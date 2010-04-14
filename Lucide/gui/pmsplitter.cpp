@@ -169,6 +169,16 @@ static MRESULT EXPENTRY splitterProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM m
             setWindSize( hwnd, sws );
             return (MRESULT)(TRUE);
 
+        case SBM_SETSPLITTERSIZE:
+            sws->splitterWidth = SHORT1FROMMP( mp1 );
+            if ( sws->splitterWidth < 0 )
+                sws->splitterWidth = SPLITTER_WIDTH;
+            setWindSize( hwnd, sws );
+            return (MRESULT)(TRUE);
+
+        case SBM_GETSPLITTERSIZE:
+            return MRFROMSHORT( sws->splitterWidth );
+
         case WM_DESTROY:
             delete sws;
             break;

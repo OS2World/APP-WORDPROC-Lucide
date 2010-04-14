@@ -58,6 +58,17 @@ BOOL InitPMSplitterClass( HAB hab );
 // SHORT size;
 // (BOOL)WinSendMsg( hwnd, SBM_SETFIXEDSIZE, MPFROMSHORT( size ), MPVOID );
 
+// SetSplitterSize - Set the width of the splitter bar in pixels
+//                   (-1 resets to the default)
+#define SBM_SETSPLITTERSIZE (WM_USER+6)
+// SHORT splitterSize;
+// (BOOL)WinSendMsg( hwnd, SBM_SETSPLITTERSIZE,
+//                   MPFROMSHORT( splitterSize ), MPVOID );
+
+// GetSplitterSize - Get the width of the splitter bar in pixels
+#define SBM_GETSPLITTERSIZE (WM_USER+7)
+// (SHORT)WinSendMsg( hwnd, SBM_GETSPLITTERSIZE, MPVOID, MPVOID );
+
 // Control notification code, splitter pos changed
 // MP1 - (id, SBN_POSITIONCHANGED)  MP2 - (newpos, oldpos)
 #define SBN_POSITIONCHANGED	1
