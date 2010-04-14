@@ -122,6 +122,8 @@ class Lucide
         static bool isThumbNeeded( const char *fn );
         static void writeThumbnail( const char *fn );
         static void gotoFile( FileList file );
+        static void savePosition();
+        static void restorePosition();
 };
 
 #endif // __LUCIDE_H

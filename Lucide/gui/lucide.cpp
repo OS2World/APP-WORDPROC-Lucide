@@ -81,10 +81,12 @@ typedef _find find_t;
 const char *appName    = "Lucide";
 const char *appVersion = VERSION;
 const char *appDate = VERSIONDATE;
-const char *fwp        = "FrameWindowPos";
-const char *lvd        = "LastViewedDir";
-const char *splpos     = "SplitterPos";
-const char *showind    = "ShowIndex";
+const char *prfFwp     = "FrameWindowPos";
+const char *prfLvd     = "LastViewedDir";
+const char *prfSplpos  = "SplitterPos";
+const char *prfShowind = "ShowIndex";
+const char *prfMaxView = "MaxView";
+const char *prfFs      = "FullScreen";
 
 HWND createToolbar( HWND hwnd );
 void AboutBox( HWND hWndFrame );
@@ -174,6 +176,28 @@ extern "C" unsigned long _System _DLL_InitTerm( unsigned long mod_handle,
     }
 }
 #endif
+
+
+// stolen from xWorkplace sources
+static
+APIRET my_DosQueryProcAddr(PCSZ pcszModuleName, ULONG ulOrdinal, PFN *ppfn)
+{
+    HMODULE hmod = NULL;
+    APIRET rc = 0;
+    if (!(rc = DosQueryModuleHandle( (PSZ)pcszModuleName, &hmod))) {
+        if ((rc = DosQueryProcAddr( hmod, ulOrdinal, NULL, ppfn))) {
+            // the CP programming guide and reference says use
+            // DosLoadModule if DosQueryProcAddr fails with this error
+            if (rc == ERROR_INVALID_HANDLE) {
+                if (!(rc = DosLoadModule(NULL, 0, (PSZ) pcszModuleName,
+                                         &hmod))) {
+                    rc = DosQueryProcAddr(hmod, ulOrdinal, NULL, ppfn);
+                }
+            }
+        }
+    }
+    return rc;
+}
 
 
 PFNWP pOldFrameProc = NULL;
@@ -636,7 +660,7 @@ void Lucide::openDocument()
     memset( fd, 0, sizeof( FILEDLG ) );
     fd->cbSize = sizeof( FILEDLG );
     fd->fl = FDS_CENTER | FDS_OPEN_DIALOG;
-    PrfQueryProfileString( HINI_USERPROFILE, appName, lvd, "",
+    PrfQueryProfileString( HINI_USERPROFILE, appName, prfLvd, "",
                            fd->szFullFile, sizeof( fd->szFullFile ) );
     LcdFileDlg( HWND_DESKTOP, hWndFrame, fd );
     if ( fd->lReturn == DID_OK )
@@ -646,7 +670,7 @@ void Lucide::openDocument()
         char buf[ _MAX_PATH ] = "";
         _splitpath( fd->szFullFile, drv, dir, NULL, NULL );
         _makepath( buf, drv, dir, NULL, NULL );
-        PrfWriteProfileString( HINI_USERPROFILE, appName, lvd, buf );
+        PrfWriteProfileString( HINI_USERPROFILE, appName, prfLvd, buf );
 
         loadDocument( fd->szFullFile );
     }
@@ -662,7 +686,7 @@ bool Lucide::saveDocumentAs()
     memset( fd, 0, sizeof( FILEDLG ) );
     fd->cbSize = sizeof( FILEDLG );
     fd->fl = FDS_CENTER | FDS_SAVEAS_DIALOG;
-    PrfQueryProfileString( HINI_USERPROFILE, appName, lvd, "",
+    PrfQueryProfileString( HINI_USERPROFILE, appName, prfLvd, "",
                            dirbuf, sizeof( dirbuf ) );
     char fil[ _MAX_FNAME ] = "";
     char ext[ _MAX_EXT ] = "";
@@ -834,14 +858,14 @@ void Lucide::toggleMaxviewFullscreen( bool maxview )
         WinSetWindowUShort( hWndFrame, QWS_YMINIMIZE, winPos.YMinimize );
         WinSetWindowPos( hWndFrame, NULLHANDLE,
                          winPos.Swp.x, winPos.Swp.y, winPos.Swp.cx, winPos.Swp.cy,
-                         SWP_MOVE | SWP_SIZE | SWP_SHOW );
+                         SWP_SIZE | SWP_MOVE | SWP_SHOW );
     }
     else if ( maxviewState == On )
     {
-        WinSetWindowPos( hWndFrame, HWND_TOP, 0, 0,
+        WinSetWindowPos( hWndFrame, NULLHANDLE, 0, 0,
                          WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN ),
                          WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN ),
-                         SWP_SIZE | SWP_MOVE | SWP_ZORDER );
+                         SWP_SIZE | SWP_MOVE | SWP_SHOW );
     }
 }
 
@@ -992,6 +1016,149 @@ void Lucide::gotoFile( FileList file )
 
     loadDocument( fn );
     delete fn;
+}
+
+void Lucide::savePosition()
+{
+    if ( !WinIsWindow( hab, hWndFrame ) )
+        return;
+
+    char valbuf[ 3 ] = "";
+    PrfWriteProfileString( HINI_USERPROFILE, appName, prfSplpos,
+                           itoa( Lucide::splitterPos, valbuf, 10 ) );
+    PrfWriteProfileString( HINI_USERPROFILE, appName, prfShowind,
+                           itoa( Lucide::showIndex, valbuf, 10 ) );
+
+    if ( isMaxview )
+        PrfWriteProfileString( HINI_USERPROFILE, appName, prfMaxView, "1" );
+    else
+        PrfWriteProfileString( HINI_USERPROFILE, appName, prfMaxView, NULL );
+
+    if ( isFullscreen )
+        PrfWriteProfileString( HINI_USERPROFILE, appName, prfFs, "1" );
+    else
+        PrfWriteProfileString( HINI_USERPROFILE, appName, prfFs, NULL );
+
+    if ( !isMaxview && !isFullscreen ) {
+        WinQueryWindowPos( hWndFrame, &winPos.Swp );
+        winPos.XRestore  = WinQueryWindowUShort( hWndFrame, QWS_XRESTORE );
+        winPos.YRestore  = WinQueryWindowUShort( hWndFrame, QWS_YRESTORE );
+        winPos.CXRestore = WinQueryWindowUShort( hWndFrame, QWS_CXRESTORE );
+        winPos.CYRestore = WinQueryWindowUShort( hWndFrame, QWS_CYRESTORE );
+        winPos.XMinimize = WinQueryWindowUShort( hWndFrame, QWS_XMINIMIZE );
+        winPos.YMinimize = WinQueryWindowUShort( hWndFrame, QWS_YMINIMIZE );
+    }
+
+    PrfWriteProfileData( HINI_USERPROFILE, appName, prfFwp, &winPos, sizeof( winPos ) );
+}
+
+void Lucide::restorePosition()
+{
+    splitterPos = PrfQueryProfileInt( HINI_USERPROFILE, appName, prfSplpos,
+                                      Lucide::splitterPos );
+    showIndex = PrfQueryProfileInt( HINI_USERPROFILE, appName, prfShowind,
+                                    Lucide::showIndex );
+
+    WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS,
+                MPFROMSHORT( showIndex ? splitterPos : 0 ), MPVOID );
+
+    bool maxview = PrfQueryProfileInt( HINI_USERPROFILE, appName, prfMaxView, 0 ) == 1;
+    bool fullscreen = PrfQueryProfileInt( HINI_USERPROFILE, appName, prfFs, 0 ) == 1;
+
+    LONG sx, sy;
+    sx = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
+    sy = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
+
+    ULONG SwpOptions = SWP_MOVE | SWP_SIZE | SWP_ACTIVATE;
+    if ( !maxview && !fullscreen )
+        SwpOptions |= SWP_SHOW;
+
+    ULONG ulWpSize = sizeof( winPos );
+    if ( PrfQueryProfileData( HINI_USERPROFILE, appName, prfFwp, &winPos, &ulWpSize ) )
+    {
+
+        if ( winPos.Swp.fl & SWP_MAXIMIZE ) {
+            SwpOptions |= SWP_MAXIMIZE;
+        }
+        else if ( winPos.Swp.fl & SWP_MINIMIZE ) {
+            SwpOptions |= SWP_MINIMIZE;
+        }
+
+        LONG sx, sy;
+        sx = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
+        sy = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
+
+        if ( winPos.Swp.x > sx ) {
+            winPos.Swp.x = sx - winPos.Swp.cx;
+        }
+        if ( winPos.Swp.y > sy ) {
+            winPos.Swp.y = sy - winPos.Swp.cy;
+        }
+
+        if ( !isMaxview && !isFullscreen ) {
+            WinSetWindowPos( hWndFrame, NULLHANDLE,
+                             winPos.Swp.x, winPos.Swp.y, winPos.Swp.cx, winPos.Swp.cy,
+                             SwpOptions );
+        }
+
+        WinSetWindowUShort( hWndFrame, QWS_XRESTORE,  winPos.XRestore );
+        WinSetWindowUShort( hWndFrame, QWS_YRESTORE,  winPos.YRestore );
+        WinSetWindowUShort( hWndFrame, QWS_CXRESTORE, winPos.CXRestore );
+        WinSetWindowUShort( hWndFrame, QWS_CYRESTORE, winPos.CYRestore );
+        WinSetWindowUShort( hWndFrame, QWS_XMINIMIZE, winPos.XMinimize );
+        WinSetWindowUShort( hWndFrame, QWS_YMINIMIZE, winPos.YMinimize );
+
+        // we don't the app to be minimized at startup
+        if ( SwpOptions & SWP_MINIMIZE )
+            WinSetWindowPos( hWndFrame, NULLHANDLE, 0, 0, 0, 0, SWP_RESTORE );
+    }
+    else
+    {
+        typedef
+        BOOL ( APIENTRY *WinQueryDesktopWorkArea_T ) ( HWND hwndDesktop,
+                                                       PRECTL pwrcWorkArea );
+        static WinQueryDesktopWorkArea_T WinQueryDesktopWorkArea =
+            (WinQueryDesktopWorkArea_T) ~0;
+
+        if ( (ULONG) WinQueryDesktopWorkArea == (ULONG) ~0 ) {
+            if ( my_DosQueryProcAddr( "PMMERGE", 5469,
+                                      (PFN *) &WinQueryDesktopWorkArea ) )
+                WinQueryDesktopWorkArea = NULL;
+        }
+
+        SWP swp;
+        RECTL rcl;
+        if ( WinQueryDesktopWorkArea &&
+             WinQueryDesktopWorkArea( HWND_DESKTOP, &rcl ) ) {
+            swp.x = rcl.xLeft;
+            swp.y = rcl.yBottom;
+            swp.cx = rcl.xRight - rcl.xLeft;
+            swp.cy = rcl.yTop - rcl.yBottom;
+        } else {
+            swp.x = 0;
+            swp.y = 0;
+            swp.cx = sx;
+            swp.cy = sy;
+        }
+
+        swp.x += 16;
+        swp.y += 16;
+        swp.cx -= 32;
+        swp.cy -= 32;
+
+        WinSetWindowPos( hWndFrame, NULLHANDLE, swp.x, swp.y, swp.cx, swp.cy,
+                         SwpOptions );
+    }
+
+    if ( fullscreen )
+    {
+        toggleFullscreen();
+        isMaxview = maxview;
+    }
+    else if ( maxview )
+    {
+        toggleMaxview();
+    }
 }
 
 static MRESULT EXPENTRY frameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
@@ -1335,10 +1502,6 @@ __declspec(dllexport) _System APIRET APIENTRY LucideMain( int argc, char *argv[]
 
     WinSendMsg( hVertSplitter, SBM_SETWINDOWS,
                 MPFROMHWND( indexWin->getHWND() ), MPFROMHWND( docViewer->getFrameHWND() ) );
-    Lucide::splitterPos = PrfQueryProfileInt( HINI_USERPROFILE, appName, splpos, Lucide::splitterPos );
-    Lucide::showIndex = PrfQueryProfileInt( HINI_USERPROFILE, appName, showind, Lucide::showIndex );
-    WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS,
-                MPFROMSHORT( Lucide::showIndex ? Lucide::splitterPos : 0 ), MPVOID );
 
     // Horizontal splitter and its windows - Toolbar and Vertical splitter
     // Horizontal splitter is client window
@@ -1363,12 +1526,7 @@ __declspec(dllexport) _System APIRET APIENTRY LucideMain( int argc, char *argv[]
     findDlg = new FindDlg( hWndFrame );
     recent  = new RecentFiles( hWndMenu );
 
-    // �������� ���� �ணࠬ��
-    if ( !PMRestoreWindowPos( NULL, appName, fwp, hWndFrame,
-                              TRUE, TRUE, FALSE, FALSE, FALSE ) ) {
-        WinSetWindowPos( hWndFrame, HWND_TOP, 100, 100, 630, 400,
-                         SWP_SIZE | SWP_MOVE | SWP_SHOW | SWP_ACTIVATE );
-    }
+    Lucide::restorePosition();
 
     Lucide::focusDocview();
 
@@ -1384,15 +1542,7 @@ __declspec(dllexport) _System APIRET APIENTRY LucideMain( int argc, char *argv[]
         WinDispatchMsg( hab, &qmsg );
     }
 
-    if ( WinIsWindow( hab, hWndFrame ) )
-    {
-        char valbuf[ 3 ] = "";
-        PrfWriteProfileString( HINI_USERPROFILE, appName, splpos,
-                               itoa( Lucide::splitterPos, valbuf, 10 ) );
-        PrfWriteProfileString( HINI_USERPROFILE, appName, showind,
-                               itoa( Lucide::showIndex, valbuf, 10 ) );
-        PMStoreWindowPos( NULL, appName, fwp, hWndFrame );
-    }
+    Lucide::savePosition();
 
     WinDestroyWindow( hWndFrame );
 
