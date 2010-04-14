@@ -8,7 +8,7 @@
 MENU_DOCUMENT=~Dokument
 MENU_NEW_WINDOW=~Neues Fenster
 MENU_OPEN=~ôffnen...\tStrg+O
-MENU_NEXT_PREVIOUS=NÑchste/~Vorhergehende Datei
+MENU_NEXT_PREVIOUS=NÑchste/~Vorige Datei
 MENU_FIRST=~Erste\tUmschalt+Pos1
 MENU_PREVIOUS=~Vorige\tUmschalt+BildOb.
 MENU_NEXT=~NÑchste\tUmschalt+BildUnt.
@@ -32,7 +32,7 @@ MENU_VIEW=~Anzeige
 MENU_FIT_WINDOW=~Ganze Seite\tStrg+0
 MENU_ACTUAL_SIZE=~Originalgrî·e\tStrg+1
 MENU_FIT_WIDTH=Seiten~breite\tStrg+2
-# - unused - MENU_ZOOM_IN_OUT=~Zoom-Modus (grîsser/kleiner)
+# - unused - MENU_ZOOM_IN_OUT=~Zoom-Modus (grî·er/kleiner)
 MENU_ZOOM_IN=Vergrî·ern\tStrg++
 MENU_ZOOM_OUT=Verkleinern\tStrg+-
 MENU_FIRST_PAGE=~Erste Seite
@@ -63,12 +63,12 @@ TBHINT_FIRST_PAGE=Erste Seite
 TBHINT_PREV_PAGE=Vorige Seite
 TBHINT_NEXT_PAGE=NÑchste Seite
 TBHINT_LAST_PAGE=Letzte Seite
-TBHINT_ACTUAL_SIZE=Originalgî·e
+TBHINT_ACTUAL_SIZE=Originalgrî·e
 TBHINT_FIT_WINDOW=Ganze Seite
 TBHINT_FIT_WIDTH=Seitenbreite
 TBHINT_FIND=Suchen...
 TBHINT_FINDAGAIN=Weitersuchen
-TBHINT_ZOOM_IN_OUT=Zoom-Modus (grîsser/kleiner)
+TBHINT_ZOOM_IN_OUT=Zoom-Modus (grî·er/kleiner)
 # toolbar's page number
 TB_PAGENUM=von %d
 
@@ -162,7 +162,7 @@ PDLG_CANCEL=~Abbruch
 # About dialog
 #
 AD_ABOUT=öber
-AD_DESCRIPTION=Plugin-basierender Dokumentviewer mit UnterstÅtzung zahlreicher Dateiformate
+AD_DESCRIPTION=Plugin-basierter Dokumentbetrachter fÅr zahlreicher Dateiformate
 AD_COPYRIGHTS=(c) by Eugene Romanenko, netlabs.org in Zusammenarbeit mit Serenity Systems International
 AD_OK=~OK
 
