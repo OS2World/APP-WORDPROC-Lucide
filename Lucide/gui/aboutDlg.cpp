@@ -115,7 +115,13 @@ static MRESULT EXPENTRY AboutProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 
                 centerWindow( hWndFrame, hwnd );
 
                 char buf[ 256 ];
-                snprintf( buf, sizeof buf, "%s %s", appName, appVersion );
+                if (strlen(appDate) >=1)
+                {
+                        snprintf( buf, sizeof buf, "%s %s (%s)", appName, appVersion, appDate );
+                } else
+                {
+                        snprintf( buf, sizeof buf, "%s %s", appName, appVersion );
+                }
                 WinSetDlgItemText( hwnd, IDT_LUCIDEVERSION, buf );
 
                 HPOINTER p = WinLoadPointer( HWND_DESKTOP, _hmod, IDP_HAND );
