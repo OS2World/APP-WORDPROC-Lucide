@@ -110,8 +110,9 @@ class Lucide
         static void toggleZoom();
         static void enableCopy( bool enable );
         static void setPageLayout( PgLayout layout );
-        static void toggleMaxview();
-        static void toggleFullscreen();
+        static void toggleMaxview() { toggleMaxviewFullscreen( true ); }
+        static void toggleFullscreen() { toggleMaxviewFullscreen( false ); }
+        static void toggleMaxviewFullscreen( bool maxview );
         static void focusDocview();
         static void focusIndex();
         static void cmdMinimize();

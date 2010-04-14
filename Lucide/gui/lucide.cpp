@@ -98,6 +98,7 @@ HWND  hWndFrame      = NULLHANDLE;
 HWND  hWndMenu       = NULLHANDLE;
 HWND  hToolBar       = NULLHANDLE;
 HWND  hVertSplitter  = NULLHANDLE;
+HWND  hHorizSplitter = NULLHANDLE;
 HWND  hFrameSysmenu  = NULLHANDLE;
 HWND  hFrameTitlebar = NULLHANDLE;
 HWND  hFrameMinMax   = NULLHANDLE;
@@ -716,18 +717,76 @@ void Lucide::checkNavpane()
 }
 
 
-void Lucide::toggleMaxview()
+void Lucide::toggleMaxviewFullscreen( bool maxview )
 {
+    enum TriState { NoChange, On, Off };
+    TriState maxviewState = NoChange;
+    TriState fullscreenState = NoChange;
+
+    if ( maxview )
+    {
+        // maxview command issued
+        if ( !isMaxview )
+        {
+            if ( isFullscreen ) {
+                fullscreenState = Off;
+                isFullscreen = false;
+            } else {
+                maxviewState = On;
+            }
+            isMaxview = true;
+        }
+        else
+        {
+            if ( isFullscreen ) {
+                fullscreenState = Off;
+                isFullscreen = false;
+            } else {
+                maxviewState = Off;
+                isMaxview = false;
+            }
+        }
+    }
+    else
+    {
+        // fullscreen command issued
+        if ( !isFullscreen )
+        {
+            fullscreenState = On;
+            if ( !isMaxview )
+                maxviewState = On;
+        }
+        else
+        {
+            fullscreenState = Off;
+            if ( !isMaxview )
+                maxviewState = Off;
+        }
+
+        isFullscreen = !isFullscreen;
+    }
+
     ULONG ulFrameStyle = WinQueryWindowULong( hWndFrame, QWL_STYLE );
 
-    if ( isMaxview )
+    if ( fullscreenState == Off )
+    {
+        docViewer->setFullscreen( false );
+        WinSetParent( hWndMenu, hWndFrame, TRUE );
+    }
+    else if ( fullscreenState == On )
+    {
+        docViewer->setFullscreen( true );
+        WinSetParent( hWndMenu, HWND_OBJECT, FALSE );
+    }
+
+    if ( maxviewState == Off )
     {
         WinSetParent( hFrameSysmenu,  hWndFrame, FALSE );
         WinSetParent( hFrameTitlebar, hWndFrame, FALSE );
         WinSetParent( hFrameMinMax,   hWndFrame, FALSE );
         ulFrameStyle |= FS_SIZEBORDER;
     }
-    else
+    else if ( maxviewState == On )
     {
         WinQueryWindowPos( hWndFrame, &winPos.Swp );
         winPos.XRestore  = WinQueryWindowUShort( hWndFrame, QWS_XRESTORE );
@@ -743,12 +802,28 @@ void Lucide::toggleMaxview()
         ulFrameStyle &= ~FS_SIZEBORDER;
     }
 
-    WinSetWindowULong( hWndFrame, QWL_STYLE, ulFrameStyle );
-    WinSendMsg( hWndFrame, WM_UPDATEFRAME,
-                MPFROMLONG( FCF_TITLEBAR | FCF_SIZEBORDER | FCF_SYSMENU | FCF_MINMAX ),
-                MPVOID );
+    if ( maxviewState != NoChange || fullscreenState != NoChange )
+    {
+        WinSetWindowULong( hWndFrame, QWL_STYLE, ulFrameStyle );
+        WinSendMsg( hWndFrame, WM_UPDATEFRAME, MPVOID, MPVOID );
+    }
 
-    if ( isMaxview )
+    if ( fullscreenState == Off )
+    {
+        WinSendMsg( hVertSplitter, SBM_SETSPLITTERSIZE, MPFROMSHORT( -1 ), MPVOID );
+        WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS,
+                    MPFROMSHORT( Lucide::showIndex ? Lucide::splitterPos : 0 ), MPVOID );
+        WinSendMsg( hHorizSplitter, SBM_SETFIXEDSIZE,
+            MPFROMSHORT( DEFAULT_PICTSIZE + TOOLBAR_HEIGHT_ADD ), MPVOID );
+    }
+    else if ( fullscreenState == On )
+    {
+        WinSendMsg( hHorizSplitter, SBM_SETSPLITTERPOS, 0, MPVOID );
+        WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS, 0, MPVOID );
+        WinSendMsg( hVertSplitter, SBM_SETSPLITTERSIZE, 0, MPVOID );
+    }
+
+    if ( maxviewState == Off )
     {
         WinSetWindowUShort( hWndFrame, QWS_XRESTORE,  winPos.XRestore );
         WinSetWindowUShort( hWndFrame, QWS_YRESTORE,  winPos.YRestore );
@@ -756,48 +831,19 @@ void Lucide::toggleMaxview()
         WinSetWindowUShort( hWndFrame, QWS_CYRESTORE, winPos.CYRestore );
         WinSetWindowUShort( hWndFrame, QWS_XMINIMIZE, winPos.XMinimize );
         WinSetWindowUShort( hWndFrame, QWS_YMINIMIZE, winPos.YMinimize );
-        ULONG swpopt = SWP_MOVE | SWP_SIZE | SWP_SHOW;
         WinSetWindowPos( hWndFrame, NULLHANDLE,
                          winPos.Swp.x, winPos.Swp.y, winPos.Swp.cx, winPos.Swp.cy,
-                         swpopt );
+                         SWP_MOVE | SWP_SIZE | SWP_SHOW );
     }
-    else
+    else if ( maxviewState == On )
     {
         WinSetWindowPos( hWndFrame, HWND_TOP, 0, 0,
                          WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN ),
                          WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN ),
                          SWP_SIZE | SWP_MOVE | SWP_ZORDER );
     }
-
-    isMaxview = !isMaxview;
 }
 
-
-void Lucide::toggleFullscreen()
-{
-    if ( isFullscreen )
-    {
-        docViewer->setFullscreen( false );
-        WinSetParent( docViewer->getFrameHWND(), hWndFrame, TRUE );
-        WinSendMsg( hVertSplitter, SBM_SETWINDOWS,
-                    MPFROMHWND( indexWin->getHWND() ),
-                    MPFROMHWND( docViewer->getFrameHWND() ) );
-    }
-    else
-    {
-        docViewer->setFullscreen( true );
-        WinSendMsg( hVertSplitter, SBM_SETWINDOWS,
-                    MPFROMHWND( indexWin->getHWND() ),
-                    MPFROMHWND( NULLHANDLE ) );
-        WinSetParent( docViewer->getFrameHWND(), HWND_DESKTOP, FALSE );
-        WinSetWindowPos( docViewer->getFrameHWND(), HWND_TOP, 0, 0,
-                         WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN ),
-                         WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN ),
-                         SWP_SIZE | SWP_MOVE | SWP_ZORDER );
-    }
-
-    isFullscreen = !isFullscreen;
-}
 
 void Lucide::focusDocview()
 {
@@ -1274,10 +1320,10 @@ __declspec(dllexport) _System APIRET APIENTRY LucideMain( int argc, char *argv[]
 
     // Horizontal splitter and its windows - Toolbar and Vertical splitter
     // Horizontal splitter is client window
-    HWND hHorizSplitter = WinCreateWindow( hWndFrame, WC_ER_SPLITTER, "",
-                                           WS_VISIBLE | SBS_HSPLIT | SBS_SECONDFIXED,
-                                           0, 0, 0, 0, hWndFrame, HWND_TOP,
-                                           FID_CLIENT, NULL, NULL );
+    hHorizSplitter = WinCreateWindow( hWndFrame, WC_ER_SPLITTER, "",
+                                      WS_VISIBLE | SBS_HSPLIT | SBS_SECONDFIXED,
+                                      0, 0, 0, 0, hWndFrame, HWND_TOP,
+                                      FID_CLIENT, NULL, NULL );
     pOldSplProc = WinSubclassWindow( hHorizSplitter, splProc );
 
     hToolBar = createToolbar( hWndFrame );
