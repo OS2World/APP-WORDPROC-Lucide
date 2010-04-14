@@ -189,6 +189,7 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     hWndDocFrame = WinCreateStdWindow( hWndFrame, WS_VISIBLE, &dfFlags, NULL, NULL,
                                        WS_VISIBLE, _hmod, 0, NULL );
     WinSetWindowULong( hWndDocFrame, QWL_USER, (ULONG)this );
+    oldFrameProc = WinSubclassWindow( hWndDocFrame, docFrameProc );
 
     hWndDoc = WinCreateWindow( hWndDocFrame, "er.docview", NULL,
                                WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN,
@@ -2625,4 +2626,22 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
     return WinDefWindowProc( hwnd, msg, mp1, mp2 );
 }
 
+
+// static, window procedure
+MRESULT EXPENTRY DocumentViewer::docFrameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
+{
+    DocumentViewer *_this = (DocumentViewer *)WinQueryWindowULong( hwnd, QWL_USER );
+
+    switch ( msg )
+    {
+        case WM_SYSCOMMAND:
+            // Send WM_SYSCOMMAND messages to the main frame so that the main
+            // system menu works when the document frame (which doesn't actually
+            // have a system menu) is in focus
+            WinSendMsg( _this->hMainFrame, WM_SYSCOMMAND, mp1, mp2 );
+            return (MRESULT)FALSE;
+    }
+
+    return _this->oldFrameProc( hwnd, msg, mp1, mp2 );
+}
 

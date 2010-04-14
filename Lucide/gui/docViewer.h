@@ -168,6 +168,7 @@ class DocumentViewer
         LuInputText *textField;
         long textFieldPage;
         long textFieldIndex;
+        PFNWP oldFrameProc;
         HWND hWndHscroll;
         HWND hWndVscroll;
         SHORT sHscrollMax;
