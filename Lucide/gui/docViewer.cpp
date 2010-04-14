@@ -2336,31 +2336,9 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
         }
     }
 
-    //
-    // In fullscreen mode accelerators not work, so we process these keys here.
-    //
-
-    // Ctrl+L
-    if ( ( fsflags & KC_CTRL ) && !( fsflags & KC_KEYUP ) && ( toupper( usch ) == 'L' ) )
-    {
-        Lucide::toggleFullscreen();
-        return TRUE;
-    }
-
-    // Esc && fullscreen
+    // Special case for Esc in fullscreen
     if ( fullscreen && !( fsflags & KC_KEYUP ) && ( fsflags & KC_VIRTUALKEY ) && ( usvk == VK_ESC ) ) {
         Lucide::toggleFullscreen();
-        return TRUE;
-    }
-
-    // +
-    if ( ( fsflags & KC_CHAR ) && !( fsflags & KC_KEYUP ) && ( usch == '+' ) ) {
-        goToPage( currentpage + 1 );
-        return TRUE;
-    }
-    // -
-    if ( ( fsflags & KC_CHAR ) && !( fsflags & KC_KEYUP ) && ( usch == '-' ) ) {
-        goToPage( currentpage - 1 );
         return TRUE;
     }
 
