@@ -11,6 +11,9 @@
 #
 VERSION		= 1.30
 
+# if you want a versiondate add it to LocalConfig.kmk
+VERSIONDATE	= 
+
 #------------------------------------------------------------------------------
 # Common libraries referenced by components
 #------------------------------------------------------------------------------
