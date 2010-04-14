@@ -176,7 +176,8 @@ extern "C" unsigned long _System _DLL_InitTerm( unsigned long mod_handle,
 #endif
 
 
-PFNWP pOldSplProc;
+PFNWP pOldFrameProc = NULL;
+PFNWP pOldSplProc   = NULL;
 
 void Lucide::enableCopy( bool enable )
 {
@@ -771,7 +772,7 @@ void Lucide::toggleMaxviewFullscreen( bool maxview )
     if ( fullscreenState == Off )
     {
         docViewer->setFullscreen( false );
-        WinSetParent( hWndMenu, hWndFrame, TRUE );
+        WinSetParent( hWndMenu, hWndFrame, FALSE );
     }
     else if ( fullscreenState == On )
     {
@@ -991,6 +992,25 @@ void Lucide::gotoFile( FileList file )
 
     loadDocument( fn );
     delete fn;
+}
+
+static MRESULT EXPENTRY frameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
+{
+    switch ( msg )
+    {
+        case WM_SYSCOMMAND:
+        {
+            if ( SHORT1FROMMP(mp1) == SC_CLOSE ) {
+                // the system menu is disabled in fullscreen/presentation mode
+                // but we still want to exit with Alt-F4 so always handle it here
+                WinPostMsg( hWndFrame, WM_CLOSE, NULL, NULL );
+                return (MRESULT)FALSE;
+            }
+        }
+        break;
+    }
+
+    return pOldFrameProc( hwnd, msg, mp1, mp2 );
 }
 
 static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
@@ -1291,6 +1311,8 @@ __declspec(dllexport) _System APIRET APIENTRY LucideMain( int argc, char *argv[]
     title = newstrdupL( MSGS_MAIN_WIN_TITLE );
     hWndFrame = WinCreateStdWindow( HWND_DESKTOP, 0, &ulFrameFlags, NULL, title,
                                     WS_SYNCPAINT|WS_VISIBLE, _hmod, IDI_MAIN_ICON, NULL );
+    pOldFrameProc = WinSubclassWindow( hWndFrame, frameProc );
+
     hFrameSysmenu  = WinWindowFromID( hWndFrame, FID_SYSMENU );
     hFrameTitlebar = WinWindowFromID( hWndFrame, FID_TITLEBAR );
     hFrameMinMax   = WinWindowFromID( hWndFrame, FID_MINMAX );
