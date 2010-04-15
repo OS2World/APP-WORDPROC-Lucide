@@ -1179,8 +1179,21 @@ static MRESULT EXPENTRY frameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 
                     return (MRESULT)TRUE;
                 }
             }
+            // in fullscreen, we hide the menu which effectively makes all
+            // disabled items work through accelerators which is completely
+            // unexpected. Fix it by translating accels manually and checking
+            // if they are disabled in the hidden menu
+            if ( WinTranslateAccel( hab, hwnd, WinQueryAccelTable( hab, hwnd ),
+                                    pqmsg ) ) {
+                if ( pqmsg->msg == WM_COMMAND ) {
+                    SHORT cm = SHORT1FROMMP(pqmsg->mp1);
+                    if ( !WinIsMenuItemEnabled( hWndMenu, cm ) )
+                        pqmsg->msg = WM_NULL;
+                }
+                return (MRESULT)TRUE;
+            }
+            return (MRESULT)FALSE;
         }
-        break;
 
         case WM_SYSCOMMAND:
         {
