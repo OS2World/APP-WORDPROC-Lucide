@@ -543,7 +543,6 @@ void DocumentViewer::setRotation( long _rotation )
 void DocumentViewer::setFullscreen( bool _fullscreen )
 {
     fullscreen = _fullscreen;
-    ULONG ulFrameStyle = WinQueryWindowULong( hWndDocFrame, QWL_STYLE );
 
     if ( fullscreen )
     {
@@ -553,7 +552,6 @@ void DocumentViewer::setFullscreen( bool _fullscreen )
         setZoom( -2 );
         WinSetParent( hWndHscroll, HWND_OBJECT, FALSE );
         WinSetParent( hWndVscroll, HWND_OBJECT, FALSE );
-        ulFrameStyle &= ~FS_SIZEBORDER;
     }
     else
     {
@@ -561,12 +559,9 @@ void DocumentViewer::setFullscreen( bool _fullscreen )
         setZoom( zoomSave );
         WinSetParent( hWndHscroll, hWndDocFrame, FALSE );
         WinSetParent( hWndVscroll, hWndDocFrame, FALSE );
-        ulFrameStyle &= ~FS_SIZEBORDER;
     }
 
-    WinSetWindowULong( hWndDocFrame, QWL_STYLE, ulFrameStyle );
-    WinSendMsg( hWndDocFrame, WM_UPDATEFRAME,
-                MPFROMLONG( FCF_VERTSCROLL | FCF_HORZSCROLL | FCF_SIZEBORDER ), MPVOID );
+    WinSendMsg( hWndDocFrame, WM_UPDATEFRAME, MPVOID, MPVOID );
 
     if ( mouseHidden ) {
         WinShowPointer( HWND_DESKTOP, TRUE );
@@ -771,10 +766,6 @@ void DocumentViewer::drawPage()
 // handles vertical scrolling
 MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2 )
 {
-    if ( fullscreen ) {
-        return ( MRFROMLONG( 0 ) );
-    }
-
     sVscrollInc = 0;
 
     switch ( SHORT2FROMMP( mp2 ) )
@@ -800,11 +791,11 @@ MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2 )
             break;
     }
 
-    if ( SHORT2FROMMP( mp2 ) != SB_PAGEDRAG ) {
-        sVscrollInc = std::max( -sVscrollPos * (LONG)VScrollStep, std::min( sVscrollInc,
-                              ( sVscrollMax - sVscrollPos ) * (LONG)VScrollStep ) );
-        sVscrollInc = ( sVscrollInc / VScrollStep ) * VScrollStep;
-    }
+    sVscrollInc =
+        std::max( -sVscrollPos * (LONG)VScrollStep,
+                  std::min( sVscrollInc,
+                            ( sVscrollMax - sVscrollPos ) * (LONG)VScrollStep ) );
+    sVscrollInc = ( sVscrollInc / VScrollStep ) * VScrollStep;
 
     if ( sVscrollInc != 0 )
     {
@@ -821,10 +812,6 @@ MRESULT DocumentViewer::vertScroll( HWND hwnd, MPARAM mp2 )
 // handles horizontal scrolling
 MRESULT DocumentViewer::horizScroll( HWND hwnd, MPARAM mp2 )
 {
-    if ( fullscreen ) {
-        return ( MRFROMLONG( 0 ) );
-    }
-
     sHscrollInc = 0;
 
     switch ( SHORT2FROMMP( mp2 ) )
@@ -850,7 +837,9 @@ MRESULT DocumentViewer::horizScroll( HWND hwnd, MPARAM mp2 )
             break;
     }
 
-    sHscrollInc = std::max( -(LONG)sHscrollPos, std::min( sHscrollInc, (LONG)(sHscrollMax - sHscrollPos) ) );
+    sHscrollInc =
+        std::max( -(LONG)sHscrollPos,
+                  std::min( sHscrollInc, (LONG)(sHscrollMax - sHscrollPos) ) );
 
     if ( sHscrollInc != 0 )
     {
@@ -891,60 +880,49 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
     CreateGraphicsBuffer( hab, &rectl, hps, &hpsBuffer, &hdcBuffer );
     WinReleasePS( hps );
 
-    if ( fullscreen )
+    sHscrollMax = (SHORT)std::max( 0., ( isContinuous() ? fullwidth : width ) - cxClient );
+    sHscrollPos = std::min( sHscrollPos, sHscrollMax );
+
+    WinSendMsg( hWndHscroll, SBM_SETSCROLLBAR,
+                MPFROMSHORT(sHscrollPos), MPFROM2SHORT(0, sHscrollMax) );
+    WinSendMsg( hWndHscroll, SBM_SETTHUMBSIZE,
+                MPFROM2SHORT( cxClient, width ), MPVOID );
+    WinEnableWindow( hWndHscroll, (BOOL)( sHscrollMax != 0 ) );
+
+    VScrollStep = 1;
+    if ( isContinuous() )
     {
-        sHscrollMax = 0;
-        sHscrollPos = 0;
-        realVscrollMax = 0;
-        VScrollStep = 1;
-        sVscrollPos = 0;
+        realVscrollMax = std::max( 0., fullheight - cyClient );
+        ULONG ssize = realVscrollMax / VScrollStep;
+        while ( ssize > 32000 ) {
+            VScrollStep += LINE_HEIGHT;
+            ssize = realVscrollMax / VScrollStep;
+        }
+
+        sVscrollMax = (SHORT)ssize;
+        if ( realVscrollMax > ( sVscrollMax * VScrollStep ) ) {
+            sVscrollMax += 1;
+        }
     }
-    else
-    {
-        sHscrollMax = (SHORT)std::max( 0., ( isContinuous() ? fullwidth : width ) - cxClient );
-        sHscrollPos = std::min( sHscrollPos, sHscrollMax );
-
-        WinSendMsg( hWndHscroll, SBM_SETSCROLLBAR,
-                    MPFROMSHORT(sHscrollPos), MPFROM2SHORT(0, sHscrollMax) );
-        WinSendMsg( hWndHscroll, SBM_SETTHUMBSIZE,
-                    MPFROM2SHORT( cxClient, width ), MPVOID );
-        WinEnableWindow( hWndHscroll, (BOOL)( sHscrollMax != 0 ) );
-
-        VScrollStep = 1;
-        if ( isContinuous() )
-        {
-            realVscrollMax = std::max( 0., fullheight - cyClient );
-            ULONG ssize = realVscrollMax / VScrollStep;
-            while ( ssize > 32000 ) {
-                VScrollStep += LINE_HEIGHT;
-                ssize = realVscrollMax / VScrollStep;
-            }
-
-            sVscrollMax = (SHORT)ssize;
-            if ( realVscrollMax > ( sVscrollMax * VScrollStep ) ) {
-                sVscrollMax += 1;
-            }
-        }
-        else {
-            realVscrollMax = sVscrollMax = (SHORT)std::max( 0., height - cyClient );
-        }
-        sVscrollPos = std::min( sVscrollPos, sVscrollMax );
-
-        WinSendMsg( hWndVscroll, SBM_SETSCROLLBAR,
-                    MPFROMSHORT(sVscrollPos), MPFROM2SHORT(0, sVscrollMax) );
-        if ( isContinuous() ) {
-            WinSendMsg( hWndVscroll, SBM_SETTHUMBSIZE,
-                        MPFROM2SHORT( cyClient/VScrollStep, fullheight/VScrollStep ), MPVOID );
-        }
-        else {
-            WinSendMsg( hWndVscroll, SBM_SETTHUMBSIZE,
-                        MPFROM2SHORT( cyClient, height ), MPVOID );
-        }
-        WinEnableWindow( hWndVscroll, (BOOL)( sVscrollMax != 0 ) );
-
-        SHORT realScrollPos = (SHORT)(sVscrollMax * relativeScrollPos);
-        vertScroll( hWndDoc, MPFROM2SHORT( realScrollPos, SB_SLIDERPOSITION ) );
+    else {
+        realVscrollMax = sVscrollMax = (SHORT)std::max( 0., height - cyClient );
     }
+    sVscrollPos = std::min( sVscrollPos, sVscrollMax );
+
+    WinSendMsg( hWndVscroll, SBM_SETSCROLLBAR,
+                MPFROMSHORT(sVscrollPos), MPFROM2SHORT(0, sVscrollMax) );
+    if ( isContinuous() ) {
+        WinSendMsg( hWndVscroll, SBM_SETTHUMBSIZE,
+                    MPFROM2SHORT( cyClient/VScrollStep, fullheight/VScrollStep ), MPVOID );
+    }
+    else {
+        WinSendMsg( hWndVscroll, SBM_SETTHUMBSIZE,
+                    MPFROM2SHORT( cyClient, height ), MPVOID );
+    }
+    WinEnableWindow( hWndVscroll, (BOOL)( sVscrollMax != 0 ) );
+
+    SHORT realScrollPos = (SHORT)(sVscrollMax * relativeScrollPos);
+    vertScroll( hWndDoc, MPFROM2SHORT( realScrollPos, SB_SLIDERPOSITION ) );
 
     positionTextField();
 }
@@ -2005,7 +1983,7 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
             docDraggingEnd.x = xpos;
             docDraggingEnd.y = ypos;
 
-            SHORT hMove = docDraggingEnd.x - docDraggingStart.x;
+            SHORT hMove = -( docDraggingEnd.x - docDraggingStart.x );
             if ( abs( hMove ) > 5 )
             {
                 horizScroll( hwnd, MPFROM2SHORT( hMove, SB_PAGEDRAG ) );
