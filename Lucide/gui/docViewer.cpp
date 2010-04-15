@@ -544,6 +544,10 @@ void DocumentViewer::setFullscreen( bool _fullscreen )
 {
     fullscreen = _fullscreen;
 
+    // make sure partial repaints from the async thread are discarded while we
+    // change the document window's size and position several times below
+    WinLockWindowUpdate( HWND_DESKTOP, hWndDocFrame );
+
     if ( fullscreen )
     {
         pglSave = getPageLayout();
@@ -560,6 +564,8 @@ void DocumentViewer::setFullscreen( bool _fullscreen )
         WinSetParent( hWndHscroll, hWndDocFrame, FALSE );
         WinSetParent( hWndVscroll, hWndDocFrame, FALSE );
     }
+
+    WinLockWindowUpdate( HWND_DESKTOP, NULLHANDLE );
 
     WinSendMsg( hWndDocFrame, WM_UPDATEFRAME, MPVOID, MPVOID );
 
