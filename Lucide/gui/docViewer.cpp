@@ -1479,6 +1479,8 @@ void DocumentViewer::hideTextField( bool apply, PPOINTL ptl )
         r.xLeft -= 1; r.yBottom -= 1;
         r.xRight += 1; r.yTop += 1;
         WinInvalidateRect( hWndDoc, &r, TRUE );
+        // remove the focus from the window we hid
+        WinSetFocus( HWND_DESKTOP, hWndDoc );
     }
 }
 

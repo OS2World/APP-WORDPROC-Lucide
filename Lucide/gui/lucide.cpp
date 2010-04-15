@@ -1165,6 +1165,23 @@ static MRESULT EXPENTRY frameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 
 {
     switch ( msg )
     {
+        case WM_TRANSLATEACCEL:
+        {
+            // change the accel logic by first letting the focus window process
+            // WM_CHAR and only translate it to accel if not handled (this makes
+            // sure that keyboard shortcuts in input fields work even if we
+            // defined our own accelerators from these shortcuts)
+            PQMSG pqmsg = (PQMSG)mp1;
+            HWND focus = WinQueryFocus( HWND_DESKTOP );
+            if ( focus == pqmsg->hwnd && focus != hwnd ) {
+                if ( WinDispatchMsg( hab, pqmsg ) ) {
+                    pqmsg->msg = WM_NULL;
+                    return (MRESULT)TRUE;
+                }
+            }
+        }
+        break;
+
         case WM_SYSCOMMAND:
         {
             if ( SHORT1FROMMP(mp1) == SC_CLOSE ) {
