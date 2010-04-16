@@ -112,7 +112,7 @@ class Lucide
         static void setPageLayout( PgLayout layout );
         static void toggleMaxview() { toggleMaxviewFullscreen( true ); }
         static void toggleFullscreen() { toggleMaxviewFullscreen( false ); }
-        static void toggleMaxviewFullscreen( bool maxview );
+        static void toggleMaxviewFullscreen( bool maxview, bool atStartup = false );
         static void focusDocview();
         static void focusIndex();
         static void cmdMinimize();

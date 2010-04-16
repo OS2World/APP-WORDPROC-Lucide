@@ -742,7 +742,7 @@ void Lucide::checkNavpane()
 }
 
 
-void Lucide::toggleMaxviewFullscreen( bool maxview )
+void Lucide::toggleMaxviewFullscreen( bool maxview, bool atStartup )
 {
     enum TriState { NoChange, On, Off };
     TriState maxviewState = NoChange;
@@ -813,13 +813,16 @@ void Lucide::toggleMaxviewFullscreen( bool maxview )
     }
     else if ( maxviewState == On )
     {
-        WinQueryWindowPos( hWndFrame, &winPos.Swp );
-        winPos.XRestore  = WinQueryWindowUShort( hWndFrame, QWS_XRESTORE );
-        winPos.YRestore  = WinQueryWindowUShort( hWndFrame, QWS_YRESTORE );
-        winPos.CXRestore = WinQueryWindowUShort( hWndFrame, QWS_CXRESTORE );
-        winPos.CYRestore = WinQueryWindowUShort( hWndFrame, QWS_CYRESTORE );
-        winPos.XMinimize = WinQueryWindowUShort( hWndFrame, QWS_XMINIMIZE );
-        winPos.YMinimize = WinQueryWindowUShort( hWndFrame, QWS_YMINIMIZE );
+        if ( !atStartup )
+        {
+            WinQueryWindowPos( hWndFrame, &winPos.Swp );
+            winPos.XRestore  = WinQueryWindowUShort( hWndFrame, QWS_XRESTORE );
+            winPos.YRestore  = WinQueryWindowUShort( hWndFrame, QWS_YRESTORE );
+            winPos.CXRestore = WinQueryWindowUShort( hWndFrame, QWS_CXRESTORE );
+            winPos.CYRestore = WinQueryWindowUShort( hWndFrame, QWS_CYRESTORE );
+            winPos.XMinimize = WinQueryWindowUShort( hWndFrame, QWS_XMINIMIZE );
+            winPos.YMinimize = WinQueryWindowUShort( hWndFrame, QWS_YMINIMIZE );
+        }
 
         WinSetParent( hFrameSysmenu,  HWND_OBJECT, FALSE );
         WinSetParent( hFrameTitlebar, HWND_OBJECT, FALSE );
@@ -1069,14 +1072,12 @@ void Lucide::restorePosition()
     sx = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
     sy = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
 
-    ULONG SwpOptions = SWP_MOVE | SWP_SIZE | SWP_ACTIVATE;
-    if ( !maxview && !fullscreen )
-        SwpOptions |= SWP_SHOW;
+    ULONG SwpOptions = SWP_MOVE | SWP_SIZE | SWP_ACTIVATE | SWP_SHOW;
+    bool atStartup = true;
 
     ULONG ulWpSize = sizeof( winPos );
     if ( PrfQueryProfileData( HINI_USERPROFILE, appName, prfFwp, &winPos, &ulWpSize ) )
     {
-
         if ( winPos.Swp.fl & SWP_MAXIMIZE ) {
             SwpOptions |= SWP_MAXIMIZE;
         }
@@ -1095,10 +1096,26 @@ void Lucide::restorePosition()
             winPos.Swp.y = sy - winPos.Swp.cy;
         }
 
-        if ( !isMaxview && !isFullscreen ) {
+        // Just a note: the FID_CLIENT window is only resized by WinSetWindowPos()
+        // on the frame if the size is actually changed *and* the SWP_SHOW flag
+        // is present (PM bug?). Therefore, when the saved normal size the same
+        // as fullscreen and we should go fullscreen at startup, WinSetWindowPos()
+        // issued from toggleMaxviewFullscreen() will not resize FID_CLIENT even
+        // though it will contain SWP_SHOW
+
+        if ( !maxview && !fullscreen ) {
+            // only set the normal size if no if fullscreen or presentation is
+            // requested, to avoid flicker. We could also avoid flicker by
+            // omitting SWP_SHOW but see the note above
             WinSetWindowPos( hWndFrame, NULLHANDLE,
                              winPos.Swp.x, winPos.Swp.y, winPos.Swp.cx, winPos.Swp.cy,
                              SwpOptions );
+        } else {
+            // if we don't SWP_ACTIVATE now, then the title bar will keep the
+            // inactive state after the user switches from fullscreen/presentation
+            // (where the title bar is hidden) back to normal view later in this
+            // session. Looks like a PM bug too
+            WinSetWindowPos( hWndFrame, NULLHANDLE, 0, 0, 0, 0, SWP_ACTIVATE );
         }
 
         WinSetWindowUShort( hWndFrame, QWS_XRESTORE,  winPos.XRestore );
@@ -1148,16 +1165,20 @@ void Lucide::restorePosition()
 
         WinSetWindowPos( hWndFrame, NULLHANDLE, swp.x, swp.y, swp.cx, swp.cy,
                          SwpOptions );
+
+        // we don't initialize winPos here so reset atStartup to let
+        // toggleMaxviewFullscreen() do this
+        atStartup = false;
     }
 
     if ( fullscreen )
     {
-        toggleFullscreen();
+        toggleMaxviewFullscreen( false, atStartup );
         isMaxview = maxview;
     }
     else if ( maxview )
     {
-        toggleMaxview();
+        toggleMaxviewFullscreen( true, atStartup );
     }
 }
 
