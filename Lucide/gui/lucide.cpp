@@ -810,6 +810,12 @@ void Lucide::toggleFullscreenEx( bool presentation, bool atStartup )
         WinSetParent( hFrameTitlebar, hWndFrame, FALSE );
         WinSetParent( hFrameMinMax,   hWndFrame, FALSE );
         ulFrameStyle |= FS_SIZEBORDER;
+
+        // PM does not synchronize the title bar hilite state when it is added
+        // to the frame window. Do it ourselves
+        BOOL active = WinQueryActiveWindow( HWND_DESKTOP ) == hWndFrame;
+        WinSendMsg( hFrameTitlebar, TBM_SETHILITE,
+                    MPFROMSHORT( active ), MPVOID );
     }
     else if ( fullscreenState == On )
     {
@@ -1112,12 +1118,6 @@ void Lucide::restorePosition()
             WinSetWindowPos( hWndFrame, NULLHANDLE,
                              winPos.Swp.x, winPos.Swp.y, winPos.Swp.cx, winPos.Swp.cy,
                              SwpOptions );
-        } else {
-            // if we don't SWP_ACTIVATE now, then the title bar will keep the
-            // inactive state after the user switches from fullscreen/presentation
-            // (where the title bar is hidden) back to normal view later in this
-            // session. Looks like a PM bug too
-            WinSetWindowPos( hWndFrame, NULLHANDLE, 0, 0, 0, 0, SWP_ACTIVATE );
         }
 
         WinSetWindowUShort( hWndFrame, QWS_XRESTORE,  winPos.XRestore );
