@@ -64,6 +64,7 @@ typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 #define PAGEBACK_COLOR  0xFFFFFFL
 #define VERT_SPACE      2
 #define NO_MOUSE_TIMER  1
+#define NO_MOUSE_TIME   3000 // ms
 #define SB_PAGEDRAG     100
 
 #define DOC_ID_ENTRY    0
@@ -154,8 +155,8 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     docDraggingEnd.x = 0;  docDraggingEnd.y = 0;
     // fullscreen
     fullscreen     = false;
-    secondsNoMouse = 0;
     mouseHidden    = false;
+    inFocus        = false;
     xLastPos       = 0;
     yLastPos       = 0;
     // asynch draw
@@ -213,7 +214,6 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     hWndVscroll = WinWindowFromID( hWndDocFrame, FID_VERTSCROLL );
 
     drawThreadId = _beginthread( drawthread, NULL, 262144, this );
-    WinStartTimer( hab, hWndDoc, NO_MOUSE_TIMER, 1000 );
 }
 
 // DocumentViewer destructor
@@ -569,9 +569,18 @@ void DocumentViewer::setFullscreen( bool _fullscreen )
 
     WinSendMsg( hWndDocFrame, WM_UPDATEFRAME, MPVOID, MPVOID );
 
+    unhideMouse();
+}
+
+void DocumentViewer::unhideMouse()
+{
     if ( mouseHidden ) {
         WinShowPointer( HWND_DESKTOP, TRUE );
         mouseHidden = false;
+    }
+
+    if ( fullscreen && inFocus ) {
+        WinStartTimer( hab, hWndDoc, NO_MOUSE_TIMER, NO_MOUSE_TIME );
     }
 }
 
@@ -1884,12 +1893,7 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
 {
     if ( ( xpos != xLastPos ) || ( ypos != yLastPos ) ) // only if mouse really moved
     {
-        secondsNoMouse = 0;
-        if ( fullscreen && mouseHidden )
-        {
-            WinShowPointer( HWND_DESKTOP, TRUE );
-            mouseHidden = false;
-        }
+        unhideMouse();
     }
     xLastPos = xpos;
     yLastPos = ypos;
@@ -2480,12 +2484,11 @@ void DocumentViewer::wmTimer( USHORT idTimer )
 {
     if ( idTimer == NO_MOUSE_TIMER )
     {
-        secondsNoMouse++;
-
-        if ( fullscreen && !mouseHidden && ( secondsNoMouse > 3 ) )
+        if ( fullscreen && !mouseHidden && inFocus )
         {
             WinShowPointer( HWND_DESKTOP, FALSE );
             mouseHidden = true;
+            WinStopTimer( hab, hWndDoc, NO_MOUSE_TIMER );
         }
     }
 }
@@ -2515,6 +2518,11 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
             _this = (DocumentViewer *)mp1;
             return (MRESULT)FALSE;
         }
+
+        case WM_SETFOCUS:
+            _this->inFocus = SHORT1FROMMP( mp2 ) == TRUE;
+            _this->unhideMouse();
+            break;
 
         case DM_DRAGOVER:
             return _this->wmDragOver( (PDRAGINFO)mp1 );

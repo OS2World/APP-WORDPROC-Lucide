@@ -95,6 +95,7 @@ class DocumentViewer
         void setRotation( long _rotation );
         long getRotation() { return rotation; }
         void selectAll();
+        void unhideMouse();
         void copyToClipbrd();
         void searchDocument( const char *_searchString, bool _caseSensitive,
                              bool _continueSearch );
@@ -204,8 +205,8 @@ class DocumentViewer
 
         // fullscreen
         bool fullscreen;
-        long secondsNoMouse;
         bool mouseHidden;
+        bool inFocus;
         SHORT xLastPos;
         SHORT yLastPos;
         PgLayout pglSave;
