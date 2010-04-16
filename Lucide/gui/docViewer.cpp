@@ -153,8 +153,8 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     docDraggingStarted = false;
     docDraggingStart.x = 0;  docDraggingStart.y = 0;
     docDraggingEnd.x = 0;  docDraggingEnd.y = 0;
-    // fullscreen
-    fullscreen     = false;
+    // presentation
+    presentation   = false;
     mouseHidden    = false;
     inFocus        = false;
     xLastPos       = 0;
@@ -540,15 +540,15 @@ void DocumentViewer::setRotation( long _rotation )
     }
 }
 
-void DocumentViewer::setFullscreen( bool _fullscreen )
+void DocumentViewer::setPresentation( bool _presentation )
 {
-    fullscreen = _fullscreen;
+    presentation = _presentation;
 
     // make sure partial repaints from the async thread are discarded while we
     // change the document window's size and position several times below
     WinLockWindowUpdate( HWND_DESKTOP, hWndDocFrame );
 
-    if ( fullscreen )
+    if ( presentation )
     {
         pglSave = getPageLayout();
         zoomSave = getZoom();
@@ -579,7 +579,7 @@ void DocumentViewer::unhideMouse()
         mouseHidden = false;
     }
 
-    if ( fullscreen && inFocus ) {
+    if ( presentation && inFocus ) {
         WinStartTimer( hab, hWndDoc, NO_MOUSE_TIMER, NO_MOUSE_TIME );
     }
 }
@@ -2251,7 +2251,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
             case VK_PAGEUP:
                 if ( fsflags & KC_CTRL )
                 {
-                    if ( fullscreen ) {
+                    if ( presentation ) {
                         goToPage( 0 );
                     } else {
                         vertScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ) );
@@ -2262,7 +2262,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                     bool dojump = ( !isContinuous() && ( sVscrollPos == 0 )
                                         && ( currentpage > 0 ) );
 
-                    if ( fullscreen || dojump ) {
+                    if ( presentation || dojump ) {
                         goToPage( currentpage - 1 );
                         if ( dojump ) {
                             vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ) );
@@ -2276,7 +2276,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
             case VK_PAGEDOWN:
                 if ( fsflags & KC_CTRL )
                 {
-                    if ( fullscreen ) {
+                    if ( presentation ) {
                         goToPage( totalpages - 1 );
                     } else {
                         vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ) );
@@ -2286,7 +2286,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                 {
                     bool dojump = ( !isContinuous() && ( sVscrollPos == sVscrollMax ) );
 
-                    if ( fullscreen || dojump ) {
+                    if ( presentation || dojump ) {
                         goToPage( currentpage + 1 );
                     } else {
                         WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEDOWN ) );
@@ -2327,9 +2327,10 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
         }
     }
 
-    // Special case for Esc in fullscreen
-    if ( fullscreen && !( fsflags & KC_KEYUP ) && ( fsflags & KC_VIRTUALKEY ) && ( usvk == VK_ESC ) ) {
-        Lucide::toggleFullscreen();
+    // Special case for Esc in presentation mode
+    if ( presentation && !( fsflags & KC_KEYUP ) &&
+         ( fsflags & KC_VIRTUALKEY ) && ( usvk == VK_ESC ) ) {
+        Lucide::togglePresentation();
         return TRUE;
     }
 
@@ -2484,7 +2485,7 @@ void DocumentViewer::wmTimer( USHORT idTimer )
 {
     if ( idTimer == NO_MOUSE_TIMER )
     {
-        if ( fullscreen && !mouseHidden && inFocus )
+        if ( presentation && !mouseHidden && inFocus )
         {
             WinShowPointer( HWND_DESKTOP, FALSE );
             mouseHidden = true;

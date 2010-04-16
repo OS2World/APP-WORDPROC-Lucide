@@ -68,7 +68,7 @@ E' possibile inviare i seguenti comandi a tale pipe:
 
 $prev              - vai alla pagina precedente
 $next              - vai alla pagina successiva
-$switchfullscreen  - vai a tutto schermo (anche se minimizzato)
+$presentation      - vai a tutto schermo (anche se minimizzato)
 $minimize          - minimizza Lucide (anche se a tutto schermo)
 $rotate            - ruota 90 gradi in senso orario
 $zoomin            - ingrandisci vista

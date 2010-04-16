@@ -85,8 +85,8 @@ const char *prfFwp     = "FrameWindowPos";
 const char *prfLvd     = "LastViewedDir";
 const char *prfSplpos  = "SplitterPos";
 const char *prfShowind = "ShowIndex";
-const char *prfMaxView = "MaxView";
-const char *prfFs      = "FullScreen";
+const char *prfFullscreen   = "FullScreen";
+const char *prfPresentation = "Presentation";
 
 HWND createToolbar( HWND hwnd );
 void AboutBox( HWND hWndFrame );
@@ -119,8 +119,8 @@ char           *title     = NULL;
 bool         Lucide::dontSwitchPage                = false;
 SHORT        Lucide::splitterPos                   = 100;
 bool         Lucide::showIndex                     = true;
-bool         Lucide::isMaxview                     = false;
 bool         Lucide::isFullscreen                  = false;
+bool         Lucide::isPresentation                = false;
 LuWindowPos  Lucide::winPos                        = {0};
 char         Lucide::docFullName[ CCHMAXPATH ]     = "";
 char         Lucide::docFileName[ CCHMAXPATHCOMP ] = "";
@@ -742,76 +742,76 @@ void Lucide::checkNavpane()
 }
 
 
-void Lucide::toggleMaxviewFullscreen( bool maxview, bool atStartup )
+void Lucide::toggleFullscreenEx( bool presentation, bool atStartup )
 {
     enum TriState { NoChange, On, Off };
-    TriState maxviewState = NoChange;
     TriState fullscreenState = NoChange;
+    TriState presentationState = NoChange;
 
-    if ( maxview )
+    if ( !presentation )
     {
-        // maxview command issued
-        if ( !isMaxview )
+        // fullscreen command issued
+        if ( !isFullscreen )
         {
-            if ( isFullscreen ) {
-                fullscreenState = Off;
-                isFullscreen = false;
+            if ( isPresentation ) {
+                presentationState = Off;
+                isPresentation = false;
             } else {
-                maxviewState = On;
+                fullscreenState = On;
             }
-            isMaxview = true;
+            isFullscreen = true;
         }
         else
         {
-            if ( isFullscreen ) {
+            if ( isPresentation ) {
+                presentationState = Off;
+                isPresentation = false;
+            } else {
                 fullscreenState = Off;
                 isFullscreen = false;
-            } else {
-                maxviewState = Off;
-                isMaxview = false;
             }
         }
     }
     else
     {
-        // fullscreen command issued
-        if ( !isFullscreen )
+        // presentation command issued
+        if ( !isPresentation )
         {
-            fullscreenState = On;
-            if ( !isMaxview )
-                maxviewState = On;
+            presentationState = On;
+            if ( !isFullscreen )
+                fullscreenState = On;
         }
         else
         {
-            fullscreenState = Off;
-            if ( !isMaxview )
-                maxviewState = Off;
+            presentationState = Off;
+            if ( !isFullscreen )
+                fullscreenState = Off;
         }
 
-        isFullscreen = !isFullscreen;
+        isPresentation = !isPresentation;
     }
 
     ULONG ulFrameStyle = WinQueryWindowULong( hWndFrame, QWL_STYLE );
 
-    if ( fullscreenState == Off )
+    if ( presentationState == Off )
     {
-        docViewer->setFullscreen( false );
+        docViewer->setPresentation( false );
         WinSetParent( hWndMenu, hWndFrame, FALSE );
     }
-    else if ( fullscreenState == On )
+    else if ( presentationState == On )
     {
-        docViewer->setFullscreen( true );
+        docViewer->setPresentation( true );
         WinSetParent( hWndMenu, HWND_OBJECT, FALSE );
     }
 
-    if ( maxviewState == Off )
+    if ( fullscreenState == Off )
     {
         WinSetParent( hFrameSysmenu,  hWndFrame, FALSE );
         WinSetParent( hFrameTitlebar, hWndFrame, FALSE );
         WinSetParent( hFrameMinMax,   hWndFrame, FALSE );
         ulFrameStyle |= FS_SIZEBORDER;
     }
-    else if ( maxviewState == On )
+    else if ( fullscreenState == On )
     {
         if ( !atStartup )
         {
@@ -830,13 +830,13 @@ void Lucide::toggleMaxviewFullscreen( bool maxview, bool atStartup )
         ulFrameStyle &= ~FS_SIZEBORDER;
     }
 
-    if ( maxviewState != NoChange || fullscreenState != NoChange )
+    if ( fullscreenState != NoChange || presentationState != NoChange )
     {
         WinSetWindowULong( hWndFrame, QWL_STYLE, ulFrameStyle );
         WinSendMsg( hWndFrame, WM_UPDATEFRAME, MPVOID, MPVOID );
     }
 
-    if ( fullscreenState == Off )
+    if ( presentationState == Off )
     {
         WinSendMsg( hVertSplitter, SBM_SETSPLITTERSIZE, MPFROMSHORT( -1 ), MPVOID );
         WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS,
@@ -844,14 +844,14 @@ void Lucide::toggleMaxviewFullscreen( bool maxview, bool atStartup )
         WinSendMsg( hHorizSplitter, SBM_SETFIXEDSIZE,
             MPFROMSHORT( DEFAULT_PICTSIZE + TOOLBAR_HEIGHT_ADD ), MPVOID );
     }
-    else if ( fullscreenState == On )
+    else if ( presentationState == On )
     {
         WinSendMsg( hHorizSplitter, SBM_SETSPLITTERPOS, 0, MPVOID );
         WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS, 0, MPVOID );
         WinSendMsg( hVertSplitter, SBM_SETSPLITTERSIZE, 0, MPVOID );
     }
 
-    if ( maxviewState == Off )
+    if ( fullscreenState == Off )
     {
         WinSetWindowUShort( hWndFrame, QWS_XRESTORE,  winPos.XRestore );
         WinSetWindowUShort( hWndFrame, QWS_YRESTORE,  winPos.YRestore );
@@ -863,7 +863,7 @@ void Lucide::toggleMaxviewFullscreen( bool maxview, bool atStartup )
                          winPos.Swp.x, winPos.Swp.y, winPos.Swp.cx, winPos.Swp.cy,
                          SWP_SIZE | SWP_MOVE | SWP_SHOW );
     }
-    else if ( maxviewState == On )
+    else if ( fullscreenState == On )
     {
         WinSetWindowPos( hWndFrame, NULLHANDLE, 0, 0,
                          WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN ),
@@ -910,9 +910,9 @@ void Lucide::cmdMinimize()
     WinSetWindowPos( hWndFrame, HWND_TOP, 0, 0, 0, 0, SWP_MINIMIZE );
 }
 
-void Lucide::cmdSwitchToFullscreen()
+void Lucide::cmdSwitchToPresentation()
 {
-    if ( !isFullscreen )
+    if ( !isPresentation )
     {
         SWP pos = {0};
         WinQueryWindowPos( hWndFrame, &pos );
@@ -921,7 +921,7 @@ void Lucide::cmdSwitchToFullscreen()
             WinSetWindowPos( hWndFrame, HWND_TOP, 0, 0, 0, 0,
                     SWP_SHOW | SWP_ACTIVATE | SWP_RESTORE | SWP_ZORDER );
         }
-        toggleFullscreen();
+        togglePresentation();
     }
 }
 
@@ -1032,17 +1032,17 @@ void Lucide::savePosition()
     PrfWriteProfileString( HINI_USERPROFILE, appName, prfShowind,
                            itoa( Lucide::showIndex, valbuf, 10 ) );
 
-    if ( isMaxview )
-        PrfWriteProfileString( HINI_USERPROFILE, appName, prfMaxView, "1" );
-    else
-        PrfWriteProfileString( HINI_USERPROFILE, appName, prfMaxView, NULL );
-
     if ( isFullscreen )
-        PrfWriteProfileString( HINI_USERPROFILE, appName, prfFs, "1" );
+        PrfWriteProfileString( HINI_USERPROFILE, appName, prfFullscreen, "1" );
     else
-        PrfWriteProfileString( HINI_USERPROFILE, appName, prfFs, NULL );
+        PrfWriteProfileString( HINI_USERPROFILE, appName, prfFullscreen, NULL );
 
-    if ( !isMaxview && !isFullscreen ) {
+    if ( isPresentation )
+        PrfWriteProfileString( HINI_USERPROFILE, appName, prfPresentation, "1" );
+    else
+        PrfWriteProfileString( HINI_USERPROFILE, appName, prfPresentation, NULL );
+
+    if ( !isFullscreen && !isPresentation ) {
         WinQueryWindowPos( hWndFrame, &winPos.Swp );
         winPos.XRestore  = WinQueryWindowUShort( hWndFrame, QWS_XRESTORE );
         winPos.YRestore  = WinQueryWindowUShort( hWndFrame, QWS_YRESTORE );
@@ -1065,8 +1065,10 @@ void Lucide::restorePosition()
     WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS,
                 MPFROMSHORT( showIndex ? splitterPos : 0 ), MPVOID );
 
-    bool maxview = PrfQueryProfileInt( HINI_USERPROFILE, appName, prfMaxView, 0 ) == 1;
-    bool fullscreen = PrfQueryProfileInt( HINI_USERPROFILE, appName, prfFs, 0 ) == 1;
+    bool fullscreen = PrfQueryProfileInt( HINI_USERPROFILE, appName,
+                                          prfFullscreen, 0 ) == 1;
+    bool presentation = PrfQueryProfileInt( HINI_USERPROFILE, appName,
+                                            prfPresentation, 0 ) == 1;
 
     LONG sx, sy;
     sx = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
@@ -1100,10 +1102,10 @@ void Lucide::restorePosition()
         // on the frame if the size is actually changed *and* the SWP_SHOW flag
         // is present (PM bug?). Therefore, when the saved normal size the same
         // as fullscreen and we should go fullscreen at startup, WinSetWindowPos()
-        // issued from toggleMaxviewFullscreen() will not resize FID_CLIENT even
+        // issued from toggleFullscreenEx() will not resize FID_CLIENT even
         // though it will contain SWP_SHOW
 
-        if ( !maxview && !fullscreen ) {
+        if ( !fullscreen && !presentation ) {
             // only set the normal size if no if fullscreen or presentation is
             // requested, to avoid flicker. We could also avoid flicker by
             // omitting SWP_SHOW but see the note above
@@ -1167,18 +1169,18 @@ void Lucide::restorePosition()
                          SwpOptions );
 
         // we don't initialize winPos here so reset atStartup to let
-        // toggleMaxviewFullscreen() do this
+        // toggleFullscreenEx() do this
         atStartup = false;
     }
 
     if ( fullscreen )
     {
-        toggleMaxviewFullscreen( false, atStartup );
-        isMaxview = maxview;
+        toggleFullscreenEx( false, atStartup );
+        isFullscreen = fullscreen;
     }
-    else if ( maxview )
+    else if ( presentation )
     {
-        toggleMaxviewFullscreen( true, atStartup );
+        toggleFullscreenEx( true, atStartup );
     }
 }
 
@@ -1200,8 +1202,8 @@ static MRESULT EXPENTRY frameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 
                     return (MRESULT)TRUE;
                 }
             }
-            // in fullscreen, we hide the menu which effectively makes all
-            // disabled items work through accelerators which is completely
+            // in presentation mode, we hide the menu which effectively makes
+            // all disabled items work through accelerators which is completely
             // unexpected. Fix it by translating accels manually and checking
             // if they are disabled in the hidden menu
             if ( WinTranslateAccel( hab, hwnd, WinQueryAccelTable( hab, hwnd ),
@@ -1468,12 +1470,12 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     }
                     return (MRESULT)FALSE;
 
-                case CM_MAXVIEW:
-                    Lucide::toggleMaxview();
-                    return (MRESULT)FALSE;
-
                 case CM_FULLSCREEN:
                     Lucide::toggleFullscreen();
+                    return (MRESULT)FALSE;
+
+                case CM_PRESENTATION:
+                    Lucide::togglePresentation();
                     return (MRESULT)FALSE;
 
                 case CM_PRODINFO:
@@ -1484,8 +1486,8 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     Lucide::cmdMinimize();
                     return (MRESULT)FALSE;
 
-                case CM_TOFULLSCREEN:
-                    Lucide::cmdSwitchToFullscreen();
+                case CM_TOPRESENTATION:
+                    Lucide::cmdSwitchToPresentation();
                     return (MRESULT)FALSE;
 
                 case CM_SWITCHWINDOW:

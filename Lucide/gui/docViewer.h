@@ -99,7 +99,7 @@ class DocumentViewer
         void copyToClipbrd();
         void searchDocument( const char *_searchString, bool _caseSensitive,
                              bool _continueSearch );
-        void setFullscreen( bool _fullscreen );
+        void setPresentation( bool _presentation );
         void zoomInOut( bool zoomIn );
         void resetModifiedState();
 
@@ -203,8 +203,8 @@ class DocumentViewer
         POINTL docDraggingStart;
         POINTL docDraggingEnd;
 
-        // fullscreen
-        bool fullscreen;
+        // presentation
+        bool presentation;
         bool mouseHidden;
         bool inFocus;
         SHORT xLastPos;

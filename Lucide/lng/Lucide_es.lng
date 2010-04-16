@@ -41,8 +41,7 @@ MENU_FONTS_INFO=~Fonts utilizadas...
 
 MENU_WINDOW=V~entana
 MENU_SHOW_NAV_PANE=Mostrar panel de ~navegaci¢n
-MENU_MAXVIEW=~Maximizar vista\tF11
-MENU_FULLSCREEN=~Pantalla completa\tCtrl+L
+MENU_FULLSCREEN=~Pantalla completa\tF11
 
 MENU_HELP=A~yuda
 MENU_PRODUCT_INFORMATION=~Acerca de

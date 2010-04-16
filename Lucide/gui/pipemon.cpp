@@ -44,14 +44,14 @@
 static const char *pipeName    = "\\PIPE\\LUCIDE";
 
 // Commands
-static const char *cmPrev       = "$prev";
-static const char *cmNext       = "$next";
-static const char *cmMinimize   = "$minimize";
-static const char *cmFullScreen = "$switchfullscreen";
-static const char *cmRotate     = "$rotate";
-static const char *cmZoomIn     = "$zoomin";
-static const char *cmZoomOut    = "$zoomout";
-static const char *cmZoomOrig   = "$zoomoriginal";
+static const char *cmPrev         = "$prev";
+static const char *cmNext         = "$next";
+static const char *cmMinimize     = "$minimize";
+static const char *cmPresentation = "$presentation";
+static const char *cmRotate       = "$rotate";
+static const char *cmZoomIn       = "$zoomin";
+static const char *cmZoomOut      = "$zoomout";
+static const char *cmZoomOrig     = "$zoomoriginal";
 
 
 static void pipeMonitor( void *p )
@@ -97,9 +97,9 @@ static void pipeMonitor( void *p )
                         WinPostMsg( hWndFrame, WM_COMMAND, MPFROMSHORT( CM_MINIMIZE ),
                                     MPFROM2SHORT( CMDSRC_OTHER, TRUE ) );
                     }
-                    else if ( strnicmp( buf, cmFullScreen, strlen( cmFullScreen ) ) == 0 )
+                    else if ( strnicmp( buf, cmPresentation, strlen( cmPresentation ) ) == 0 )
                     {
-                        WinPostMsg( hWndFrame, WM_COMMAND, MPFROMSHORT( CM_TOFULLSCREEN ),
+                        WinPostMsg( hWndFrame, WM_COMMAND, MPFROMSHORT( CM_TOPRESENTATION ),
                                     MPFROM2SHORT( CMDSRC_OTHER, TRUE ) );
                     }
                     else if ( strnicmp( buf, cmRotate, strlen( cmRotate ) ) == 0 )

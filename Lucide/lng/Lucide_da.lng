@@ -37,8 +37,7 @@ MENU_DOCUMENT_INFO=~Dokument info...
 MENU_FONTS_INFO=Font ~info...
 MENU_WINDOW=~Vindue
 MENU_SHOW_NAV_PANE=~Vis navigations panel
-MENU_MAXVIEW=~Maximeret vindue\tF11
-MENU_FULLSCREEN=~Fuldsk‘rm\tCtrl+L
+MENU_FULLSCREEN=~Fuldsk‘rm\tF11
 MENU_HELP=~Hj‘lp
 MENU_PRODUCT_INFORMATION=~Produkt Information
 

@@ -38,8 +38,7 @@ MENU_DOCUMENT_INFO=~Document informatie
 MENU_FONTS_INFO=Lettert~ype informatie
 MENU_WINDOW=Ve~nster
 MENU_SHOW_NAV_PANE=~Tonen navigatie paneel
-MENU_MAXVIEW=~Maximale weergave\tF11
-MENU_FULLSCREEN=Volledig ~scherm\tCtrl+L
+MENU_FULLSCREEN=Volledig ~scherm\tF11
 MENU_HELP=~Help
 MENU_PRODUCT_INFORMATION=~Product Informatie
 

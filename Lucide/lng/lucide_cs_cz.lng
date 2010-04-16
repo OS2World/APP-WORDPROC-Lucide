@@ -40,8 +40,7 @@ MENU_DOCUMENT_INFO=~Informace o dokumentu...
 MENU_FONTS_INFO=In~formace o p°smech...
 MENU_WINDOW=~Okno
 MENU_SHOW_NAV_PANE=~Zobrazit navigaün° liÁtu
-MENU_MAXVIEW=~Maximalizovat\tF11
-MENU_FULLSCREEN=~Cel† obrazovka\tCtrl+L
+MENU_FULLSCREEN=~Cel† obrazovka\tF11
 MENU_HELP=~N†povÿda
 MENU_PRODUCT_INFORMATION=~Informace o programu
 

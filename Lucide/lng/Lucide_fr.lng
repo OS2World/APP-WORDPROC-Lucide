@@ -39,8 +39,7 @@ MENU_DOCUMENT_INFO=~Info. sur le document...
 MENU_FONTS_INFO=I~nfo. sur les ~polices...
 MENU_WINDOW=~Fenˆtres
 MENU_SHOW_NAV_PANE=Afficher le panneau de ~navigation
-MENU_MAXVIEW=~Agrandissement\tF11
-MENU_FULLSCREEN=~Plein ‚cran\tCtrl+L
+MENU_FULLSCREEN=~Plein ‚cran\tF11
 MENU_HELP=~Aide
 MENU_PRODUCT_INFORMATION=Info. ~produit
 

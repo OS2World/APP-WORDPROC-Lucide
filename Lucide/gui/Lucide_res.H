@@ -99,15 +99,15 @@
 #define CM_FONTSINFO    412
 
 #define CM_NAVPANE      501
-#define CM_MAXVIEW      502
-#define CM_FULLSCREEN   503
+#define CM_FULLSCREEN   502
+#define CM_PRESENTATION 503
 
 #define CM_PRODINFO     601
 
 // No menuitems for this commands
-#define CM_MINIMIZE     701
-#define CM_TOFULLSCREEN 702
-#define CM_SWITCHWINDOW 703
+#define CM_MINIMIZE         701
+#define CM_TOPRESENTATION   702
+#define CM_SWITCHWINDOW     703
 
 #define CM_RECENT       1000
 #define CM_RECENTCLEAR  1099

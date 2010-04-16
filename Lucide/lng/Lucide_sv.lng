@@ -38,8 +38,7 @@ MENU_DOCUMENT_INFO=~Dokumentinfo...
 MENU_FONTS_INFO=Font~info...
 MENU_WINDOW=~F”nster
 MENU_SHOW_NAV_PANE=Visa navigationspanel
-MENU_MAXVIEW=~Maximerad visning\tF11
-MENU_FULLSCREEN=Fullsk„rm\tCtrl+L
+MENU_FULLSCREEN=Fullsk„rm\tF11
 MENU_HELP=~Hj„lp
 MENU_PRODUCT_INFORMATION=Produktinformation
 

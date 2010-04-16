@@ -66,7 +66,7 @@ You may send following commands to this pipe:
 
 $prev              - will switch to the previous page
 $next              - will switch to the next page
-$switchfullscreen  - will switch to fullscreen (even if minimized)
+$presentation      - will switch to presentation (even if minimized)
 $minimize          - will mimimize Lucide (even if fullscreen)
 $rotate            - will rotate 90ø CW
 $zoomin            - will zoom in

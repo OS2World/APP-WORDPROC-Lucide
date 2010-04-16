@@ -74,8 +74,8 @@ class Lucide
         static bool docLoaded;
         static long loadErrorCode;
         static char *loadError;
-        static bool isMaxview;
         static bool isFullscreen;
+        static bool isPresentation;
         static LuWindowPos winPos;
 
         static void setOfPages( long pages );
@@ -110,13 +110,13 @@ class Lucide
         static void toggleZoom();
         static void enableCopy( bool enable );
         static void setPageLayout( PgLayout layout );
-        static void toggleMaxview() { toggleMaxviewFullscreen( true ); }
-        static void toggleFullscreen() { toggleMaxviewFullscreen( false ); }
-        static void toggleMaxviewFullscreen( bool maxview, bool atStartup = false );
+        static void toggleFullscreen() { toggleFullscreenEx( false ); }
+        static void togglePresentation() { toggleFullscreenEx( true ); }
+        static void toggleFullscreenEx( bool presentation, bool atStartup = false );
         static void focusDocview();
         static void focusIndex();
         static void cmdMinimize();
-        static void cmdSwitchToFullscreen();
+        static void cmdSwitchToPresentation();
         static void cmdSwitchWindow();
         static void createThumbnail( LuDocument *_doc );
         static bool isThumbNeeded( const char *fn );

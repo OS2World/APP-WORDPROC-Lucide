@@ -48,8 +48,7 @@ MENU_DOCUMENT_INFO=Do~kumentinformationen...
 MENU_FONTS_INFO=Schr~ifteninformation...
 MENU_WINDOW=~Fenster
 MENU_SHOW_NAV_PANE=~Navigator anzeigen
-MENU_MAXVIEW=~Maximiert\tF11
-MENU_FULLSCREEN=~Vollbild\tStrg+L
+MENU_FULLSCREEN=~Vollbild\tF11
 MENU_HELP=~Hilfe
 MENU_PRODUCT_INFORMATION=~Produktinformation
 

@@ -48,8 +48,8 @@ MENU_DOCUMENT_INFO=Информация о ~документе...
 MENU_FONTS_INFO=Информация о ~шрифтах...
 MENU_WINDOW=~Окно
 MENU_SHOW_NAV_PANE=~Отображать панель навигации
-MENU_MAXVIEW=~Масимально развернуть\tF11
-MENU_FULLSCREEN=~Полноэкранный режим\tCtrl+L
+MENU_FULLSCREEN=~Полноэкранный режим\tF11
+MENU_PRESENTATION=П~резентация\tF5
 MENU_HELP=~Справка
 MENU_PRODUCT_INFORMATION=~О программе
 
