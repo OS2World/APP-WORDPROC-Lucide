@@ -49,6 +49,7 @@ MENU_FONTS_INFO=Schr~ifteninformation...
 MENU_WINDOW=~Fenster
 MENU_SHOW_NAV_PANE=~Navigator anzeigen
 MENU_FULLSCREEN=~Vollbild\tF11
+MENU_PRESENTATION=~Pr„sentation\tF5
 MENU_HELP=~Hilfe
 MENU_PRODUCT_INFORMATION=~Produktinformation
 
