@@ -103,6 +103,27 @@ void PageInputFields::fillCache( int i )
     }
 }
 
+PFNWP oldMLEProc = NULL;
+
+MRESULT EXPENTRY MLEProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
+{
+    if ( msg == WM_CHAR )
+    {
+        USHORT fsflags = SHORT1FROMMP( mp1 );
+        USHORT usch = SHORT1FROMMP( mp2 );
+        USHORT usvk = SHORT2FROMMP( mp2 );
+
+        if ( ( fsflags & KC_VIRTUALKEY ) && !( fsflags & KC_CTRL ) &&
+             usvk == VK_NEWLINE ) {
+            // redirect to the parent to cause field submission
+            HWND parent = WinQueryWindow( hwnd, QW_PARENT );
+            return WinSendMsg( parent, msg, mp1, mp2 );
+        }
+    }
+
+    return oldMLEProc( hwnd, msg, mp1, mp2 );
+}
+
 // DocumentViewer constructor
 DocumentViewer::DocumentViewer( HWND hWndFrame )
 {
@@ -206,6 +227,8 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
                                MLS_BORDER,
                                0, 0, 0, 0, hWndDoc,
                                HWND_TOP, DOC_ID_MLE, NULL, NULL );
+
+    oldMLEProc = WinSubclassWindow( hWndMLE, MLEProc );
 
     char *mleFont = "10.Helvetica Bold";
     WinSetPresParam( hWndMLE, PP_FONTNAMESIZE, strlen( mleFont ) + 1, mleFont );
