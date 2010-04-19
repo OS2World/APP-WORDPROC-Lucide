@@ -375,7 +375,7 @@ bool DocumentViewer::close( bool force )
             // ask for the confirmation to close the modified document
             char *t = newstrdupL( MSGS_WARNING );
             char *m = newstrdupL( MSGS_CLOSE_MODIFIED_DOCUMENT );
-            ULONG response = WinMessageBox( HWND_DESKTOP, HWND_DESKTOP, m, t,
+            ULONG response = WinMessageBox( HWND_DESKTOP, hMainFrame, m, t,
                                             0, MB_YESNOCANCEL | MB_WARNING | MB_MOVEABLE );
             delete m;
             delete t;
