@@ -669,8 +669,8 @@ static VOID drawFramed( HWND hwnd, PRECTL prcl, BOOL framed, BOOL pressed )
 
 
 static CHAR ppFont[]     = "8.Helv";
-static ULONG ulBackColor = CLR_CYAN;
-static ULONG ulForeColor = CLR_BLACK;
+static ULONG ulBackColor = 0x00ffffe4;  //RGB_RED;
+static ULONG ulForeColor = RGB_BLACK;
 
 static VOID wrkMouseMove( HAB hab, HWND hwnd, MPARAM mp1, twsItem *ti )
 {
@@ -721,8 +721,8 @@ static VOID wrkMouseMove( HAB hab, HWND hwnd, MPARAM mp1, twsItem *ti )
                                        SS_TEXT | DT_CENTER |  DT_VCENTER,
                                        NULLHANDLE, 2, &hwndBC );
                     WinSetPresParam( hwndBC, PP_FONTNAMESIZE, sizeof( ppFont ), ppFont );
-                    WinSetPresParam( hwndBC, PP_BACKGROUNDCOLORINDEX, sizeof( ulBackColor ), &ulBackColor );
-                    WinSetPresParam( hwndBC, PP_FOREGROUNDCOLORINDEX, sizeof( ulForeColor ), &ulForeColor );
+                    WinSetPresParam( hwndBC, PP_BACKGROUNDCOLOR, sizeof( ulBackColor ), &ulBackColor );
+                    WinSetPresParam( hwndBC, PP_FOREGROUNDCOLOR, sizeof( ulForeColor ), &ulForeColor );
 
                     hpsTemp = WinGetPS( hwndBC );
 
