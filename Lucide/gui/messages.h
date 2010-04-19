@@ -68,6 +68,7 @@ extern const char *MSGS_FILE_SAVE_ERROR;
 extern const char *MSGS_PAGE;
 extern const char *MSGS_ERROR_STARTING_BROWSER;
 extern const char *MSGS_CLOSE_MODIFIED_DOCUMENT;
+extern const char *MSGS_FILE_COPY_SUFFIX;
 
 extern const char *MSGS_LDERR;
 extern const char *MSGS_LDERR_OUT_OF_MEMORY;

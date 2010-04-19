@@ -691,8 +691,11 @@ bool Lucide::saveDocumentAs()
     char fil[ _MAX_FNAME ] = "";
     char ext[ _MAX_EXT ] = "";
     _splitpath( docFullName, NULL, NULL, fil, ext );
+    char filcopy[ _MAX_FNAME ] = "";
+    snprintf( filcopy, sizeof( filcopy ),
+              getLocalizedString( MSGS_FILE_COPY_SUFFIX ).c_str(), fil );
     snprintf( fd->szFullFile, sizeof( fd->szFullFile ),
-                "%s%s%s", dirbuf, fil, ext );
+              "%s%s%s", dirbuf, filcopy, ext );
     WinFileDlg( HWND_DESKTOP, hWndFrame, fd );
     if ( fd->lReturn == DID_OK )
     {
@@ -710,7 +713,10 @@ bool Lucide::saveDocumentAs()
         }
         if ( doSave )
         {
-            if ( !( saved = doc->saveAs( ev, fd->szFullFile ) ) )
+            // @todo poppler has troubles saving to the same file name
+            // (some locking issues) so forbid it for now
+            if ( ( saved = false, stricmp( docFullName, fd->szFullFile ) == 0 ) ||
+                 !( saved = doc->saveAs( ev, fd->szFullFile ) ) )
             {
                 char *m = newstrdupL( MSGS_FILE_SAVE_ERROR );
                 WinMessageBox( HWND_DESKTOP, hWndFrame, m, NULL,

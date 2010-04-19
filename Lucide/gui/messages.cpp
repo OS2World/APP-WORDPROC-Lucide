@@ -67,6 +67,7 @@ const char *MSGS_FILE_SAVE_ERROR          = "MSGS_FILE_SAVE_ERROR";
 const char *MSGS_PAGE                     = "MSGS_PAGE";
 const char *MSGS_ERROR_STARTING_BROWSER   = "MSGS_ERROR_STARTING_BROWSER";
 const char *MSGS_CLOSE_MODIFIED_DOCUMENT  = "MSGS_CLOSE_MODIFIED_DOCUMENT";
+const char *MSGS_FILE_COPY_SUFFIX         = "MSGS_FILE_COPY_SUFFIX";
 
 const char *MSGS_LDERR                    = "MSGS_LDERR";
 const char *MSGS_LDERR_OUT_OF_MEMORY      = "MSGS_LDERR_OUT_OF_MEMORY";

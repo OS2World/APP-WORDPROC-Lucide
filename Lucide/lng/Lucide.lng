@@ -86,6 +86,7 @@ MSGS_FILE_SAVE_ERROR=Error saving file!
 MSGS_PAGE=Page
 MSGS_ERROR_STARTING_BROWSER=Error starting browser!
 MSGS_CLOSE_MODIFIED_DOCUMENT=Document has been modified. Save?
+MSGS_FILE_COPY_SUFFIX=%s Copy
 
 MSGS_LDERR=File load error: %s!
 MSGS_LDERR_OUT_OF_MEMORY=Out of memory
