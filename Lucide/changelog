@@ -1,3 +1,35 @@
+1.31:
+  - Renamed "Full screen" mode to "Presentation" mode (activated by F5 now) and
+    renamed "Maximized view" mode to "Full screen" mode (same F11 shortcut),
+    for clarity and similarity with other applications (closed ticket #176).
+  - Renamed "$switchfullscreen" pipe command to "$presentation".
+  - Fixed copy to clipboard in presentation mode (closed ticket #169). All
+    normal accelerators now work in presentation mode too, including Ctrl-O,
+    Ctrl-+, Ctrl-- and so on.
+  - Both the full screen and presentation modes can now be closed by Alt-F4.
+  - The full screen or presentation mode is properly saved when exiting Lucide
+    and restored at startup.
+  - If Lucide is closed minimized, it will be automatically restored at startup.
+  - Pressing the "+/=" key moves to the next page (previously, it was necessary
+    to hold Shift to make it work in many keyboard layouts).
+  - Made copy to clipboard work in input fields in presentation mode.
+  - Made copy to clipboard work in the document information dialog with Ctrl+C/
+    Ctrl+Ins (closed ticket #142). Ctrl+A/Ctrl+/ may be used to select all
+    lines for copying. This dialog can be now activated with Ctrl+I.
+  - Made copy to clipboard work in the font information dialog.
+  - Unified keyboard navigation in all modes (closed ticket #177):
+    * Home/End/PgUp/PgDn scroll to the first/last/previous/next page.
+    * Ctrl+Home/End/PgUp/PgDn go to the top of the first/last/previous/next page.
+    * Left/Right/Up/Down scroll the page to the corresponding direction.
+    * Ctrl+Left/Right/Up/Down scroll to the corresponding edge of the page.
+  - Auto-scroll the index window to make sure the current page is always visible.
+  - Made Enter submit the edited text in multi-line entry fields. Ctrl+Enter
+    may be used to start a new line.
+  - Fixed scrolling the document with RMB and enabled it in presentation mode
+    (closed ticket #124).
+  - Fixed loading JPEG files broken in 1.30.
+
+
 1.30:
   - PDF plugin: added support for filling forms in PDF documents (closed ticket
     #48).

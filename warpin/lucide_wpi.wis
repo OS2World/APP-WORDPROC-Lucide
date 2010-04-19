@@ -199,12 +199,15 @@ By pressing the "I agree" button, you agree to all terms and conditions to the b
 <README FORMAT=HTML>
 <B>LICENSE</B>
 <P>
-Lucide is licensed for use with eComStation only. You are not allowed to
-distribute the product by uploading it to public Internet servers or by any
-other means make it publicly available.
-
+Starting with version 1.3.0 Mensys BV and Serenity Systems International 
+have agreed in opensourcing Lucide, while still investing in the product.
+Netlabs.org would like to express it's gratitude toward Mensys BV and 
+Serenity Systems International.</P>
+<P>
+Lucide as of version 1.3.0 is released and distributed under CDDL/LGPL.</P>
+<P>
 The plugins are released under CDDL/LGPL or GPL, depending on the plugin. See
-http://svn.netlabs.org/lucide/ for more information and source code.
+http://svn.netlabs.org/lucide/ for more information and source code.</P>
 </README>
 </PAGE>
 
