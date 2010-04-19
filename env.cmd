@@ -45,9 +45,11 @@ cmdline
 drop cmdline
 
 /* setup GCC */
+if (G.PATH_TOOL_GCC442 \== '') then do
 cmdline = 'call' G.PATH_TOOL_GCC442'\gcc442.cmd @'
 cmdline
 drop cmdline
+end
 
 /* fix the outdated kBuild setting in GCC environment */
 if (EnvGet('BUILD_PLATFORM') == 'OS2') then
