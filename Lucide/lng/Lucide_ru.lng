@@ -86,6 +86,7 @@ MSGS_FILE_SAVE_ERROR=Ошибка сохранения файла!
 MSGS_PAGE=Страница
 MSGS_ERROR_STARTING_BROWSER=Ошибка запуска браузера!
 MSGS_CLOSE_MODIFIED_DOCUMENT=Документ был изменён. Сохранить?
+MSGS_FILE_COPY_SUFFIX=Копия %s
 
 MSGS_LDERR=Ошибка загрузки файла: %s!
 MSGS_LDERR_OUT_OF_MEMORY=Недостаточно памяти
