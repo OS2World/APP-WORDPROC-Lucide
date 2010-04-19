@@ -36,7 +36,7 @@ MENU_ROTATE_CW=~Girar 90ø en sentido horario\tCtrl+Shift++
 MENU_ROTATE_CCW=Girar 90ø en sentido antihorario\tCtrl+Shift+-
 MENU_SINGLE_PAGE=~Una p gina cada vez
 MENU_CONTINUOUS=Estilo ~continuo
-MENU_DOCUMENT_INFO=~Informaci¢n sobre el documento...
+MENU_DOCUMENT_INFO=~Informaci¢n sobre el documento...\tCtrl+I
 MENU_FONTS_INFO=~Fonts utilizadas...
 
 MENU_WINDOW=V~entana
