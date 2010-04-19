@@ -43,6 +43,7 @@
 #include "fontsInfoDlg.h"
 #include "Lucide_res.h"
 #include "messages.h"
+#include "cpconv.h"
 
 
 FontsInfoDlg::FontsInfoDlg( HWND hWndFrame, LuDocument *_doc )
@@ -149,6 +150,28 @@ void FontsInfoDlg::loadthread( void *p )
     _endthread();
 }
 
+static bool addPropToString( HWND hwndCntr, PRECORDCORE pRec, void *pUser )
+{
+    ListRec *rec = reinterpret_cast<ListRec *>( pRec );
+    std::string *str = static_cast<std::string *>( pUser );
+    if ( !str->empty() )
+        *str += '\n';
+    *str += rec->miniRecordCore.pszIcon;
+    *str += " | ";
+    *str += rec->type;
+    *str += " | ";
+    *str += rec->embed;
+    return true;
+}
+
+static bool selectProp( HWND hwndCntr, PRECORDCORE pRec, void *pUser )
+{
+    ListRec *rec = reinterpret_cast<ListRec *>( pRec );
+    return WinSendMsg( hwndCntr, CM_SETRECORDEMPHASIS,
+                       MPFROMP( &rec->miniRecordCore ),
+                       MPFROM2SHORT( TRUE, CRA_SELECTED ) ) == (MRESULT)TRUE;
+}
+
 MRESULT EXPENTRY FontsInfoDlg::fontsInfoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
     // This is a static method, so we don't know which instantiation we're
@@ -171,6 +194,9 @@ MRESULT EXPENTRY FontsInfoDlg::fontsInfoDlgProc( HWND hwnd, ULONG msg, MPARAM mp
             _this->hContainer = WinWindowFromID( hwnd, IDC_FONTSLIST );
             localizeDialog( hwnd );
             centerWindow( _this->hFrame, hwnd );
+
+            // setup the accelerators
+            WinSetAccelTable( hab, WinLoadAccelTable( hab, _hmod, IDA_FONTSINFOACCEL ), hwnd );
 
             // init container
             CNRINFO ci;
@@ -233,6 +259,36 @@ MRESULT EXPENTRY FontsInfoDlg::fontsInfoDlgProc( HWND hwnd, ULONG msg, MPARAM mp
         }
         break;
 
+        case WM_COMMAND:
+        {
+            switch( SHORT1FROMMP(mp1) )
+            {
+                case CM_COPY:
+                {
+                    HWND cntr = WinWindowFromID( hwnd, IDC_PROPSLIST );
+                    std::string props;
+                    enumCntrEmphasis( cntr, CRA_SELECTED, addPropToString, &props );
+                    if ( !props.empty()) {
+                        char *utf8 = uniSysToUtf8( props.c_str(), NULL, NULL );
+                        if ( utf8 )
+                            textToClipbrd( hab, utf8 );
+                        delete[] utf8;
+                    }
+                }
+                return (MRESULT)FALSE;
+
+                case CM_SELECTALL:
+                {
+                    HWND cntr = WinWindowFromID( hwnd, IDC_PROPSLIST );
+                    enumCntrRecords( cntr, selectProp, NULL );
+                }
+                return (MRESULT)FALSE;
+
+                default:
+                    break;
+            }
+        }
+        break;
     }
     return WinDefDlgProc( hwnd, msg, mp1, mp2 );
 }
