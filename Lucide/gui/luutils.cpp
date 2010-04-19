@@ -531,6 +531,37 @@ double convZoom( SHORT v )
     return z;
 }
 
+void enumCntrRecords( HWND hwndCntr, PENUMCNTRFN pFn, void *pUser )
+{
+    PRECORDCORE rec = (PRECORDCORE) WinSendMsg( hwndCntr, CM_QUERYRECORD,
+                                                0,
+                                                MPFROM2SHORT( CMA_FIRST, CMA_ITEMORDER ) );
+    while ( rec != NULL && rec != (PRECORDCORE)(-1) )
+    {
+        if ( !pFn( hwndCntr, rec, pUser ) )
+            return;
+        rec = (PRECORDCORE) WinSendMsg( hwndCntr, CM_QUERYRECORD,
+                                        MPFROMP( rec ),
+                                        MPFROM2SHORT( CMA_NEXT, CMA_ITEMORDER ) );
+    }
+}
+
+void enumCntrEmphasis( HWND hwndCntr, USHORT fEmphasisMask,
+                       PENUMCNTRFN pFn, void *pUser )
+{
+    PRECORDCORE rec = (PRECORDCORE) WinSendMsg( hwndCntr, CM_QUERYRECORDEMPHASIS,
+                                                MPFROMP( CMA_FIRST ),
+                                                MPFROMSHORT( fEmphasisMask ) );
+    while ( rec != NULL && rec != (PRECORDCORE)(-1) )
+    {
+        if ( !pFn( hwndCntr, rec, pUser ) )
+            return;
+        rec = (PRECORDCORE) WinSendMsg( hwndCntr, CM_QUERYRECORDEMPHASIS,
+                                        MPFROMP( rec ),
+                                        MPFROMSHORT( fEmphasisMask ) );
+    }
+}
+
 char *getTmpDir( char *buf )
 {
     char *tmpenv = getenv( "TMP" );

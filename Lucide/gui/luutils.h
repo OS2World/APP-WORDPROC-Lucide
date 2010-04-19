@@ -55,6 +55,7 @@ class afbuf
 
 
 #ifdef INCL_WIN
+
 BOOL CreateGraphicsBuffer( HAB hab, PRECTL prectl, HPS hps, HPS *phpsBuffer, HDC *phdcBuffer );
 void BlitGraphicsBuffer( HPS hps, HPS hpsBuffer, PRECTL prclPaint );
 void DestroyGraphicsBuffer( HPS hpsBuffer, HDC hdcBuffer );
@@ -68,6 +69,11 @@ void textToClipbrd( HAB hab, const char *text );
 void centerWindow( HWND parent, HWND hwnd );
 SHORT setZoomValues( HWND lbox );
 double convZoom( SHORT v );
+
+typedef bool (* PENUMCNTRFN)( HWND hwndCntr, PRECORDCORE pRec, void *pUser );
+void enumCntrRecords( HWND hwndCntr, PENUMCNTRFN pFn, void *pUser );
+void enumCntrEmphasis( HWND hwndCntr, USHORT fEmphasisMask,
+                       PENUMCNTRFN pFn, void *pUser );
 #endif
 
 
