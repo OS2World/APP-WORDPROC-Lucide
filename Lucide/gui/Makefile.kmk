@@ -57,6 +57,8 @@ Lucide_dll_LIBPATH	 = $(PATH_LIB)
 Lucide_dll_LIBS		 = \
 	ludoc.lib
 
+Lucide.rc_DEPS = dialogs.rc
+
 #
 # Lucide GUI application
 #

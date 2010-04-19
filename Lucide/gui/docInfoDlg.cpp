@@ -43,6 +43,7 @@
 #include "docInfoDlg.h"
 #include "Lucide_res.h"
 #include "messages.h"
+#include "cpconv.h"
 
 
 DocInfoDlg::DocInfoDlg( HWND hWndFrame, LuDocumentInfo *_dinfo )
@@ -132,6 +133,25 @@ void DocInfoDlg::loadValues( HWND cntr )
     }
 }
 
+static bool addPropToString( HWND hwndCntr, PRECORDCORE pRec, void *pUser )
+{
+    ListRec *rec = reinterpret_cast<ListRec *>( pRec );
+    std::string *str = static_cast<std::string *>( pUser );
+    if ( !str->empty() )
+        *str += '\n';
+    *str += rec->miniRecordCore.pszIcon;
+    *str += ' ';
+    *str += rec->value;
+    return true;
+}
+
+static bool selectProp( HWND hwndCntr, PRECORDCORE pRec, void *pUser )
+{
+    ListRec *rec = reinterpret_cast<ListRec *>( pRec );
+    return WinSendMsg( hwndCntr, CM_SETRECORDEMPHASIS,
+                       MPFROMP( &rec->miniRecordCore ),
+                       MPFROM2SHORT( TRUE, CRA_SELECTED ) ) == (MRESULT)TRUE;
+}
 
 MRESULT EXPENTRY DocInfoDlg::docInfoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
@@ -153,6 +173,9 @@ MRESULT EXPENTRY DocInfoDlg::docInfoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, M
             _this = (DocInfoDlg *)mp2;
             localizeDialog( hwnd );
             centerWindow( _this->hFrame, hwnd );
+
+            // setup the accelerators
+            WinSetAccelTable( hab, WinLoadAccelTable( hab, _hmod, IDA_DOCINFOACCEL ), hwnd );
 
             // init container
             HWND cntr = WinWindowFromID( hwnd, IDC_PROPSLIST );
@@ -209,6 +232,36 @@ MRESULT EXPENTRY DocInfoDlg::docInfoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, M
         }
         break;
 
+        case WM_COMMAND:
+        {
+            switch( SHORT1FROMMP(mp1) )
+            {
+                case CM_COPY:
+                {
+                    HWND cntr = WinWindowFromID( hwnd, IDC_PROPSLIST );
+                    std::string props;
+                    enumCntrEmphasis( cntr, CRA_SELECTED, addPropToString, &props );
+                    if ( !props.empty()) {
+                        char *utf8 = uniSysToUtf8( props.c_str(), NULL, NULL );
+                        if ( utf8 )
+                            textToClipbrd( hab, utf8 );
+                        delete[] utf8;
+                    }
+                }
+                return (MRESULT)FALSE;
+
+                case CM_SELECTALL:
+                {
+                    HWND cntr = WinWindowFromID( hwnd, IDC_PROPSLIST );
+                    enumCntrRecords( cntr, selectProp, NULL );
+                }
+                return (MRESULT)FALSE;
+
+                default:
+                    break;
+            }
+        }
+        break;
     }
     return WinDefDlgProc( hwnd, msg, mp1, mp2 );
 }

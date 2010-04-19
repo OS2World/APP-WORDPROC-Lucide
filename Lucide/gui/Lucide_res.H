@@ -58,7 +58,9 @@
 #define IDB_MGLASS		32
 
 #define IDM_MAINMENU    100
-#define IDA_MAINACCEL   101
+
+#define IDA_MAINACCEL       101
+#define IDA_DOCINFOACCEL    102
 
 #define CM_NEW_WINDOW   101
 #define CM_OPEN         102
