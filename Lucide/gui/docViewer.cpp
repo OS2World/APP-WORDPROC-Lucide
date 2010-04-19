@@ -2241,74 +2241,85 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
         switch ( usvk )
         {
             case VK_UP:
-                WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_LINEUP ) );
+                if ( fsflags & KC_CTRL ) {
+                    vertScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ) );
+                } else {
+                    WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_LINEUP ) );
+                }
                 return TRUE;
 
             case VK_DOWN:
-                WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_LINEDOWN ) );
-                return TRUE;
-
-            case VK_PAGEUP:
-                if ( fsflags & KC_CTRL )
-                {
-                    if ( presentation ) {
-                        goToPage( 0 );
-                    } else {
-                        vertScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ) );
-                    }
-                }
-                else
-                {
-                    bool dojump = ( !isContinuous() && ( sVscrollPos == 0 )
-                                        && ( currentpage > 0 ) );
-
-                    if ( presentation || dojump ) {
-                        goToPage( currentpage - 1 );
-                        if ( dojump ) {
-                            vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ) );
-                        }
-                    } else {
-                        WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEUP ) );
-                    }
-                }
-                return TRUE;
-
-            case VK_PAGEDOWN:
-                if ( fsflags & KC_CTRL )
-                {
-                    if ( presentation ) {
-                        goToPage( totalpages - 1 );
-                    } else {
-                        vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ) );
-                    }
-                }
-                else
-                {
-                    bool dojump = ( !isContinuous() && ( sVscrollPos == sVscrollMax ) );
-
-                    if ( presentation || dojump ) {
-                        goToPage( currentpage + 1 );
-                    } else {
-                        WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEDOWN ) );
-                    }
+                if ( fsflags & KC_CTRL ) {
+                    vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ) );
+                } else {
+                    WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_LINEDOWN ) );
                 }
                 return TRUE;
 
             case VK_LEFT:
-                WinSendMsg( hwnd, WM_HSCROLL, MPVOID, MPFROM2SHORT( 0, SB_LINELEFT ) );
+                if ( fsflags & KC_CTRL ) {
+                    horizScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ) );
+                } else {
+                    WinSendMsg( hwnd, WM_HSCROLL, MPVOID, MPFROM2SHORT( 0, SB_LINELEFT ) );
+                }
                 return TRUE;
 
             case VK_RIGHT:
-                WinSendMsg( hwnd, WM_HSCROLL, MPVOID, MPFROM2SHORT( 0, SB_LINERIGHT ) );
+                if ( fsflags & KC_CTRL ) {
+                    horizScroll( hwnd, MPFROM2SHORT( sHscrollMax, SB_SLIDERPOSITION ) );
+                } else {
+                    WinSendMsg( hwnd, WM_HSCROLL, MPVOID, MPFROM2SHORT( 0, SB_LINERIGHT ) );
+                }
                 return TRUE;
+
+
+            case VK_PAGEUP:
+                if ( !( fsflags & KC_CTRL ) )
+                {
+                    bool dojump = ( !isContinuous() && ( sVscrollPos == 0 )
+                                        && ( currentpage > 0 ) );
+
+                    if ( dojump ) {
+                        goToPage( currentpage - 1 );
+                        vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ) );
+                    } else {
+                        WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEUP ) );
+                    }
+                    return TRUE;
+                }
+                break;
+
+            case VK_PAGEDOWN:
+                if ( !( fsflags & KC_CTRL ) )
+                {
+                    bool dojump = ( !isContinuous() && ( sVscrollPos == sVscrollMax ) );
+
+                    if ( dojump ) {
+                        goToPage( currentpage + 1 );
+                    } else {
+                        WinSendMsg( hwnd, WM_VSCROLL, MPVOID, MPFROM2SHORT( 0, SB_PAGEDOWN ) );
+                    }
+                    return TRUE;
+                }
+                break;
 
             case VK_HOME:
-                horizScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ) );
-                return TRUE;
+                if ( !( fsflags & KC_CTRL ) )
+                {
+                    goToPage( 0 );
+                    vertScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ) );
+                    return TRUE;
+                }
+                break;
 
             case VK_END:
-                horizScroll( hwnd, MPFROM2SHORT( sHscrollMax, SB_SLIDERPOSITION ) );
-                return TRUE;
+                if ( !( fsflags & KC_CTRL ) )
+                {
+                    goToPage( totalpages - 1 );
+                    vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ) );
+                    return TRUE;
+                }
+                break;
 
             case VK_ESC:
                 if ( textField != NULL ) {
