@@ -1193,13 +1193,20 @@ static MRESULT EXPENTRY frameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 
             // change the accel logic by first letting the focus window process
             // WM_CHAR and only translate it to accel if not handled (this makes
             // sure that keyboard shortcuts in input fields work even if we
-            // defined our own accelerators from these shortcuts)
+            // defined our own accelerators from these shortcuts). Make an
+            // exception for VK_TAB since it's always eaten by the standard
+            // window procedure and therefore the accel table will never be
+            // called
             PQMSG pqmsg = (PQMSG)mp1;
-            HWND focus = WinQueryFocus( HWND_DESKTOP );
-            if ( focus == pqmsg->hwnd && focus != hwnd ) {
-                if ( WinDispatchMsg( hab, pqmsg ) ) {
-                    pqmsg->msg = WM_NULL;
-                    return (MRESULT)TRUE;
+            if ( !( SHORT1FROMMP( pqmsg->mp1 ) & KC_VIRTUALKEY ) ||
+                 !( SHORT2FROMMP( pqmsg->mp2 ) == VK_TAB ) )
+            {
+                HWND focus = WinQueryFocus( HWND_DESKTOP );
+                if ( focus == pqmsg->hwnd && focus != hwnd ) {
+                    if ( WinDispatchMsg( hab, pqmsg ) ) {
+                        pqmsg->msg = WM_NULL;
+                        return (MRESULT)TRUE;
+                    }
                 }
             }
             // in presentation mode, we hide the menu which effectively makes
@@ -1207,7 +1214,8 @@ static MRESULT EXPENTRY frameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 
             // unexpected. Fix it by translating accels manually and checking
             // if they are disabled in the hidden menu
             if ( WinTranslateAccel( hab, hwnd, WinQueryAccelTable( hab, hwnd ),
-                                    pqmsg ) ) {
+                                    pqmsg ) )
+            {
                 if ( pqmsg->msg == WM_COMMAND ) {
                     SHORT cm = SHORT1FROMMP(pqmsg->mp1);
                     if ( !WinIsMenuItemEnabled( hWndMenu, cm ) )
