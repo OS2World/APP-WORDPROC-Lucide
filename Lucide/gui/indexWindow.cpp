@@ -239,6 +239,31 @@ bool IndexWindow::goToPage( TreeRecord *parent, long page )
             }
             WinSendMsg( hWndIndex, CM_SETRECORDEMPHASIS, MPFROMP( pr ),
                         MPFROM2SHORT( TRUE, CRA_SELECTED | CRA_CURSORED ) );
+            // make sure the selected page is visible
+            RECTL rcl;
+            QUERYRECORDRECT qrr;
+            qrr.cb = sizeof(QUERYRECORDRECT);
+            qrr.pRecord = (PRECORDCORE)&pr->miniRecordCore;
+            qrr.fRightSplitWindow = FALSE;
+            qrr.fsExtent = CMA_TEXT;
+            if ( WinSendMsg( hWndIndex, CM_QUERYRECORDRECT,
+                             MPFROMP( &rcl ), MPFROMP( &qrr ) ) ) {
+                RECTL wrcl;
+                if ( WinSendMsg( hWndIndex, CM_QUERYVIEWPORTRECT,
+                                 MPFROMP( &wrcl ), MPFROM2SHORT( CMA_WINDOW, FALSE ) ) ) {
+                    LONG dy = 0;
+                    if ( rcl.yTop > wrcl.yTop ) {
+                        dy = wrcl.yTop - rcl.yTop;
+                    } else if ( rcl.yBottom < wrcl.yBottom ) {
+                        dy = wrcl.yBottom - rcl.yBottom;
+                    }
+                    if ( dy ) {
+                        WinSendMsg( hWndIndex, CM_SCROLLWINDOW,
+                                    MPFROMSHORT( CMA_VERTICAL ),
+                                    MPFROMLONG( dy ) );
+                    }
+                }
+            }
             return true;
         }
 
