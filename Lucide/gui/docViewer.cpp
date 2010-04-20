@@ -2297,7 +2297,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
 
 
             case VK_PAGEUP:
-                if ( !( fsflags & KC_CTRL ) )
+                if ( !( fsflags & (KC_CTRL | KC_SHIFT | KC_ALT) ) )
                 {
                     bool dojump = ( !isContinuous() && ( sVscrollPos == 0 )
                                         && ( currentpage > 0 ) );
@@ -2313,7 +2313,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                 break;
 
             case VK_PAGEDOWN:
-                if ( !( fsflags & KC_CTRL ) )
+                if ( !( fsflags & (KC_CTRL | KC_SHIFT | KC_ALT) ) )
                 {
                     bool dojump = ( !isContinuous() && ( sVscrollPos == sVscrollMax ) );
 
@@ -2324,10 +2324,10 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                     }
                     return TRUE;
                 }
-                break;
+                return FALSE;
 
             case VK_HOME:
-                if ( !( fsflags & KC_CTRL ) )
+                if ( !( fsflags & (KC_CTRL | KC_SHIFT | KC_ALT) ) )
                 {
                     goToPage( 0 );
                     vertScroll( hwnd, MPFROM2SHORT( 0, SB_SLIDERPOSITION ) );
@@ -2336,7 +2336,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                 break;
 
             case VK_END:
-                if ( !( fsflags & KC_CTRL ) )
+                if ( !( fsflags & (KC_CTRL | KC_SHIFT | KC_ALT) ) )
                 {
                     goToPage( totalpages - 1 );
                     vertScroll( hwnd, MPFROM2SHORT( sVscrollMax, SB_SLIDERPOSITION ) );
