@@ -1,13 +1,22 @@
 #
-# Lucide language file, IT
+# Lucide language file, IT (1.3.1)
 #
 
 #
 # Main menu
 #
 MENU_DOCUMENT=~Documento
+MENU_NEW_WINDOW=~Nuova finestra
 MENU_OPEN=~Apri...\tCtrl+O
+MENU_NEXT_PREVIOUS=Successivo/Pre~cedente
+MENU_FIRST=Primo\tShift+Home
+MENU_PREVIOUS=Precedente\tShift+PgUp
+MENU_NEXT=Prossimo\tShift+PgDn
+MENU_LAST=Ultimo\tShift+End
+MENU_RECENT_FILES=~Files recenti
+MENU_CLEAR_LIST=~Cancella lista
 MENU_SAVE_AS=~Salva come...
+MENU_CLOSE=~Chiudi
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Impostazioni pa~gina...
 MENU_PRINT=Stam~pa...\tCtrl+P
@@ -24,6 +33,8 @@ MENU_FIT_WINDOW=~Adatta alla finestra\tCtrl+0
 MENU_ACTUAL_SIZE=~Dimensione reale\tCtrl+1
 MENU_FIT_WIDTH=Adatta alla ~larghezza\tCtrl+2
 # - unused - MENU_ZOOM_IN_OUT=~Ingrandisci/rimpicciolisci
+MENU_ZOOM_IN=Zoom in\tCtrl++
+MENU_ZOOM_OUT=Zoom out\tCtrl+-
 MENU_FIRST_PAGE=~Prima pagina
 MENU_PREV_PAGE=Pagina p~recedente\t-
 MENU_NEXT_PAGE=Pagina ~successiva\t+
@@ -38,6 +49,7 @@ MENU_FONTS_INFO=Informazioni ~tipi di carattere...
 MENU_WINDOW=~Finestra
 MENU_SHOW_NAV_PANE=Mostra il pannello di ~navigazione
 MENU_FULLSCREEN=Schermo ~intero\tF11
+MENU_PRESENTATION=~Presentazione\tF5
 MENU_HELP=A~iuto
 MENU_PRODUCT_INFORMATION=Informazioni sul prodotto
 
@@ -72,6 +84,20 @@ MSGS_OVERWRITE_FILE=Il file esiste gi…. Sovrascrivere?
 MSGS_FILE_SAVE_ERROR=Errore salvataggio file!
 MSGS_PAGE=Pagina
 MSGS_ERROR_STARTING_BROWSER=Errore di scorrimento file!
+MSGS_CLOSE_MODIFIED_DOCUMENT=Il documento Š stato modificato. Vuoi salvare?
+MSGS_FILE_COPY_SUFFIX=%s Copia
+
+MSGS_LDERR=File load error: %s!
+MSGS_LDERR_OUT_OF_MEMORY=Memoria esaurita
+MSGS_LDERR_OPEN_ERROR=Errore apertura
+MSGS_LDERR_READ_ERROR=Errore di lettura
+MSGS_LDERR_DAMAGED=File danneggiato
+MSGS_LDERR_WRONG_FORMAT=Formato errato
+MSGS_LDERR_ENCRYPTED=Il file Š cifrato
+
+MSGS_RERR_OUT_OF_MEMORY=Memoria esaurita
+MSGS_RERR_CORRUPTED_PAGE_DATA=Pagina dati corrotta
+MSGS_RERR_FONT_NOT_FOUND=Font %s non trovato
 
 #
 # "Plugins list" dialog
@@ -175,6 +201,10 @@ PD_RANGE_PAGES=~Pagine
 PD_FROM=~Da
 PD_TO=~A
 PD_NUMBER_OF_COPIES=Numero di ~copie
+PD_RANGE_EVEN_ODD_LABEL=Intervallo di stampa
+PD_RANGE_EVEN_ODD=Pagine pari e dispari
+PD_RANGE_ODD=Solo pagine dispari
+PD_RANGE_EVEN=Solo pagine pari
 PD_PRINT_TYPE=Tipo di stampa
 PD_TYPE_POSTSCRIPT=Post~script
 PD_TYPE_ASIMAGE=Come ~immagine
@@ -183,6 +213,7 @@ PD_PAGE_ORIENTATION=Orientamento pagina
 PD_PORTRAIT=~Verticale
 PD_LANDSCAPE=~Orizzontale
 PD_MARGINS=Margini (mm)
+PD_IGNORE_PRINTER_MARGINS=Ignora margini stampante
 PD_MLEFT=Sinistro
 PD_MRIGHT=Destro
 PD_MTOP=Superiore
@@ -197,3 +228,24 @@ PRINT_GENERATING_POSTSCRIPT=Generazione del file postscript...
 PRINT_SPOOLING_POSTSCRIPT=Coda di stampa dei dati postscript...
 PRINT_FAILED=Stampa fallita!
 
+#
+# Password dialog
+#
+PSW_TITLE=Il documento Š cifrato!
+PSW_PASSWORD=~Password
+PSW_OK=~OK
+PSW_CANCEL=~Annulla
+
+#
+# Open file dialog
+#
+FDLG_OPEN=Apri
+FDLG_FILENAME=~Nome file
+FDLG_DRIVE=D~isco
+FDLG_FILETYPE=~Tipo file
+FDLG_FILE=~File
+FDLG_DIRECTORY=~Cartella
+FDLG_OK=~OK
+FDLG_CANCEL=~Annulla
+FDLG_NO_PREVIEW_AVAILABLE=Anteprima non disponibile
+FDLG_ALL_SUPPORTED_TYPES=<Tutti i tipi supportati>
