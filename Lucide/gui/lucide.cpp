@@ -618,8 +618,10 @@ void Lucide::readMask( const char *mask )
 {
     char *buf = new char[ CCHMAXPATH ];
     strcpy( buf, docFullName );
-    char *r = strrchr( buf, '\\' );
-    if ( r != NULL )
+    char *r = buf + strlen( buf );
+    while ( r >= buf && *r != '\\' && *r != '/')
+        --r;
+    if ( r >= buf )
     {
         *( r + 1 ) = 0;
         strcat( buf, mask );
