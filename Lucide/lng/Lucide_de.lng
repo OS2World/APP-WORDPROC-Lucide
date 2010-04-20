@@ -86,6 +86,7 @@ MSGS_FILE_SAVE_ERROR=Fehler beim Schreiben der Datei!
 MSGS_PAGE=Seite
 MSGS_ERROR_STARTING_BROWSER=Fehler beim Starten des Browsers!
 MSGS_CLOSE_MODIFIED_DOCUMENT=Dokument wurde ge„ndert. Sichern?
+MSGS_FILE_COPY_SUFFIX=%s Kopie
 
 MSGS_LDERR=Lesefehler: %s!
 MSGS_LDERR_OUT_OF_MEMORY=Speichermangel
