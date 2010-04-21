@@ -12,7 +12,7 @@
 VERSION		= 1.31
 
 # Lucide version date
-VERSIONDATE	= 2010-04-20
+VERSIONDATE	= 2010-04-21
 
 #------------------------------------------------------------------------------
 # Common libraries referenced by components

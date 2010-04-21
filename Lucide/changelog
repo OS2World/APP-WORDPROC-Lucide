@@ -19,15 +19,20 @@
   - Made copy to clipboard work in the font information dialog.
   - Unified keyboard navigation in all modes (closed ticket #177):
     * Home/End/PgUp/PgDn scroll to the first/last/previous/next page.
-    * Ctrl+Home/End/PgUp/PgDn go to the top of the first/last/previous/next page.
+    * Ctrl+Home/End/PgUp/PgDn go to the top of the first/last/previous/next
+      page.
     * Left/Right/Up/Down scroll the page to the corresponding direction.
     * Ctrl+Left/Right/Up/Down scroll to the corresponding edge of the page.
-  - Auto-scroll the index window to make sure the current page is always visible.
+  - Auto-scroll the index window to make sure the current page is always
+    visible.
   - Made Enter submit the edited text in multi-line entry fields. Ctrl+Enter
     may be used to start a new line.
   - Fixed scrolling the document with RMB and enabled it in presentation mode
     (closed ticket #124).
-  - Fixed loading JPEG files broken in 1.30.
+  - Fixed file navigation with Shift+PgUp/PgDown/Home/End broken in version
+    1.30 (closed ticket #175). Note that the files are visited in alphabetical
+    order now (using locale-aware comparison) which matches the common behavior.
+  - Fixed loading JPEG files broken in version 1.30.
 
 
 1.30:
