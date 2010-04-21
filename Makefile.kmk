@@ -17,15 +17,13 @@ include $(PATH_SUB_CURRENT)/Lucide/Makefile.kmk
 # WarpIn & Zip distribution
 #
 
+PATH_OUT		?= . # be on the safe side (we do rmdir -fR of PATH_PACKING)
 PATH_PACKING	 = $(PATH_OUT)/packing
 
-LUCIDE_WPI	 = $(PATH_OUT)/Lucide-$(subst .,_,$(VERSION)).wpi
-LUCIDE_ZIP	 = $(PATH_OUT)/Lucide-$(subst .,_,$(VERSION)).zip
+LUCIDE_WPI	 = $(PATH_OUT)/Lucide-$(subst $(SP),_,$(subst .,_,$(VERSION))).wpi
+LUCIDE_ZIP	 = $(PATH_OUT)/Lucide-$(subst $(SP),_,$(subst .,_,$(VERSION))).zip
 
 OTHER_CLEAN	+= $(LUCIDE_WPI) $(LUCIDE_ZIP)
-
-clean:
-	$(RM) -fR $(PATH_PACKING)
 
 ifeq ($(IN_PACKING),)
 
@@ -36,10 +34,12 @@ ifeq ($(IN_PACKING),)
 PACKING		 = do_packing
 
 do_packing:
-	$(QUIET)$(MAKE) IN_PACKING=1 rebuild packing
+	$(RM) -fR $(PATH_PACKING)
+	$(QUIET)$(MAKE) IN_PACKING=1 uninstall rebuild packing
 
 fastpacking:
-	$(QUIET)$(MAKE) IN_PACKING=1 packing
+	$(RM) -fR $(PATH_PACKING)
+	$(QUIET)$(MAKE) IN_PACKING=1 uninstall packing
 
 else
 
