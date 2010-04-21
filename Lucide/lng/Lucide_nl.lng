@@ -86,6 +86,7 @@ MSGS_FILE_SAVE_ERROR=Fout bij het opslaan van het bestand!
 MSGS_PAGE=Pagina
 MSGS_ERROR_STARTING_BROWSER=Fout bij het opstarten van de browser!
 MSGS_CLOSE_MODIFIED_DOCUMENT=Document is gewijzigd. Opslaan?
+MSGS_FILE_COPY_SUFFIX=Kopie van %s
 
 MSGS_LDERR=Bestand inleesfout: %s!
 MSGS_LDERR_OUT_OF_MEMORY=Onvoldoende geheugen
