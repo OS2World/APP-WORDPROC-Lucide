@@ -62,13 +62,13 @@ Lucide_wpi_1_SOURCES	 = \
 	$(abspathex $(Lucide_lng_SOURCES),$(Lucide_lng_PATH))
 
 Lucide_wpi_2_INST		 = $(notdir $(PATH_PACKING))/wpi/2
-Lucide_wpi_2_SOURCES	 = $(TARGET_ludjvu)
+Lucide_wpi_2_SOURCES	 = $(TARGET_lupoppler)
 
 Lucide_wpi_3_INST		 = $(notdir $(PATH_PACKING))/wpi/3
-Lucide_wpi_3_SOURCES	 = $(TARGET_lujpeg)
+Lucide_wpi_3_SOURCES	 = $(TARGET_ludjvu)
 
 Lucide_wpi_4_INST		 = $(notdir $(PATH_PACKING))/wpi/4
-Lucide_wpi_4_SOURCES	 = $(TARGET_lupoppler)
+Lucide_wpi_4_SOURCES	 = $(TARGET_lujpeg)
 
 $(LUCIDE_WPI): install
 	$(call MSG_L1,Packing $@)
