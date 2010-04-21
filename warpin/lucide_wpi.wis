@@ -192,7 +192,15 @@ http://svn.netlabs.org/lucide/
 </PAGE>
 
 <PAGE INDEX=2 TYPE=README>
-<NEXTBUTTON TARGET=3>~I agree</NEXTBUTTON>
+<NEXTBUTTON TARGET=3>~Next</NEXTBUTTON>
+<TEXT>
+The following list describes what is new in this version of Lucide.
+</TEXT>
+<README FORMAT=PLAIN EXTRACTFROMPCK="1">changelog</README>
+</PAGE>
+
+<PAGE INDEX=3 TYPE=README>
+<NEXTBUTTON TARGET=4>~I agree</NEXTBUTTON>
 <TEXT>
 By pressing the "I agree" button, you agree to all terms and conditions to the below licence agreement.
 </TEXT>
@@ -213,8 +221,8 @@ http://svn.netlabs.org/lucide/ for more information and source code.</P>
 
 <!-- The TYPE=CONTAINER will list the packages which can be installed. -->
 
-<PAGE INDEX=3 TYPE=CONTAINER>
-<NEXTBUTTON TARGET=4>~Next</NEXTBUTTON>
+<PAGE INDEX=4 TYPE=CONTAINER>
+<NEXTBUTTON TARGET=6>~Next</NEXTBUTTON>
 <TEXT>
 Please select the packages which are to be installed. You may change the target paths for the packages.
 </TEXT>
@@ -222,10 +230,14 @@ Please select the packages which are to be installed. You may change the target 
 
 
 <!-- The TYPE=CONFIGURE will allow the user to set the CONFIG.SYS and
-     WPS classes/objects stuff. -->
+     WPS classes/objects stuff.
 
-<PAGE INDEX=4 TYPE=CONFIGURE>
-<NEXTBUTTON TARGET=5>~Next</NEXTBUTTON>
+     NOTE that we skip this target since 1.32 to avoid inconsistency that could
+     happen should the user deselect creation of WPS objects (see ticket:128
+     for details). -->
+
+<PAGE INDEX=5 TYPE=CONFIGURE>
+<NEXTBUTTON TARGET=6>~Next</NEXTBUTTON>
 <TEXT>
 
 Please select additional configuration that WarpIN should perform after installing this archive.
@@ -239,7 +251,7 @@ Please select additional configuration that WarpIN should perform after installi
      Note that the TYPE=INSTALL page (which we had in Alpha #3)
      is no longer supported. -->
 
-<PAGE INDEX=5 TYPE=TEXT>
+<PAGE INDEX=6 TYPE=TEXT>
 <NEXTBUTTON TARGET=0>I~nstall</NEXTBUTTON>
 <TEXT>
 

@@ -70,7 +70,7 @@ Lucide_wpi_3_SOURCES	 = $(TARGET_ludjvu)
 Lucide_wpi_4_INST		 = $(notdir $(PATH_PACKING))/wpi/4
 Lucide_wpi_4_SOURCES	 = $(TARGET_lujpeg)
 
-$(LUCIDE_WPI): install
+$(LUCIDE_WPI): install warpin/lucide_wpi.wis
 	$(call MSG_L1,Packing $@)
 	-$(QUIET)$(RM) -f $@
 	$(QUIET)echo > $(abspathex $(Lucide_wpi_1_INST),$(PATH_OUT))/lucide.fcf
