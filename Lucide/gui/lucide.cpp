@@ -37,7 +37,8 @@
 #include "os2all.h"
 
 #include <string>
-#include <set>
+#include <vector>
+#include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 #include <process.h>
@@ -136,8 +137,8 @@ char        *Lucide::thumbnailData                 = NULL;
 int          Lucide::thumbnailDataLen              = 0;
 
 // List of files in current directory
-static std::set<std::string> fileList;
-static std::set<std::string>::const_iterator fileListIterator;
+static std::vector<std::string> fileList;
+static std::vector<std::string>::const_iterator fileListIterator;
 
 HMODULE _hmod = NULLHANDLE;
 
@@ -630,13 +631,20 @@ void Lucide::readMask( const char *mask )
         unsigned done = _dos_findfirst( buf, _A_RDONLY | _A_NORMAL, &ffblk );
         while ( done == 0 )
         {
-            fileList.insert( find_t_name( ffblk ) );
+            fileList.push_back( find_t_name( ffblk ) );
             done = _dos_findnext( &ffblk );
         }
         _dos_findclose( &ffblk );
 
     }
     delete buf;
+}
+
+// comparison, not case sensitive.
+bool compare_nocase( const std::string &first, const std::string &second)
+{
+    // note: stricmp is locale aware in kLIBC
+    return stricmp( first.c_str(), second.c_str() ) < 0;
 }
 
 void Lucide::loadFileList()
@@ -653,7 +661,8 @@ void Lucide::loadFileList()
     }
     delete exts;
 
-    fileListIterator = fileList.find( docFileName );
+    std::sort( fileList.begin(), fileList.end(), compare_nocase );
+    fileListIterator = std::find( fileList.begin(), fileList.end(), docFileName );
 }
 
 void Lucide::openDocument()
