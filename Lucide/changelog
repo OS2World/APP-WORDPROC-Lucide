@@ -1,3 +1,10 @@
+1.32:
+  - Fixed mismatch between the package names and actual plugins they contain.
+  - WPI: Fixed the version number.
+  - WPI: Skip the WPS object creation dialog to avoid a possible WPS association
+    inconsistency (closed ticket 128).
+
+
 1.31:
   - Renamed "Full screen" mode to "Presentation" mode (activated by F5 now) and
     renamed "Maximized view" mode to "Full screen" mode (same F11 shortcut),

@@ -164,7 +164,7 @@ PDLG_CANCEL=~Abbruch
 #
 AD_ABOUT=öber
 AD_DESCRIPTION=Plugin-basierter Dokumentbetrachter fÅr zahlreicher Dateiformate
-AD_COPYRIGHTS=(c) by Eugene Romanenko, netlabs.org in Zusammenarbeit mit Serenity Systems International
+AD_COPYRIGHTS=(c) Eugene Romanenko, Dmitry A. Kuminov (netlabs.org) in Zusammenarbeit mit Serenity Systems International
 AD_OK=~OK
 
 #
