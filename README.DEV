@@ -70,12 +70,15 @@ at:
 GENERATING DISTRIBUTION ARCHIVES
 
 In order to generate WPI and ZIP distribution archives in the output directory,
-issue the following command (prefixed with "se" if you use it):
+issue the following command in the root of the source tree (prefixed with "se"
+if you use it):
 
   kmk packing
 
 Note that this command will perform a complete cleanup before packing, to make
-sure everything is rebuilt from scratch.
+sure everything is rebuilt from scratch. For testing purposes, you may omit 
+the cleanup pass by invoking the "kmk fastpacking" which will only generate
+the distribution archives from the existing build.
 
 
 
@@ -85,8 +88,8 @@ The following kmk targets may be of interest:
 
   - clean           Cleans up the build by deleting all generated output.
   - uninstall       Deletes all installed files.
-  - packing         Creates distribution archives in the output directory
-                    (see GENERATING DISTRIBUTION ARCHIVES above).
+  - packing,        Creates distribution archives in the output directory
+    fastpacking     (see GENERATING DISTRIBUTION ARCHIVES above).
 
 
 
