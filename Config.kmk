@@ -9,10 +9,17 @@
 #
 # Lucide version string
 #
-VERSION		= 1.31
+# NOTE: If you change this, do not forget to update the version path in
+#       warpin/lucide_wpi.wis accordingly!
+#
+# @todo Automate version syhchronization in .wis using e.g. sed.
+#
+VERSION		= 1.32 beta
 
+#
 # Lucide version date
-VERSIONDATE	= 2010-04-21
+#
+VERSIONDATE	= 2010-xx-xx
 
 #------------------------------------------------------------------------------
 # Common libraries referenced by components

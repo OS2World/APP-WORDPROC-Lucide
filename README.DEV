@@ -76,9 +76,24 @@ if you use it):
   kmk packing
 
 Note that this command will perform a complete cleanup before packing, to make
-sure everything is rebuilt from scratch. For testing purposes, you may omit 
+sure everything is rebuilt from scratch. For testing purposes, you may omit
 the cleanup pass by invoking the "kmk fastpacking" which will only generate
 the distribution archives from the existing build.
+
+IMPORTANT:
+
+    Do not forget to update VERSION and VERSIONDATE in Config.kmk and the
+    version path in warpin/lucide_wpi.wis before the release and increase it
+    immediately after the release (after tagging the SVN trunk with the release
+    tag) with assigning the beta state (see below).
+
+    The version assignment scheme is as follows:
+
+    * VERSION is set to "X.YZ beta" for the development phase and to "X.YZ"
+      for releases.
+
+    * The WarpIn version path is set to to X\Y\Z\0 for the development phase
+      and to X\Y\Z\1 for releases.
 
 
 
