@@ -13,5 +13,75 @@ include $(PATH_SUB_CURRENT)/libdjvu/Makefile.kmk
 include $(PATH_SUB_CURRENT)/libjpeg/Makefile.kmk
 include $(PATH_SUB_CURRENT)/Lucide/Makefile.kmk
 
+#
+# WarpIn & Zip distribution
+#
+
+PATH_PACKING	 = $(PATH_OUT)/packing
+
+LUCIDE_WPI	 = $(PATH_OUT)/Lucide-$(subst .,_,$(VERSION)).wpi
+LUCIDE_ZIP	 = $(PATH_OUT)/Lucide-$(subst .,_,$(VERSION)).zip
+
+OTHER_CLEAN	+= $(LUCIDE_WPI) $(LUCIDE_ZIP)
+
+clean:
+	$(RM) -fR $(PATH_PACKING)
+
+ifeq ($(IN_PACKING),)
+
+#
+# Special packing target sets a magic variable and restarts
+# (to avoid extra INSTALLS targets during regular non-packing kmk invocations)
+#
+PACKING		+= do_packing
+
+do_packing:
+	$(QUIET)$(MAKE) IN_PACKING=1 uninstall clean packing
+
+fastpacking:
+	$(QUIET)$(MAKE) IN_PACKING=1 packing
+
+else
+
+#
+# Real packing rules
+#
+INSTALLS	+= Lucide_wpi_1 Lucide_wpi_2 Lucide_wpi_3 Lucide_wpi_4 Lucide_zip
+PACKING		+= $(LUCIDE_WPI) $(LUCIDE_ZIP)
+
+Lucide_wpi_1_INST		 = $(notdir $(PATH_PACKING))/wpi/1
+Lucide_wpi_1_SOURCES	:= \
+	$(filter-out %/ludjvu.dll \
+				 %/lujpeg.dll \
+				 %/lupplr.dll,$(wildcard $(PATH_BIN)/*))
+
+Lucide_wpi_2_INST		 = $(notdir $(PATH_PACKING))/wpi/2
+Lucide_wpi_2_SOURCES	:= $(PATH_BIN)/ludjvu.dll
+
+Lucide_wpi_3_INST		 = $(notdir $(PATH_PACKING))/wpi/3
+Lucide_wpi_3_SOURCES	:= $(PATH_BIN)/lujpeg.dll
+
+Lucide_wpi_4_INST		 = $(notdir $(PATH_PACKING))/wpi/4
+Lucide_wpi_4_SOURCES	:= $(PATH_BIN)/lupplr.dll
+
+$(LUCIDE_WPI): all
+	$(call MSG_L1,Packing $@)
+	-$(QUIET)$(RM) -f $@
+	$(QUIET)echo > $(abspathex $(Lucide_wpi_1_INST),$(PATH_OUT))/lucide.fcf
+	$(QUIET)wic -a $@ \
+		$(foreach p,$(patsubst Lucide_wpi_%,%,$(filter Lucide_wpi_%,$(INSTALLS))),\
+			$(p) -c$(abspathex $(Lucide_wpi_$(p)_INST),$(PATH_OUT)) \*) \
+		-s warpin/lucide_wpi.wis
+
+Lucide_zip_INST		 = $(notdir $(PATH_PACKING))/zip
+Lucide_zip_SOURCES	:= $(filter-out %/lucide.fcf,$(wildcard $(PATH_BIN)/*))
+
+$(LUCIDE_ZIP): all
+	$(call MSG_L1,Packing $@)
+	-$(QUIET)$(RM) -f $@
+	$(QUIET)$(REDIRECT) -C $(PATH_PACKING)/zip -- zip -Sr9 $@ \*
+
+endif
+
 include $(FILE_KBUILD_SUB_FOOTER)
 
