@@ -36,7 +36,7 @@ ifeq ($(IN_PACKING),)
 PACKING		 = do_packing
 
 do_packing:
-	$(QUIET)$(MAKE) IN_PACKING=1 uninstall clean packing
+	$(QUIET)$(MAKE) IN_PACKING=1 rebuild packing
 
 fastpacking:
 	$(QUIET)$(MAKE) IN_PACKING=1 packing
