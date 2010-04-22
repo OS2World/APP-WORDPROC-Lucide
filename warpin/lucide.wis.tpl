@@ -169,7 +169,7 @@ Select "Cancel" to abort installation.
 </TEXT>
 
 <README FORMAT=HTML>
-<B>Lucide for eComStation</B>
+<B>Lucide for eComStation, version ${VERSION} ${BUILD}</B>
 <P>
 Lucide is a plugin based document viewer for eComStation. In its first incarnation
 it supports PDF, DjVu and JPEG files but new document types can easily be added to it.

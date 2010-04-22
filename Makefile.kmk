@@ -45,6 +45,9 @@ fastpacking:
 	$(RM) -fR $(PATH_PACKING)
 	$(QUIET)$(MAKE) IN_PACKING=1 uninstall packing
 
+fastestpacking:
+	$(QUIET)$(MAKE) IN_PACKING=1 packing
+
 else
 
 #
@@ -86,6 +89,8 @@ $(LUCIDE_WPI): $(LUCIDE_WIS) install
 $(LUCIDE_WIS): warpin/lucide.wis.tpl Config.kmk | $$(call DIRDEP,$$(@D))
 	$(call MSG_L1,Generating $@)
 	$(QUIET)$(SED) \
+		-e "s;\\\$${VERSION};$(VERSION);g" \
+		-e "s;\\\$${BUILD};$(BUILD);g" \
 		-e "s;\\\$${WPIVERSION};$(subst .,\\\,$(VERSION));g" \
 		-e "s;\\\$${WPIBUILD};$(WPIBUILD);g" \
 		--output $@ $<
