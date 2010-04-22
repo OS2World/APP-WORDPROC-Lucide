@@ -23,7 +23,7 @@ PATH_PACKING	 = $(PATH_OUT)/packing
 LUCIDE_WPI	 = $(PATH_OUT)/Lucide-$(subst $(SP),_,$(subst .,_,$(VERSION))).wpi
 LUCIDE_ZIP	 = $(PATH_OUT)/Lucide-$(subst $(SP),_,$(subst .,_,$(VERSION))).zip
 
-OTHER_CLEAN	+= $(LUCIDE_WPI) $(LUCIDE_ZIP)
+OTHER_CLEAN	+= $(LUCIDE_WPI) $(LUCIDE_ZIP) warpin/lucide_wpi.wis
 
 ifeq ($(IN_PACKING),)
 
@@ -78,6 +78,12 @@ $(LUCIDE_WPI): install warpin/lucide_wpi.wis
 		$(foreach p,$(patsubst Lucide_wpi_%,%,$(filter Lucide_wpi_%,$(INSTALLS))),\
 			$(p) -c$(abspathex $(Lucide_wpi_$(p)_INST),$(PATH_OUT)) \*) \
 		-s warpin/lucide_wpi.wis
+
+warpin/lucide_wpi.wis: config.kmk warpin/lucide_wpi.wi_
+	@echo Writing wis script
+	$(SED) "s;_WPIVERSION_;$(subst .,\\\,$(WPIVERSION));g" warpin/lucide_wpi.wi_ \
+		| $(SED) "s;_WPIBUILD_;$(WPIBUILD);g" \
+		> warpin/lucide_wpi.wis
 
 #
 # ZIP (puts all WPI packages together)

@@ -8,13 +8,13 @@
 
 #
 # Lucide version string
-#
-# NOTE: If you change this, do not forget to update the version path in
-#       warpin/lucide_wpi.wis accordingly!
-#
-# @todo Automate version syhchronization in .wis using e.g. sed.
+# see README.DEV for the versioning scheme
 #
 VERSION		= 1.32 beta
+#
+# Lucide WPI version strings
+WPIVERSION	= 1.3.2
+WPIBUILD	= 0
 
 #
 # Lucide version date
