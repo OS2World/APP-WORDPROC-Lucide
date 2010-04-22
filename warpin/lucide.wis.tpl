@@ -121,6 +121,8 @@ Return WirexxGetEnv('plug_jpeg')
      CREATEOBJECT='REPLACE WPProgram|=("change")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      WRITEPROFILE="USER\Lucide\Path|$(1)"
      CLEARPROFILE="USER\Lucide\Path"
+     REQUIRES="netlabs.org\kLIBC\LIBC 0.6 Runtime\0\6\3"
+     REQUIRES="netlabs.org\GCC4\Runtime\4\4\2\20091204"
      SELECT
      >=("title").</PCK>
 
