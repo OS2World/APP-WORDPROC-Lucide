@@ -17,13 +17,17 @@ include $(PATH_SUB_CURRENT)/Lucide/Makefile.kmk
 # WarpIn & Zip distribution
 #
 
-PATH_OUT		?= . # be on the safe side (we do rmdir -fR of PATH_PACKING)
-PATH_PACKING	 = $(PATH_OUT)/packing
+PATH_OUT	?= . # be on the safe side (we do rmdir -fR of PATH_PACKING)
+PATH_PACKING = $(PATH_OUT)/packing
 
-LUCIDE_WPI	 = $(PATH_OUT)/Lucide-$(subst $(SP),_,$(subst .,_,$(VERSION)))_$(BUILD).wpi
-LUCIDE_ZIP	 = $(PATH_OUT)/Lucide-$(subst $(SP),_,$(subst .,_,$(VERSION)))_$(BUILD).zip
+FILE_VERSION = $(subst $(SP),_,$(subst .,_,$(VERSION)$(if $(BUILD),_$(BUILD))))
 
-OTHER_CLEAN	+= $(LUCIDE_WPI) $(LUCIDE_ZIP) warpin/lucide_wpi.wis
+LUCIDE_WPI	 = $(PATH_OUT)/Lucide-$(FILE_VERSION).wpi
+LUCIDE_ZIP	 = $(PATH_OUT)/Lucide-$(FILE_VERSION).zip
+
+LUCIDE_WIS	 = $(PATH_PACKING)/wpi/lucide.wis
+
+OTHER_CLEAN	+= $(LUCIDE_WPI) $(LUCIDE_ZIP) $(LUCIDE_WIS)
 
 ifeq ($(IN_PACKING),)
 
@@ -70,20 +74,23 @@ Lucide_wpi_3_SOURCES	 = $(TARGET_ludjvu)
 Lucide_wpi_4_INST		 = $(notdir $(PATH_PACKING))/wpi/4
 Lucide_wpi_4_SOURCES	 = $(TARGET_lujpeg)
 
-$(LUCIDE_WPI): install warpin/lucide_wpi.wis
+$(LUCIDE_WPI): $(LUCIDE_WIS) install
 	$(call MSG_L1,Packing $@)
 	-$(QUIET)$(RM) -f $@
 	$(QUIET)echo > $(abspathex $(Lucide_wpi_1_INST),$(PATH_OUT))/lucide.fcf
 	$(QUIET)wic -a $@ \
 		$(foreach p,$(patsubst Lucide_wpi_%,%,$(filter Lucide_wpi_%,$(INSTALLS))),\
 			$(p) -c$(abspathex $(Lucide_wpi_$(p)_INST),$(PATH_OUT)) \*) \
-		-s warpin/lucide_wpi.wis
+		-s $(LUCIDE_WIS)
 
-warpin/lucide_wpi.wis: config.kmk warpin/lucide_wpi.wi_
-	@echo Writing wis script
-	$(SED) "s;_WPIVERSION_;$(subst .,\\\,$(VERSION));g" warpin/lucide_wpi.wi_ \
-		| $(SED) "s;_WPIBUILD_;$(WPIBUILD);g" \
-		> warpin/lucide_wpi.wis
+$(LUCIDE_WIS): warpin/lucide.wis.tpl Config.kmk | $$(call DIRDEP,$$(@D))
+	$(call MSG_L1,Generating $@)
+	$(QUIET)$(SED) \
+		-e "s;\\\$${WPIVERSION};$(subst .,\\\,$(VERSION));g" \
+		-e "s;\\\$${WPIBUILD};$(WPIBUILD);g" \
+		--output $@ $<
+
+BLDDIRS	+= $(dir $(LUCIDE_WIS))
 
 #
 # ZIP (puts all WPI packages together)

@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <string>
 
 #include "globals.h"
 #include "luutils.h"
@@ -114,15 +115,15 @@ static MRESULT EXPENTRY AboutProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 
                 localizeDialog( hwnd );
                 centerWindow( hWndFrame, hwnd );
 
-                char buf[ 256 ];
-                if (strlen(appDate) >=1)
-                {
-                        snprintf( buf, sizeof buf, "%s %s %s (%s)", appName, appVersion, appBuild, appDate );
-                } else
-                {
-                        snprintf( buf, sizeof buf, "%s %s %s", appName, appVersion, appBuild );
+                std::string ver = appName;
+                (ver += ' ') += appVersion;
+                if ( strlen( appBuild ) > 0 ) {
+                    (ver += ' ') += appBuild;
                 }
-                WinSetDlgItemText( hwnd, IDT_LUCIDEVERSION, buf );
+                if ( strlen( appDate ) > 0 ) {
+                    ((ver += " (") += appDate) += ')';
+                }
+                WinSetDlgItemText( hwnd, IDT_LUCIDEVERSION, ver.c_str() );
 
                 HPOINTER p = WinLoadPointer( HWND_DESKTOP, _hmod, IDP_HAND );
                 setLinkPointer( p );

@@ -1,10 +1,9 @@
-1.32:
-  - Fixed mismatch between the package names and actual plugins they contain.
+1.3.2:
+  - WPI: Fixed mismatch between the package names and actual plugins they contain.
   - WPI: Fixed the version number.
   - WPI: Skip the WPS object creation dialog to avoid a possible WPS association
     inconsistency (closed ticket 128).
-  - Renamed version from the x.yz to the x.y.z scheme
-  - Added a BUILD string to the About Dialoge
+  - Changed the versioning scheme from X.YZ to X.Y.Z.
 
 
 1.31:

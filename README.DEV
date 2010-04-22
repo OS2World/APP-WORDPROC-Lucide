@@ -80,21 +80,14 @@ sure everything is rebuilt from scratch. For testing purposes, you may omit
 the cleanup pass by invoking the "kmk fastpacking" which will only generate
 the distribution archives from the existing build.
 
-IMPORTANT:
+IMPORTANT (for the release builder):
 
-    Do not forget to update VERSION, BUILD, VERSIONDATE and WPIBUILD in Config.kmk.
-    The warpin/lucide_wpi.wis script gets created from the warpin/lucide_wpi.wi_ within
-    the packing process. Don't forget to set the new VERSION... strings in config.kmk
-    immediately after the release (after tagging the SVN trunk with the release
-    tag) with assigning the beta state (see below).
-
-    The version assignment scheme is as follows:
-
-    * VERSION is set to "X.Y.Z" and BUILD "beta" for the development phase and to "X.Y.Z"
-      and BUILD "GA" for releases.
-
-    * The WarpIn version path is set to to X\Y\Z\0 for the development phase
-      and to X\Y\Z\1 for releases.
+    Do not forget to update VERSION, BUILD/WPIBUILD and VERSIONDATE in
+    Config.kmk. Note that you should immediately increase the version number
+    in SVN after the release (after tagging the SVN trunk with the release tag)
+    and set BUILD to "beta" to indicate a new development phase. Right before
+    the release, you end the development phase by changing BUILD from "beta"
+    to "GA" and create a corresponding release tag in SVN.
 
 
 
