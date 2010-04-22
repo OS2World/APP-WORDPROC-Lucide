@@ -3,6 +3,7 @@
   - WPI: Fixed the version number.
   - WPI: Skip the WPS object creation dialog to avoid a possible WPS association
     inconsistency (closed ticket 128).
+  - WPI: Added dependency on "LIBC 0.6 Runtime" and "GCC4 Runtime" WPI packages.
   - Changed the versioning scheme from X.YZ to X.Y.Z.
 
 
