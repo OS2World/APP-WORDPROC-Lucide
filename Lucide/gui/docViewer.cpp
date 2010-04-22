@@ -2324,7 +2324,7 @@ BOOL DocumentViewer::wmChar( HWND hwnd, MPARAM mp1, MPARAM mp2 )
                     }
                     return TRUE;
                 }
-                return FALSE;
+                break;
 
             case VK_HOME:
                 if ( !( fsflags & (KC_CTRL | KC_SHIFT | KC_ALT) ) )
