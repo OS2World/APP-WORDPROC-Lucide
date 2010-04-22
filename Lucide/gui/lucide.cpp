@@ -81,6 +81,7 @@ typedef _find find_t;
 
 const char *appName    = "Lucide";
 const char *appVersion = VERSION;
+const char *appBuild    = BUILD;
 const char *appDate = VERSIONDATE;
 const char *prfFwp     = "FrameWindowPos";
 const char *prfLvd     = "LastViewedDir";

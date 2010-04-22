@@ -3,6 +3,8 @@
   - WPI: Fixed the version number.
   - WPI: Skip the WPS object creation dialog to avoid a possible WPS association
     inconsistency (closed ticket 128).
+  - Renamed version from the x.yz to the x.y.z scheme
+  - Added a BUILD string to the About Dialoge
 
 
 1.31:

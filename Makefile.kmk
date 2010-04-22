@@ -20,8 +20,8 @@ include $(PATH_SUB_CURRENT)/Lucide/Makefile.kmk
 PATH_OUT		?= . # be on the safe side (we do rmdir -fR of PATH_PACKING)
 PATH_PACKING	 = $(PATH_OUT)/packing
 
-LUCIDE_WPI	 = $(PATH_OUT)/Lucide-$(subst $(SP),_,$(subst .,_,$(VERSION))).wpi
-LUCIDE_ZIP	 = $(PATH_OUT)/Lucide-$(subst $(SP),_,$(subst .,_,$(VERSION))).zip
+LUCIDE_WPI	 = $(PATH_OUT)/Lucide-$(subst $(SP),_,$(subst .,_,$(VERSION)))_$(BUILD).wpi
+LUCIDE_ZIP	 = $(PATH_OUT)/Lucide-$(subst $(SP),_,$(subst .,_,$(VERSION)))_$(BUILD).zip
 
 OTHER_CLEAN	+= $(LUCIDE_WPI) $(LUCIDE_ZIP) warpin/lucide_wpi.wis
 
@@ -81,7 +81,7 @@ $(LUCIDE_WPI): install warpin/lucide_wpi.wis
 
 warpin/lucide_wpi.wis: config.kmk warpin/lucide_wpi.wi_
 	@echo Writing wis script
-	$(SED) "s;_WPIVERSION_;$(subst .,\\\,$(WPIVERSION));g" warpin/lucide_wpi.wi_ \
+	$(SED) "s;_WPIVERSION_;$(subst .,\\\,$(VERSION));g" warpin/lucide_wpi.wi_ \
 		| $(SED) "s;_WPIBUILD_;$(WPIBUILD);g" \
 		> warpin/lucide_wpi.wis
 

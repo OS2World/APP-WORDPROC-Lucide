@@ -82,15 +82,16 @@ the distribution archives from the existing build.
 
 IMPORTANT:
 
-    Do not forget to update VERSION and VERSIONDATE in Config.kmk and the
-    version path in warpin/lucide_wpi.wis before the release and increase it
+    Do not forget to update VERSION, BUILD, VERSIONDATE and WPIBUILD in Config.kmk.
+    The warpin/lucide_wpi.wis script gets created from the warpin/lucide_wpi.wi_ within
+    the packing process. Don't forget to set the new VERSION... strings in config.kmk
     immediately after the release (after tagging the SVN trunk with the release
     tag) with assigning the beta state (see below).
 
     The version assignment scheme is as follows:
 
-    * VERSION is set to "X.YZ beta" for the development phase and to "X.YZ"
-      for releases.
+    * VERSION is set to "X.Y.Z" and BUILD "beta" for the development phase and to "X.Y.Z"
+      and BUILD "GA" for releases.
 
     * The WarpIn version path is set to to X\Y\Z\0 for the development phase
       and to X\Y\Z\1 for releases.

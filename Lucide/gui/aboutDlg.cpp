@@ -117,10 +117,10 @@ static MRESULT EXPENTRY AboutProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 
                 char buf[ 256 ];
                 if (strlen(appDate) >=1)
                 {
-                        snprintf( buf, sizeof buf, "%s %s (%s)", appName, appVersion, appDate );
+                        snprintf( buf, sizeof buf, "%s %s %s (%s)", appName, appVersion, appBuild, appDate );
                 } else
                 {
-                        snprintf( buf, sizeof buf, "%s %s", appName, appVersion );
+                        snprintf( buf, sizeof buf, "%s %s %s", appName, appVersion, appBuild );
                 }
                 WinSetDlgItemText( hwnd, IDT_LUCIDEVERSION, buf );
 

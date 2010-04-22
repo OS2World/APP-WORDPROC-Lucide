@@ -40,6 +40,7 @@ class Environment;
 extern const char *appName;
 extern const char *appVersion;
 extern const char *appDate;
+extern const char *appBuild;
 extern HAB hab;
 extern Environment *ev;
 extern char deffont[];
