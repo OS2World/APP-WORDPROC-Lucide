@@ -217,8 +217,11 @@ void Lucide::setOfPages( long pages )
     snprintf( pgnum, sizeof( pgnum ), pgfrm, pages );
     delete pgfrm;
     WinSetDlgItemText( hToolBar, TBID_OFPAGES, pgnum );
+
+    // if pages are 0 also set limits to 0
+    long pageLimit = (pages >= 1 ? 1:0);
     WinSendDlgItemMsg( hToolBar, TBID_PAGENUM, SPBM_SETLIMITS,
-                       MPFROMLONG( pages ), MPFROMLONG( 1 ) );
+                       MPFROMLONG( pages ), MPFROMLONG( pageLimit ) );
 }
 
 void Lucide::checkNavigationMenus()
@@ -446,6 +449,7 @@ bool Lucide::closeDocument( bool force )
 
     // clear the index
     indexWin->clear( NULL );
+
     return true;
 }
 
