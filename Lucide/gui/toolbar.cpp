@@ -73,6 +73,14 @@ static MRESULT EXPENTRY tbProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     }
                 }
 
+                if ( ( controlId == TBID_PAGENUM ) && ( notifyCode == SPBN_SETFOCUS )
+                     && !Lucide::dontSwitchPage )
+                {
+/* @todo highlight the text in the spinbutton (is that possible at all???)
+                   BOOL rc = (BOOL)WinSendDlgItemMsg( hwnd, TBID_PAGENUM, EM_SETSEL,
+                                      MPFROM2SHORT(1,10), NULL); */
+                }
+
                 if ( ( controlId == TBID_ZOOM ) && ( notifyCode == CBN_ENTER ) )
                 {
                     bool shortValueOk = false;
@@ -224,7 +232,7 @@ HWND createToolbar( HWND hwnd )
                                      0,0,0,0, hToolBar, HWND_TOP, TBID_PAGENUM, NULL, NULL );
     WinSendMsg( cs.ctrlHandle, SPBM_SETLIMITS, MPFROMLONG( 0 ), MPFROMLONG( 0 ) );
     WinSetPresParam( cs.ctrlHandle, PP_FONTNAMESIZE, deffontlen, deffont );
-    cs.cx = 50;
+    cs.cx = 75;
     cs.cy = 0;
     cs.bubbleText = NULL;
     WinSendMsg( hToolBar, TBM_ADDCONTROL, (MPARAM)&cs, MPVOID );
