@@ -53,6 +53,10 @@ class IndexWindow
 
         HWND getHWND() { return hWndPanel; }
         HWND getIndexHWND() { return hWndIndex; }
+
+        // we need this clear function also when closing a document
+        void clear( TreeRecord *parent );
+
         
         void setDocument( LuDocument *_doc );
 		bool goToPage( TreeRecord *parent, long page );
@@ -63,7 +67,9 @@ class IndexWindow
         void loadIndex();
         void loadPagesList();
 		void addNodes( TreeRecord *parent, LuIndexNode *n );
-		void clear( TreeRecord *parent );
+
+/* moved to public
+                void clear( TreeRecord *parent ); */
     
 		
         static MRESULT EXPENTRY panelProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );

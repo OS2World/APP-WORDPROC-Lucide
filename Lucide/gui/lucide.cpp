@@ -444,6 +444,8 @@ bool Lucide::closeDocument( bool force )
         thumbnailDataLen = 0;
     }
 
+    // clear the index
+    indexWin->clear( NULL );
     return true;
 }
 
@@ -834,6 +836,11 @@ void Lucide::toggleFullscreenEx( bool presentation, bool atStartup )
         BOOL active = WinQueryActiveWindow( HWND_DESKTOP ) == hWndFrame;
         WinSendMsg( hFrameTitlebar, TBM_SETHILITE,
                     MPFROMSHORT( active ), MPVOID );
+
+        // reset the fullscreen menu check
+        WinCheckMenuItem( hWndMenu, CM_FULLSCREEN, FALSE );
+        WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( CM_FULLSCREEN ), (MPARAM)FALSE );
+
     }
     else if ( fullscreenState == On )
     {
@@ -847,6 +854,10 @@ void Lucide::toggleFullscreenEx( bool presentation, bool atStartup )
             winPos.XMinimize = WinQueryWindowUShort( hWndFrame, QWS_XMINIMIZE );
             winPos.YMinimize = WinQueryWindowUShort( hWndFrame, QWS_YMINIMIZE );
         }
+
+        // set the fullscreen menu check
+        WinCheckMenuItem( hWndMenu, CM_FULLSCREEN, TRUE );
+        WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( CM_FULLSCREEN ), (MPARAM)TRUE );
 
         WinSetParent( hFrameSysmenu,  HWND_OBJECT, FALSE );
         WinSetParent( hFrameTitlebar, HWND_OBJECT, FALSE );
@@ -867,12 +878,21 @@ void Lucide::toggleFullscreenEx( bool presentation, bool atStartup )
                     MPFROMSHORT( Lucide::showIndex ? Lucide::splitterPos : 0 ), MPVOID );
         WinSendMsg( hHorizSplitter, SBM_SETFIXEDSIZE,
             MPFROMSHORT( DEFAULT_PICTSIZE + TOOLBAR_HEIGHT_ADD ), MPVOID );
+
+        // reset the presentation menu check
+        WinCheckMenuItem( hWndMenu, CM_PRESENTATION, FALSE );
+        WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( CM_PRESENTATION ), (MPARAM)FALSE );
+
     }
     else if ( presentationState == On )
     {
         WinSendMsg( hHorizSplitter, SBM_SETSPLITTERPOS, 0, MPVOID );
         WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS, 0, MPVOID );
         WinSendMsg( hVertSplitter, SBM_SETSPLITTERSIZE, 0, MPVOID );
+
+        // set the presentation menu check
+        WinCheckMenuItem( hWndMenu, CM_PRESENTATION, TRUE );
+        WinSendMsg( hToolBar, TBM_SETCHECK, MPFROMSHORT( CM_PRESENTATION ), (MPARAM)TRUE );
     }
 
     if ( fullscreenState == Off )
