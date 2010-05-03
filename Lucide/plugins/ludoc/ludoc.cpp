@@ -444,11 +444,25 @@ SOM_Scope LuPixbuf*  SOMLINK getThumbnail(LuDocument *somSelf,
 }
 
 
-SOM_Scope LuDocument_LuRectSequence*  SOMLINK searchText(LuDocument *somSelf,
-                                                          Environment *ev,
-                                                         long pagenum,
-                                                         string text,
-                                                         boolean caseSensitive )
+
+/*
+ * SOM_Scope LuDocument_LuRectSequence*  SOMLINK searchText(LuDocument *somSelf,
+ *                                                           Environment *ev,
+ *                                                          long pagenum,
+ *                                                          string text,
+ *                                                          boolean caseSensitive
+ *                                                          boolean findBack)
+ */
+
+/*
+ * The prototype for searchText was replaced by the following prototype:
+ */
+SOM_Scope LuDocument_LuRectSequence*  SOMLINK searchText(LuDocument *somSelf, 
+                                                          Environment *ev, 
+                                                         long pagenum, 
+                                                         string text, 
+                                                         boolean caseSensitive, 
+                                                         boolean findBack)
 {
     // Abstract method does nothing
     return NULL;

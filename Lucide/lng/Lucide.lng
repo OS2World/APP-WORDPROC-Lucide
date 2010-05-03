@@ -147,6 +147,7 @@ DOCINFO_MOD_DATE=Modified:
 FIND_FIND=Find
 FIND_FIND_WHAT=~Find what
 FIND_MATCH_CASE=~Match case
+FIND_BACK=Find ~Backwards
 FIND_OK=~OK
 FIND_CANCEL=~Cancel
 # other 'find'-related messages

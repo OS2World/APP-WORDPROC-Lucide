@@ -45,6 +45,7 @@ class FindDlg
         ULONG showDialog();
         char *getSearchString() { return searchString; }
         bool isCaseSensitive() { return caseSensitive; }
+        bool doFindBack() { return findBack; }
 
     private:
 
@@ -53,6 +54,7 @@ class FindDlg
         HWND hFrame;
         char *searchString;
         bool caseSensitive;
+        bool findBack;
 };
 
 class GotoDlg

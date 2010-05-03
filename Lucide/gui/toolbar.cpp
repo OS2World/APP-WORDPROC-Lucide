@@ -76,9 +76,9 @@ static MRESULT EXPENTRY tbProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                 if ( ( controlId == TBID_PAGENUM ) && ( notifyCode == SPBN_SETFOCUS )
                      && !Lucide::dontSwitchPage )
                 {
-/* @todo highlight the text in the spinbutton (is that possible at all???)
+                // @todo highlight the text in the spinbutton (should work but looks like its not)
                    BOOL rc = (BOOL)WinSendDlgItemMsg( hwnd, TBID_PAGENUM, EM_SETSEL,
-                                      MPFROM2SHORT(1,10), NULL); */
+                                      MPFROM2SHORT(0,256), NULL);
                 }
 
                 if ( ( controlId == TBID_ZOOM ) && ( notifyCode == CBN_ENTER ) )

@@ -657,7 +657,7 @@ void DocumentViewer::selectAll()
 
 // perform search in document
 void DocumentViewer::searchDocument( const char *_searchString, bool _caseSensitive,
-                                     bool _continueSearch )
+                                     bool _continueSearch, bool _findBack )
 {
     abortSearch = false;
     if ( !continueSearch ) {
@@ -668,6 +668,7 @@ void DocumentViewer::searchDocument( const char *_searchString, bool _caseSensit
     searchString = newstrdup( _searchString );
     caseSensitive = _caseSensitive;
     continueSearch = _continueSearch;
+    findBack = _findBack;
 
     progressDlg->setBreakFunc( searchabort, this );
     progressDlg->setText( "" );
@@ -690,12 +691,18 @@ void DocumentViewer::searchthread( void *p )
     HMQ thmq = WinCreateMsgQueue( thab, 0 );
 
     long i = _this->currentpage;
+if (!_this->findBack) {
     if ( _this->continueSearch && ( _this->currentpage < ( _this->totalpages - 1 ) ) ) {
         i = _this->currentpage + 1;
     }
+} else {
+    if ( _this->continueSearch && ( _this->currentpage >= 1 ) ) {
+        i = _this->currentpage - 1;
+    }
+}
 
     bool found = false;
-    for ( ; i < _this->totalpages; i++ )
+    for ( ; _this->findBack ? i >=0 : i < _this->totalpages; _this->findBack ? i-- : i++ )
     {
         char *fmt = newstrdupL( FIND_SEARCH_PAGE_OF );
         char *buf = new char[ 255 ];
@@ -705,7 +712,7 @@ void DocumentViewer::searchthread( void *p )
         delete buf;
 
         _this->foundrects[ i ] = _this->doc->searchText( ev, i,
-                                        (char *)_this->searchString, _this->caseSensitive );
+                                        (char *)_this->searchString, _this->caseSensitive, _this->findBack );
         if ( _this->foundrects[ i ] != NULL )
         {
             found = true;

@@ -132,6 +132,7 @@
 #define IDD_FIND            1003
 #define IDC_FINDFIELD       10
 #define IDC_FINDMATCHCASE   11
+#define IDC_FINDBACK 12
 
 #define IDD_PROGRESS        1004
 #define IDC_PTEXT           10

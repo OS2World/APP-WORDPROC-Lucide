@@ -1418,7 +1418,7 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                         if ( strlen( findDlg->getSearchString() ) > 0 )
                         {
                             docViewer->searchDocument( findDlg->getSearchString(),
-                                            findDlg->isCaseSensitive(), false );
+                                            findDlg->isCaseSensitive(), false, findDlg->doFindBack() );
 
                             WinEnableMenuItem( hWndMenu, CM_FINDAGAIN, TRUE );
                             WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FINDAGAIN), (MPARAM)TRUE );
@@ -1428,7 +1428,7 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
                 case CM_FINDAGAIN:
                     docViewer->searchDocument( findDlg->getSearchString(),
-                                               findDlg->isCaseSensitive(), true );
+                                               findDlg->isCaseSensitive(), true, findDlg->doFindBack() );
                     return (MRESULT)FALSE;
 
                 case CM_SETTINGS:

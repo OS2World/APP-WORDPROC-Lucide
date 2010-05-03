@@ -98,7 +98,7 @@ class DocumentViewer
         void unhideMouse();
         void copyToClipbrd();
         void searchDocument( const char *_searchString, bool _caseSensitive,
-                             bool _continueSearch );
+                             bool _continueSearch, bool _findBack );
         void setPresentation( bool _presentation );
         void zoomInOut( bool zoomIn );
         void resetModifiedState();
@@ -243,6 +243,7 @@ class DocumentViewer
         char *searchString;
         bool caseSensitive;
         bool continueSearch;
+        bool findBack;
         bool abortSearch;
 
         // pointers

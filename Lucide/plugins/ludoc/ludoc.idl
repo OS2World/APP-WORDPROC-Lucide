@@ -523,7 +523,7 @@ interface LuDocument : SOMObject
      *
      * Note: SOMMalloc() must be used for all memory allocations.
      **/
-    LuRectSequence *searchText( in long pagenum, in string text, in boolean caseSensitive );
+    LuRectSequence *searchText( in long pagenum, in string text, in boolean caseSensitive, in boolean findBack );
 
 
     /**

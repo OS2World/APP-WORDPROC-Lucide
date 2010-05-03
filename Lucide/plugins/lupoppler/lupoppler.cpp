@@ -1332,7 +1332,8 @@ SOM_Scope LuDocument_LuRectSequence*  SOMLINK searchText(LuPopplerDocument *somS
                                                           Environment *ev,
                                                          long pagenum,
                                                          string text,
-                                                         boolean caseSensitive)
+                                                         boolean caseSensitive,
+                                                         boolean findBack)
 {
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
     PopplerDocument *document = (PopplerDocument *)somThis->data;

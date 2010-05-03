@@ -147,6 +147,7 @@ DOCINFO_MOD_DATE=GeÑndert am:
 FIND_FIND=Suchen
 FIND_FIND_WHAT=~Suchbegriff
 FIND_MATCH_CASE=~Gro·-/Kleinschreibung beachten
+FIND_BACK=~RÅckwÑrts suchen
 FIND_OK=~OK
 FIND_CANCEL=~Abbruch
 # other 'find'-related messages

@@ -49,6 +49,7 @@ FindDlg::FindDlg( HWND hWndFrame )
     hFrame        = hWndFrame;
     searchString  = newstrdup( "" );
     caseSensitive = false;
+    findBack = false;
 }
 
 FindDlg::~FindDlg()
@@ -90,6 +91,8 @@ MRESULT EXPENTRY FindDlg::findDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
             WinSetDlgItemText( hwnd, IDC_FINDFIELD, _this->searchString );
             WinSendDlgItemMsg( hwnd, IDC_FINDFIELD, EM_SETSEL, MPFROM2SHORT( 0, MAXSEARCHLENGTH ), MPVOID );
             WinCheckButton( hwnd, IDC_FINDMATCHCASE, _this->caseSensitive );
+            WinCheckButton( hwnd, IDC_FINDBACK, _this->findBack );
+
 
             return (MRESULT)FALSE;
         }
@@ -104,6 +107,7 @@ MRESULT EXPENTRY FindDlg::findDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
                         delete _this->searchString;
                         _this->searchString = newstrdup( buf );
                         _this->caseSensitive = WinQueryButtonCheckstate( hwnd, IDC_FINDMATCHCASE );
+                        _this->findBack = WinQueryButtonCheckstate( hwnd, IDC_FINDBACK );
                         WinDismissDlg( hwnd, DID_OK );
                     }
                     return (MRESULT)FALSE;
@@ -174,6 +178,12 @@ MRESULT EXPENTRY GotoDlg::gotoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
             WinSetDlgItemText( hwnd, IDC_PAGES, pgnum );
             return (MRESULT)FALSE;
         }
+
+        case WM_CONTROL:
+        // @todo highlight the text in the spinbutton (should work but looks like its not)
+        WinSendDlgItemMsg( hwnd, IDC_PAGE, EM_SETSEL,
+                                      MPFROM2SHORT(0, 256), NULL);
+        return (MRESULT)FALSE;
 
         case WM_COMMAND:
             switch (SHORT1FROMMP(mp1))
