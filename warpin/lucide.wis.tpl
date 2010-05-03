@@ -51,6 +51,16 @@ Select
   _plug_djvu = 'Lucide DjVu plugin'
   _plug_jpeg = 'Lucide JPEG plugin'
  End
+ When _id = 'ES' Then Do
+  _title = 'Lucide - Visor de documentos'
+  _folder = 'Lucide para eCS'
+  _prog = 'Lucide'
+  _readme = 'L‚eme de Lucide'
+  _change = 'Lucide Change Log'
+  _plug_pdf = 'Plugin PDF para Lucide'
+  _plug_djvu = 'Plugin DjVu para Lucide'
+  _plug_jpeg = 'Plugin JPEG para Lucide'
+ End
  When _id = 'SV' Then Do
   _title = 'Lucide - Dokumentvisare'
   _folder = 'Lucide for eCS'
@@ -174,9 +184,6 @@ Select "Cancel" to abort installation.
 Lucide is a plugin based document viewer for eComStation. In its first incarnation
 it supports PDF, DjVu and JPEG files but new document types can easily be added to it.
 <P>
-Lucide itself is currently released as binary-only, the plugin sourcecode is available
-so developers can use this as a base for more plugins. The binary is not available
-at netlabs.org, you need an eComStation account to get it.
 <P>
 <BR>
 Features:
