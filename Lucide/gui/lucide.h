@@ -106,6 +106,7 @@ class Lucide
         static void checkMenus( bool initial );
         static void checkNavpane();
         static void goToPage( long page );
+        static long pageCount();
         static void setZoom( double zoom );
         static void toggleZoom();
         static void enableCopy( bool enable );

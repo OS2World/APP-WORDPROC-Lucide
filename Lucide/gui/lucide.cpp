@@ -212,16 +212,17 @@ void Lucide::enableCopy( bool enable )
 
 void Lucide::setOfPages( long pages )
 {
-    char *pgfrm = newstrdupL( TB_PAGENUM );
     char pgnum[ 32 ];
+
+    // set current page
+    snprintf(pgnum, sizeof(pgnum), "%i", pages >0 ? 1:0);
+    WinSetDlgItemText(hToolBar, TBID_PAGENUM, pgnum);
+
+    // set of pages
+    char *pgfrm = newstrdupL( TB_PAGENUM );
     snprintf( pgnum, sizeof( pgnum ), pgfrm, pages );
     delete pgfrm;
     WinSetDlgItemText( hToolBar, TBID_OFPAGES, pgnum );
-
-    // if pages are 0 also set limits to 0
-    long pageLimit = (pages >= 1 ? 1:0);
-    WinSendDlgItemMsg( hToolBar, TBID_PAGENUM, SPBM_SETLIMITS,
-                       MPFROMLONG( pages ), MPFROMLONG( pageLimit ) );
 }
 
 void Lucide::checkNavigationMenus()
@@ -240,8 +241,9 @@ void Lucide::checkNavigationMenus()
 
     bool tmp = dontSwitchPage;
     dontSwitchPage = true;
-    WinSendDlgItemMsg( hToolBar, TBID_PAGENUM, SPBM_SETCURRENTVALUE,
-                       MPFROMLONG( docViewer->getCurrentPage() + 1 ), MPVOID );
+    char pgnum[32];
+    snprintf(pgnum, sizeof(pgnum), "%i", docViewer->getCurrentPage() + 1);
+    WinSetDlgItemText(hToolBar, TBID_PAGENUM, pgnum);
     dontSwitchPage = tmp;
     indexWin->goToPage( NULL, docViewer->getCurrentPage() );
 }
@@ -396,6 +398,15 @@ void Lucide::goToPage( long page )
 {
     if ( docViewer != NULL ) {
         docViewer->goToPage( page );
+    }
+}
+
+long Lucide::pageCount( void )
+{
+    if ( doc != NULL ) {
+        return doc->getPageCount( ev );
+    } else {
+        return 0;
     }
 }
 

@@ -60,25 +60,29 @@ static MRESULT EXPENTRY tbProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                 SHORT controlId = SHORT1FROMMP( mp1 );
                 SHORT notifyCode = SHORT2FROMMP( mp1 );
 
-                if ( ( controlId == TBID_PAGENUM ) && ( notifyCode == SPBN_CHANGE )
+                if ( ( controlId == TBID_PAGENUM ) && ( notifyCode == EN_CHANGE )
                      && !Lucide::dontSwitchPage )
                 {
-                    LONG spbmValue = 0;
-                    BOOL rc = (BOOL)WinSendDlgItemMsg( hwnd, TBID_PAGENUM, SPBM_QUERYVALUE,
-                                       MPFROMP( &spbmValue ),
-                                       MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                        char szText[256];
+                        LONG newPage = 0;
+                        ULONG retLen = 0;
+                        retLen = WinQueryDlgItemText( hwnd, TBID_PAGENUM, sizeof(szText),
+                                            szText );
 
-                    if ( rc && ( spbmValue > 0 ) ) {
-                        Lucide::goToPage( spbmValue - 1 );
-                    }
+                        if ( retLen > 0) {
+                                newPage = atol(szText);
+                                if (newPage > 0 && newPage <= Lucide::pageCount()) {
+                                    Lucide::goToPage(newPage - 1);
+                                }
+                        }
                 }
 
-                if ( ( controlId == TBID_PAGENUM ) && ( notifyCode == SPBN_SETFOCUS )
+                if ( ( controlId == TBID_PAGENUM ) && ( notifyCode == EN_SETFOCUS )
                      && !Lucide::dontSwitchPage )
                 {
-                // @todo highlight the text in the spinbutton (should work but looks like its not)
-                   BOOL rc = (BOOL)WinSendDlgItemMsg( hwnd, TBID_PAGENUM, EM_SETSEL,
-                                      MPFROM2SHORT(0,256), NULL);
+                // highlight the text
+                WinSendDlgItemMsg( hwnd, TBID_PAGENUM, EM_SETSEL,
+                                      MPFROM2SHORT(0, 256), NULL);
                 }
 
                 if ( ( controlId == TBID_ZOOM ) && ( notifyCode == CBN_ENTER ) )
@@ -225,14 +229,13 @@ HWND createToolbar( HWND hwnd )
     bs.enabled = TRUE;
     WinSendMsg( hToolBar, TBM_ADDBUTTON, (MPARAM)&bs, MPVOID );
 
-    // pages spin
+    // pages text
     AddCtrlStruct cs;
-    cs.ctrlHandle = WinCreateWindow( hToolBar, WC_SPINBUTTON, NULL,
-                                     WS_VISIBLE|SPBS_MASTER|SPBS_NUMERICONLY|SPBS_JUSTCENTER,
+    cs.ctrlHandle = WinCreateWindow( hToolBar, WC_ENTRYFIELD, NULL,
+                                     WS_VISIBLE|ES_CENTER|ES_MARGIN|ES_AUTOSCROLL,
                                      0,0,0,0, hToolBar, HWND_TOP, TBID_PAGENUM, NULL, NULL );
-    WinSendMsg( cs.ctrlHandle, SPBM_SETLIMITS, MPFROMLONG( 0 ), MPFROMLONG( 0 ) );
     WinSetPresParam( cs.ctrlHandle, PP_FONTNAMESIZE, deffontlen, deffont );
-    cs.cx = 75;
+    cs.cx = 50;
     cs.cy = 0;
     cs.bubbleText = NULL;
     WinSendMsg( hToolBar, TBM_ADDCONTROL, (MPARAM)&cs, MPVOID );

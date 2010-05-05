@@ -167,36 +167,41 @@ MRESULT EXPENTRY GotoDlg::gotoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
             localizeDialog( hwnd );
             centerWindow( _this->hFrame, hwnd );
 
-            WinSendDlgItemMsg( hwnd, IDC_PAGE, SPBM_SETLIMITS,
-                               MPFROMLONG( _this->pages ), MPFROMLONG( 1 ) );
-            WinSendDlgItemMsg( hwnd, IDC_PAGE, SPBM_SETCURRENTVALUE,
-                               MPFROMLONG( _this->curpage ), MPVOID );
-            char *pgfrm = newstrdupL( GTP_OF );
             char pgnum[ 32 ];
+
+            // set current page
+            snprintf(pgnum, sizeof(pgnum), "%d", _this->curpage);
+            WinSetDlgItemText(hwnd, IDC_PAGE, pgnum);
+
+            // set of pages
+            char *pgfrm = newstrdupL( GTP_OF );
             snprintf( pgnum, sizeof( pgnum ), pgfrm, _this->pages );
             delete pgfrm;
             WinSetDlgItemText( hwnd, IDC_PAGES, pgnum );
+
+            // highlight the text
+            WinSendDlgItemMsg( hwnd, IDC_PAGE, EM_SETSEL,
+                                      MPFROM2SHORT(0, 256), NULL);
+
             return (MRESULT)FALSE;
         }
-
-        case WM_CONTROL:
-        // @todo highlight the text in the spinbutton (should work but looks like its not)
-        WinSendDlgItemMsg( hwnd, IDC_PAGE, EM_SETSEL,
-                                      MPFROM2SHORT(0, 256), NULL);
-        return (MRESULT)FALSE;
 
         case WM_COMMAND:
             switch (SHORT1FROMMP(mp1))
             {
                 case DID_OK:
                     {
-                        LONG spbmValue = 0;
-                        BOOL rc = (BOOL)WinSendDlgItemMsg( hwnd, IDC_PAGE, SPBM_QUERYVALUE,
-                                            MPFROMP( &spbmValue ),
-                                            MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                        char szText[256];
+                        LONG newPage = 0;
+                        ULONG retLen = 0;
+                        retLen = WinQueryDlgItemText( hwnd, IDC_PAGE, sizeof(szText),
+                                            szText );
 
-                        if ( rc && ( spbmValue > 0 ) ) {
-                            _this->page = spbmValue;
+                        if ( retLen > 0) {
+                                newPage = atol(szText);
+                                if (newPage > 0 && newPage <= _this->pages) {
+                                    _this->page = newPage;
+                                }
                         }
                         WinDismissDlg( hwnd, DID_OK );
                     }
