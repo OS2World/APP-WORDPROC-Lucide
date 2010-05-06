@@ -223,6 +223,12 @@ void Lucide::setOfPages( long pages )
     snprintf( pgnum, sizeof( pgnum ), pgfrm, pages );
     delete pgfrm;
     WinSetDlgItemText( hToolBar, TBID_OFPAGES, pgnum );
+
+    // set the maximum length for current page
+    snprintf(pgnum, sizeof(pgnum), "%d", pages);
+    WinSendDlgItemMsg( hToolBar, TBID_PAGENUM, EM_SETTEXTLIMIT,
+                              MPFROMSHORT((SHORT)strlen(pgnum)), NULL);
+
 }
 
 void Lucide::checkNavigationMenus()
@@ -239,6 +245,7 @@ void Lucide::checkNavigationMenus()
     WinEnableMenuItem( hWndMenu, CM_LASTPAGE, enlast );
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_LASTPAGE), (MPARAM)enlast );
 
+    // set actual page
     bool tmp = dontSwitchPage;
     dontSwitchPage = true;
     char pgnum[32];

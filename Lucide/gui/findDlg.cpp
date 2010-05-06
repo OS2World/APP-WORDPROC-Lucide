@@ -35,6 +35,7 @@
 #include "os2all.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include "globals.h"
 #include "findDlg.h"
@@ -179,9 +180,13 @@ MRESULT EXPENTRY GotoDlg::gotoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
             delete pgfrm;
             WinSetDlgItemText( hwnd, IDC_PAGES, pgnum );
 
-            // highlight the text
+            // highlight the current page
             WinSendDlgItemMsg( hwnd, IDC_PAGE, EM_SETSEL,
                                       MPFROM2SHORT(0, 256), NULL);
+            // set the maximum length for current page
+            snprintf(pgnum, sizeof(pgnum), "%d", _this->pages);
+            WinSendDlgItemMsg( hwnd, IDC_PAGE, EM_SETTEXTLIMIT,
+                                      MPFROMSHORT((SHORT)strlen(pgnum)), NULL);
 
             return (MRESULT)FALSE;
         }
