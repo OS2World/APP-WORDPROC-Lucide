@@ -163,6 +163,10 @@ HWND createToolbar( HWND hwnd )
                                 0, NULL, NULL );
     pOldTbProc = WinSubclassWindow( hToolBar, tbProc );
 
+    // used for different purposes
+    char pgnum[ 32 ];
+    HPS hps;
+
     AddBtnStruct bs;
 
     bs.cmd = CM_OPEN;
@@ -235,8 +239,13 @@ HWND createToolbar( HWND hwnd )
                                      WS_VISIBLE|ES_CENTER|ES_MARGIN|ES_AUTOSCROLL,
                                      0,0,0,0, hToolBar, HWND_TOP, TBID_PAGENUM, NULL, NULL );
     WinSetPresParam( cs.ctrlHandle, PP_FONTNAMESIZE, deffontlen, deffont );
-    cs.cx = 50;
-    cs.cy = 0;
+    // calculate the width
+    snprintf( pgnum, sizeof( pgnum ), "%d", 99999 );
+    hps = WinGetPS( cs.ctrlHandle );
+    cs.cx = getStringPixSize( hps, pgnum ) + 4;
+    WinReleasePS( hps );
+
+    cs.cy = 2;
     cs.bubbleText = NULL;
     WinSendMsg( hToolBar, TBM_ADDCONTROL, (MPARAM)&cs, MPVOID );
 
@@ -247,11 +256,10 @@ HWND createToolbar( HWND hwnd )
     ULONG syscmenu = SYSCLR_MENU;
     WinSetPresParam( cs.ctrlHandle, PP_BACKGROUNDCOLORINDEX, sizeof( ULONG ), &syscmenu );
     char *pgfrm = newstrdupL( TB_PAGENUM );
-    char pgnum[ 32 ];
-    snprintf( pgnum, sizeof( pgnum ), pgfrm, 9999 );
+    snprintf( pgnum, sizeof( pgnum ), pgfrm, 99999 );
     delete pgfrm;
-    HPS hps = WinGetPS( cs.ctrlHandle );
-    cs.cx = getStringPixSize( hps, pgnum ) + 4;
+    hps = WinGetPS( cs.ctrlHandle );
+    cs.cx = getStringPixSize( hps, pgnum );
     WinReleasePS( hps );
     cs.cy = 0;
     cs.bubbleText = NULL;
