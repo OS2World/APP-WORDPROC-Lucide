@@ -1244,6 +1244,21 @@ void Lucide::restorePosition()
     }
 }
 
+static bool isAncestorOf( HWND hwnd1, HWND hwnd2 )
+{
+    static HWND desktop = NULLHANDLE;
+    if ( desktop == NULLHANDLE )
+        desktop = WinQueryDesktopWindow( hab, NULLHANDLE );
+
+    if ( hwnd1 == NULLHANDLE || hwnd2 == NULLHANDLE )
+        return false;
+
+    while ( hwnd2 != hwnd1 && hwnd2 != desktop )
+        hwnd2 = WinQueryWindow( hwnd2, QW_PARENT );
+
+    return hwnd2 == hwnd1;
+}
+
 static MRESULT EXPENTRY frameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
     switch ( msg )
@@ -1252,16 +1267,24 @@ static MRESULT EXPENTRY frameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 
         {
             // change the accel logic by first letting the focus window process
             // WM_CHAR and only translate it to accel if not handled (this makes
-            // sure that keyboard shortcuts in input fields work even if we
-            // defined our own accelerators from these shortcuts). Make an
-            // exception for VK_TAB since it's always eaten by the standard
-            // window procedure and therefore the accel table will never be
-            // called
+            // sure that standard keyboard shortcuts in e.g. input fields work
+            // even if we define our own accelerators from these shortcuts in
+            // the main window). Make an exception for VK_TAB since it's always
+            // eaten by the standard window procedure and therefore the accel
+            // table will never be called. Note that we do this trick only for
+            // the document window and its children: other windows such as the
+            // standard frame controls like menu etc. are known to demonstrate
+            // weird behavior (for example, the menu window seems to exit the
+            // menu mode on any WM_CHAR sent to it)
+            HWND focus = WinQueryFocus( HWND_DESKTOP );
+            if ( !isAncestorOf( docViewer->getFrameHWND(), focus ) )
+                break;
             PQMSG pqmsg = (PQMSG)mp1;
+            if ( pqmsg->msg != WM_CHAR )
+                break;
             if ( !( SHORT1FROMMP( pqmsg->mp1 ) & KC_VIRTUALKEY ) ||
                  !( SHORT2FROMMP( pqmsg->mp2 ) == VK_TAB ) )
             {
-                HWND focus = WinQueryFocus( HWND_DESKTOP );
                 if ( focus == pqmsg->hwnd && focus != hwnd ) {
                     if ( WinDispatchMsg( hab, pqmsg ) ) {
                         pqmsg->msg = WM_NULL;
