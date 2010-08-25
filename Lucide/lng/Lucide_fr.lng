@@ -76,7 +76,7 @@ TB_PAGENUM=sur %d
 #
 # Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=%APPNAME% - Afficheur de document
+MSGS_MAIN_WIN_TITLE=%APPNAME%
 MSGS_NO_SUIT_PLUG=Composant enfichable introuvable pour le document indiqu‚ !
 MSGS_FILE_LOAD_ERROR=Erreur de chargement de fichier ! 
 MSGS_LOADING_DOCUMENT=Chargement du document en cours, veuillez patienter...

@@ -112,6 +112,7 @@ extern const char *DOCINFO_CREATOR;
 extern const char *DOCINFO_PRODUCER;
 extern const char *DOCINFO_CREATION_DATE;
 extern const char *DOCINFO_MOD_DATE;
+extern const char *DOCINFO_NAME;
 
 // "Find" dialog, other 'find'-related messages
 extern const char *FIND_SEARCH_PAGE_OF;

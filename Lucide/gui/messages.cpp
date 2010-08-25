@@ -111,6 +111,7 @@ const char *DOCINFO_CREATOR       = "DOCINFO_CREATOR";
 const char *DOCINFO_PRODUCER      = "DOCINFO_PRODUCER";
 const char *DOCINFO_CREATION_DATE = "DOCINFO_CREATION_DATE";
 const char *DOCINFO_MOD_DATE      = "DOCINFO_MOD_DATE";
+const char *DOCINFO_NAME = "DOCINFO_NAME";
 
 // "Find" dialog, other 'find'-related messages
 const char *FIND_SEARCH_PAGE_OF = "FIND_SEARCH_PAGE_OF";

@@ -1425,7 +1425,7 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                 case CM_DOCINFO:
                 {
                     LuDocumentInfo *dinfo = doc->getDocumentInfo( ev );
-                    DocInfoDlg *d = new DocInfoDlg( hWndFrame, dinfo );
+                    DocInfoDlg *d = new DocInfoDlg( hWndFrame, dinfo, Lucide::docFileName );
                     d->doDialog();
                     LuDocument::freeDocumentInfo( ev, dinfo );
                     return (MRESULT)FALSE;

@@ -1,5 +1,5 @@
 #
-# Lucide language file, EN
+# Lucide language file, EN (1.3.3)
 #
 
 #
@@ -75,7 +75,7 @@ TB_PAGENUM=of %d
 #
 # Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=%APPNAME% - Document Viewer
+MSGS_MAIN_WIN_TITLE=%APPNAME%
 MSGS_NO_SUIT_PLUG=Can't find suitable plugin for specified document!
 MSGS_FILE_LOAD_ERROR=File load error!
 MSGS_LOADING_DOCUMENT=Loading document, please wait...
@@ -140,6 +140,7 @@ DOCINFO_CREATOR=Creator:
 DOCINFO_PRODUCER=Producer:
 DOCINFO_CREATION_DATE=Created:
 DOCINFO_MOD_DATE=Modified:
+DOCINFO_NAME=Documentname:
 
 #
 # "Find" dialog

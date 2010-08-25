@@ -42,7 +42,7 @@ struct LuDocumentInfo;
 class DocInfoDlg
 {
     public:
-        DocInfoDlg( HWND hWndFrame, LuDocumentInfo *_dinfo );
+        DocInfoDlg( HWND hWndFrame, LuDocumentInfo *_dinfo, const char *fname );
         virtual ~DocInfoDlg();
 
         // Once a dialog object is created, either delete it again, or
@@ -58,6 +58,7 @@ class DocInfoDlg
 
         HWND hFrame;
         LuDocumentInfo *dinfo;
+        char *filename;
 };
 
 #endif // __DOCINFODLG_H

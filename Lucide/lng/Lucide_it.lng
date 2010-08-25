@@ -75,7 +75,7 @@ TB_PAGENUM=di %d
 #
 # Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=%APPNAME% - Visualizzatore documenti
+MSGS_MAIN_WIN_TITLE=%APPNAME%
 MSGS_NO_SUIT_PLUG=Impossibile trovare un plugin adatto al tipo di documento selezionato!
 MSGS_FILE_LOAD_ERROR=Errore di apertura file!
 MSGS_LOADING_DOCUMENT=Apertura documento, attendere...

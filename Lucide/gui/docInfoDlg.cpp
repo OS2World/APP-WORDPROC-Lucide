@@ -46,10 +46,11 @@
 #include "cpconv.h"
 
 
-DocInfoDlg::DocInfoDlg( HWND hWndFrame, LuDocumentInfo *_dinfo )
+DocInfoDlg::DocInfoDlg( HWND hWndFrame, LuDocumentInfo *_dinfo, const char *fname )
 {
     hFrame   = hWndFrame;
     dinfo    = _dinfo;
+    filename    = newstrdup( fname );
 }
 
 DocInfoDlg::~DocInfoDlg()
@@ -101,6 +102,8 @@ void DocInfoDlg::loadValues( HWND cntr )
     if ( dinfo == NULL ) {
         return;
     }
+    // first add the filename
+    insertPair(cntr, DOCINFO_NAME, filename);
 
     if ( dinfo->fields_mask & LU_DOCUMENT_INFO_TITLE ) {
         insertPair( cntr, DOCINFO_TITLE, dinfo->title );

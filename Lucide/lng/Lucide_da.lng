@@ -74,7 +74,7 @@ TB_PAGENUM=af %d
 #
 # Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=%APPNAME% - Dokument Fremviser
+MSGS_MAIN_WIN_TITLE=%APPNAME%
 MSGS_NO_SUIT_PLUG=%APPNAME% underst›tter ikke denne dokument type
 MSGS_FILE_LOAD_ERROR=Fejl under indl‘sning af dokumentet!
 MSGS_LOADING_DOCUMENT=Dokumentet indl‘ses...hold p† hatten...
