@@ -643,12 +643,18 @@ static void previewFile( HWND hwnd, const char *fn )
         pd->hdc = NULLHANDLE;
     }
 
-
     ULONG ealen = 0;
     PVOID eadata = getEA( fn, "LUCIDE_THUMBNAIL", &ealen );
-
     if ( eadata != NULL )
     {
+        // as we need to deal with old and new ea style, we need to know which style
+        char *eadata2 = (char*)eadata;
+        if (*((ushort*)eadata2) == EAT_BINARY)
+        {
+             eadata2 += sizeof(long);
+             ealen -= sizeof(long);
+        }
+
         char *tmpgif = new char[ CCHMAXPATH ];
         getTmpDir( tmpgif );
         strcat( tmpgif, "LUTHUMBR.GIF" );
@@ -657,7 +663,7 @@ static void previewFile( HWND hwnd, const char *fn )
                               S_IWRITE | S_IREAD );
         if ( h != -1 )
         {
-            ULONG wrt = write( h, eadata, ealen );
+            ULONG wrt = write( h, eadata2, ealen );
             close( h );
             if ( wrt == ealen ) {
                 readGif( hwnd, tmpgif );

@@ -212,6 +212,13 @@ static BOOL set_ea( const char *file_name, const char *ea_name,
     databufp += sizeof(short);
     memcpy( databufp, ea_name, ea_name_len+1 ); // with trailing zero
     databufp += ea_name_len+1;
+
+    // set the ea type and length
+    *((short*)databufp) = EAT_BINARY;
+    databufp += sizeof(short);
+    *((short*)databufp) = (short)ea_data_len;
+    databufp += sizeof(short);
+
     memcpy( databufp, ea_data, ea_data_len ); // with trailing zero
     databufp += ea_data_len;
 
