@@ -58,5 +58,9 @@ void LuSettings::save()
     char buf[ 10 ];
     PrfWriteProfileString( HINI_USERPROFILE, appName, Layout, itoa( layout, buf, 10 ) );
     PrfWriteProfileData( HINI_USERPROFILE, appName, Zoom, &zoom, sizeof( zoom ) );
+
+    // also set the actual pagelayout to the new settings
+    Lucide::setPageLayout(layout );
+    Lucide::setZoom(zoom );
 }
 
