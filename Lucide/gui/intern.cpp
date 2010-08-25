@@ -166,7 +166,10 @@ void loadLang()
         loadLng( langDefault, lfile.buffer, true );
     }
 
-    char *lng = getenv( "LANG" );
+    char *lng = getenv("LC_ALL");
+    if ( lng == NULL ) {
+    lng = getenv( "LANG" );
+    }
     if ( lng == NULL ) {
         return;
     }
