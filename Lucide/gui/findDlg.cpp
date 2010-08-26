@@ -204,7 +204,7 @@ MRESULT EXPENTRY GotoDlg::gotoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
 
                         if ( retLen > 0) {
                                 newPage = atol(szText);
-                                if (newPage > 0 && newPage <= _this->pages) {
+                                if (newPage > 0) {
                                     _this->page = newPage;
                                 }
                         }

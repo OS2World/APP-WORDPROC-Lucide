@@ -404,6 +404,9 @@ void Lucide::checkMenus( bool initial )
 void Lucide::goToPage( long page )
 {
     if ( docViewer != NULL ) {
+       if (page > (doc->getPageCount(ev) -1)) {
+                page = doc->getPageCount(ev) -1;
+       }
         docViewer->goToPage( page );
     }
 }

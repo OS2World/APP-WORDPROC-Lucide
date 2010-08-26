@@ -71,7 +71,7 @@ static MRESULT EXPENTRY tbProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
                         if ( retLen > 0) {
                                 newPage = atol(szText);
-                                if (newPage > 0 && newPage <= Lucide::pageCount()) {
+                                if (newPage > 0) {
                                     Lucide::goToPage(newPage - 1);
                                 }
                         }
