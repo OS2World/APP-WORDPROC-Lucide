@@ -15,7 +15,7 @@
 //
 // Copyright (C) 2006 Scott Turner <scotty1024@mac.com>
 // Copyright (C) 2007, 2008 Julien Rebetez <julienr@svn.gnome.org>
-// Copyright (C) 2007-2009 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2007-2010 Carlos Garcia Campos <carlosgc@gnome.org>
 // Copyright (C) 2007, 2008 Iñigo Martínez <inigomartinez@gmail.com>
 // Copyright (C) 2008 Michael Vrable <mvrable@cs.ucsd.edu>
 // Copyright (C) 2008 Hugo Mercier <hmercier31@gmail.com>
@@ -45,6 +45,7 @@ class Form;
 class FormWidget;
 class PDFRectangle;
 class Movie;
+class LinkAction;
 class OCGs;
 class Sound;
 
@@ -290,15 +291,14 @@ public:
   AnnotColor(double gray);
   AnnotColor(double r, double g, double b);
   AnnotColor(double c, double m, double y, double k);
-  AnnotColor(Array *array);
-  ~AnnotColor();
+  AnnotColor(Array *array, int adjust = 0);
 
   AnnotColorSpace getSpace() const { return (AnnotColorSpace) length; }
-  double *getValues() const { return values; }
+  const double *getValues() const { return values; }
 
 private:
 
-  double *values;
+  double values[4];
   int length;
 };
 
@@ -514,7 +514,7 @@ public:
   AnnotSubtype getType() const { return type; }
   PDFRectangle *getRect() const { return rect; }
   GooString *getContents() const { return contents; }
-  Dict *getPageDict() const { return pageDict; }
+  int getPageNum() const { return page; }
   GooString *getName() const { return name; }
   GooString *getModified() const { return modified; }
   Guint getFlags() const { return flags; }
@@ -534,10 +534,14 @@ private:
 
 
 protected:
-  void setColor(Array *a, GBool fill, int adjust);
+  void setColor(AnnotColor *color, GBool fill);
   void drawCircle(double cx, double cy, double r, GBool fill);
   void drawCircleTopLeft(double cx, double cy, double r);
   void drawCircleBottomRight(double cx, double cy, double r);
+  void createForm(double *bbox, GBool transparencyGroup, Object *resDict, Object *aStream);
+  void createResourcesDict(char *formName, Object *formStream, char *stateName,
+			   double opacity, char *blendMode, Object *resDict);
+  GBool isVisible(GBool printing);
 
   // Updates the field key of the annotation dictionary
   // and sets M to the current time
@@ -551,7 +555,7 @@ protected:
 
   // optional data
   GooString *contents;              // Contents
-  Dict *pageDict;                   // P
+  int       page;                   // P
   GooString *name;                  // NM
   GooString *modified;              // M
   Guint flags;                      // F (must be a 32 bit unsigned int)
@@ -670,6 +674,8 @@ public:
   AnnotText(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
   ~AnnotText();
 
+  virtual void draw(Gfx *gfx, GBool printing);
+
   // getters
   GBool getOpen() const { return open; }
   GooString *getIcon() const { return icon; }
@@ -697,89 +703,20 @@ private:
 
 class AnnotMovie: public Annot {
  public:
-  enum PosterType {
-    posterTypeNone,
-    posterTypeStream,
-    posterTypeFromMovie
-  };
-
-  enum RepeatMode {
-    repeatModeOnce,
-    repeatModeOpen,
-    repeatModeRepeat,
-    repeatModePalindrome
-  };
-
-  struct Time {
-    Time() { units_per_second = 0; }
-    Gulong units;
-    int units_per_second; // 0 : defined by movie
-  };
-
   AnnotMovie(XRef *xrefA, PDFRectangle *rect, Movie *movieA, Catalog *catalog);
   AnnotMovie(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
   ~AnnotMovie();
 
+  virtual void draw(Gfx *gfx, GBool printing);
+
   GooString* getTitle() { return title; }
-  GooString* getFileName() { return fileName; }
-  int getRotationAngle() { return rotationAngle; }
-
-  PosterType getPosterType() { return posterType; }
-  Stream* getPosterStream() { return posterStream; }
-
-  Time getStart() { return start; }
-  Time getDuration() { return duration; }
-  double getRate() { return rate; }
-  double getVolume() { return volume; }
-
-  GBool getShowControls() { return showControls; }
-  RepeatMode getRepeatMode() { return repeatMode; }
-  GBool getSynchronousPlay() { return synchronousPlay; }
-
-  GBool needFloatingWindow() { return hasFloatingWindow; }
-  GBool needFullscreen() { return isFullscreen; }
-  
-  
-  void getMovieSize(int& width, int& height);
-  void getZoomFactor(int& num, int& denum);
-  void getWindowPosition(double& x, double& y) { x = FWPosX; y = FWPosY; }
-
   Movie* getMovie() { return movie; }
 
  private:
   void initialize(XRef *xrefA, Catalog *catalog, Dict *dict);
 
   GooString* title;      // T
-  GooString* fileName;   // Movie/F
-
-  int width;             // Movie/Aspect
-  int height;            // Movie/Aspect
-  int rotationAngle;     // Movie/Rotate
-
-  PosterType posterType; // Movie/Poster
-  Stream* posterStream;
-
-  Time start;            // A/Start
-  Time duration;         // A/Duration
-  double rate;           // A/Rate
-  double volume;         // A/Volume
-  
-  GBool showControls;    // A/ShowControls
-  
-  RepeatMode repeatMode; // A/Mode
-  
-  GBool synchronousPlay; // A/Synchronous
-
-  // floating window
-  GBool hasFloatingWindow; 
-  unsigned short FWScaleNum; // A/FWScale
-  unsigned short FWScaleDenum;
-  GBool isFullscreen;
-
-  double FWPosX;         // A/FWPosition
-  double FWPosY; 
-
-  Movie* movie;
+  Movie* movie;          // Movie + A
 };
 
 
@@ -797,7 +734,7 @@ class AnnotScreen: public Annot {
   GooString* getTitle() { return title; }
 
   AnnotAppearanceCharacs *getAppearCharacs() { return appearCharacs; }
-  Object* getAction() { return &action; }
+  LinkAction* getAction() { return action; }
   Object* getAdditionActions() { return &additionAction; }
 
  private:
@@ -808,7 +745,7 @@ class AnnotScreen: public Annot {
 
   AnnotAppearanceCharacs* appearCharacs; // MK
 
-  Object action;                         // A
+  LinkAction *action;                    // A
   Object additionAction;                 // AA
 };
 
@@ -926,6 +863,8 @@ public:
   AnnotLine(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
   ~AnnotLine();
 
+  virtual void draw(Gfx *gfx, GBool printing);
+
   // getters
   AnnotLineEndingStyle getStartStyle() const { return startStyle; }
   AnnotLineEndingStyle getEndStyle() const { return endStyle; }
@@ -980,6 +919,8 @@ public:
   AnnotTextMarkup(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
   virtual ~AnnotTextMarkup();
 
+  virtual void draw(Gfx *gfx, GBool printing);
+
   AnnotQuadrilaterals *getQuadrilaterals() const { return quadrilaterals; }
 
 protected:
@@ -1020,6 +961,8 @@ public:
   AnnotGeometry(XRef *xrefA, PDFRectangle *rect, AnnotSubtype subType, Catalog *catalog);
   AnnotGeometry(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
   ~AnnotGeometry();
+
+  virtual void draw(Gfx *gfx, GBool printing);
 
   // getters
   AnnotColor *getInteriorColor() const { return interiorColor; }
@@ -1146,6 +1089,8 @@ public:
   AnnotFileAttachment(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
   ~AnnotFileAttachment();
 
+  virtual void draw(Gfx *gfx, GBool printing);
+
   // getters
   Object *getFile() { return &file; }
   GooString *getName() const { return name; }
@@ -1171,6 +1116,8 @@ public:
   AnnotSound(XRef *xrefA, PDFRectangle *rect, Sound *soundA, Catalog *catalog);
   AnnotSound(XRef *xrefA, Dict *dict, Catalog *catalog, Object *obj);
   ~AnnotSound();
+
+  virtual void draw(Gfx *gfx, GBool printing);
 
   // getters
   Sound *getSound() { return sound; }

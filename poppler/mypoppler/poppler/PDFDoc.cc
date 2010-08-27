@@ -17,10 +17,12 @@
 // Copyright (C) 2005, 2007-2009 Albert Astals Cid <aacid@kde.org>
 // Copyright (C) 2008 Julien Rebetez <julienr@svn.gnome.org>
 // Copyright (C) 2008 Pino Toscano <pino@kde.org>
-// Copyright (C) 2008 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2008, 2010 Carlos Garcia Campos <carlosgc@gnome.org>
 // Copyright (C) 2009 Eric Toombs <ewtoombs@uwaterloo.ca>
 // Copyright (C) 2009 Kovid Goyal <kovid@kovidgoyal.net>
 // Copyright (C) 2009 Axel Struebing <axel.struebing@freenet.de>
+// Copyright (C) 2010 Hib Eris <hib@hiberis.nl>
+// Copyright (C) 2010 Jakub Wilk <ubanus@users.sf.net>
 //
 // To see a description of the changes please see the Changelog file that
 // came with your tarball or type make ChangeLog if you are building from git
@@ -73,15 +75,11 @@
 // PDFDoc
 //------------------------------------------------------------------------
 
-PDFDoc::PDFDoc(GooString *fileNameA, GooString *ownerPassword,
-	       GooString *userPassword, void *guiDataA) {
-  Object obj;
-
+void PDFDoc::init()
+{
   ok = gFalse;
   errCode = errNone;
-
-  guiData = guiDataA;
-
+  fileName = NULL;
   file = NULL;
   str = NULL;
   xref = NULL;
@@ -89,8 +87,21 @@ PDFDoc::PDFDoc(GooString *fileNameA, GooString *ownerPassword,
 #ifndef DISABLE_OUTLINE
   outline = NULL;
 #endif
+}
+
+PDFDoc::PDFDoc()
+{
+  init();
+}
+
+PDFDoc::PDFDoc(GooString *fileNameA, GooString *ownerPassword,
+	       GooString *userPassword, void *guiDataA) {
+  Object obj;
+
+  init();
 
   fileName = fileNameA;
+  guiData = guiDataA;
 
   // try to open file
 #ifdef VMS
@@ -120,22 +131,13 @@ PDFDoc::PDFDoc(GooString *fileNameA, GooString *ownerPassword,
 PDFDoc::PDFDoc(wchar_t *fileNameA, int fileNameLen, GooString *ownerPassword,
 	       GooString *userPassword, void *guiDataA) {
   OSVERSIONINFO version;
-  wchar_t fileName2[_MAX_PATH + 1];
+  wchar_t fileName2[MAX_PATH + 1];
   Object obj;
   int i;
 
-  ok = gFalse;
-  errCode = errNone;
+  init();
 
   guiData = guiDataA;
-
-  file = NULL;
-  str = NULL;
-  xref = NULL;
-  catalog = NULL;
-#ifndef DISABLE_OUTLINE
-  outline = NULL;
-#endif
 
   //~ file name should be stored in Unicode (?)
   fileName = new GooString();
@@ -144,7 +146,7 @@ PDFDoc::PDFDoc(wchar_t *fileNameA, int fileNameLen, GooString *ownerPassword,
   }
 
   // zero-terminate the file name string
-  for (i = 0; i < fileNameLen && i < _MAX_PATH; ++i) {
+  for (i = 0; i < fileNameLen && i < MAX_PATH; ++i) {
     fileName2[i] = fileNameA[i];
   }
   fileName2[i] = 0;
@@ -174,21 +176,15 @@ PDFDoc::PDFDoc(wchar_t *fileNameA, int fileNameLen, GooString *ownerPassword,
 
 PDFDoc::PDFDoc(BaseStream *strA, GooString *ownerPassword,
 	       GooString *userPassword, void *guiDataA) {
-  ok = gFalse;
-  errCode = errNone;
+
+  init();
   guiData = guiDataA;
   if (strA->getFileName()) {
     fileName = strA->getFileName()->copy();
   } else {
     fileName = NULL;
   }
-  file = NULL;
   str = strA;
-  xref = NULL;
-  catalog = NULL;
-#ifndef DISABLE_OUTLINE
-  outline = NULL;
-#endif
   ok = setup(ownerPassword, userPassword);
 }
 
@@ -230,11 +226,6 @@ GBool PDFDoc::setup(GooString *ownerPassword, GooString *userPassword) {
     errCode = errBadCatalog;
     return gFalse;
   }
-
-#ifndef DISABLE_OUTLINE
-  // read outline
-  outline = new Outline(catalog->getOutline(), xref);
-#endif
 
   // done
   return gTrue;
@@ -304,6 +295,7 @@ GBool PDFDoc::checkFooter() {
 void PDFDoc::checkHeader() {
   char hdrBuf[headerSearchSize+1];
   char *p;
+  char *tokptr;
   int i;
 
   pdfMajorVersion = 0;
@@ -322,7 +314,7 @@ void PDFDoc::checkHeader() {
     return;
   }
   str->moveStart(i);
-  if (!(p = strtok(&hdrBuf[i+5], " \t\n\r"))) {
+  if (!(p = strtok_r(&hdrBuf[i+5], " \t\n\r", &tokptr))) {
     error(-1, "May not be a PDF file (continuing anyway)");
     return;
   }
@@ -376,10 +368,11 @@ void PDFDoc::displayPage(OutputDev *out, int page,
   if (globalParams->getPrintCommands()) {
     printf("***** page %d *****\n", page);
   }
-  catalog->getPage(page)->display(out, hDPI, vDPI,
-				  rotate, useMediaBox, crop, printing, catalog,
-				  abortCheckCbk, abortCheckCbkData,
-				  annotDisplayDecideCbk, annotDisplayDecideCbkData);
+  if (catalog->getPage(page))
+    catalog->getPage(page)->display(out, hDPI, vDPI,
+				    rotate, useMediaBox, crop, printing, catalog,
+				    abortCheckCbk, abortCheckCbkData,
+				    annotDisplayDecideCbk, annotDisplayDecideCbkData);
 }
 
 void PDFDoc::displayPages(OutputDev *out, int firstPage, int lastPage,
@@ -406,20 +399,22 @@ void PDFDoc::displayPageSlice(OutputDev *out, int page,
 			      void *abortCheckCbkData,
                               GBool (*annotDisplayDecideCbk)(Annot *annot, void *user_data),
                               void *annotDisplayDecideCbkData) {
-  catalog->getPage(page)->displaySlice(out, hDPI, vDPI,
-				       rotate, useMediaBox, crop,
-				       sliceX, sliceY, sliceW, sliceH,
-				       printing, catalog,
-				       abortCheckCbk, abortCheckCbkData,
-				       annotDisplayDecideCbk, annotDisplayDecideCbkData);
+  if (catalog->getPage(page))
+    catalog->getPage(page)->displaySlice(out, hDPI, vDPI,
+					 rotate, useMediaBox, crop,
+					 sliceX, sliceY, sliceW, sliceH,
+					 printing, catalog,
+					 abortCheckCbk, abortCheckCbkData,
+					 annotDisplayDecideCbk, annotDisplayDecideCbkData);
 }
 
 Links *PDFDoc::getLinks(int page) {
-  return catalog->getPage(page)->getLinks(catalog);
+  return catalog->getPage(page) ? catalog->getPage(page)->getLinks(catalog) : NULL;
 }
   
 void PDFDoc::processLinks(OutputDev *out, int page) {
-  catalog->getPage(page)->processLinks(out, catalog);
+  if (catalog->getPage(page))
+    catalog->getPage(page)->processLinks(out, catalog);
 }
 
 GBool PDFDoc::isLinearized() {
@@ -549,17 +544,16 @@ void PDFDoc::saveIncrementalUpdate (OutStream* outStr)
 
   uxref = new XRef();
   uxref->add(0, 65535, 0, gFalse);
-  int objectsCount = 0; //count the number of objects in the XRef(s)
   for(int i=0; i<xref->getNumObjects(); i++) {
     if ((xref->getEntry(i)->type == xrefEntryFree) && 
         (xref->getEntry(i)->gen == 0)) //we skip the irrelevant free objects
       continue;
-    objectsCount++;
+
     if (xref->getEntry(i)->updated) { //we have an updated object
       Object obj1;
       Ref ref;
       ref.num = i;
-      ref.gen = xref->getEntry(i)->gen;
+      ref.gen = xref->getEntry(i)->type == xrefEntryCompressed ? 0 : xref->getEntry(i)->gen;
       xref->fetch(ref.num, ref.gen, &obj1);
       Guint offset = writeObject(&obj1, &ref, outStr);
       uxref->add(ref.num, ref.gen, offset, gTrue);
@@ -574,7 +568,7 @@ void PDFDoc::saveIncrementalUpdate (OutStream* outStr)
   Guint uxrefOffset = outStr->getPos();
   uxref->writeToFile(outStr, gFalse /* do not write unnecessary entries */);
 
-  writeTrailer(uxrefOffset, objectsCount, outStr, gTrue);
+  writeTrailer(uxrefOffset, xref->getSize(), outStr, gTrue);
 
   delete uxref;
 }
@@ -911,4 +905,25 @@ void PDFDoc::writeTrailer (Guint uxrefOffset, int uxrefSize, OutStream* outStr, 
   outStr->printf( "%%%%EOF\r\n");
 
   delete trailerDict;
+}
+
+#ifndef DISABLE_OUTLINE
+Outline *PDFDoc::getOutline()
+{
+  if (!outline) {
+    // read outline
+    outline = new Outline(catalog->getOutline(), xref);
+  }
+
+  return outline;
+}
+#endif
+
+PDFDoc *PDFDoc::ErrorPDFDoc(int errorCode, GooString *fileNameA)
+{
+  PDFDoc *doc = new PDFDoc();
+  doc->errCode = errorCode;
+  doc->fileName = fileNameA;
+
+  return doc;
 }

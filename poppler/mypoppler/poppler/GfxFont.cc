@@ -21,7 +21,7 @@
 // Copyright (C) 2008 Ed Avis <eda@waniasset.com>
 // Copyright (C) 2008 Hib Eris <hib@hiberis.nl>
 // Copyright (C) 2009 Peter Kerzum <kerzum@yandex-team.ru>
-// Copyright (C) 2009 David Benjamin <davidben@mit.edu>
+// Copyright (C) 2009, 2010 David Benjamin <davidben@mit.edu>
 //
 // To see a description of the changes please see the Changelog file that
 // came with your tarball or type make ChangeLog if you are building from git
@@ -837,32 +837,32 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GooString *nameA,
 	// if it wasn't in the name-to-Unicode table, check for a
 	// name that looks like 'Axx' or 'xx', where 'A' is any letter
 	// and 'xx' is two hex digits. Be strict and assume that names are
-    // consistent (i.e. either all are 'Axx' or 'xx')
+        // consistent (i.e. either all are 'Axx' or 'xx')
     if (hex) {
-      if (strlen(charName) == 3 &&
-          isalpha(charName[0]) &&
-          isxdigit(charName[1]) && isxdigit(charName[2]) &&
-          ((charName[1] >= 'a' && charName[1] <= 'f') ||
-           (charName[1] >= 'A' && charName[1] <= 'F') ||
-           (charName[2] >= 'a' && charName[2] <= 'f') ||
-           (charName[2] >= 'A' && charName[2] <= 'F'))) {
-        if (alpha == -1)
-          alpha = charName[0];
-        else if (alpha != charName[0])
-          hex = gFalse;
-      } else
-      if (strlen(charName) == 2 &&
-          isxdigit(charName[0]) && isxdigit(charName[1]) &&
-          ((charName[0] >= 'a' && charName[0] <= 'f') ||
-           (charName[0] >= 'A' && charName[0] <= 'F') ||
-           (charName[1] >= 'a' && charName[1] <= 'f') ||
-           (charName[1] >= 'A' && charName[1] <= 'F'))) {
-        if (alpha == -1)
-          alpha = 0;
-        else if (alpha != 0)
-          hex = gFalse;
-      } else {
-          hex = gFalse;
+	if (strlen(charName) == 3 &&
+	     isalpha(charName[0]) &&
+	     isxdigit(charName[1]) && isxdigit(charName[2]) &&
+	     ((charName[1] >= 'a' && charName[1] <= 'f') ||
+	      (charName[1] >= 'A' && charName[1] <= 'F') ||
+	      (charName[2] >= 'a' && charName[2] <= 'f') ||
+	      (charName[2] >= 'A' && charName[2] <= 'F'))) {
+          if (alpha == -1)
+            alpha = charName[0];
+          else if (alpha != charName[0])
+            hex = gFalse;
+        } else
+	if (strlen(charName) == 2 &&
+	     isxdigit(charName[0]) && isxdigit(charName[1]) &&
+	     ((charName[0] >= 'a' && charName[0] <= 'f') ||
+	      (charName[0] >= 'A' && charName[0] <= 'F') ||
+	      (charName[1] >= 'a' && charName[1] <= 'f') ||
+	      (charName[1] >= 'A' && charName[1] <= 'F'))) {
+          if (alpha == -1)
+            alpha = 0;
+          else if (alpha != 0)
+            hex = gFalse;
+        } else {
+            hex = gFalse;
       }
 	}
 	missing = gTrue;
@@ -1505,13 +1505,15 @@ GfxCIDFont::GfxCIDFont(XRef *xref, char *tagA, Ref idA, GooString *nameA,
     cMapName = new GooString(obj1.getName());
     cMap = globalParams->getCMap(collection, cMapName);
   }
-  delete collection;
-  delete cMapName;
   if (!cMap) {
       error(-1, "Unknown CMap '%s' for character collection '%s'",
 	    cMapName->getCString(), collection->getCString());
+      delete collection;
+      delete cMapName;
       goto err2;
     }
+  delete collection;
+  delete cMapName;
   obj1.free();
 
   // CIDToGIDMap (for embedded TrueType fonts)

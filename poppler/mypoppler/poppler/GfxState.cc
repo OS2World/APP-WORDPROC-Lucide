@@ -672,10 +672,9 @@ void GfxCalGrayColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
   r = xyzrgb[0][0] * X + xyzrgb[0][1] * Y + xyzrgb[0][2] * Z;
   g = xyzrgb[1][0] * X + xyzrgb[1][1] * Y + xyzrgb[1][2] * Z;
   b = xyzrgb[2][0] * X + xyzrgb[2][1] * Y + xyzrgb[2][2] * Z;
-  rgb->r = dblToCol(pow(clip01(r * kr), 0.5));
-  rgb->g = dblToCol(pow(clip01(g * kg), 0.5));
-  rgb->b = dblToCol(pow(clip01(b * kb), 0.5));
-  rgb->r = rgb->g = rgb->b = clip01(color->c[0]);
+  rgb->r = dblToCol(sqrt(clip01(r * kr)));
+  rgb->g = dblToCol(sqrt(clip01(g * kg)));
+  rgb->b = dblToCol(sqrt(clip01(b * kb)));
 }
 
 void GfxCalGrayColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
@@ -909,12 +908,12 @@ void GfxCalRGBColorSpace::getXYZ(GfxColor *color,
   double *pX, double *pY, double *pZ) {
   double A, B, C;
 
-  A = colToDbl(color->c[0]);
-  B = colToDbl(color->c[1]);
-  C = colToDbl(color->c[2]);
-  *pX = mat[0]*pow(A,gammaR)+mat[3]*pow(B,gammaG)+mat[6]*pow(C,gammaB);
-  *pY = mat[1]*pow(A,gammaR)+mat[4]*pow(B,gammaG)+mat[7]*pow(C,gammaB);
-  *pZ = mat[2]*pow(A,gammaR)+mat[5]*pow(B,gammaG)+mat[8]*pow(C,gammaB);
+  A = pow(colToDbl(color->c[0]), gammaR);
+  B = pow(colToDbl(color->c[1]), gammaG);
+  C = pow(colToDbl(color->c[2]), gammaB);
+  *pX = mat[0] * A + mat[3] * B + mat[6] * C;
+  *pY = mat[1] * A + mat[4] * B + mat[7] * C;
+  *pZ = mat[2] * A + mat[5] * B + mat[8] * C;
 }
 
 void GfxCalRGBColorSpace::getGray(GfxColor *color, GfxGray *gray) {
@@ -965,9 +964,9 @@ void GfxCalRGBColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
   r = xyzrgb[0][0] * X + xyzrgb[0][1] * Y + xyzrgb[0][2] * Z;
   g = xyzrgb[1][0] * X + xyzrgb[1][1] * Y + xyzrgb[1][2] * Z;
   b = xyzrgb[2][0] * X + xyzrgb[2][1] * Y + xyzrgb[2][2] * Z;
-  rgb->r = dblToCol(pow(clip01(r), 0.5));
-  rgb->g = dblToCol(pow(clip01(g), 0.5));
-  rgb->b = dblToCol(pow(clip01(b), 0.5));
+  rgb->r = dblToCol(sqrt(clip01(r)));
+  rgb->g = dblToCol(sqrt(clip01(g)));
+  rgb->b = dblToCol(sqrt(clip01(b)));
 }
 
 void GfxCalRGBColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
@@ -1246,9 +1245,9 @@ void GfxLabColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
   r = xyzrgb[0][0] * X + xyzrgb[0][1] * Y + xyzrgb[0][2] * Z;
   g = xyzrgb[1][0] * X + xyzrgb[1][1] * Y + xyzrgb[1][2] * Z;
   b = xyzrgb[2][0] * X + xyzrgb[2][1] * Y + xyzrgb[2][2] * Z;
-  rgb->r = dblToCol(pow(clip01(r * kr), 0.5));
-  rgb->g = dblToCol(pow(clip01(g * kg), 0.5));
-  rgb->b = dblToCol(pow(clip01(b * kb), 0.5));
+  rgb->r = dblToCol(sqrt(clip01(r * kr)));
+  rgb->g = dblToCol(sqrt(clip01(g * kg)));
+  rgb->b = dblToCol(sqrt(clip01(b * kb)));
 }
 
 void GfxLabColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
@@ -1465,13 +1464,16 @@ GfxColorSpace *GfxICCBasedColorSpace::parse(Array *arr, Gfx *gfx) {
   cs = new GfxICCBasedColorSpace(nCompsA, altA, &iccProfileStreamA);
   if (dict->lookup("Range", &obj2)->isArray() &&
       obj2.arrayGetLength() == 2 * nCompsA) {
+    Object obj4;
     for (i = 0; i < nCompsA; ++i) {
       obj2.arrayGet(2*i, &obj3);
-      cs->rangeMin[i] = obj3.getNum();
+      obj2.arrayGet(2*i+1, &obj4);
+      if (obj3.isNum() && obj4.isNum()) {
+        cs->rangeMin[i] = obj3.getNum();
+        cs->rangeMax[i] = obj4.getNum();
+      }
       obj3.free();
-      obj2.arrayGet(2*i+1, &obj3);
-      cs->rangeMax[i] = obj3.getNum();
-      obj3.free();
+      obj4.free();
     }
   }
   obj2.free();
@@ -4780,23 +4782,12 @@ void GfxState::getFontTransMat(double *m11, double *m12,
 
 void GfxState::setCTM(double a, double b, double c,
 		      double d, double e, double f) {
-  int i;
-
   ctm[0] = a;
   ctm[1] = b;
   ctm[2] = c;
   ctm[3] = d;
   ctm[4] = e;
   ctm[5] = f;
-
-  // avoid FP exceptions on badly messed up PDF files
-  for (i = 0; i < 6; ++i) {
-    if (ctm[i] > 1e10) {
-      ctm[i] = 1e10;
-    } else if (ctm[i] < -1e10) {
-      ctm[i] = -1e10;
-    }
-  }
 }
 
 void GfxState::concatCTM(double a, double b, double c,
@@ -4805,7 +4796,6 @@ void GfxState::concatCTM(double a, double b, double c,
   double b1 = ctm[1];
   double c1 = ctm[2];
   double d1 = ctm[3];
-  int i;
 
   ctm[0] = a * a1 + b * c1;
   ctm[1] = a * b1 + b * d1;
@@ -4813,15 +4803,6 @@ void GfxState::concatCTM(double a, double b, double c,
   ctm[3] = c * b1 + d * d1;
   ctm[4] = e * a1 + f * c1 + ctm[4];
   ctm[5] = e * b1 + f * d1 + ctm[5];
-
-  // avoid FP exceptions on badly messed up PDF files
-  for (i = 0; i < 6; ++i) {
-    if (ctm[i] > 1e10) {
-      ctm[i] = 1e10;
-    } else if (ctm[i] < -1e10) {
-      ctm[i] = -1e10;
-    }
-  }
 }
 
 void GfxState::shiftCTM(double tx, double ty) {

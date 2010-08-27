@@ -195,7 +195,7 @@ Features:
 <P>
 <BR>
 For further details please visit the Lucide project homepage:<BR>
-http://svn.netlabs.org/lucide/
+<U><a href="http://svn.netlabs.org/lucide/">http://svn.netlabs.org/lucide/</a></U>
 <BR>
 </README>
 </PAGE>
@@ -221,10 +221,10 @@ have agreed in opensourcing Lucide, while still investing in the product.
 Netlabs.org would like to express it's gratitude toward Mensys BV and
 Serenity Systems International.</P>
 <P>
-Lucide as of version 1.3.0 is released and distributed under CDDL/LGPL.</P>
+Lucide as of version 1.3.0 is released and distributed under <U><a href="http://opensource.org/licenses/cddl1.php">CDDL</a></U>/<U><a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a></U>.</P>
 <P>
 The plugins are released under CDDL/LGPL or GPL, depending on the plugin. See
-http://svn.netlabs.org/lucide/ for more information and source code.</P>
+<U><a href="http://svn.netlabs.org/lucide/">http://svn.netlabs.org/lucide/</a></U> for more information and source code.</P>
 </README>
 </PAGE>
 

@@ -18,7 +18,7 @@
 // Copyright (C) 2006 Takashi Iwai <tiwai@suse.de>
 // Copyright (C) 2006 Kristian Høgsberg <krh@redhat.com>
 // Copyright (C) 2008 Adam Batkin <adam@batkin.net>
-// Copyright (C) 2008 Hib Eris <hib@hiberis.nl>
+// Copyright (C) 2008, 2010 Hib Eris <hib@hiberis.nl>
 // Copyright (C) 2009 Albert Astals Cid <aacid@kde.org>
 // Copyright (C) 2009 Kovid Goyal <kovid@kovidgoyal.net>
 //
@@ -41,7 +41,6 @@
 #  endif
 #  include <limits.h>
 #  include <string.h>
-/* Lucide */
 #  if !defined(VMS) && !defined(ACORN) && !defined(MACOS) && !defined(OS2)
 #    include <pwd.h>
 #  endif
@@ -65,7 +64,6 @@ GooString *getHomeDir() {
   //---------- VMS ----------
   return new GooString("SYS$LOGIN:");
 
-/* Lucide */
 #elif defined(__EMX__) || defined(_WIN32) || defined(OS2)
   //---------- OS/2+EMX and Win32 ----------
   char *s;
@@ -215,7 +213,6 @@ GooString *appendToPath(GooString *path, char *fileName) {
   }
   return path;
 
-/* Lucide */
 #elif defined(__EMX__) || defined(OS2)
   //---------- OS/2+EMX ----------
   int i;
@@ -303,7 +300,6 @@ GooString *grabPath(char *fileName) {
     return new GooString(fileName, p + 1 - fileName);
   return new GooString();
 
-/* Lucide */
 #elif defined(__EMX__) || defined(_WIN32) || defined(OS2)
   //---------- OS/2+EMX and Win32 ----------
   char *p;
@@ -348,7 +344,6 @@ GBool isAbsolutePath(char *path) {
   return strchr(path, ':') ||
 	 (path[0] == '[' && path[1] != '.' && path[1] != '-');
 
-/* Lucide */
 #elif defined(__EMX__) || defined(_WIN32) || defined(OS2)
   //---------- OS/2+EMX and Win32 ----------
   return path[0] == '/' || path[0] == '\\' || path[1] == ':';
@@ -381,11 +376,11 @@ GooString *makePathAbsolute(GooString *path) {
 
 #elif defined(_WIN32)
   //---------- Win32 ----------
-  char buf[_MAX_PATH];
+  char buf[MAX_PATH];
   char *fp;
 
   buf[0] = '\0';
-  if (!GetFullPathName(path->getCString(), _MAX_PATH, buf, &fp)) {
+  if (!GetFullPathName(path->getCString(), MAX_PATH, buf, &fp)) {
     path->clear();
     return path;
   }
@@ -403,7 +398,6 @@ GooString *makePathAbsolute(GooString *path) {
   path->del(0, 1);
   return path;
 
-/* Lucide */
 #elif defined(OS2)
   //---------- OS/2 -----------
   char buf[_MAX_PATH];
@@ -515,7 +509,7 @@ GBool openTempFile(GooString **name, FILE **f, char *mode) {
   }
   delete s;
   return gFalse;
-/* Lucide */
+
 #elif defined(VMS) || defined(__EMX__) || defined(ACORN) || defined(MACOS) || defined(OS2)
   //---------- non-Unix ----------
   char *s;

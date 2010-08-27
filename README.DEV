@@ -125,3 +125,9 @@ behavior. You may set them in the OS/2 environment or put to your
     quiet). The highest level will make kBuild print every command it executes
     which is useful when something does not work like you want.
 
+
+USEFUL LINKS
+
+  * poppler library is found on poppler.freedesktop.org
+  * djvu library is found djvu.sourceforge.net
+  * jpeg library www.ijg.com

@@ -14,10 +14,10 @@
 // under GPL version 2 or later
 //
 // Copyright (C) 2005 Jonathan Blandford <jrb@redhat.com>
-// Copyright (C) 2005-2009 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2005-2010 Albert Astals Cid <aacid@kde.org>
 // Copyright (C) 2006 Thorkild Stray <thorkild@ifi.uio.no>
 // Copyright (C) 2006 Kristian Høgsberg <krh@redhat.com>
-// Copyright (C) 2006-2009 Carlos Garcia Campos <carlosgc@gnome.org>
+// Copyright (C) 2006-2010 Carlos Garcia Campos <carlosgc@gnome.org>
 // Copyright (C) 2006, 2007 Jeff Muizelaar <jeff@infidigm.net>
 // Copyright (C) 2007, 2008 Brad Hards <bradh@kde.org>
 // Copyright (C) 2007 Adrian Johnson <ajohnson@redneon.com>
@@ -28,9 +28,10 @@
 // Copyright (C) 2008 Michael Vrable <mvrable@cs.ucsd.edu>
 // Copyright (C) 2008 Hib Eris <hib@hiberis.nl>
 // Copyright (C) 2009 M Joonas Pihlaja <jpihlaja@cc.helsinki.fi>
-// Copyright (C) 2009 Thomas Freitag <Thomas.Freitag@alfa.de>
+// Copyright (C) 2009, 2010 Thomas Freitag <Thomas.Freitag@alfa.de>
 // Copyright (C) 2009 William Bader <williambader@hotmail.com>
-// Copyright (C) 2009 David Benjamin <davidben@mit.edu>
+// Copyright (C) 2009, 2010 David Benjamin <davidben@mit.edu>
+// Copyright (C) 2010 Nils Höglund <nils.hoglund@gmail.com>
 //
 // To see a description of the changes please see the Changelog file that
 // came with your tarball or type make ChangeLog if you are building from git
@@ -307,7 +308,8 @@ static inline GBool isSameGfxColor(const GfxColor &colorA, const GfxColor &color
 // GfxResources
 //------------------------------------------------------------------------
 
-GfxResources::GfxResources(XRef *xref, Dict *resDict, GfxResources *nextA) {
+GfxResources::GfxResources(XRef *xref, Dict *resDict, GfxResources *nextA) :
+    gStateCache(2, xref) {
   Object obj1, obj2;
   Ref r;
 
@@ -480,11 +482,27 @@ GfxShading *GfxResources::lookupShading(char *name, Gfx *gfx) {
 }
 
 GBool GfxResources::lookupGState(char *name, Object *obj) {
+  if (!lookupGStateNF(name, obj))
+    return gFalse;
+
+  if (!obj->isRef())
+    return gTrue;
+  
+  const Ref ref = obj->getRef();
+  if (!gStateCache.lookup(ref, obj)->isNull())
+    return gTrue;
+  obj->free();
+
+  gStateCache.put(ref)->copy(obj);
+  return gTrue;
+}
+
+GBool GfxResources::lookupGStateNF(char *name, Object *obj) {
   GfxResources *resPtr;
 
   for (resPtr = this; resPtr; resPtr = resPtr->next) {
     if (resPtr->gStateDict.isDict()) {
-      if (!resPtr->gStateDict.dictLookup(name, obj)->isNull()) {
+      if (!resPtr->gStateDict.dictLookupNF(name, obj)->isNull()) {
 	return gTrue;
       }
       obj->free();
@@ -525,6 +543,8 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, int pageNum, Dict *resDict, Catalog *cata
   // initialize
   out = outA;
   state = new GfxState(hDPI, vDPI, box, rotate, out->upsideDown());
+  stackHeight = 1;
+  pushStateGuard();
   fontChanged = gFalse;
   clip = clipNone;
   ignoreUndef = 0;
@@ -577,6 +597,8 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict, Catalog *catalogA,
   // initialize
   out = outA;
   state = new GfxState(72, 72, box, 0, gFalse);
+  stackHeight = 1;
+  pushStateGuard();
   fontChanged = gFalse;
   clip = clipNone;
   ignoreUndef = 0;
@@ -601,7 +623,12 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict, Catalog *catalogA,
 }
 
 Gfx::~Gfx() {
+  while (stateGuards.size()) {
+    popStateGuard();
+  }
+  // There shouldn't be more saves, but pop them if there were any
   while (state->hasSaves()) {
+    error(-1, "Found state under last state guard. Popping.");
     restoreState();
   }
   if (!subPage) {
@@ -649,10 +676,12 @@ void Gfx::go(GBool topLevel) {
   int lastAbortCheck;
 
   // scan a sequence of objects
+  pushStateGuard();
   updateLevel = lastAbortCheck = 0;
   numArgs = 0;
   parser->getObj(&obj);
   while (!obj.isEOF()) {
+    commandAborted = gFalse;
 
     // got a command - execute it
     if (obj.isCmd()) {
@@ -698,6 +727,14 @@ void Gfx::go(GBool topLevel) {
       if (++updateLevel >= 20000) {
 	out->dump();
 	updateLevel = 0;
+      }
+
+      // did the command throw an exception
+      if (commandAborted) {
+	// don't propogate; recursive drawing comes from Form XObjects which
+	// should probably be drawn in a separate context anyway for caching
+	commandAborted = gFalse;
+	break;
       }
 
       // check for an abort
@@ -747,6 +784,8 @@ void Gfx::go(GBool topLevel) {
       args[i].free();
   }
 
+  popStateGuard();
+
   // update display
   if (topLevel && updateLevel > 0) {
     out->dump();
@@ -772,6 +811,7 @@ void Gfx::execOp(Object *cmd, Object args[], int numArgs) {
   if (op->numArgs >= 0) {
     if (numArgs < op->numArgs) {
       error(getPos(), "Too few (%d) args to '%s' operator", numArgs, name);
+      commandAborted = gTrue;
       return;
     }
     if (numArgs > op->numArgs) {
@@ -1257,31 +1297,26 @@ void Gfx::opSetRenderingIntent(Object args[], int numArgs) {
 void Gfx::opSetFillGray(Object args[], int numArgs) {
   GfxColor color;
 
-  if (textHaveCSPattern) {
+  if (textHaveCSPattern && drawText) {
     GBool needFill = out->deviceHasTextClip(state);
     out->endTextObject(state);
     if (needFill) {
       doPatternFill(gTrue);
     }
     out->restoreState(state);
-    state->setFillPattern(NULL);
-    state->setFillColorSpace(new GfxDeviceGrayColorSpace());
-    out->updateFillColorSpace(state);
-    color.c[0] = dblToCol(args[0].getNum());
-    state->setFillColor(&color);
-    out->updateFillColor(state);
+  }
+  state->setFillPattern(NULL);
+  state->setFillColorSpace(new GfxDeviceGrayColorSpace());
+  out->updateFillColorSpace(state);
+  color.c[0] = dblToCol(args[0].getNum());
+  state->setFillColor(&color);
+  out->updateFillColor(state);
+  if (textHaveCSPattern) {
     out->beginTextObject(state);
     out->updateRender(state);
     out->updateTextMat(state);
     out->updateTextPos(state);
     textHaveCSPattern = gFalse;
-  } else {
-    state->setFillPattern(NULL);
-    state->setFillColorSpace(new GfxDeviceGrayColorSpace());
-    out->updateFillColorSpace(state);
-    color.c[0] = dblToCol(args[0].getNum());
-    state->setFillColor(&color);
-    out->updateFillColor(state);
   }
 }
 
@@ -1300,20 +1335,28 @@ void Gfx::opSetFillCMYKColor(Object args[], int numArgs) {
   GfxColor color;
   int i;
 
+  if (textHaveCSPattern && drawText) {
+    GBool needFill = out->deviceHasTextClip(state);
+    out->endTextObject(state);
+    if (needFill) {
+      doPatternFill(gTrue);
+    }
+    out->restoreState(state);
+  }
+  state->setFillPattern(NULL);
+  state->setFillColorSpace(new GfxDeviceCMYKColorSpace());
+  out->updateFillColorSpace(state);
+  for (i = 0; i < 4; ++i) {
+    color.c[i] = dblToCol(args[i].getNum());
+  }
+  state->setFillColor(&color);
+  out->updateFillColor(state);
   if (textHaveCSPattern) {
-    colorSpaceText = new GfxDeviceCMYKColorSpace();
-    for (i = 0; i < 4; ++i) {
-      colorText.c[i] = dblToCol(args[i].getNum());
-    }
-  } else {
-    state->setFillPattern(NULL);
-    state->setFillColorSpace(new GfxDeviceCMYKColorSpace());
-    out->updateFillColorSpace(state);
-    for (i = 0; i < 4; ++i) {
-      color.c[i] = dblToCol(args[i].getNum());
-    }
-    state->setFillColor(&color);
-    out->updateFillColor(state);
+    out->beginTextObject(state);
+    out->updateRender(state);
+    out->updateTextMat(state);
+    out->updateTextPos(state);
+    textHaveCSPattern = gFalse;
   }
 }
 
@@ -1335,20 +1378,28 @@ void Gfx::opSetFillRGBColor(Object args[], int numArgs) {
   GfxColor color;
   int i;
 
+  if (textHaveCSPattern && drawText) {
+    GBool needFill = out->deviceHasTextClip(state);
+    out->endTextObject(state);
+    if (needFill) {
+      doPatternFill(gTrue);
+    }
+    out->restoreState(state);
+  }
+  state->setFillPattern(NULL);
+  state->setFillColorSpace(new GfxDeviceRGBColorSpace());
+  out->updateFillColorSpace(state);
+  for (i = 0; i < 3; ++i) {
+    color.c[i] = dblToCol(args[i].getNum());
+  }
+  state->setFillColor(&color);
+  out->updateFillColor(state);
   if (textHaveCSPattern) {
-    colorSpaceText = new GfxDeviceRGBColorSpace();
-    for (i = 0; i < 3; ++i) {
-      colorText.c[i] = dblToCol(args[i].getNum());
-    }
-  } else {
-    state->setFillPattern(NULL);
-    state->setFillColorSpace(new GfxDeviceRGBColorSpace());
-    out->updateFillColorSpace(state);
-    for (i = 0; i < 3; ++i) {
-      color.c[i] = dblToCol(args[i].getNum());
-    }
-    state->setFillColor(&color);
-    out->updateFillColor(state);
+    out->beginTextObject(state);
+    out->updateRender(state);
+    out->updateTextMat(state);
+    out->updateTextPos(state);
+    textHaveCSPattern = gFalse;
   }
 }
 
@@ -1371,7 +1422,6 @@ void Gfx::opSetFillColorSpace(Object args[], int numArgs) {
   GfxColorSpace *colorSpace;
   GfxColor color;
 
-  state->setFillPattern(NULL);
   res->lookupColorSpace(args[0].getName(), &obj);
   if (obj.isNull()) {
     colorSpace = GfxColorSpace::parse(&args[0], this);
@@ -1380,28 +1430,29 @@ void Gfx::opSetFillColorSpace(Object args[], int numArgs) {
   }
   obj.free();
   if (colorSpace) {
+    if (textHaveCSPattern && drawText) {
+      GBool needFill = out->deviceHasTextClip(state);
+      out->endTextObject(state);
+      if (needFill) {
+        doPatternFill(gTrue);
+      }
+      out->restoreState(state);
+    }
+    state->setFillPattern(NULL);
     state->setFillColorSpace(colorSpace);
     out->updateFillColorSpace(state);
     colorSpace->getDefaultColor(&color);
     state->setFillColor(&color);
     out->updateFillColor(state);
-    if (drawText) {
-      if (colorSpace->getMode() == csPattern) {
-        colorSpaceText = NULL;
-        textHaveCSPattern = gTrue;
-        out->beginTextObject(state);
-      } else if (textHaveCSPattern) {
-        GBool needFill = out->deviceHasTextClip(state);
-        out->endTextObject(state);
-        if (needFill) {
-          doPatternFill(gTrue);
-        }
-        out->beginTextObject(state);
-        out->updateRender(state);
-        out->updateTextMat(state);
-        out->updateTextPos(state);
-        textHaveCSPattern = gFalse;
-      }
+    if (textHaveCSPattern) {
+      out->beginTextObject(state);
+      out->updateRender(state);
+      out->updateTextMat(state);
+      out->updateTextPos(state);
+      textHaveCSPattern = colorSpace->getMode() == csPattern;
+    } else if (drawText && out->supportTextCSPattern(state)) {
+      out->beginTextObject(state);
+      textHaveCSPattern = gTrue;
     }
   } else {
     error(getPos(), "Bad color space (fill)");
@@ -2054,7 +2105,8 @@ void Gfx::doShadingPatternFill(GfxShadingPattern *sPat,
     state->lineTo(xMin, yMax);
     state->closePath();
     state->clip();
-    out->clip(state);
+    if (!textHaveCSPattern && !maskHaveCSPattern)
+      out->clip(state);
     state->setPath(savedPath->copy());
   }
 
@@ -2472,7 +2524,7 @@ void Gfx::doAxialShFill(GfxAxialShading *shading) {
   if (out->useFillColorStop()) {
     // make sure we add stop color when t = tMin
     state->setFillColor(&color0);
-    out->updateFillColorStop(state, (tt - tMin)/(tMax - tMin));
+    out->updateFillColorStop(state, 0);
   }
 
   // compute the coordinates of the point on the t axis at t = tMin;
@@ -3281,7 +3333,6 @@ void Gfx::opBeginText(Object args[], int numArgs) {
   out->updateTextPos(state);
   fontChanged = gTrue;
   if (out->supportTextCSPattern(state)) {
-    colorSpaceText = NULL;
     textHaveCSPattern = gTrue;
   }
 }
@@ -3290,19 +3341,11 @@ void Gfx::opEndText(Object args[], int numArgs) {
   GBool needFill = out->deviceHasTextClip(state);
   out->endTextObject(state);
   drawText = gFalse;
-  if (out->supportTextCSPattern(state) && textHaveCSPattern) {
+  if (textHaveCSPattern) {
     if (needFill) {
       doPatternFill(gTrue);
     }
     out->restoreState(state);
-    if (colorSpaceText != NULL) {
-      state->setFillPattern(NULL);
-      state->setFillColorSpace(colorSpaceText);
-      out->updateFillColorSpace(state);
-      state->setFillColor(&colorText);
-      out->updateFillColor(state);
-      colorSpaceText = NULL;
-    }
   }
   textHaveCSPattern = gFalse;
 }
@@ -4516,6 +4559,8 @@ void Gfx::opBeginMarkedContent(Object args[], int numArgs) {
 
   if(numArgs == 2 && args[1].isDict ()) {
     out->beginMarkedContent(args[0].getName(),args[1].getDict());
+  } else if(numArgs == 1) {
+    out->beginMarkedContent(args[0].getName(),NULL);
   }
 }
 
@@ -4676,7 +4721,7 @@ void Gfx::drawAnnot(Object *str, AnnotBorder *border, AnnotColor *aColor,
       out->updateStrokeColorSpace(state);
     }
     if (aColor && (aColor->getSpace() == AnnotColor::colorRGB)) {
-      double *values = aColor->getValues();
+      const double *values = aColor->getValues();
       r = values[0];
       g = values[1];
       b = values[2];
@@ -4720,14 +4765,35 @@ void Gfx::drawAnnot(Object *str, AnnotBorder *border, AnnotColor *aColor,
   }
 }
 
+int Gfx::bottomGuard() {
+    return stateGuards[stateGuards.size()-1];
+}
+
+void Gfx::pushStateGuard() {
+    stateGuards.push_back(stackHeight);
+}
+
+void Gfx::popStateGuard() {
+    while (stackHeight > bottomGuard() && state->hasSaves())
+	restoreState();
+    stateGuards.pop_back();
+}
+
 void Gfx::saveState() {
   out->saveState(state);
   state = state->save();
+  stackHeight++;
 }
 
 void Gfx::restoreState() {
+  if (stackHeight <= bottomGuard() || !state->hasSaves()) {
+    error(-1, "Restoring state when no valid states to pop");
+    commandAborted = gTrue;
+    return;
+  }
   state = state->restore();
   out->restoreState(state);
+  stackHeight--;
 }
 
 void Gfx::pushResources(Dict *resDict) {

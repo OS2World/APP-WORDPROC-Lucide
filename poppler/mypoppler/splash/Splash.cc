@@ -11,7 +11,7 @@
 // All changes made under the Poppler project to this file are licensed
 // under GPL version 2 or later
 //
-// Copyright (C) 2005-2009 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2005-2010 Albert Astals Cid <aacid@kde.org>
 // Copyright (C) 2005 Marco Pesenti Gritti <mpg@redhat.com>
 //
 // To see a description of the changes please see the Changelog file that
@@ -41,6 +41,9 @@
 #include "SplashFont.h"
 #include "SplashGlyphBitmap.h"
 #include "Splash.h"
+
+// to get the unlikely definition
+#include "poppler/Object.h"
 
 //------------------------------------------------------------------------
 
@@ -646,6 +649,9 @@ inline void Splash::pipeIncX(SplashPipe *pipe) {
 }
 
 inline void Splash::drawPixel(SplashPipe *pipe, int x, int y, GBool noClip) {
+  if (unlikely(y < 0))
+    return;
+
   if (noClip || state->clip->test(x, y)) {
     pipeSetXY(pipe, x, y);
     pipeRun(pipe);
@@ -3018,11 +3024,11 @@ SplashError Splash::composite(SplashBitmap *src, int xSrc, int ySrc,
       pipeSetXY(&pipe, xDest, yDest + y);
       ap = src->getAlphaPtr() + (ySrc + y) * src->getWidth() + xSrc;
       for (x = 0; x < w; ++x) {
-	src->getPixel(xSrc + x, ySrc + y, pixel);
 	alpha = *ap++;
 	if (noClip || state->clip->test(xDest + x, yDest + y)) {
 	  // this uses shape instead of alpha, which isn't technically
 	  // correct, but works out the same
+	  src->getPixel(xSrc + x, ySrc + y, pixel);
 	  pipe.shape = (SplashCoord)(alpha / 255.0);
 	  pipeRun(&pipe);
 	  updateModX(xDest + x);
@@ -3038,8 +3044,8 @@ SplashError Splash::composite(SplashBitmap *src, int xSrc, int ySrc,
     for (y = 0; y < h; ++y) {
       pipeSetXY(&pipe, xDest, yDest + y);
       for (x = 0; x < w; ++x) {
-	src->getPixel(xSrc + x, ySrc + y, pixel);
 	if (noClip || state->clip->test(xDest + x, yDest + y)) {
+	  src->getPixel(xSrc + x, ySrc + y, pixel);
 	  pipeRun(&pipe);
 	  updateModX(xDest + x);
 	  updateModY(yDest + y);
@@ -3109,10 +3115,19 @@ void Splash::compositeBackground(SplashColorPtr color) {
       q = &bitmap->alpha[y * bitmap->width];
       for (x = 0; x < bitmap->width; ++x) {
 	alpha = *q++;
-	alpha1 = 255 - alpha;
-	p[0] = div255(alpha1 * color0 + alpha * p[0]);
-	p[1] = div255(alpha1 * color1 + alpha * p[1]);
-	p[2] = div255(alpha1 * color2 + alpha * p[2]);
+	if (alpha == 0)
+	{
+	  p[0] = color0;
+	  p[1] = color1;
+	  p[2] = color2;
+	}
+	else if (alpha != 255)
+	{
+	  alpha1 = 255 - alpha;
+	  p[0] = div255(alpha1 * color0 + alpha * p[0]);
+	  p[1] = div255(alpha1 * color1 + alpha * p[1]);
+	  p[2] = div255(alpha1 * color2 + alpha * p[2]);
+	}
 	p += 3;
       }
     }
@@ -3126,10 +3141,19 @@ void Splash::compositeBackground(SplashColorPtr color) {
       q = &bitmap->alpha[y * bitmap->width];
       for (x = 0; x < bitmap->width; ++x) {
 	alpha = *q++;
-	alpha1 = 255 - alpha;
-	p[0] = div255(alpha1 * color0 + alpha * p[0]);
-	p[1] = div255(alpha1 * color1 + alpha * p[1]);
-	p[2] = div255(alpha1 * color2 + alpha * p[2]);
+	if (alpha == 0)
+	{
+	  p[0] = color0;
+	  p[1] = color1;
+	  p[2] = color2;
+	}
+	else if (alpha != 255)
+	{
+	  alpha1 = 255 - alpha;
+	  p[0] = div255(alpha1 * color0 + alpha * p[0]);
+	  p[1] = div255(alpha1 * color1 + alpha * p[1]);
+	  p[2] = div255(alpha1 * color2 + alpha * p[2]);
+	}
 	p[3] = 255;
 	p += 4;
       }
@@ -3163,7 +3187,7 @@ void Splash::compositeBackground(SplashColorPtr color) {
 SplashError Splash::blitTransparent(SplashBitmap *src, int xSrc, int ySrc,
 				    int xDest, int yDest, int w, int h) {
   SplashColor pixel;
-  SplashColorPtr p;
+  SplashColorPtr p, sp;
   Guchar *q;
   int x, y, mask;
 
@@ -3203,23 +3227,24 @@ SplashError Splash::blitTransparent(SplashBitmap *src, int xSrc, int ySrc,
   case splashModeBGR8:
     for (y = 0; y < h; ++y) {
       p = &bitmap->data[(yDest + y) * bitmap->rowSize + 3 * xDest];
+      sp = &src->data[(ySrc + y) * src->rowSize + 3 * xSrc];
       for (x = 0; x < w; ++x) {
-	src->getPixel(xSrc + x, ySrc + y, pixel);
-	*p++ = pixel[0];
-	*p++ = pixel[1];
-	*p++ = pixel[2];
+	*p++ = *sp++;
+	*p++ = *sp++;
+	*p++ = *sp++;
       }
     }
     break;
   case splashModeXBGR8:
     for (y = 0; y < h; ++y) {
       p = &bitmap->data[(yDest + y) * bitmap->rowSize + 4 * xDest];
+      sp = &src->data[(ySrc + y) * src->rowSize + 4 * xSrc];
       for (x = 0; x < w; ++x) {
-	src->getPixel(xSrc + x, ySrc + y, pixel);
-	*p++ = pixel[0];
-	*p++ = pixel[1];
-	*p++ = pixel[2];
+	*p++ = *sp++;
+	*p++ = *sp++;
+	*p++ = *sp++;
 	*p++ = 255;
+	*sp++;
       }
     }
     break;

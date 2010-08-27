@@ -5,7 +5,7 @@
 // This file is licensed under the GPLv2 or later
 //
 // Copyright 2006-2008 Julien Rebetez <julienr@svn.gnome.org>
-// Copyright 2007-2009 Albert Astals Cid <aacid@kde.org>
+// Copyright 2007-2010 Albert Astals Cid <aacid@kde.org>
 // Copyright 2007-2008 Carlos Garcia Campos <carlosgc@gnome.org>
 // Copyright 2007 Adrian Johnson <ajohnson@redneon.com>
 // Copyright 2007 Iñigo Martínez <inigomartinez@gmail.com>
@@ -990,7 +990,7 @@ FormFieldText::FormFieldText(XRef *xrefA, Object *aobj, const Ref& ref)
 GooString* FormFieldText::getContentCopy ()
 {
   if (!content) return NULL;
-  return new GooString(*content);
+  return new GooString(content);
 }
 
 void FormFieldText::setContentCopy (GooString* new_content)

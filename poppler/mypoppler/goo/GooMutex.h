@@ -47,7 +47,6 @@ typedef CRITICAL_SECTION GooMutex;
 #define gLockMutex(m) EnterCriticalSection(m)
 #define gUnlockMutex(m) LeaveCriticalSection(m)
 
-/* Lucide */
 #elif defined(OS2)
 
 #define INCL_DOS

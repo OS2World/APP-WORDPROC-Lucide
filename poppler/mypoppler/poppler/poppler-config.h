@@ -40,6 +40,11 @@
 #define TEXTOUT_WORD_LIST 1
 #endif
 
+/* Use fontconfig font configuration backend */
+#ifndef WITH_FONTCONFIGURATION_FONTCONFIG
+#define WITH_FONTCONFIGURATION_FONTCONFIG 1
+#endif
+
 // Also, there's a couple of preprocessor symbols in the header files
 // that are used but never defined: DISABLE_OUTLINE, DEBUG_MEM and
 
@@ -48,7 +53,7 @@
 //------------------------------------------------------------------------
 
 // copyright notice
-#define popplerCopyright "Copyright 2005-2009 The Poppler Developers - http://poppler.freedesktop.org"
+#define popplerCopyright "Copyright 2005-2010 The Poppler Developers - http://poppler.freedesktop.org"
 #define xpdfCopyright "Copyright 1996-2004 Glyph & Cog, LLC"
 
 //------------------------------------------------------------------------

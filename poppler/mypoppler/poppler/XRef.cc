@@ -15,7 +15,7 @@
 //
 // Copyright (C) 2005 Dan Sheridan <dan.sheridan@postman.org.uk>
 // Copyright (C) 2005 Brad Hards <bradh@frogmouth.net>
-// Copyright (C) 2006, 2008 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2006, 2008, 2010 Albert Astals Cid <aacid@kde.org>
 // Copyright (C) 2007-2008 Julien Rebetez <julienr@svn.gnome.org>
 // Copyright (C) 2007 Carlos Garcia Campos <carlosgc@gnome.org>
 // Copyright (C) 2009 Ilya Gorenbein <igorenbein@finjan.com>
@@ -45,6 +45,7 @@
 #include "Error.h"
 #include "ErrorCodes.h"
 #include "XRef.h"
+#include "PopplerCache.h"
 
 //------------------------------------------------------------------------
 
@@ -95,6 +96,37 @@ private:
   Object *objs;			// the objects (length = nObjects)
   int *objNums;			// the object numbers (length = nObjects)
   GBool ok;
+};
+
+class ObjectStreamKey : public PopplerCacheKey
+{
+  public:
+    ObjectStreamKey(int num) : objStrNum(num)
+    {
+    }
+
+    bool operator==(const PopplerCacheKey &key) const
+    {
+      const ObjectStreamKey *k = static_cast<const ObjectStreamKey*>(&key);
+      return objStrNum == k->objStrNum;
+    }
+
+    const int objStrNum;
+};
+
+class ObjectStreamItem : public PopplerCacheItem
+{
+  public:
+    ObjectStreamItem(ObjectStream *objStr) : objStream(objStr)
+    {
+    }
+
+    ~ObjectStreamItem()
+    {
+      delete objStream;
+    }
+
+    ObjectStream *objStream;
 };
 
 ObjectStream::ObjectStream(XRef *xref, int objStrNumA) {
@@ -233,7 +265,7 @@ XRef::XRef() {
   size = 0;
   streamEnds = NULL;
   streamEndsLen = 0;
-  objStr = NULL;
+  objStrs = new PopplerCache(5);
 }
 
 XRef::XRef(BaseStream *strA) {
@@ -246,7 +278,7 @@ XRef::XRef(BaseStream *strA) {
   entries = NULL;
   streamEnds = NULL;
   streamEndsLen = 0;
-  objStr = NULL;
+  objStrs = new PopplerCache(5);
 
   encrypted = gFalse;
   permFlags = defPermFlags;
@@ -267,7 +299,8 @@ XRef::XRef(BaseStream *strA) {
 
   // read the xref table
   } else {
-    while (readXRef(&pos)) ;
+    GooVector<Guint> followedXRefStm;
+    while (readXRef(&pos, &followedXRefStm)) ;
 
     // if there was a problem with the xref table,
     // try to reconstruct it
@@ -308,8 +341,8 @@ XRef::~XRef() {
   if (streamEnds) {
     gfree(streamEnds);
   }
-  if (objStr) {
-    delete objStr;
+  if (objStrs) {
+    delete objStrs;
   }
 }
 
@@ -346,7 +379,7 @@ Guint XRef::getStartXref() {
 
 // Read one xref table section.  Also reads the associated trailer
 // dictionary, and returns the prev pointer (if any).
-GBool XRef::readXRef(Guint *pos) {
+GBool XRef::readXRef(Guint *pos, GooVector<Guint> *followedXRefStm) {
   Parser *parser;
   Object obj;
   GBool more;
@@ -362,7 +395,7 @@ GBool XRef::readXRef(Guint *pos) {
   // parse an old-style xref table
   if (obj.isCmd("xref")) {
     obj.free();
-    more = readXRefTable(parser, pos);
+    more = readXRefTable(parser, pos, followedXRefStm);
 
   // parse an xref stream
   } else if (obj.isInt()) {
@@ -395,7 +428,7 @@ GBool XRef::readXRef(Guint *pos) {
   return gFalse;
 }
 
-GBool XRef::readXRefTable(Parser *parser, Guint *pos) {
+GBool XRef::readXRefTable(Parser *parser, Guint *pos, GooVector<Guint> *followedXRefStm) {
   XRefEntry entry;
   GBool more;
   Object obj, obj2;
@@ -509,7 +542,15 @@ GBool XRef::readXRefTable(Parser *parser, Guint *pos) {
   // check for an 'XRefStm' key
   if (obj.getDict()->lookup("XRefStm", &obj2)->isInt()) {
     pos2 = (Guint)obj2.getInt();
-    readXRef(&pos2);
+    for (size_t i = 0; ok == gTrue && i < followedXRefStm->size(); ++i) {
+      if (followedXRefStm->at(i) == pos2) {
+        ok = gFalse;
+      }
+    }
+    if (ok) {
+      followedXRefStm->push_back(pos2);
+      readXRef(&pos2, followedXRefStm);
+    }
     if (!ok) {
       obj2.free();
       goto err1;
@@ -807,7 +848,11 @@ GBool XRef::constructXRef() {
 		      return gFalse;
 		    }
 		    entries = (XRefEntry *)
-		        greallocn(entries, newSize, sizeof(XRefEntry));
+		        greallocn_checkoverflow(entries, newSize, sizeof(XRefEntry));
+		    if (entries == NULL) {
+		      size = 0;
+		      return gFalse;
+		    }
 		    for (i = size; i < newSize; ++i) {
 		      entries[i].offset = 0xffffffff;
 		      entries[i].type = xrefEntryFree;
@@ -888,13 +933,17 @@ GBool XRef::okToPrint(GBool ignoreOwnerPW) {
 // 2 (and we are allowed to print at all), or with security handler rev
 // 3 and we are allowed to print, and bit 12 is set.
 GBool XRef::okToPrintHighRes(GBool ignoreOwnerPW) {
-  if (2 == encRevision) {
-    return (okToPrint(ignoreOwnerPW));
-  } else if (encRevision >= 3) {
-    return (okToPrint(ignoreOwnerPW) && (permFlags & permHighResPrint));
+  if (encrypted) {
+    if (2 == encRevision) {
+      return (okToPrint(ignoreOwnerPW));
+    } else if (encRevision >= 3) {
+      return (okToPrint(ignoreOwnerPW) && (permFlags & permHighResPrint));
+    } else {
+      // something weird - unknown security handler version
+      return gFalse;
+    }
   } else {
-    // something weird - unknown security handler version
-    return gFalse;
+    return gTrue;
   }
 }
 
@@ -993,22 +1042,34 @@ Object *XRef::fetch(int num, int gen, Object *obj) {
     break;
 
   case xrefEntryCompressed:
+  {
     if (gen != 0) {
       goto err;
     }
-    if (!objStr || objStr->getObjStrNum() != (int)e->offset) {
-      if (objStr) {
-	delete objStr;
-      }
+
+    ObjectStream *objStr = NULL;
+    ObjectStreamKey key(e->offset);
+    PopplerCacheItem *item = objStrs->lookup(key);
+    if (item) {
+      ObjectStreamItem *it = static_cast<ObjectStreamItem *>(item);
+      objStr = it->objStream;
+    }
+
+    if (!objStr) {
       objStr = new ObjectStream(this, e->offset);
       if (!objStr->isOk()) {
 	delete objStr;
 	objStr = NULL;
 	goto err;
+      } else {
+	ObjectStreamKey *newkey = new ObjectStreamKey(e->offset);
+	ObjectStreamItem *newitem = new ObjectStreamItem(objStr);
+	objStrs->put(newkey, newitem);
       }
     }
     objStr->getObject(e->gen, num, obj);
-    break;
+  }
+  break;
 
   default:
     goto err;
