@@ -2,6 +2,7 @@
   - added backwards search (ticket #190)
   - fixed goto page handling (ticket #198)
   - some other small fixes
+  - updated poppler to 0.14.2
   - WPI: made http links clickable
 
 
