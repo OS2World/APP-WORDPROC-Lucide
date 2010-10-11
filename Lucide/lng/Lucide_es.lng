@@ -1,97 +1,255 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  
-  
+#
+# Lucide language file, ES (1.3.3)
+#
 
+#
+# Main menu
+#
+MENU_DOCUMENT=~Archivo
+MENU_NEW_WINDOW=~Nueva ventana
+MENU_OPEN=~Abrir...\tCtrl+O
+MENU_NEXT_PREVIOUS=Siguiente/An~terior
+MENU_FIRST=~Primero\tMays+Inicio
+MENU_PREVIOUS=An~terior\tMays+Re P g
+MENU_NEXT=~Siguiente\tMays+Av P g
+MENU_LAST=é~ltimo\tMays+Fin
+MENU_RECENT_FILES=Archivos ~recientes
+MENU_CLEAR_LIST=~Borrar la lista
+MENU_SAVE_AS=~Guardar como...
+MENU_CLOSE=~Cerrar
+# MENU_PAGE_SETUP: to delete
+MENU_PAGE_SETUP=~Preferencias de p gina...
+MENU_PRINT=~Imprimir...\tCtrl+P
+MENU_PLUGINS_LIST=~Lista de plugins...
+MENU_EXIT=~Salir\tCtrl+X
 
-  
+MENU_EDIT=~Editar
+MENU_COPY=~Copia\tCtrl+Insert
+MENU_SELECT_ALL=~Seleccionar todo\tCtrl+/
+MENU_FIND=~Buscar...\tCtrl+F
+MENU_FINDAGAIN=Buscar si~guiente\tCtrl+G
+MENU_SETTINGS=~Preferencias
 
-  <head>
-    <title>
-      Attachment â€“ Lucide
-    </title>
-        <link rel="search" href="/lucide/search" />
-        <link rel="help" href="/lucide/wiki/TracGuide" />
-        <link rel="alternate" href="/lucide/raw-attachment/ticket/209/Lucide_es.lng" title="Original Format" />
-        <link rel="up" href="/lucide/ticket/209" title="Ticket #209" />
-        <link rel="start" href="/lucide/wiki" />
-        <link rel="stylesheet" href="/trac/css/trac.css" type="text/css" /><link rel="stylesheet" href="/lucide/pygments/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/css/code.css" type="text/css" />
-        <link rel="shortcut icon" href="/lucide/chrome/common/trac.ico" type="image/x-icon" />
-        <link rel="icon" href="/lucide/chrome/common/trac.ico" type="image/x-icon" />
-      <link type="application/opensearchdescription+xml" rel="search" href="/lucide/search/opensearch" title="Search Lucide" />
-    <script type="text/javascript" src="/trac/js/jquery.js"></script><script type="text/javascript" src="/trac/js/trac.js"></script><script type="text/javascript" src="/trac/js/search.js"></script>
-    <!--[if lt IE 7]>
-    <script type="text/javascript" src="/trac/js/ie_pre7_hacks.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div id="banner">
-      <div id="header">
-        <a id="logo" href="http://svn.netlabs.org/lucide/"><img src="http://www.netlabs.org/gfx/Lucide.png" alt="Trac" height="78" width="195" /></a>
-      </div>
-      <form id="search" action="/lucide/search" method="get">
-        <div>
-          <label for="proj-search">Search:</label>
-          <input type="text" id="proj-search" name="q" size="18" value="" />
-          <input type="submit" value="Search" />
-        </div>
-      </form>
-      <div id="metanav" class="nav">
-    <ul>
-      <li class="first"><a href="/lucide/login">Login</a></li><li><a href="/lucide/wiki/TracGuide">Help/Guide</a></li><li><a href="/lucide/about">About Trac</a></li><li class="last"><a href="/lucide/prefs">Preferences</a></li>
-    </ul>
-  </div>
-    </div>
-    <div id="mainnav" class="nav">
-    <ul>
-      <li class="first"><a href="/lucide/wiki">Wiki</a></li><li><a href="/lucide/timeline">Timeline</a></li><li><a href="/lucide/roadmap">Roadmap</a></li><li><a href="/lucide/browser">Browse Source</a></li><li><a href="/lucide/report">View Tickets</a></li><li class="last"><a href="/lucide/search">Search</a></li>
-    </ul>
-  </div>
-    <div id="main">
-      <div id="ctxtnav" class="nav">
-        <h2>Context Navigation</h2>
-          <ul>
-              <li class="last first"><a href="/lucide/ticket/209">Back to Ticket #209</a></li>
-          </ul>
-        <hr />
-      </div>
-    <div id="content" class="attachment">
-        <h1><a href="/lucide/ticket/209">Ticket #209</a>: Lucide_es.lng</h1>
-        <table id="info" summary="Description">
-          <tbody>
-            <tr>
-              <th scope="col">
-                File Lucide_es.lng, <span title="7351 bytes">7.2 KB</span>
-                (added by sparrac,  <a class="timeline" href="/lucide/timeline?from=2010-09-13T13%3A18%3A29%2B0200&amp;precision=second" title="2010-09-13T13:18:29+0200 in Timeline">4 weeks</a> ago)
-              </th>
-            </tr>
-            <tr>
-              <td class="message searchable">
-                
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div id="preview" class="searchable">
-    <table class="code"><thead><tr><th class="lineno" title="Line numbers">Line</th><th class="content">Â </th></tr></thead><tbody><tr><th id="L1"><a href="#L1">1</a></th><td>#</td></tr><tr><th id="L2"><a href="#L2">2</a></th><td># Lucide language file, ES (1.3.3)</td></tr><tr><th id="L3"><a href="#L3">3</a></th><td>#</td></tr><tr><th id="L4"><a href="#L4">4</a></th><td></td></tr><tr><th id="L5"><a href="#L5">5</a></th><td>#</td></tr><tr><th id="L6"><a href="#L6">6</a></th><td># Main menu</td></tr><tr><th id="L7"><a href="#L7">7</a></th><td>#</td></tr><tr><th id="L8"><a href="#L8">8</a></th><td>MENU_DOCUMENT=~Archivo</td></tr><tr><th id="L9"><a href="#L9">9</a></th><td>MENU_NEW_WINDOW=~Nueva ventana</td></tr><tr><th id="L10"><a href="#L10">10</a></th><td>MENU_OPEN=~Abrir...\tCtrl+O</td></tr><tr><th id="L11"><a href="#L11">11</a></th><td>MENU_NEXT_PREVIOUS=Siguiente/An~terior</td></tr><tr><th id="L12"><a href="#L12">12</a></th><td>MENU_FIRST=~Primero\tMays+Inicio</td></tr><tr><th id="L13"><a href="#L13">13</a></th><td>MENU_PREVIOUS=An~terior\tMays+Re PÂ g</td></tr><tr><th id="L14"><a href="#L14">14</a></th><td>MENU_NEXT=~Siguiente\tMays+Av PÂ g</td></tr><tr><th id="L15"><a href="#L15">15</a></th><td>MENU_LAST=Ã©~ltimo\tMays+Fin</td></tr><tr><th id="L16"><a href="#L16">16</a></th><td>MENU_RECENT_FILES=Archivos ~recientes</td></tr><tr><th id="L17"><a href="#L17">17</a></th><td>MENU_CLEAR_LIST=~Borrar la lista</td></tr><tr><th id="L18"><a href="#L18">18</a></th><td>MENU_SAVE_AS=~Guardar como...</td></tr><tr><th id="L19"><a href="#L19">19</a></th><td>MENU_CLOSE=~Cerrar</td></tr><tr><th id="L20"><a href="#L20">20</a></th><td># MENU_PAGE_SETUP: to delete</td></tr><tr><th id="L21"><a href="#L21">21</a></th><td>MENU_PAGE_SETUP=~Preferencias de pÂ gina...</td></tr><tr><th id="L22"><a href="#L22">22</a></th><td>MENU_PRINT=~Imprimir...\tCtrl+P</td></tr><tr><th id="L23"><a href="#L23">23</a></th><td>MENU_PLUGINS_LIST=~Lista de plugins...</td></tr><tr><th id="L24"><a href="#L24">24</a></th><td>MENU_EXIT=~Salir\tCtrl+X</td></tr><tr><th id="L25"><a href="#L25">25</a></th><td></td></tr><tr><th id="L26"><a href="#L26">26</a></th><td>MENU_EDIT=~Editar</td></tr><tr><th id="L27"><a href="#L27">27</a></th><td>MENU_COPY=~Copia\tCtrl+Insert</td></tr><tr><th id="L28"><a href="#L28">28</a></th><td>MENU_SELECT_ALL=~Seleccionar todo\tCtrl+/</td></tr><tr><th id="L29"><a href="#L29">29</a></th><td>MENU_FIND=~Buscar...\tCtrl+F</td></tr><tr><th id="L30"><a href="#L30">30</a></th><td>MENU_FINDAGAIN=Buscar si~guiente\tCtrl+G</td></tr><tr><th id="L31"><a href="#L31">31</a></th><td>MENU_SETTINGS=~Preferencias</td></tr><tr><th id="L32"><a href="#L32">32</a></th><td></td></tr><tr><th id="L33"><a href="#L33">33</a></th><td>MENU_VIEW=~Ver</td></tr><tr><th id="L34"><a href="#L34">34</a></th><td>MENU_FIT_WINDOW=Ajustar a la ~ventana\tCtrl+0</td></tr><tr><th id="L35"><a href="#L35">35</a></th><td>MENU_ACTUAL_SIZE=~Tamaâ‚¬o real\tCtrl+1</td></tr><tr><th id="L36"><a href="#L36">36</a></th><td>MENU_FIT_WIDTH=Ajustar al ~ancho\tCtrl+2</td></tr><tr><th id="L37"><a href="#L37">37</a></th><td>MENU_ZOOM_IN=Aumentar zoom\tCtrl++</td></tr><tr><th id="L38"><a href="#L38">38</a></th><td>MENU_ZOOM_OUT=Disminuir zoom\tCtrl+-</td></tr><tr><th id="L39"><a href="#L39">39</a></th><td>MENU_FIRST_PAGE=~Primera pÂ gina</td></tr><tr><th id="L40"><a href="#L40">40</a></th><td>MENU_PREV_PAGE=PÂ gina anterior\t-</td></tr><tr><th id="L41"><a href="#L41">41</a></th><td>MENU_NEXT_PAGE=PÂ gina ~siguiente\t+</td></tr><tr><th id="L42"><a href="#L42">42</a></th><td>MENU_LAST_PAGE=~Ã©ltima pÂ gina</td></tr><tr><th id="L43"><a href="#L43">43</a></th><td>MENU_GO_TO_PAGE=~Ir a la pÂ gina...\tCtrl+N</td></tr><tr><th id="L44"><a href="#L44">44</a></th><td>MENU_ROTATE_CW=~Girar 90Ã¸ en sentido horario\tCtrl+Mays++</td></tr><tr><th id="L45"><a href="#L45">45</a></th><td>MENU_ROTATE_CCW=Girar 90Ã¸ en sentido antihorario\tCtrl+Mays+-</td></tr><tr><th id="L46"><a href="#L46">46</a></th><td>MENU_SINGLE_PAGE=~Una pÂ gina cada vez</td></tr><tr><th id="L47"><a href="#L47">47</a></th><td>MENU_CONTINUOUS=Estilo ~continuo</td></tr><tr><th id="L48"><a href="#L48">48</a></th><td>MENU_DOCUMENT_INFO=~InformaciÂ¢n sobre el documento...\tCtrl+I</td></tr><tr><th id="L49"><a href="#L49">49</a></th><td>MENU_FONTS_INFO=~Fuentes utilizadas...</td></tr><tr><th id="L50"><a href="#L50">50</a></th><td></td></tr><tr><th id="L51"><a href="#L51">51</a></th><td>MENU_WINDOW=V~entana</td></tr><tr><th id="L52"><a href="#L52">52</a></th><td>MENU_SHOW_NAV_PANE=Mostrar panel de ~navegaciÂ¢n</td></tr><tr><th id="L53"><a href="#L53">53</a></th><td>MENU_FULLSCREEN=~Pantalla completa\tF11</td></tr><tr><th id="L54"><a href="#L54">54</a></th><td>MENU_PRESENTATION=~PresentaciÂ¢n\tF5</td></tr><tr><th id="L55"><a href="#L55">55</a></th><td>MENU_HELP=A~yuda</td></tr><tr><th id="L56"><a href="#L56">56</a></th><td>MENU_PRODUCT_INFORMATION=~Acerca de</td></tr><tr><th id="L57"><a href="#L57">57</a></th><td></td></tr><tr><th id="L58"><a href="#L58">58</a></th><td>#</td></tr><tr><th id="L59"><a href="#L59">59</a></th><td># Toolbar hints</td></tr><tr><th id="L60"><a href="#L60">60</a></th><td>#</td></tr><tr><th id="L61"><a href="#L61">61</a></th><td>TBHINT_OPEN=Abrir documento...</td></tr><tr><th id="L62"><a href="#L62">62</a></th><td>TBHINT_PRINT=Imprimir...</td></tr><tr><th id="L63"><a href="#L63">63</a></th><td>TBHINT_SHOW_NAV_PANE=Mostrar/ocultar el panel de navegaciÂ¢n</td></tr><tr><th id="L64"><a href="#L64">64</a></th><td>TBHINT_FIRST_PAGE=Primera pÂ gina</td></tr><tr><th id="L65"><a href="#L65">65</a></th><td>TBHINT_PREV_PAGE=PÂ gina anterior</td></tr><tr><th id="L66"><a href="#L66">66</a></th><td>TBHINT_NEXT_PAGE=Siguiente pÂ gina</td></tr><tr><th id="L67"><a href="#L67">67</a></th><td>TBHINT_LAST_PAGE=Ã©ltima pÂ gina</td></tr><tr><th id="L68"><a href="#L68">68</a></th><td>TBHINT_ACTUAL_SIZE=Tamaâ‚¬o real</td></tr><tr><th id="L69"><a href="#L69">69</a></th><td>TBHINT_FIT_WINDOW=Ajustar alto de las pÂ ginas a la ventana</td></tr><tr><th id="L70"><a href="#L70">70</a></th><td>TBHINT_FIT_WIDTH=Ajustar ancho de las pÂ ginas a la ventana</td></tr><tr><th id="L71"><a href="#L71">71</a></th><td>TBHINT_FIND=Buscar...</td></tr><tr><th id="L72"><a href="#L72">72</a></th><td>TBHINT_FINDAGAIN=Buscar siguiente</td></tr><tr><th id="L73"><a href="#L73">73</a></th><td>TBHINT_ZOOM_IN_OUT=Aumentar/reducir tamaâ‚¬o</td></tr><tr><th id="L74"><a href="#L74">74</a></th><td># toolbar's page number</td></tr><tr><th id="L75"><a href="#L75">75</a></th><td>TB_PAGENUM=de %d</td></tr><tr><th id="L76"><a href="#L76">76</a></th><td></td></tr><tr><th id="L77"><a href="#L77">77</a></th><td>#</td></tr><tr><th id="L78"><a href="#L78">78</a></th><td># Lucide messages</td></tr><tr><th id="L79"><a href="#L79">79</a></th><td>#</td></tr><tr><th id="L80"><a href="#L80">80</a></th><td>MSGS_MAIN_WIN_TITLE=%APPNAME%</td></tr><tr><th id="L81"><a href="#L81">81</a></th><td>MSGS_NO_SUIT_PLUG=Â­No puede encontrarse un plugin adecuado para el documento especificado!</td></tr><tr><th id="L82"><a href="#L82">82</a></th><td>MSGS_FILE_LOAD_ERROR=Â­Error cargando el archivo!</td></tr><tr><th id="L83"><a href="#L83">83</a></th><td>MSGS_LOADING_DOCUMENT=Cargando el documento, por favor espere...</td></tr><tr><th id="L84"><a href="#L84">84</a></th><td>MSGS_CREATING_THUMBNAIL=Creando las miniaturas del documento, por favor espere...</td></tr><tr><th id="L85"><a href="#L85">85</a></th><td>MSGS_WARNING=Â­AtenciÂ¢n!</td></tr><tr><th id="L86"><a href="#L86">86</a></th><td>MSGS_OVERWRITE_FILE=El archivo ya existe. Å¡Desea sustituirlo?</td></tr><tr><th id="L87"><a href="#L87">87</a></th><td>MSGS_FILE_SAVE_ERROR=Â­Error guardando el archivo!</td></tr><tr><th id="L88"><a href="#L88">88</a></th><td>MSGS_PAGE=PÂ gina</td></tr><tr><th id="L89"><a href="#L89">89</a></th><td>MSGS_ERROR_STARTING_BROWSER=Â­Error iniciando el navegador!</td></tr><tr><th id="L90"><a href="#L90">90</a></th><td>MSGS_CLOSE_MODIFIED_DOCUMENT=El documento ha sido modificado. Å¡Desea guardarlo?</td></tr><tr><th id="L91"><a href="#L91">91</a></th><td>MSGS_FILE_COPY_SUFFIX=Copia de %s</td></tr><tr><th id="L92"><a href="#L92">92</a></th><td>MSGS_LDERR=Â­Error al cargar el archivo: %s !</td></tr><tr><th id="L93"><a href="#L93">93</a></th><td>MSGS_LDERR_OUT_OF_MEMORY=Fuera de memoria</td></tr><tr><th id="L94"><a href="#L94">94</a></th><td>MSGS_LDERR_OPEN_ERROR=Error de apertura</td></tr><tr><th id="L95"><a href="#L95">95</a></th><td>MSGS_LDERR_READ_ERROR=Error de lectura</td></tr><tr><th id="L96"><a href="#L96">96</a></th><td>MSGS_LDERR_DAMAGED=Archivo daâ‚¬ado</td></tr><tr><th id="L97"><a href="#L97">97</a></th><td>MSGS_LDERR_WRONG_FORMAT=Formato incorrecto</td></tr><tr><th id="L98"><a href="#L98">98</a></th><td>MSGS_LDERR_ENCRYPTED=El archivo estÂ  cifrado</td></tr><tr><th id="L99"><a href="#L99">99</a></th><td>MSGS_RERR_OUT_OF_MEMORY=Fuera de memoria</td></tr><tr><th id="L100"><a href="#L100">100</a></th><td>MSGS_RERR_CORRUPTED_PAGE_DATA=Datos de pÂ gina corruptos</td></tr><tr><th id="L101"><a href="#L101">101</a></th><td>MSGS_RERR_FONT_NOT_FOUND=Fuente %s no encontrada</td></tr><tr><th id="L102"><a href="#L102">102</a></th><td></td></tr><tr><th id="L103"><a href="#L103">103</a></th><td>#</td></tr><tr><th id="L104"><a href="#L104">104</a></th><td># "Plugins list" dialog</td></tr><tr><th id="L105"><a href="#L105">105</a></th><td>#</td></tr><tr><th id="L106"><a href="#L106">106</a></th><td>PLUGLIST_PLUGINS_LIST=Lista de plugins</td></tr><tr><th id="L107"><a href="#L107">107</a></th><td>PLUGLIST_CLOSE=~Cerrar</td></tr><tr><th id="L108"><a href="#L108">108</a></th><td># List columns titles</td></tr><tr><th id="L109"><a href="#L109">109</a></th><td>PLUGLIST_PLUGIN_NAME=Nombre del plugin</td></tr><tr><th id="L110"><a href="#L110">110</a></th><td>PLUGLIST_SUPP_EXTS=Extensiones soportadas</td></tr><tr><th id="L111"><a href="#L111">111</a></th><td>PLUGLIST_PLUGIN_DESC=DescripciÂ¢n del plugin</td></tr><tr><th id="L112"><a href="#L112">112</a></th><td></td></tr><tr><th id="L113"><a href="#L113">113</a></th><td>#</td></tr><tr><th id="L114"><a href="#L114">114</a></th><td># "Font info" dialog</td></tr><tr><th id="L115"><a href="#L115">115</a></th><td>#</td></tr><tr><th id="L116"><a href="#L116">116</a></th><td>FONTINFO_FONTINFO=InformaciÂ¢n de fuentes</td></tr><tr><th id="L117"><a href="#L117">117</a></th><td>FONTINFO_CLOSE=~Cerrar</td></tr><tr><th id="L118"><a href="#L118">118</a></th><td>FONTINFO_ENUMERATING=Enumerando fuentes, espere por favor...</td></tr><tr><th id="L119"><a href="#L119">119</a></th><td># List columns titles</td></tr><tr><th id="L120"><a href="#L120">120</a></th><td>FONTINFO_NAME=Nombre</td></tr><tr><th id="L121"><a href="#L121">121</a></th><td>FONTINFO_TYPE=Tipo</td></tr><tr><th id="L122"><a href="#L122">122</a></th><td>FONTINFO_EMBEDDED=Å¡Incluida en el documento?</td></tr><tr><th id="L123"><a href="#L123">123</a></th><td># Embedded types</td></tr><tr><th id="L124"><a href="#L124">124</a></th><td>FONTINFO_EMBED_NOT_EMBEDDED=No</td></tr><tr><th id="L125"><a href="#L125">125</a></th><td>FONTINFO_EMBED_EMBEDDED=SÂ¡</td></tr><tr><th id="L126"><a href="#L126">126</a></th><td>FONTINFO_EMBED_EMBEDDED_SUBSET=Parcialmente</td></tr><tr><th id="L127"><a href="#L127">127</a></th><td></td></tr><tr><th id="L128"><a href="#L128">128</a></th><td>#</td></tr><tr><th id="L129"><a href="#L129">129</a></th><td># "Document info" dialog</td></tr><tr><th id="L130"><a href="#L130">130</a></th><td>#</td></tr><tr><th id="L131"><a href="#L131">131</a></th><td>DOCINFO_DOCUMENT_INFO=InformaciÂ¢n sobre el documento</td></tr><tr><th id="L132"><a href="#L132">132</a></th><td>DOCINFO_CLOSE=~Cerrar</td></tr><tr><th id="L133"><a href="#L133">133</a></th><td># Document info keys</td></tr><tr><th id="L134"><a href="#L134">134</a></th><td>DOCINFO_TITLE=TÂ¡tulo:</td></tr><tr><th id="L135"><a href="#L135">135</a></th><td>DOCINFO_FORMAT=Formato:</td></tr><tr><th id="L136"><a href="#L136">136</a></th><td>DOCINFO_AUTHOR=Autor:</td></tr><tr><th id="L137"><a href="#L137">137</a></th><td>DOCINFO_SUBJECT=Tema:</td></tr><tr><th id="L138"><a href="#L138">138</a></th><td>DOCINFO_KEYWORDS=Palabras clave:</td></tr><tr><th id="L139"><a href="#L139">139</a></th><td>DOCINFO_CREATOR=Creado con:</td></tr><tr><th id="L140"><a href="#L140">140</a></th><td>DOCINFO_PRODUCER=Producido con:</td></tr><tr><th id="L141"><a href="#L141">141</a></th><td>DOCINFO_CREATION_DATE=Creado:</td></tr><tr><th id="L142"><a href="#L142">142</a></th><td>DOCINFO_MOD_DATE=Modificado:</td></tr><tr><th id="L143"><a href="#L143">143</a></th><td>DOCINFO_NAME=Nombre del documento:</td></tr><tr><th id="L144"><a href="#L144">144</a></th><td></td></tr><tr><th id="L145"><a href="#L145">145</a></th><td>#</td></tr><tr><th id="L146"><a href="#L146">146</a></th><td># "Find" dialog</td></tr><tr><th id="L147"><a href="#L147">147</a></th><td>#</td></tr><tr><th id="L148"><a href="#L148">148</a></th><td>FIND_FIND=Buscar</td></tr><tr><th id="L149"><a href="#L149">149</a></th><td>FIND_FIND_WHAT=QuÂ‚ ~buscar</td></tr><tr><th id="L150"><a href="#L150">150</a></th><td>FIND_MATCH_CASE=Distinguir ~mayÂ£sculas/minÂ£sculas</td></tr><tr><th id="L151"><a href="#L151">151</a></th><td>FIND_BACK=Buscar ~hacia atrÂ s</td></tr><tr><th id="L152"><a href="#L152">152</a></th><td>FIND_OK=~Bien</td></tr><tr><th id="L153"><a href="#L153">153</a></th><td>FIND_CANCEL=~Cancelar</td></tr><tr><th id="L154"><a href="#L154">154</a></th><td># other 'find'-related messages</td></tr><tr><th id="L155"><a href="#L155">155</a></th><td>FIND_SEARCH_PAGE_OF=Buscando - pÂ gina %d de %d...</td></tr><tr><th id="L156"><a href="#L156">156</a></th><td>FIND_NOT_FOUND=Â­No se encuentra!</td></tr><tr><th id="L157"><a href="#L157">157</a></th><td></td></tr><tr><th id="L158"><a href="#L158">158</a></th><td>#</td></tr><tr><th id="L159"><a href="#L159">159</a></th><td># "Progress" dialog</td></tr><tr><th id="L160"><a href="#L160">160</a></th><td>#</td></tr><tr><th id="L161"><a href="#L161">161</a></th><td>PDLG_PROGRESS=Progreso</td></tr><tr><th id="L162"><a href="#L162">162</a></th><td>PDLG_CANCEL=~Cancelar</td></tr><tr><th id="L163"><a href="#L163">163</a></th><td></td></tr><tr><th id="L164"><a href="#L164">164</a></th><td>#</td></tr><tr><th id="L165"><a href="#L165">165</a></th><td># About dialog</td></tr><tr><th id="L166"><a href="#L166">166</a></th><td>#</td></tr><tr><th id="L167"><a href="#L167">167</a></th><td>AD_ABOUT=Acerca de</td></tr><tr><th id="L168"><a href="#L168">168</a></th><td>AD_DESCRIPTION=Visor de documentos con arquitectura de plugins y soporte para varios formatos de archivo</td></tr><tr><th id="L169"><a href="#L169">169</a></th><td>AD_COPYRIGHTS=(c) Eugene Romanenko, Dmitry A. Kuminov (netlabs.org) en colaboraciÂ¢n con Serenity Systems International</td></tr><tr><th id="L170"><a href="#L170">170</a></th><td>AD_OK=~Bien</td></tr><tr><th id="L171"><a href="#L171">171</a></th><td></td></tr><tr><th id="L172"><a href="#L172">172</a></th><td>#</td></tr><tr><th id="L173"><a href="#L173">173</a></th><td># Settings dialog</td></tr><tr><th id="L174"><a href="#L174">174</a></th><td>#</td></tr><tr><th id="L175"><a href="#L175">175</a></th><td>SD_SETTINGS=Opciones</td></tr><tr><th id="L176"><a href="#L176">176</a></th><td>SD_DEFAULT_PAGE_LAYOUT=~Ver pÂ ginas</td></tr><tr><th id="L177"><a href="#L177">177</a></th><td>SD_DEFAULT_ZOOM=~Zoom por omisiÂ¢n</td></tr><tr><th id="L178"><a href="#L178">178</a></th><td>SD_SINGLE_PAGE=Una pÂ gina cada vez</td></tr><tr><th id="L179"><a href="#L179">179</a></th><td>SD_CONTINUOUS=Estilo continuo</td></tr><tr><th id="L180"><a href="#L180">180</a></th><td>SD_OK=~Bien</td></tr><tr><th id="L181"><a href="#L181">181</a></th><td>SD_CANCEL=~Cancelar</td></tr><tr><th id="L182"><a href="#L182">182</a></th><td></td></tr><tr><th id="L183"><a href="#L183">183</a></th><td>#</td></tr><tr><th id="L184"><a href="#L184">184</a></th><td># 'Go to page' dialog</td></tr><tr><th id="L185"><a href="#L185">185</a></th><td>#</td></tr><tr><th id="L186"><a href="#L186">186</a></th><td>GTP_GOTOPAGE=Ir a la pÂ gina</td></tr><tr><th id="L187"><a href="#L187">187</a></th><td>GTP_PAGE=PÂ gina</td></tr><tr><th id="L188"><a href="#L188">188</a></th><td>GTP_OF=de %d</td></tr><tr><th id="L189"><a href="#L189">189</a></th><td>GTP_OK=~Bien</td></tr><tr><th id="L190"><a href="#L190">190</a></th><td>GTP_CANCEL=~Cancelar</td></tr><tr><th id="L191"><a href="#L191">191</a></th><td></td></tr><tr><th id="L192"><a href="#L192">192</a></th><td>#</td></tr><tr><th id="L193"><a href="#L193">193</a></th><td># Print dialog</td></tr><tr><th id="L194"><a href="#L194">194</a></th><td>#</td></tr><tr><th id="L195"><a href="#L195">195</a></th><td>PD_TITLE=Imprimir</td></tr><tr><th id="L196"><a href="#L196">196</a></th><td>PD_PRINTER=Impresora</td></tr><tr><th id="L197"><a href="#L197">197</a></th><td>PD_NAME_LABEL=~Nombre</td></tr><tr><th id="L198"><a href="#L198">198</a></th><td>PD_JOB_PROPERTIES=~Propiedades del trabajo</td></tr><tr><th id="L199"><a href="#L199">199</a></th><td>PD_DRIVER_LABEL=Controlador</td></tr><tr><th id="L200"><a href="#L200">200</a></th><td>PD_PRINT_RANGE_AND_COPIES=~Rango de impresiÂ¢n y nÂ§ de copias</td></tr><tr><th id="L201"><a href="#L201">201</a></th><td>PD_RANGE_ALL=~Todas</td></tr><tr><th id="L202"><a href="#L202">202</a></th><td>PD_RANGE_CURRENT_PAGE=SÂ¢lo la pÂ gina ~actual</td></tr><tr><th id="L203"><a href="#L203">203</a></th><td>PD_RANGE_PAGES=~PÂ ginas</td></tr><tr><th id="L204"><a href="#L204">204</a></th><td>PD_FROM=~de</td></tr><tr><th id="L205"><a href="#L205">205</a></th><td>PD_TO=~a</td></tr><tr><th id="L206"><a href="#L206">206</a></th><td>PD_NUMBER_OF_COPIES=~NÂ£mero de copias</td></tr><tr><th id="L207"><a href="#L207">207</a></th><td>PD_RANGE_EVEN_ODD_LABEL=Alcance de la impresiÂ¢n</td></tr><tr><th id="L208"><a href="#L208">208</a></th><td>PD_RANGE_EVEN_ODD=PÂ ginas pares e impares</td></tr><tr><th id="L209"><a href="#L209">209</a></th><td>PD_RANGE_ODD=SÂ¢lo pÂ ginas impares</td></tr><tr><th id="L210"><a href="#L210">210</a></th><td>PD_RANGE_EVEN=SÂ¢lo pÂ ginas pares</td></tr><tr><th id="L211"><a href="#L211">211</a></th><td>PD_PRINT_TYPE=~Tipo de impresiÂ¢n</td></tr><tr><th id="L212"><a href="#L212">212</a></th><td>PD_TYPE_POSTSCRIPT=Postscript</td></tr><tr><th id="L213"><a href="#L213">213</a></th><td>PD_PRINT_TO_FILE=Imprimir a un archivo</td></tr><tr><th id="L214"><a href="#L214">214</a></th><td>PD_TYPE_ASIMAGE=Como imagen</td></tr><tr><th id="L215"><a href="#L215">215</a></th><td>PD_HIGHER_IMAGE_QUALITY=Mayor ~calidad de imagen (mÂ s lento, requiere mÂ s memoria)</td></tr><tr><th id="L216"><a href="#L216">216</a></th><td>PD_PAGE_ORIENTATION=~OrientaciÂ¢n de las pÂ ginas</td></tr><tr><th id="L217"><a href="#L217">217</a></th><td>PD_PORTRAIT=Vertical</td></tr><tr><th id="L218"><a href="#L218">218</a></th><td>PD_LANDSCAPE=Apaisada</td></tr><tr><th id="L219"><a href="#L219">219</a></th><td>PD_MARGINS=~MÂ rgenes (mm)</td></tr><tr><th id="L220"><a href="#L220">220</a></th><td>PD_IGNORE_PRINTER_MARGINS=Ignorar los mÂ rgenes de la impresora</td></tr><tr><th id="L221"><a href="#L221">221</a></th><td>PD_MLEFT=Izquierdo</td></tr><tr><th id="L222"><a href="#L222">222</a></th><td>PD_MRIGHT=Derecho</td></tr><tr><th id="L223"><a href="#L223">223</a></th><td>PD_MTOP=Superior</td></tr><tr><th id="L224"><a href="#L224">224</a></th><td>PD_MBOTTOM=Inferior</td></tr><tr><th id="L225"><a href="#L225">225</a></th><td>PD_SELECTED_FORM=Formato seleccionado</td></tr><tr><th id="L226"><a href="#L226">226</a></th><td>PD_BTNPRINT=~Imprimir</td></tr><tr><th id="L227"><a href="#L227">227</a></th><td>PD_BTNCANCEL=~Cancelar</td></tr><tr><th id="L228"><a href="#L228">228</a></th><td>PD_WRONG_MARGINS=Â­MÂ rgenes errÂ¢neos!</td></tr><tr><th id="L229"><a href="#L229">229</a></th><td># other 'print'-related messages</td></tr><tr><th id="L230"><a href="#L230">230</a></th><td>PRINT_PRINTING_PAGE_OF=Imprimiendo pÂ gina %d (%d de %d)...</td></tr><tr><th id="L231"><a href="#L231">231</a></th><td>PRINT_GENERATING_POSTSCRIPT=Generando archivo postscript...</td></tr><tr><th id="L232"><a href="#L232">232</a></th><td>PRINT_SPOOLING_POSTSCRIPT=Enviando datos postcript al controlador de spool...</td></tr><tr><th id="L233"><a href="#L233">233</a></th><td>PRINT_FAILED=Â­Error al imprimir!</td></tr><tr><th id="L234"><a href="#L234">234</a></th><td></td></tr><tr><th id="L235"><a href="#L235">235</a></th><td>#</td></tr><tr><th id="L236"><a href="#L236">236</a></th><td># Password dialog</td></tr><tr><th id="L237"><a href="#L237">237</a></th><td>#</td></tr><tr><th id="L238"><a href="#L238">238</a></th><td>PSW_TITLE=Â­El documento tiene contraseâ‚¬a!</td></tr><tr><th id="L239"><a href="#L239">239</a></th><td>PSW_PASSWORD=C~ontraseâ‚¬a</td></tr><tr><th id="L240"><a href="#L240">240</a></th><td>PSW_OK=~Bien</td></tr><tr><th id="L241"><a href="#L241">241</a></th><td>PSW_CANCEL=~Cancelar</td></tr><tr><th id="L242"><a href="#L242">242</a></th><td></td></tr><tr><th id="L243"><a href="#L243">243</a></th><td>#</td></tr><tr><th id="L244"><a href="#L244">244</a></th><td># Open file dialog</td></tr><tr><th id="L245"><a href="#L245">245</a></th><td>#</td></tr><tr><th id="L246"><a href="#L246">246</a></th><td>FDLG_OPEN=Abrir</td></tr><tr><th id="L247"><a href="#L247">247</a></th><td>FDLG_FILENAME=~Nombre</td></tr><tr><th id="L248"><a href="#L248">248</a></th><td>FDLG_DRIVE=~Unidad</td></tr><tr><th id="L249"><a href="#L249">249</a></th><td>FDLG_FILETYPE=~Tipo</td></tr><tr><th id="L250"><a href="#L250">250</a></th><td>FDLG_FILE=~Archivo</td></tr><tr><th id="L251"><a href="#L251">251</a></th><td>FDLG_DIRECTORY=~Directorio</td></tr><tr><th id="L252"><a href="#L252">252</a></th><td>FDLG_OK=~Bien</td></tr><tr><th id="L253"><a href="#L253">253</a></th><td>FDLG_CANCEL=~Cancelar</td></tr><tr><th id="L254"><a href="#L254">254</a></th><td>FDLG_NO_PREVIEW_AVAILABLE=No hay vista previa disponible</td></tr><tr><th id="L255"><a href="#L255">255</a></th><td>FDLG_ALL_SUPPORTED_TYPES=&lt;Todos los tipos soportados&gt;</td></tr></tbody></table>
-        </div>
-    </div>
-    <div id="altlinks">
-      <h3>Download in other formats:</h3>
-      <ul>
-        <li class="last first">
-          <a rel="nofollow" href="/lucide/raw-attachment/ticket/209/Lucide_es.lng">Original Format</a>
-        </li>
-      </ul>
-    </div>
-    </div>
-    <div id="footer" lang="en" xml:lang="en"><hr />
-      <a id="tracpowered" href="http://trac.edgewall.org/"><img src="/trac/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
-      <p class="left">
-        Powered by <a href="/lucide/about"><strong>Trac 0.11.7</strong></a><br />
-        By <a href="http://www.edgewall.org/">Edgewall Software</a>.
-      </p>
-      <p class="right">Visit the Trac open source project at<br /><a href="http://trac.edgewall.com/">http://trac.edgewall.com/</a></p>
-    </div>
-  </body>
-</html>
+MENU_VIEW=~Ver
+MENU_FIT_WINDOW=Ajustar a la ~ventana\tCtrl+0
+MENU_ACTUAL_SIZE=~Tama¤o real\tCtrl+1
+MENU_FIT_WIDTH=Ajustar al ~ancho\tCtrl+2
+MENU_ZOOM_IN=Aumentar zoom\tCtrl++
+MENU_ZOOM_OUT=Disminuir zoom\tCtrl+-
+MENU_FIRST_PAGE=~Primera p gina
+MENU_PREV_PAGE=P gina anterior\t-
+MENU_NEXT_PAGE=P gina ~siguiente\t+
+MENU_LAST_PAGE=~éltima p gina
+MENU_GO_TO_PAGE=~Ir a la p gina...\tCtrl+N
+MENU_ROTATE_CW=~Girar 90ø en sentido horario\tCtrl+Mays++
+MENU_ROTATE_CCW=Girar 90ø en sentido antihorario\tCtrl+Mays+-
+MENU_SINGLE_PAGE=~Una p gina cada vez
+MENU_CONTINUOUS=Estilo ~continuo
+MENU_DOCUMENT_INFO=~Informaci¢n sobre el documento...\tCtrl+I
+MENU_FONTS_INFO=~Fuentes utilizadas...
+
+MENU_WINDOW=V~entana
+MENU_SHOW_NAV_PANE=Mostrar panel de ~navegaci¢n
+MENU_FULLSCREEN=~Pantalla completa\tF11
+MENU_PRESENTATION=~Presentaci¢n\tF5
+MENU_HELP=A~yuda
+MENU_PRODUCT_INFORMATION=~Acerca de
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=Abrir documento...
+TBHINT_PRINT=Imprimir...
+TBHINT_SHOW_NAV_PANE=Mostrar/ocultar el panel de navegaci¢n
+TBHINT_FIRST_PAGE=Primera p gina
+TBHINT_PREV_PAGE=P gina anterior
+TBHINT_NEXT_PAGE=Siguiente p gina
+TBHINT_LAST_PAGE=éltima p gina
+TBHINT_ACTUAL_SIZE=Tama¤o real
+TBHINT_FIT_WINDOW=Ajustar alto de las p ginas a la ventana
+TBHINT_FIT_WIDTH=Ajustar ancho de las p ginas a la ventana
+TBHINT_FIND=Buscar...
+TBHINT_FINDAGAIN=Buscar siguiente
+TBHINT_ZOOM_IN_OUT=Aumentar/reducir tama¤o
+# toolbar's page number
+TB_PAGENUM=de %d
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=%APPNAME%
+MSGS_NO_SUIT_PLUG=­No puede encontrarse un plugin adecuado para el documento especificado!
+MSGS_FILE_LOAD_ERROR=­Error cargando el archivo!
+MSGS_LOADING_DOCUMENT=Cargando el documento, por favor espere...
+MSGS_CREATING_THUMBNAIL=Creando las miniaturas del documento, por favor espere...
+MSGS_WARNING=­Atenci¢n!
+MSGS_OVERWRITE_FILE=El archivo ya existe. ¨Desea sustituirlo?
+MSGS_FILE_SAVE_ERROR=­Error guardando el archivo!
+MSGS_PAGE=P gina
+MSGS_ERROR_STARTING_BROWSER=­Error iniciando el navegador!
+MSGS_CLOSE_MODIFIED_DOCUMENT=El documento ha sido modificado. ¨Desea guardarlo?
+MSGS_FILE_COPY_SUFFIX=Copia de %s
+MSGS_LDERR=­Error al cargar el archivo: %s !
+MSGS_LDERR_OUT_OF_MEMORY=Fuera de memoria
+MSGS_LDERR_OPEN_ERROR=Error de apertura
+MSGS_LDERR_READ_ERROR=Error de lectura
+MSGS_LDERR_DAMAGED=Archivo da¤ado
+MSGS_LDERR_WRONG_FORMAT=Formato incorrecto
+MSGS_LDERR_ENCRYPTED=El archivo est  cifrado
+MSGS_RERR_OUT_OF_MEMORY=Fuera de memoria
+MSGS_RERR_CORRUPTED_PAGE_DATA=Datos de p gina corruptos
+MSGS_RERR_FONT_NOT_FOUND=Fuente %s no encontrada
+
+#
+# "Plugins list" dialog
+#
+PLUGLIST_PLUGINS_LIST=Lista de plugins
+PLUGLIST_CLOSE=~Cerrar
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Nombre del plugin
+PLUGLIST_SUPP_EXTS=Extensiones soportadas
+PLUGLIST_PLUGIN_DESC=Descripci¢n del plugin
+
+#
+# "Font info" dialog
+#
+FONTINFO_FONTINFO=Informaci¢n de fuentes
+FONTINFO_CLOSE=~Cerrar
+FONTINFO_ENUMERATING=Enumerando fuentes, espere por favor...
+# List columns titles
+FONTINFO_NAME=Nombre
+FONTINFO_TYPE=Tipo
+FONTINFO_EMBEDDED=¨Incluida en el documento?
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=No
+FONTINFO_EMBED_EMBEDDED=S¡
+FONTINFO_EMBED_EMBEDDED_SUBSET=Parcialmente
+
+#
+# "Document info" dialog
+#
+DOCINFO_DOCUMENT_INFO=Informaci¢n sobre el documento
+DOCINFO_CLOSE=~Cerrar
+# Document info keys
+DOCINFO_TITLE=T¡tulo:
+DOCINFO_FORMAT=Formato:
+DOCINFO_AUTHOR=Autor:
+DOCINFO_SUBJECT=Tema:
+DOCINFO_KEYWORDS=Palabras clave:
+DOCINFO_CREATOR=Creado con:
+DOCINFO_PRODUCER=Producido con:
+DOCINFO_CREATION_DATE=Creado:
+DOCINFO_MOD_DATE=Modificado:
+DOCINFO_NAME=Nombre del documento:
+
+#
+# "Find" dialog
+#
+FIND_FIND=Buscar
+FIND_FIND_WHAT=Qu‚ ~buscar
+FIND_MATCH_CASE=Distinguir ~may£sculas/min£sculas
+FIND_BACK=Buscar ~hacia atr s
+FIND_OK=~Bien
+FIND_CANCEL=~Cancelar
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=Buscando - p gina %d de %d...
+FIND_NOT_FOUND=­No se encuentra!
+
+#
+# "Progress" dialog
+#
+PDLG_PROGRESS=Progreso
+PDLG_CANCEL=~Cancelar
+
+#
+# About dialog
+#
+AD_ABOUT=Acerca de
+AD_DESCRIPTION=Visor de documentos con arquitectura de plugins y soporte para varios formatos de archivo
+AD_COPYRIGHTS=(c) Eugene Romanenko, Dmitry A. Kuminov (netlabs.org) en colaboraci¢n con Serenity Systems International
+AD_OK=~Bien
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Opciones
+SD_DEFAULT_PAGE_LAYOUT=~Ver p ginas
+SD_DEFAULT_ZOOM=~Zoom por omisi¢n
+SD_SINGLE_PAGE=Una p gina cada vez
+SD_CONTINUOUS=Estilo continuo
+SD_OK=~Bien
+SD_CANCEL=~Cancelar
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=Ir a la p gina
+GTP_PAGE=P gina
+GTP_OF=de %d
+GTP_OK=~Bien
+GTP_CANCEL=~Cancelar
+
+#
+# Print dialog
+#
+PD_TITLE=Imprimir
+PD_PRINTER=Impresora
+PD_NAME_LABEL=~Nombre
+PD_JOB_PROPERTIES=~Propiedades del trabajo
+PD_DRIVER_LABEL=Controlador
+PD_PRINT_RANGE_AND_COPIES=~Rango de impresi¢n y n§ de copias
+PD_RANGE_ALL=~Todas
+PD_RANGE_CURRENT_PAGE=S¢lo la p gina ~actual
+PD_RANGE_PAGES=~P ginas
+PD_FROM=~de
+PD_TO=~a
+PD_NUMBER_OF_COPIES=~N£mero de copias
+PD_RANGE_EVEN_ODD_LABEL=Alcance de la impresi¢n
+PD_RANGE_EVEN_ODD=P ginas pares e impares
+PD_RANGE_ODD=S¢lo p ginas impares
+PD_RANGE_EVEN=S¢lo p ginas pares
+PD_PRINT_TYPE=~Tipo de impresi¢n
+PD_TYPE_POSTSCRIPT=Postscript
+PD_PRINT_TO_FILE=Imprimir a un archivo
+PD_TYPE_ASIMAGE=Como imagen
+PD_HIGHER_IMAGE_QUALITY=Mayor ~calidad de imagen (m s lento, requiere m s memoria)
+PD_PAGE_ORIENTATION=~Orientaci¢n de las p ginas
+PD_PORTRAIT=Vertical
+PD_LANDSCAPE=Apaisada
+PD_MARGINS=~M rgenes (mm)
+PD_IGNORE_PRINTER_MARGINS=Ignorar los m rgenes de la impresora
+PD_MLEFT=Izquierdo
+PD_MRIGHT=Derecho
+PD_MTOP=Superior
+PD_MBOTTOM=Inferior
+PD_SELECTED_FORM=Formato seleccionado
+PD_BTNPRINT=~Imprimir
+PD_BTNCANCEL=~Cancelar
+PD_WRONG_MARGINS=­M rgenes err¢neos!
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=Imprimiendo p gina %d (%d de %d)...
+PRINT_GENERATING_POSTSCRIPT=Generando archivo postscript...
+PRINT_SPOOLING_POSTSCRIPT=Enviando datos postcript al controlador de spool...
+PRINT_FAILED=­Error al imprimir!
+
+#
+# Password dialog
+#
+PSW_TITLE=­El documento tiene contrase¤a!
+PSW_PASSWORD=C~ontrase¤a
+PSW_OK=~Bien
+PSW_CANCEL=~Cancelar
+
+#
+# Open file dialog
+#
+FDLG_OPEN=Abrir
+FDLG_FILENAME=~Nombre
+FDLG_DRIVE=~Unidad
+FDLG_FILETYPE=~Tipo
+FDLG_FILE=~Archivo
+FDLG_DIRECTORY=~Directorio
+FDLG_OK=~Bien
+FDLG_CANCEL=~Cancelar
+FDLG_NO_PREVIEW_AVAILABLE=No hay vista previa disponible
+FDLG_ALL_SUPPORTED_TYPES=<Todos los tipos soportados>
