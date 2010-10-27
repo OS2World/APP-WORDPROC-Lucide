@@ -1,5 +1,5 @@
 #
-# Lucide language file, CZ
+# Lucide language file, CS (1.3.3)
 #
 
 #
@@ -8,7 +8,15 @@
 MENU_DOCUMENT=~Dokument
 MENU_NEW_WINDOW=~Nov‚ okno
 MENU_OPEN=~Otevý¡t...\tCtrl+O
+MENU_NEXT_PREVIOUS=Dalç¡/Pýe~dchoz¡
+MENU_FIRST=Prvn¡\tShift+Home
+MENU_PREVIOUS=Pýedchoz¡\tShift+PgUp
+MENU_NEXT=Dalç¡\tShift+PgDn
+MENU_LAST=Posledn¡\tShift+End
+MENU_RECENT_FILES=~Ned vn‚ soubory
+MENU_CLEAR_LIST=S~mazat seznam
 MENU_SAVE_AS=~Ulo§it jako...
+MENU_CLOSE=~Zavý¡t
 # MENU_PAGE_SETUP: smazat
 MENU_PAGE_SETUP=~Nastaven¡ str nky...
 MENU_PRINT=~Tisk...\tCtrl+P
@@ -41,6 +49,7 @@ MENU_FONTS_INFO=In~formace o p¡smech...
 MENU_WINDOW=~Okno
 MENU_SHOW_NAV_PANE=~Zobrazit navigaŸn¡ liçtu
 MENU_FULLSCREEN=~Cel  obrazovka\tF11
+MENU_PRESENTATION=~Prezentace\tF5
 MENU_HELP=~N povØda
 MENU_PRODUCT_INFORMATION=~Informace o programu
 
@@ -66,15 +75,30 @@ TB_PAGENUM=z %d
 #
 # Lucide messages
 #
-MSGS_MAIN_WIN_TITLE=%APPNAME% - Prohl¡§eŸ dokument…
+MSGS_MAIN_WIN_TITLE=%APPNAME%
 MSGS_NO_SUIT_PLUG=Pro zvolenì dokument nemohu naj¡t odpov¡daj¡c¡ modul!
 MSGS_FILE_LOAD_ERROR=Chyba pýi Ÿten¡ souboru!
 MSGS_LOADING_DOCUMENT=NaŸ¡t m dokument, Ÿekejte pros¡m...
+MSGS_CREATING_THUMBNAIL=Vytv ý¡m n hled dokumentu, Ÿekejte pros¡m...
 MSGS_WARNING=UpozornØn¡!
 MSGS_OVERWRITE_FILE=Soubor ji§ existuje. Pýepsat?
 MSGS_FILE_SAVE_ERROR=Chyba pýi ukl d n¡ souboru!
 MSGS_PAGE=Strana
 MSGS_ERROR_STARTING_BROWSER=Chyba pýi spouçten¡ prohl¡§eŸe!
+MSGS_CLOSE_MODIFIED_DOCUMENT=Dokument byl zmØnØn. Ulo§it?
+MSGS_FILE_COPY_SUFFIX=Kopie %s
+
+MSGS_LDERR=Chyba pýi naŸ¡t n¡ souboru: %s!
+MSGS_LDERR_OUT_OF_MEMORY=Nedostatek pamØti
+MSGS_LDERR_OPEN_ERROR=Chyba pýi otev¡r n¡
+MSGS_LDERR_READ_ERROR=Chyba pýi Ÿten¡
+MSGS_LDERR_DAMAGED=Soubor je poçkozenì
+MSGS_LDERR_WRONG_FORMAT=Chybnì form t
+MSGS_LDERR_ENCRYPTED=Soubor je çifrovanì
+
+MSGS_RERR_OUT_OF_MEMORY=Nedostatek pamØti
+MSGS_RERR_CORRUPTED_PAGE_DATA=Poçkozen  data str nky
+MSGS_RERR_FONT_NOT_FOUND=Font %s nebyl nalezen
 
 #
 # "Plugins list" dialog
@@ -116,6 +140,7 @@ DOCINFO_CREATOR=Tv…rce:
 DOCINFO_PRODUCER=Producent:
 DOCINFO_CREATION_DATE=Vytvoýeno:
 DOCINFO_MOD_DATE=Upraveno:
+DOCINFO_NAME=Jm‚no dokumentu:
 
 #
 # "Find" dialog
@@ -123,6 +148,7 @@ DOCINFO_MOD_DATE=Upraveno:
 FIND_FIND=Naj¡t
 FIND_FIND_WHAT=~Hledanì text
 FIND_MATCH_CASE=~Rozliçovat mal /velk 
+FIND_BACK=Hledat ~zpØtnØ
 FIND_OK=~OK
 FIND_CANCEL=~Zruçit
 # other 'find'-related messages
@@ -140,7 +166,7 @@ PDLG_CANCEL=~Zruçit
 #
 AD_ABOUT=O programu
 AD_DESCRIPTION=Modul rn¡ prohl¡§eŸ dokument… podporuj¡c¡ r…zn‚ form ty soubor…
-AD_COPYRIGHTS=(c) Eugene Romanenko, netlabs.org ve spolupr ci se Serenity Systems International
+AD_COPYRIGHTS=(c) Eugene Romanenko, Dmitry A. Kuminov (netlabs.org) ve spolupr ci se Serenity Systems International
 AD_OK=~OK
 
 #
@@ -169,7 +195,7 @@ GTP_CANCEL=~Zruçit
 PD_TITLE=Tisk
 PD_PRINTER=Tisk rna
 PD_NAME_LABEL=~Jm‚no
-PD_JOB_PROPERTIES=~Vlastnosti £lohy
+PD_JOB_PROPERTIES=V~lastnosti £lohy
 PD_DRIVER_LABEL=OvladaŸ
 PD_PRINT_RANGE_AND_COPIES=TiçtØnì ~rozsah a poŸet kopi¡
 PD_RANGE_ALL=~Vçe
@@ -178,14 +204,20 @@ PD_RANGE_PAGES=~Strany
 PD_FROM=~Od
 PD_TO=~Do
 PD_NUMBER_OF_COPIES=~PoŸet kopi¡
+PD_RANGE_EVEN_ODD_LABEL=Rozsah pro tisk
+PD_RANGE_EVEN_ODD=Sud‚ a lich‚ str nky
+PD_RANGE_ODD=Jen lich‚ str nky
+PD_RANGE_EVEN=Jen sud‚ str nky
 PD_PRINT_TYPE=Typ tisku
 PD_TYPE_POSTSCRIPT=Post~Script
-PD_TYPE_ASIMAGE=Jako ~obr zek
+PD_PRINT_TO_FILE=Tisknout do souboru
+PD_TYPE_ASIMAGE=Jako o~br zek
 PD_HIGHER_IMAGE_QUALITY=~KvalitnØjç¡ obraz (pomalejç¡ a vyçç¡ pamØœov‚ n roky)
 PD_PAGE_ORIENTATION=Orientace str nky
 PD_PORTRAIT=Portr‚t
 PD_LANDSCAPE=Krajina
 PD_MARGINS=Okraje (mm)
+PD_IGNORE_PRINTER_MARGINS=Ignorovat okraje tisk rny
 PD_MLEFT=Levì
 PD_MRIGHT=Pravì
 PD_MTOP=Horn¡
@@ -200,3 +232,24 @@ PRINT_GENERATING_POSTSCRIPT=Generuji soubor ve form tu PostScript...
 PRINT_SPOOLING_POSTSCRIPT=Pýed v m data pro PostScript...
 PRINT_FAILED=Chyba pýi tisku!
 
+#
+# Password dialog
+#
+PSW_TITLE=Dokument je çifrovanì!
+PSW_PASSWORD=~Heslo
+PSW_OK=~OK
+PSW_CANCEL=~Zruçit
+
+#
+# Open file dialog
+#
+FDLG_OPEN=Otevý¡t
+FDLG_FILENAME=~Jm‚no souboru
+FDLG_DRIVE=~Disk
+FDLG_FILETYPE=~Typ souboru
+FDLG_FILE=~Soubor
+FDLG_DIRECTORY=~Adres ý
+FDLG_OK=~OK
+FDLG_CANCEL=~Zruçit
+FDLG_NO_PREVIEW_AVAILABLE=N hled nen¡ k dispozici
+FDLG_ALL_SUPPORTED_TYPES=<Vçechny podporovan‚ typy>
