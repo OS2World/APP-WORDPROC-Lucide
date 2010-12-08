@@ -31,10 +31,11 @@ fofi_TEMPLATE	= PopplerLib
 fofi_SOURCES	= $(wildcard $(fofi_PATH)/fofi/*.cc)
 
 goo_TEMPLATE	= PopplerLib
+goo_INCS		= ../../libjpeg
 goo_SOURCES		= $(wildcard $(goo_PATH)/goo/*.cc)
 
 splash_TEMPLATE	= PopplerLib
-splash_INCS		= ../freetype2/include
+splash_INCS		= ../freetype2/include ../../libjpeg
 splash_SOURCES	= $(wildcard $(splash_PATH)/splash/*.cc)
 
 poppler_TEMPLATE	= PopplerLib
