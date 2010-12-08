@@ -46,5 +46,11 @@ freetype2_SOURCES 	 = \
 	src/type42/type42.c                                                       \
 	src/winfonts/winfnt.c
 
+if 0 # more complete library, these are not needed for Lucide itself
+freetype2_SOURCES 	+= \
+	src/base/ftbbox.c                                                         \
+	src/base/ftsynth.c
+endif
+
 include $(FILE_KBUILD_SUB_FOOTER)
 
