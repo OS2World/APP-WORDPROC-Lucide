@@ -51,7 +51,7 @@ int main( int argc, char *argv[] )
 {
     int result = 1;
     char *last_slash;
-    CHAR modName[ CCHMAXPATH ] = { 0 };
+    CHAR modName[ CCHMAXPATH + 15 /*";%BEGINLIBPATH%"*/ ] = { 0 };
     HMODULE hmod = NULLHANDLE;
     APIRET rc = 0;
 
@@ -64,12 +64,16 @@ int main( int argc, char *argv[] )
 
     // fill lucide dir
     strcpy( lucideDir, argv[0] );
-    if ( ( last_slash = strrchr( lucideDir, '\\' ) ) == NULL ) {
+    if ( ( last_slash = strrchr( lucideDir, '\\' ) ) == NULL )
+    {
         return 1;
     }
-    else {
+    else
+    {
         *last_slash = 0;
     }
+    // retain the previous BEGINLIBPATH setting
+    strcat(lucideDir, ";%BEGINLIBPATH%");
 
     // set beginlibpath
     DosSetExtLIBPATH( lucideDir, BEGIN_LIBPATH );
