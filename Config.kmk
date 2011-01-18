@@ -55,6 +55,8 @@ TEMPLATE_LucideC			 = Lucide C Compiler
 TEMPLATE_LucideC_TOOL		 = GCC3OMF
 TEMPLATE_LucideC_CFLAGS		 =
 TEMPLATE_LucideC_DEFS		 = OS2
+TEMPLATE_LucideC_INCS		 = $(PATH_LIB_CURL_INCS)
+TEMPLATE_LucideC_LIBPATH	 = $(PATH_LIB_CURL_LIBPATH)
 
 #
 # Lucide C++ Compiler template
@@ -63,6 +65,8 @@ TEMPLATE_LucideCxx			 = Lucide C++ Compiler
 TEMPLATE_LucideCxx_TOOL		 = GXX3OMF
 TEMPLATE_LucideCxx_CXXFLAGS	 =
 TEMPLATE_LucideCxx_DEFS		 = OS2
+TEMPLATE_LucideCxx_INCS		 = $(PATH_LIB_CURL_INCS)
+TEMPLATE_LucideCxx_LIBPATH	 = $(PATH_LIB_CURL_LIBPATH)
 
 #
 # Lucide C PM application template

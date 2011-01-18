@@ -12,7 +12,8 @@ In order to build Lucide, you will need the following tools:
 
   - GCC compiler version 3.3.5 or 4.4.2 for OS/2 and the patched OpenWatcom
     linker. The GCC compiler must be set up to use the OpenWatcom linker for
-    linking.
+    linking. Note that GCC 4.4.4 is known to have problems with the _System
+    modifier and is not suitable for building Lucide SOM DLLs for this reason.
 
     If you do not have a working GCC environment with the above requirements, it
     is recommended to download a ready-to-use GCC 4.2.2 distribution from here:
@@ -27,6 +28,8 @@ In order to build Lucide, you will need the following tools:
     (though it will also work) -- you may simply extract the "som" subdirectory
     (with all its contents) out of the Toolkit and place it to some directory.
     You don't need to put any statements in CONFIG.SYS in this case.
+    
+  - A recent version of the CURL library (headers and .a/.lib files).
 
   - RC.EXE version 4 or 5 which should be located in a directory listed in PATH.
 

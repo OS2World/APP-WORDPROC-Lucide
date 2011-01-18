@@ -45,8 +45,8 @@ cmdline
 drop cmdline
 
 /* setup GCC */
-if (G.PATH_TOOL_GCC442 \== '') then do
-cmdline = 'call' G.PATH_TOOL_GCC442'\gcc442.cmd @'
+if (G.PATH_TOOL_GCC4_ENV \== '') then do
+cmdline = 'call' G.PATH_TOOL_GCC4_ENV
 cmdline
 drop cmdline
 end
@@ -58,6 +58,8 @@ if (EnvGet('BUILD_PLATFORM') == 'OS2') then
 /* setup variables for Config.kmk/kBuild */
 
 call EnvSet 'PATH_SDK_SOM', translate(G.PATH_SDK_SOM, '/', '\')
+call EnvSet 'PATH_LIB_CURL_INCS', translate(G.PATH_LIB_CURL_INCS, '/', '\')
+call EnvSet 'PATH_LIB_CURL_LIBPATH', translate(G.PATH_LIB_CURL_LIBPATH, '/', '\')
 
 /* setup OpenWatcom (not necessary any more) */
 /*
