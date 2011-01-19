@@ -43,15 +43,13 @@
 // and executes Lucide.exe
 //
 
-char lucideDir[ CCHMAXPATH ] = "";
-
 typedef APIRET (APIENTRY *LMain)(int argc, char **argv);
 
 int main( int argc, char *argv[] )
 {
     int result = 1;
     char *last_slash;
-    CHAR modName[ CCHMAXPATH + 15 /*";%BEGINLIBPATH%"*/ ] = { 0 };
+    char buf[ CCHMAXPATH + 15 /*";%BEGINLIBPATH%"*/ ] = { 0 };
     HMODULE hmod = NULLHANDLE;
     APIRET rc = 0;
 
@@ -63,8 +61,8 @@ int main( int argc, char *argv[] )
 #endif
 
     // fill lucide dir
-    strcpy( lucideDir, argv[0] );
-    if ( ( last_slash = strrchr( lucideDir, '\\' ) ) == NULL )
+    strcpy( buf, argv[0] );
+    if ( ( last_slash = strrchr( buf, '\\' ) ) == NULL )
     {
         return 1;
     }
@@ -73,12 +71,12 @@ int main( int argc, char *argv[] )
         *last_slash = 0;
     }
     // retain the previous BEGINLIBPATH setting
-    strcat(lucideDir, ";%BEGINLIBPATH%");
+    strcat( buf, ";%BEGINLIBPATH%" );
 
     // set beginlibpath
-    DosSetExtLIBPATH( lucideDir, BEGIN_LIBPATH );
+    DosSetExtLIBPATH( buf, BEGIN_LIBPATH );
 
-    rc = DosLoadModule( modName, sizeof( modName ), "Lucide", &hmod );
+    rc = DosLoadModule( buf, sizeof( buf ), "Lucide", &hmod );
     if ( rc == 0 )
     {
         PFN pfn = NULL;
@@ -98,13 +96,13 @@ int main( int argc, char *argv[] )
         hab = WinInitialize( 0 );
         hmq = WinCreateMsgQueue( hab, 0 );
 
-        if ( modName[0] == 0 ) { // No modulename
+        if ( buf[0] == 0 ) { // No modulename
             snprintf( msg, sizeof( msg ), "Error loading Lucide.dll: SYS%04u", rc );
         }
         else {
             snprintf( msg, sizeof( msg ),
                       "Error loading Lucide.dll: can't find module '%s' (SYS%04u)",
-                      modName, rc );
+                      buf, rc );
         }
         WinMessageBox( HWND_DESKTOP, NULLHANDLE, msg, NULL, 1, MB_OK | MB_MOVEABLE );
 
