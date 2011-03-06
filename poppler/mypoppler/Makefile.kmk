@@ -39,7 +39,7 @@ splash_INCS		= ../freetype2/include ../../libjpeg
 splash_SOURCES	= $(wildcard $(splash_PATH)/splash/*.cc)
 
 poppler_TEMPLATE	= PopplerLib
-poppler_INCS		= goo ../fc-emulate-os2 ../../libjpeg
+poppler_INCS		= goo poppler ../fc-emulate-os2 ../../libjpeg
 poppler_SOURCES		= $(filter-out \
 	$(addprefix $(poppler_PATH)/poppler/,                                     \
 		ABWOutputDev.cc                                                       \

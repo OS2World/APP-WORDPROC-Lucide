@@ -58,6 +58,7 @@
 #include <Gfx.h>
 #include <Link.h>
 #include <Form.h>
+#include <config.h>
 
 #include "lupoppler.xih"
 #include "lupifield.xih"
@@ -101,9 +102,12 @@ extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
     return &lsc;
 }
 
+static char version[256];
 extern "C" char * EXPENTRY getDescription()
 {
-    return "PDF plugin, based on poppler library v0.14.2";
+    strcpy(version, "PDF plugin, based on poppler library ");
+    strcat(version, VERSION);
+    return version;
 }
 
 
@@ -803,7 +807,7 @@ SOM_Scope boolean SOMLINK exportToPostScript(LuPopplerDocument *somSelf,
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
     PDFDoc *doc = ((PopplerDocument *)somThis->data)->doc;
 
-    PSOutputDev *out = new PSOutputDev( filename, doc->getXRef(), doc->getCatalog(), NULL,
+    PSOutputDev *out = new PSOutputDev( filename, doc, doc->getXRef(), doc->getCatalog(), NULL,
                                 (first_page <= last_page) ? (first_page + 1) : (last_page + 1),
                                 (first_page <= last_page) ? (last_page + 1) : (first_page + 1),
                                         psModePS, (int)width, (int)height, gFalse );

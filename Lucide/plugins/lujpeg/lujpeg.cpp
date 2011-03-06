@@ -58,6 +58,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <setjmp.h>
+#include "jversion.h"
 
 // jpeglib defines boolean as int while SOM defines it as unsigned char,
 // work this around (note that you need to use jpeg_boolean in this source if
@@ -102,10 +103,12 @@ extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
     return &lsc;
 }
 
-
+static char version[256];
 extern "C" char * EXPENTRY getDescription()
 {
-    return "Jpeg plugin, based on IJG JPEG Library v7";
+   strcpy(version, "Jpeg plugin, based on IJG JPEG library ");
+   strcat(version, JVERSION);
+   return version;
 }
 
 

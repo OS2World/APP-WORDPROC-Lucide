@@ -20,11 +20,6 @@
 #define MULTITHREADED 1
 #endif
 
-/* Enable exceptions. */
-#ifndef USE_EXCEPTIONS
-/* #undef USE_EXCEPTIONS */
-#endif
-
 /* Use fixedpoint. */
 #ifndef USE_FIXEDPOINT
 /* #undef USE_FIXEDPOINT */
@@ -43,6 +38,16 @@
 /* Use fontconfig font configuration backend */
 #ifndef WITH_FONTCONFIGURATION_FONTCONFIG
 #define WITH_FONTCONFIGURATION_FONTCONFIG 1
+#endif
+
+/* Use win32 font configuration backend */
+#ifndef WITH_FONTCONFIGURATION_WIN32
+/* #undef WITH_FONTCONFIGURATION_WIN32 */
+#endif
+
+/* Support for curl is compiled in. */
+#ifndef POPPLER_HAS_CURL_SUPPORT
+/* #undef POPPLER_HAS_CURL_SUPPORT */
 #endif
 
 // Also, there's a couple of preprocessor symbols in the header files
@@ -81,6 +86,14 @@
 #define CDECL
 #endif
 
+#if defined(_WIN32)
+#ifdef _MSC_VER
+#define strtok_r strtok_s
+#elif __MINGW32__
+char * strtok_r (char *s, const char *delim, char **save_ptr);
+#endif
+#endif
+
 //------------------------------------------------------------------------
 // Compiler
 //------------------------------------------------------------------------
@@ -90,6 +103,11 @@
 	__attribute__((__format__(__printf__, fmt_index, va_index)))
 #else
 #define GCC_PRINTF_FORMAT(fmt_index, va_index)
+#endif
+
+#if defined(_MSC_VER)
+#define fmax(a, b) max(a, b)
+#define fmin(a, b) min(a, b)
 #endif
 
 

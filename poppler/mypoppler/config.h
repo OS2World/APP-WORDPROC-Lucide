@@ -1,50 +1,72 @@
+/* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Default to A4 paper. */
-#define A4_PAPER 1
+/* Define if building universal (internal helper macro) */
+/* #undef AC_APPLE_UNIVERSAL_BUILD */
+
+/* Build against libcurl. */
+/* #undef ENABLE_LIBCURL */
 
 /* Use libjpeg instead of builtin jpeg decoder. */
-#define ENABLE_LIBJPEG  1
-//#undef ENABLE_LIBJPEG
+#define ENABLE_LIBJPEG 1
+
+/* Use libopenjpeg instead of builtin jpeg2000 decoder. */
+/* #undef ENABLE_LIBOPENJPEG */
+
+/* Build against libpng. */
+/* #undef ENABLE_LIBPNG */
+
+/* Do not hardcode the library location */
+/* #undef ENABLE_RELOCATABLE */
 
 /* Use zlib instead of builtin zlib decoder. */
-#undef ENABLE_ZLIB
+/* #undef ENABLE_ZLIB */
 
 /* Use cairo for rendering. */
-#undef HAVE_CAIRO
+/* #undef HAVE_CAIRO */
 
-/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'. */
-#if defined(__WATCOMC__)
-#undef HAVE_DIRENT_H
-#else
+/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
+   */
 #define HAVE_DIRENT_H 1
-#endif
-
-#define HAVE_DIRECT_H 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-#undef HAVE_DLFCN_H
+#define HAVE_DLFCN_H 1
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+/* #undef HAVE_FCNTL_H */
 
 /* Have FreeType2 include files */
 #define HAVE_FREETYPE_H 1
 
 /* Define to 1 if you have the `fseek64' function. */
-#undef HAVE_FSEEK64
+/* #undef HAVE_FSEEK64 */
 
 /* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
-#undef HAVE_FSEEKO
+#define HAVE_FSEEKO 1
 
 /* Define to 1 if you have the `ftell64' function. */
-#undef HAVE_FTELL64
+/* #undef HAVE_FTELL64 */
 
 /* Defines if gettimeofday is available on your system */
-#undef HAVE_GETTIMEOFDAY
+#define HAVE_GETTIMEOFDAY 1
+
+/* Defines if gmtime_r is available on your system */
+#define HAVE_GMTIME_R 1
+
+/* Define if you have the iconv() function and it works. */
+/* #undef HAVE_ICONV */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
+/* Define to 1 if you have the `openjpeg' library (-lopenjpeg). */
+/* #undef HAVE_LIBOPENJPEG */
+
 /* Define to 1 if you have the `z' library (-lz). */
-#undef HAVE_LIBZ
+/* #undef HAVE_LIBZ */
+
+/* Defines if localtime_r is available on your system */
+#define HAVE_LOCALTIME_R 1
 
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
@@ -53,13 +75,19 @@
 #define HAVE_MKSTEMP 1
 
 /* Define to 1 if you have the `mkstemps' function. */
-#undef HAVE_MKSTEMPS
+#define HAVE_MKSTEMPS 1
 
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
-#undef HAVE_NDIR_H
+/* #undef HAVE_NDIR_H */
+
+/* Define to 1 if you have the <openjpeg.h> header file. */
+/* #undef HAVE_OPENJPEG_H */
 
 /* Define to 1 if you have the `popen' function. */
-#undef HAVE_POPEN
+#define HAVE_POPEN 1
+
+/* Define if you have POSIX threads libraries and header files. */
+#define HAVE_PTHREAD 1
 
 /* Use splash for rendering. */
 #define HAVE_SPLASH 1
@@ -78,11 +106,14 @@
 
 /* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
    */
-#undef HAVE_SYS_DIR_H
+/* #undef HAVE_SYS_DIR_H */
+
+/* Define to 1 if you have the <sys/mman.h> header file. */
+/* #undef HAVE_SYS_MMAN_H */
 
 /* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
    */
-#undef HAVE_SYS_NDIR_H
+/* #undef HAVE_SYS_NDIR_H */
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
@@ -94,46 +125,90 @@
 #define HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the <zlib.h> header file. */
-#undef HAVE_ZLIB_H
+/* #undef HAVE_ZLIB_H */
+
+/* Define as const if the declaration of iconv() needs const. */
+#define ICONV_CONST const
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#define LT_OBJDIR ".libs/"
 
 /* Enable multithreading support. */
-#undef MULTITHREADED
+#define MULTITHREADED 1
 
 /* Generate OPI comments in PS output. */
-#undef OPI_SUPPORT
+#define OPI_SUPPORT 1
 
 /* Name of package */
-#undef PACKAGE
+#define PACKAGE "poppler"
 
 /* Define to the address where bug reports for this package should be sent. */
-#undef PACKAGE_BUGREPORT
+#define PACKAGE_BUGREPORT "https://bugs.freedesktop.org/enter_bug.cgi?product=poppler"
 
 /* Define to the full name of this package. */
-#undef PACKAGE_NAME
+#define PACKAGE_NAME "poppler"
 
 /* Define to the full name and version of this package. */
-#undef PACKAGE_STRING
+#define PACKAGE_STRING "poppler 0.16.3"
 
 /* Define to the one symbol short name of this package. */
-#undef PACKAGE_TARNAME
+#define PACKAGE_TARNAME "poppler"
+
+/* Define to the home page for this package. */
+#define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#undef PACKAGE_VERSION
+#define PACKAGE_VERSION "0.16.3"
+
+/* Poppler data dir */
+#define POPPLER_DATADIR "/usr/local/share/poppler"
+
+/* Support for curl based doc builder is compiled in. */
+/* #undef POPPLER_HAS_CURL_SUPPORT */
+
+/* Have GDK */
+/* #undef POPPLER_WITH_GDK */
+
+/* Define to necessary symbol if this constant uses a non-standard name on
+   your system. */
+#define PTHREAD_CREATE_JOINABLE unknown
 
 /* Define to 1 if you have the ANSI C header files. */
-#undef STDC_HEADERS
-
-/* Full path for the system-wide xpdfrc file. */
-#undef SYSTEM_XPDFRC
+#define STDC_HEADERS 1
 
 /* Enable word list support. */
-#undef TEXTOUT_WORD_LIST
+#define TEXTOUT_WORD_LIST 1
 
-/* Use fixed point arithmetic */
-#undef USE_FIXEDPOINT
+/* Defines if use cms */
+//#define USE_CMS 1
+
+/* Use fixed point arithmetic in the Splash backend */
+/* #undef USE_FIXEDPOINT */
+
+/* Use single precision arithmetic in the Splash backend */
+/* #undef USE_FLOAT */
 
 /* Version number of package */
-#undef VERSION
+#define VERSION "0.16.3"
+
+/* Use fontconfig font configuration backend */
+#define WITH_FONTCONFIGURATION_FONTCONFIG 1
+
+/* Use win32 font configuration backend */
+/* #undef WITH_FONTCONFIGURATION_WIN32 */
+
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+/* #  undef WORDS_BIGENDIAN */
+# endif
+#endif
 
 /* Define to 1 if the X Window System is missing or not being used. */
 #define X_DISPLAY_MISSING 1
@@ -149,14 +224,10 @@
 
 
 /* Number of bits in a file offset, on hosts where this is settable. */
-#undef _FILE_OFFSET_BITS
+/* #undef _FILE_OFFSET_BITS */
 
 /* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
-#undef _LARGEFILE_SOURCE
+/* #undef _LARGEFILE_SOURCE */
 
 /* Define for large files, on AIX-style hosts. */
-#undef _LARGE_FILES
-
-#define POPPLER_DATADIR "."
-
-#define HAVE_GETTIMEOFDAY 1
+/* #undef _LARGE_FILES */
