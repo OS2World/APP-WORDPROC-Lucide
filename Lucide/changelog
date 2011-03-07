@@ -2,8 +2,10 @@
   - added backwards search (ticket #190)
   - fixed goto page handling (ticket #198)
   - some other small fixes
-  - updated poppler to 0.14.2
   - WPI: made http links clickable
+  - updated poppler to 0.16.3
+  - updated freetype to 2.4.4
+  - updated jpeg to 8b
 
 
 1.3.2:

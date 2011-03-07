@@ -531,6 +531,12 @@ static string buildFontKey( FcPattern *p )
 FcFontSet *FcFontSort( FcConfig *config, FcPattern *p, FcBool trim,
                        FcCharSet **csp, FcResult *result )
 {
+    // we need to make sure the fonfconfig is initialised.
+    if (!FcInit())
+       {
+          return NULL;
+       }
+
     FcPattern *pat = new FcPattern;
     pat->family   = newstrdup( p->family );
     pat->slant    = p->slant;
@@ -543,7 +549,7 @@ FcFontSet *FcFontSort( FcConfig *config, FcPattern *p, FcBool trim,
     string key = buildFontKey( pat );
     pat->filename = newstrdup( (*fontmap)[ key ].c_str() );
 
-//printf( "MATCHED STYLE: %s, FILENAME: %s\n", key.c_str(), pat->filename );
+// printf( "MATCHED STYLE: %s, FILENAME: %s\n", key.c_str(), pat->filename );
 
     FcFontSet *fs = new FcFontSet;
     fs->nfont = 1;
