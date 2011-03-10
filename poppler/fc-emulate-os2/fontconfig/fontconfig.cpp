@@ -591,25 +591,44 @@ FcResult FcPatternGetString( const FcPattern *p, const char *object, int n, FcCh
 
 FcPattern *FcPatternBuild( void *,
                     const char *fcFamily, FcType tFamily, const char *family,
-                    const char *fcSlant, FcType tSlant, int slant,
-                    const char *fcWeight, FcType tWeight, int weight,
-                    const char *fcWidth, FcType tWidth, int width,
-                    const char *fcSpacing, FcType tSpacing, int spacing,
                     const char *fcLang, FcType tLang, const char *lang, void * )
 {
-	//printf( "FAMILY: %s, SLANT: %d, WEIGHT: %d, WIDTH: %d, SPACING: %d, LANG: %s\n",
-    //        family, slant, weight, width, spacing, lang );
+    //printf( "FAMILY: %s, LANG: %s\n", family, lang );
 
     FcPattern *p = new FcPattern;
     p->family   = newstrdup( family );
     strlwr( p->family );
-    p->slant    = slant;
-    p->weight   = weight;
-    p->width    = width;
-    p->spacing  = spacing;
+    p->slant    = -1;
+    p->weight   = -1;
+    p->width    = -1;
+    p->spacing  = -1;
     p->lang     = newstrdup( lang );
     p->filename = NULL;
 
     return p;
+}
+
+void FcPatternAddInteger(FcPattern *p, const char *fcType, int value)
+{
+// handle all possible int values
+   if (!strcmp(fcType, FC_SLANT)) {
+      p->slant = value;
+   }
+
+   if (!strcmp(fcType, FC_WEIGHT)) {
+      p->weight = value;
+   }
+
+   if (!strcmp(fcType, FC_WIDTH)) {
+      p->width = value;
+   }
+
+   if (!strcmp(fcType, FC_SPACING)) {
+      p->spacing = value;
+   }
+
+//   printf("FAMILY: %s, SLANT: %d, WEIGHT:%d, WIDTH:%d, SPACING:%d\n", p->family, p->slant, p->weight, p->width, p->spacing);
+
+   return;
 }
 

@@ -22,8 +22,8 @@ If _id = 'ZH' Then Do
 End
 Select
  When _id = 'DE' Then Do
-  _title = 'Lucide - Document Viewer'
-  _folder = 'Lucide for eCS'
+  _title = 'Lucide - Dokumentbetrachter'
+  _folder = 'Lucide fuer eCS (OS/2)'
   _prog = 'Lucide'
   _readme = 'Lucide Readme'
   _change = 'Lucide Change Log'
@@ -33,7 +33,7 @@ Select
  End
  When _id = 'NL' Then Do
   _title = 'Lucide - Document Bekijker'
-  _folder = 'Lucide for eCS'
+  _folder = 'Lucide for eCS (OS/2)'
   _prog = 'Lucide'
   _readme = 'Lucide Readme'
   _change = 'Lucide Change Log'
@@ -43,7 +43,7 @@ Select
  End
  When _id = 'FR' Then Do
   _title = 'Lucide - Afficheur de document'
-  _folder = 'Lucide for eCS'
+  _folder = 'Lucide pour eCS (OS/2)'
   _prog = 'Lucide'
   _readme = 'Lucide Readme'
   _change = 'Lucide Change Log'
@@ -53,7 +53,7 @@ Select
  End
  When _id = 'ES' Then Do
   _title = 'Lucide - Visor de documentos'
-  _folder = 'Lucide para eCS'
+  _folder = 'Lucide para eCS (OS/2)'
   _prog = 'Lucide'
   _readme = 'L‚eme de Lucide'
   _change = 'Lucide Change Log'
@@ -63,7 +63,7 @@ Select
  End
  When _id = 'SV' Then Do
   _title = 'Lucide - Dokumentvisare'
-  _folder = 'Lucide for eCS'
+  _folder = 'Lucide for eCS (OS/2)'
   _prog = 'Lucide'
   _readme = 'Lucide Readme'
   _change = 'Lucide Change Log'
@@ -73,7 +73,7 @@ Select
  End
  Otherwise Do
   _title = 'Lucide - Document Viewer'
-  _folder = 'Lucide for eCS'
+  _folder = 'Lucide for eCS (OS/2)'
   _prog = 'Lucide'
   _readme = 'Lucide Readme'
   _change = 'Lucide Change Log'
@@ -120,6 +120,12 @@ Return WirexxGetEnv('plug_djvu')
 <REXX NAME=plug_jpeg>
 Return WirexxGetEnv('plug_jpeg')
 </REXX>
+<REXX NAME=readme_XX>
+_lang = Value('lang',,'os2environment')
+_id = Translate(Left(_lang,2))
+If pos(_id,"CS,ES,FR,IT") > 0 then _readme = "readme_"_id; else _readme = "readme"
+return _readme
+</REXX>
 <PCK INDEX=1
      PACKAGEID="netlabs.org\Lucide\Lucide core\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
@@ -127,7 +133,7 @@ Return WirexxGetEnv('plug_jpeg')
      TITLE="=("title")"
      CREATEOBJECT='WPFolder|=("folder")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='REPLACE WPProgram|=("prog")|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='REPLACE WPProgram|=("readme")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
+     CREATEOBJECT='REPLACE WPProgram|=("readme")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;PROGTYPE=PM;PARAMETERS=$(1)\=("readme_XX");STARTUPDIR=$(1);'
      CREATEOBJECT='REPLACE WPProgram|=("change")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      WRITEPROFILE="USER\Lucide\Path|$(1)"
      CLEARPROFILE="USER\Lucide\Path"

@@ -138,13 +138,11 @@ FcResult FcPatternGetString( const FcPattern *p, const char *object, int n, FcCh
 //FcPattern *FcPatternBuild( FcPattern *orig, ... );
 
 FcPattern *FcPatternBuild(void *,
-					const char *fcFamily, FcType tFamily, const char *family,
-					const char *fcSlant, FcType tSlant, int slant,
-					const char *fcWeight, FcType tWeight, int weight,
-					const char *fcWidth, FcType tWidth, int width,
-					const char *fcSpacing, FcType tSpacing, int spacing,
-					const char *fcLang, FcType tLang, const char *lang,
-                    void *);
+				const char *fcFamily, FcType tFamily, const char *family,
+				const char *fcLang, FcType tLang, const char *lang,
+                                void *);
+
+void FcPatternAddInteger(FcPattern *p, const char *fcType, int value);
 
 #endif // _ERFONTCONFIG_H_
 
