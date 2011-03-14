@@ -719,6 +719,7 @@ void Lucide::openDocument()
 bool Lucide::saveDocumentAs()
 {
     bool saved = false;
+    int buflen = 0;
 
     char dirbuf[ CCHMAXPATH ];
     PFILEDLG fd = new FILEDLG;
@@ -727,6 +728,13 @@ bool Lucide::saveDocumentAs()
     fd->fl = FDS_CENTER | FDS_SAVEAS_DIALOG;
     PrfQueryProfileString( HINI_USERPROFILE, appName, prfLvd, "",
                            dirbuf, sizeof( dirbuf ) );
+    // it may be possible that the trailing \ is missing, so add it
+    buflen = strlen(dirbuf);
+    if ((dirbuf[buflen -1] != '\\') && (dirbuf[buflen -1] != '/'))
+    {
+       strcat(dirbuf, "\\");
+    }
+
     char fil[ _MAX_FNAME ] = "";
     char ext[ _MAX_EXT ] = "";
     _splitpath( docFullName, NULL, NULL, fil, ext );
@@ -750,11 +758,23 @@ bool Lucide::saveDocumentAs()
 
             doSave = ( response == MBID_YES );
         }
+
         if ( doSave )
         {
             // @todo poppler has troubles saving to the same file name
             // (some locking issues) so forbid it for now
-            if ( ( saved = false, stricmp( docFullName, fd->szFullFile ) == 0 ) ||
+
+           // we need to normalise the path
+           strcpy(dirbuf, docFullName);
+           for(buflen = 0; buflen < strlen(dirbuf); ++buflen)
+           {
+               if (dirbuf[buflen] == '/')
+               {
+                   dirbuf[buflen] = '\\';
+               }
+           }
+
+            if ( ( saved = false, stricmp( dirbuf, fd->szFullFile ) == 0 ) ||
                  !( saved = doc->saveAs( ev, fd->szFullFile ) ) )
             {
                 char *m = newstrdupL( MSGS_FILE_SAVE_ERROR );
