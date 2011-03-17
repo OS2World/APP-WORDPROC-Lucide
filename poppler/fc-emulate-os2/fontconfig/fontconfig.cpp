@@ -549,7 +549,8 @@ FcFontSet *FcFontSort( FcConfig *config, FcPattern *p, FcBool trim,
     string key = buildFontKey( pat );
     pat->filename = newstrdup( (*fontmap)[ key ].c_str() );
 
-// printf( "MATCHED STYLE: %s, FILENAME: %s\n", key.c_str(), pat->filename );
+//    printf( "fontfamily: %s --> MATCHED STYLE: %s, FILENAME: %s\n", pat->family, key.c_str(), pat->filename );
+//    printf("SLANT: %d, WEIGHT:%d, WIDTH:%d, SPACING:%d\n", pat->slant, pat->weight, pat->width, pat->spacing);
 
     FcFontSet *fs = new FcFontSet;
     fs->nfont = 1;

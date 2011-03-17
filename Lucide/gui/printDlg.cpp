@@ -48,6 +48,8 @@
 
 
 char PrintDlg::defQueue[] = { 0 };
+static const char * const IgnMargins = "IgnMargins";
+static const char * const PageRange = "PageRange";
 
 
 PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, const char *fname, long _currentpage )
@@ -538,8 +540,33 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
             localizeDialog( hwnd );
             centerWindow( _this->hFrame, hwnd );
 
-            // Print range
-            WinCheckButton( hwnd, IDC_RANGEALL, TRUE );
+            // Page range
+            int buttonctl = 0;
+            buttonctl = PrfQueryProfileInt(HINI_USERPROFILE, appName, PageRange, buttonctl);
+            switch (buttonctl)
+            {
+               case 1:
+                  WinCheckButton(hwnd, IDC_RANGECURRENT, TRUE);
+                  break;
+               case 2:
+                  WinCheckButton(hwnd, IDC_RANGEPAGES, TRUE);
+                  WinEnableControl(hwnd, IDC_LABELFROM, TRUE);
+                  WinEnableControl(hwnd, IDC_PGFROM, TRUE);
+                  WinEnableControl(hwnd, IDC_LABELTO, TRUE);
+                  WinEnableControl(hwnd, IDC_PGTO, TRUE);
+                  break;
+               default:
+                  WinCheckButton(hwnd, IDC_RANGEALL, TRUE);
+               break;
+            }
+
+            // ignore margins
+            buttonctl = 0;
+            buttonctl = PrfQueryProfileInt(HINI_USERPROFILE, appName, IgnMargins, buttonctl);
+            if (buttonctl == 1)
+            {
+            WinCheckButton( hwnd, IDC_IGNMARGINS, TRUE );
+            }
 
             // Set the print range spins
             long pages = _this->doc->getPageCount( ev );
@@ -703,10 +730,15 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                         _this->psetup->pgfrom = 1;
                         _this->psetup->pgto = _this->doc->getPageCount( ev );
 
+                        // used for ini settings
+                        char buf[10];
+                        int iniint = 0;
+
                         if ( WinQueryButtonCheckstate( hwnd, IDC_RANGECURRENT ) ) {
                             _this->psetup->range = RangeCurrent;
                             _this->psetup->pgfrom = _this->currentpage;
                             _this->psetup->pgto = _this->currentpage;
+                            iniint = 1;
                         }
 
                         if ( WinQueryButtonCheckstate( hwnd, IDC_RANGEPAGES ) )
@@ -721,7 +753,18 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                             if ( rc && ( tmpVal > 0 ) ) {
                                 _this->psetup->pgto = tmpVal;
                             }
+                            iniint = 2;
                         }
+
+                        // write ini pagerange
+                        PrfWriteProfileString(HINI_USERPROFILE, appName, PageRange, itoa(iniint, buf, 10));
+
+                        // write ini ignore margins
+                        iniint = 0;
+                        if ( WinQueryButtonCheckstate( hwnd, IDC_IGNMARGINS ) ) {
+                                iniint = 1;
+                        }
+                        PrfWriteProfileString(HINI_USERPROFILE, appName, IgnMargins, itoa(iniint, buf, 10));
 
                         _this->psetup->ptype = TypePostScript;
                         if ( WinQueryButtonCheckstate( hwnd, IDC_TYPE_ASIMAGE ) ) {

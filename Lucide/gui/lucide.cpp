@@ -730,7 +730,7 @@ bool Lucide::saveDocumentAs()
                            dirbuf, sizeof( dirbuf ) );
     // it may be possible that the trailing \ is missing, so add it
     buflen = strlen(dirbuf);
-    if ((dirbuf[buflen -1] != '\\') && (dirbuf[buflen -1] != '/'))
+    if ((dirbuf[buflen -1] != '\\') && (dirbuf[buflen -1] != '/') && (buflen < sizeof(dirbuf)))
     {
        strcat(dirbuf, "\\");
     }
