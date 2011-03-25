@@ -162,7 +162,7 @@
 #define PACKAGE_VERSION "0.16.3"
 
 /* Poppler data dir */
-#define POPPLER_DATADIR "/usr/local/share/poppler"
+#define POPPLER_DATADIR "/@unixroot/usr/local/share/poppler"
 
 /* Support for curl based doc builder is compiled in. */
 /* #undef POPPLER_HAS_CURL_SUPPORT */

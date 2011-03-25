@@ -447,6 +447,7 @@ FcBool FcInit()
 // "Fonts" -> "About Fonts" -> "PM-Supplied Fonts").
 //
 #define DEFAULT_SERIF_FONT          "times new roman"
+#define DEFAULT_SERIF_FONTJA       "times new roman wt j"
 #define DEFAULT_SANSSERIF_FONT      "helvetica"
 #define DEFAULT_MONOSPACED_FONT     "courier"
 #define DEFAULT_SYMBOL_FONT         "symbol set"
@@ -489,6 +490,11 @@ static string buildFontKey( FcPattern *p )
 
     if ( fontmap->find( key ) == fontmap->end() ) {
         // not found: try substitutions
+        if (!stricmp(p->lang, "ja"))
+        {
+            key = DEFAULT_SERIF_FONTJA;
+        } else {
+
         if ( p->spacing == FC_MONO ) {
             key = DEFAULT_MONOSPACED_FONT;
         } else {
@@ -507,11 +513,11 @@ static string buildFontKey( FcPattern *p )
                     if ( fontmap->find( key ) == fontmap->end() )
                         key = DEFAULT_SYMBOL_FONT;
                 } else {
-                    key = DEFAULT_SERIF_FONT;
+                        key = DEFAULT_SERIF_FONT;
                 }
             }
         }
-
+       }
     }
 
     if ( !ignoreStyle ) {
@@ -549,8 +555,8 @@ FcFontSet *FcFontSort( FcConfig *config, FcPattern *p, FcBool trim,
     string key = buildFontKey( pat );
     pat->filename = newstrdup( (*fontmap)[ key ].c_str() );
 
-//    printf( "fontfamily: %s --> MATCHED STYLE: %s, FILENAME: %s\n", pat->family, key.c_str(), pat->filename );
-//    printf("SLANT: %d, WEIGHT:%d, WIDTH:%d, SPACING:%d\n", pat->slant, pat->weight, pat->width, pat->spacing);
+    printf( "fontfamily: %s --> MATCHED STYLE: %s, FILENAME: %s\n", pat->family, key.c_str(), pat->filename );
+    printf("SLANT: %d, WEIGHT:%d, WIDTH:%d, SPACING:%d, LANG:%s\n", pat->slant, pat->weight, pat->width, pat->spacing, pat->lang);
 
     FcFontSet *fs = new FcFontSet;
     fs->nfont = 1;
@@ -594,7 +600,7 @@ FcPattern *FcPatternBuild( void *,
                     const char *fcFamily, FcType tFamily, const char *family,
                     const char *fcLang, FcType tLang, const char *lang, void * )
 {
-    //printf( "FAMILY: %s, LANG: %s\n", family, lang );
+//    printf( "FAMILY: %s, LANG: %s\n", family, lang );
 
     FcPattern *p = new FcPattern;
     p->family   = newstrdup( family );
