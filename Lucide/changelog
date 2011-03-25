@@ -8,6 +8,7 @@
   - updated jpeg to 8b
   - WPI: installing the right readme, if translated
   - saved some settings from print dialog (ticket #225)
+  - added a font hack to show japanese fonts (ticket #226)
 
 
 1.3.2:
