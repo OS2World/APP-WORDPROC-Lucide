@@ -957,7 +957,11 @@
         }
 
         outline->points[n].x = v_cur.x + strength + in.x;
+#ifdef __OS2__
+        outline->points[n].y = v_cur.y;
+#else
         outline->points[n].y = v_cur.y + strength + in.y;
+#endif
 
         v_prev = v_cur;
         v_cur  = v_next;
