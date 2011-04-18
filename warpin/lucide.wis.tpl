@@ -36,6 +36,7 @@ select
     rc =WirexxPutEnv('fr_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Suivant" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
+    rc =WirexxPutEnv('installText','Press "Installation" in order to start installation of this archive.')
 
   end
   when lang = 'DE' then do
@@ -57,6 +58,7 @@ select
     rc =WirexxPutEnv('de_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Zum Fortfahren "Weiter" ausw„hlen.')
     rc =WirexxPutEnv('cancelText','Zum Abbrechen "Cancel" ausw„hlen.')
+    rc =WirexxPutEnv('installText','Bitte "Installation" ausw„hlen, um die Installation des Archivs zu starten.')
   end
   when lang = 'NL' then do
     rc =WirexxPutEnv('title','Lucide - Document Bekijker')
@@ -77,6 +79,7 @@ select
     rc =WirexxPutEnv('nl_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
+    rc =WirexxPutEnv('installText','Press "Installation" in order to start installation of this archive.')
   end
   when lang = 'ES' Then Do
     rc =WirexxPutEnv('title','Lucide - Visor de documentos')
@@ -97,6 +100,7 @@ select
     rc =WirexxPutEnv('es_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
+    rc =WirexxPutEnv('installText','Press "Installation" in order to start installation of this archive.')
   end
   when lang = 'SV' Then Do
     rc =WirexxPutEnv('title','Lucide - Dokumentvisare')
@@ -117,6 +121,7 @@ select
     rc =WirexxPutEnv('sv_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
+    rc =WirexxPutEnv('installText','Press "Installation" in order to start installation of this archive.')
   end
   otherwise do
     rc =WirexxPutEnv('title','Lucide - Document Viewer')
@@ -137,6 +142,7 @@ select
     rc =WirexxPutEnv('en_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
+    rc =WirexxPutEnv('installText','Press "Installation" in order to start installation of this archive.')
   end
 end
 return ''
@@ -277,7 +283,7 @@ return readme
 </TEXT>
 
 <README FORMAT=HTML>
-<B>=("get_env welcome")=("get_env title"), version ${WPIVERSION}.${WPIBUILD}</B>
+<B>=("get_env welcome")=("get_env title"), version ${VERSION}.${WPIBUILD}</B>
 
 <P>
 Lucide is a plugin based document viewer for eComStation. In its first incarnation
@@ -358,7 +364,7 @@ Please select additional configuration that WarpIN should perform after installi
 <TEXT>
 
 
-Press "=("get_env install")" in order to start installation of this archive.</TEXT>
+=("get_env installText")</TEXT>
 </PAGE>
 </BODY>
 </WARPIN>
