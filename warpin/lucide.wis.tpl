@@ -30,14 +30,14 @@ select
     rc =WirexxPutEnv('ready','Veuillez confirmer les options d''installation.')
     rc =WirexxPutEnv('scfind','Modifications du fichier CONFIG.SYS prÇvues: paramÇtrage de la variable SCFINDUTILITY Ö SearchPlus.exe pour en faire le programme de recherche du systäme par dÇfaut. Ces modifications nÇcessiteront un redÇmarrage.')
     rc =WirexxPutEnv('over_write','Veuillez sÇlectionner de maniäre Ö Çcraser tout fichier existant.')
-    rc =WirexxPutEnv('install','~Installation')
+    rc =WirexxPutEnv('install','~Install')
     rc =WirexxPutEnv('license','~J''accepte')
     rc =WirexxPutEnv('next','~Suivant')
     rc =WirexxPutEnv('fr_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Suivant" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
-    rc =WirexxPutEnv('installText','Press "Installation" in order to start installation of this archive.')
-
+    rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+    rc =WirexxPutEnv('readmeF','readme_fr.txt')
   end
   when lang = 'DE' then do
     rc =WirexxPutEnv('title','Lucide - Dokumentenbetrachter')
@@ -52,13 +52,14 @@ select
     rc =WirexxPutEnv('accept','Bitte lesen Sie den folgenden Text und akzeptieren Sie die Lizenzvereinbarung.')
     rc =WirexxPutEnv('target','WÑhlen Sie bitte das Zielverzeichnis.')
     rc =WirexxPutEnv('re_install','Wenn dies ein Update ist, dann ist das Installationsverzeichnis das aktuelle Verzeichnis des Plugins.')
-    rc =WirexxPutEnv('install','~Installation')
+    rc =WirexxPutEnv('install','~Installieren')
     rc =WirexxPutEnv('license','St~imme zu')
     rc =WirexxPutEnv('next','W~eiter')
     rc =WirexxPutEnv('de_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Zum Fortfahren "Weiter" auswÑhlen.')
     rc =WirexxPutEnv('cancelText','Zum Abbrechen "Cancel" auswÑhlen.')
-    rc =WirexxPutEnv('installText','Bitte "Installation" auswÑhlen, um die Installation des Archivs zu starten.')
+    rc =WirexxPutEnv('installText','Bitte "Installieren" auswÑhlen, um die Installation des Archivs zu starten.')
+    rc =WirexxPutEnv('readmeF','readme_de.txt')
   end
   when lang = 'NL' then do
     rc =WirexxPutEnv('title','Lucide - Document Bekijker')
@@ -73,13 +74,14 @@ select
     rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
     rc =WirexxPutEnv('target','Please select target directory.')
     rc =WirexxPutEnv('re_install','If you are updating the Lucide for NetDrive, the default installation directory will be the current directory.')
-    rc =WirexxPutEnv('install','~Installation')
+    rc =WirexxPutEnv('install','~Install')
     rc =WirexxPutEnv('license','I ~accept')
     rc =WirexxPutEnv('next','~Next')
     rc =WirexxPutEnv('nl_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
-    rc =WirexxPutEnv('installText','Press "Installation" in order to start installation of this archive.')
+    rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+    rc =WirexxPutEnv('readmeF','readme')
   end
   when lang = 'ES' Then Do
     rc =WirexxPutEnv('title','Lucide - Visor de documentos')
@@ -94,13 +96,14 @@ select
     rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
     rc =WirexxPutEnv('target','Please select target directory.')
     rc =WirexxPutEnv('re_install','If you are updating the Lucide for NetDrive, the default installation directory will be the current directory.')
-    rc =WirexxPutEnv('install','~Installation')
+    rc =WirexxPutEnv('install','~Install')
     rc =WirexxPutEnv('license','I ~accept')
     rc =WirexxPutEnv('next','~Next')
     rc =WirexxPutEnv('es_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
-    rc =WirexxPutEnv('installText','Press "Installation" in order to start installation of this archive.')
+    rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+    rc =WirexxPutEnv('readmeF','readme_es.txt')
   end
   when lang = 'SV' Then Do
     rc =WirexxPutEnv('title','Lucide - Dokumentvisare')
@@ -115,13 +118,14 @@ select
     rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
     rc =WirexxPutEnv('target','Please select target directory.')
     rc =WirexxPutEnv('re_install','If you are updating the Lucide for NetDrive, the default installation directory will be the current directory.')
-    rc =WirexxPutEnv('install','~Installation')
+    rc =WirexxPutEnv('install','~Install')
     rc =WirexxPutEnv('license','I ~accept')
     rc =WirexxPutEnv('next','~Next')
     rc =WirexxPutEnv('sv_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
-    rc =WirexxPutEnv('installText','Press "Installation" in order to start installation of this archive.')
+    rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+    rc =WirexxPutEnv('readmeF','readme')
   end
   otherwise do
     rc =WirexxPutEnv('title','Lucide - Document Viewer')
@@ -136,13 +140,14 @@ select
     rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
     rc =WirexxPutEnv('target','Please select target directory.')
     rc =WirexxPutEnv('re_install','If you are updating the Lucide for NetDrive, the default installation directory will be the current directory.')
-    rc =WirexxPutEnv('install','~Installation')
+    rc =WirexxPutEnv('install','~Install')
     rc =WirexxPutEnv('license','I ~accept')
     rc =WirexxPutEnv('next','~Next')
     rc =WirexxPutEnv('en_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
-    rc =WirexxPutEnv('installText','Press "Installation" in order to start installation of this archive.')
+    rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+    rc =WirexxPutEnv('readmeF','readme')
   end
 end
 return ''
@@ -210,7 +215,7 @@ return readme
      TITLE="English"
      CREATEOBJECT='WPFolder|Lucide for eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide for eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|ReadMe")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=ReadMe;PROGTYPE=PM;PARAMETERS=$(1)\readme.txt;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|ReadMe")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=ReadMe;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Changelog")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env en_sel")
      >English</PCK>
@@ -220,7 +225,7 @@ return readme
      TITLE="Francais"
      CREATEOBJECT='WPFolder|Lucide pour eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide pour eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE=Lucide;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|Lucide LisezMoi|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lisez Moi;PROGTYPE=PM;PARAMETERS=$(1)\readme_FR.txt;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|Lucide LisezMoi|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lisez Moi;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Change Log|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Change Log;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env fr_sel")
      >Francais</PCK>
@@ -230,7 +235,7 @@ return readme
      TITLE="Deutsch"
      CREATEOBJECT='WPFolder|Lucide fÅr eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide fÅr eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE=Lucide;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|Lies mich!|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lies mich!;PROGTYPE=PM;PARAMETERS=$(1)\readme_DE.txt;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|Lies mich!|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lies mich!;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Entwicklungsgeschichte)|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Entwicklungsgeschichte;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env de_sel")
      >Deutsch</PCK>
@@ -240,7 +245,7 @@ return readme
      TITLE="Dutch"
      CREATEOBJECT='WPFolder|Lucide voor eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide voor eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|Lees mij")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lees mij;PROGTYPE=PM;PARAMETERS=$(1)\readme_NL.txt;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|Lees mij")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lees mij;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Changelog")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env nl_sel")
      >Dutch</PCK>
@@ -250,7 +255,7 @@ return readme
      TITLE="Espanol"
      CREATEOBJECT='WPFolder|Lucide para eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide para eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE=Lucide;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|LÇeme de Lucide|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=LÇeme de Lucide;PROGTYPE=PM;PARAMETERS=$(1)\readme_ES;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|LÇeme de Lucide|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=LÇeme de Lucide;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Change Log|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env es_sel")
      >Espanol</PCK>
@@ -260,7 +265,7 @@ return readme
      TITLE="Sverige"
      CREATEOBJECT='WPFolder|Lucide fîr eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide fîr eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|LÑs mig")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=LÑs mig;PROGTYPE=PM;PARAMETERS=$(1)\readme_SV.txt;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|LÑs mig")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=LÑs mig;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Changelog")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env sv_sel")
      >Sverige</PCK>
