@@ -41,7 +41,7 @@ installed by default in eComStation 2.0 RC1 and up):
 Optional: to have japanese fonts working you need poppler-data pack.
 
   - extract the 4 directories from the package found on http://poppler.freedesktop.org
-    to your %unixroot%/usr/local/share/poppler
+    to your %unixroot%/usr/local/share/poppler or to the dir where lucide.exe is installed
   - take care that the "Times New Roman WT J" font is installed. This font is used 
     as a fallback
     
