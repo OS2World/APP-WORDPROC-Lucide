@@ -53,7 +53,9 @@ else
 #
 # Real packing rules
 #
-INSTALLS	 = Lucide_wpi_1 Lucide_wpi_2 Lucide_wpi_3 Lucide_wpi_4 Lucide_zip
+INSTALLS	 = Lucide_wpi_1 Lucide_wpi_2 Lucide_wpi_3 Lucide_wpi_4 Lucide_wpi_5 \
+		   Lucide_wpi_6 Lucide_wpi_7 Lucide_wpi_8 Lucide_wpi_9 Lucide_wpi_10 \
+		   Lucide_zip
 PACKING		 = $(LUCIDE_WPI) $(LUCIDE_ZIP)
 
 #
@@ -76,6 +78,25 @@ Lucide_wpi_3_SOURCES	 = $(TARGET_ludjvu)
 
 Lucide_wpi_4_INST		 = $(notdir $(PATH_PACKING))/wpi/4
 Lucide_wpi_4_SOURCES	 = $(TARGET_lujpeg)
+
+Lucide_wpi_5_INST		 = $(notdir $(PATH_PACKING))/wpi/5
+Lucide_wpi_5_SOURCES	 = warpin/LngDummy.txt
+
+Lucide_wpi_6_INST		 = $(notdir $(PATH_PACKING))/wpi/6
+Lucide_wpi_6_SOURCES	 = warpin/LngDummy.txt
+
+Lucide_wpi_7_INST		 = $(notdir $(PATH_PACKING))/wpi/7
+Lucide_wpi_7_SOURCES	 = warpin/LngDummy.txt
+
+Lucide_wpi_8_INST		 = $(notdir $(PATH_PACKING))/wpi/8
+Lucide_wpi_8_SOURCES	 = warpin/LngDummy.txt
+
+Lucide_wpi_9_INST		 = $(notdir $(PATH_PACKING))/wpi/9
+Lucide_wpi_9_SOURCES	 = warpin/LngDummy.txt
+
+Lucide_wpi_10_INST		 = $(notdir $(PATH_PACKING))/wpi/10
+Lucide_wpi_10_SOURCES	 = warpin/LngDummy.txt
+
 
 $(LUCIDE_WPI): $(LUCIDE_WIS) install
 	$(call MSG_L1,Packing $@)
