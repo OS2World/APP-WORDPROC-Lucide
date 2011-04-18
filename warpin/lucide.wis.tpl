@@ -34,6 +34,9 @@ select
     rc =WirexxPutEnv('license','~J''accepte')
     rc =WirexxPutEnv('next','~Suivant')
     rc =WirexxPutEnv('fr_sel','SELECT DESELECT')
+    rc =WirexxPutEnv('nextText','Select "Suivant" to continue.')
+    rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
+
   end
   when lang = 'DE' then do
     rc =WirexxPutEnv('title','Lucide - Dokumentenbetrachter')
@@ -52,6 +55,8 @@ select
     rc =WirexxPutEnv('license','St~imme zu')
     rc =WirexxPutEnv('next','W~eiter')
     rc =WirexxPutEnv('de_sel','SELECT DESELECT')
+    rc =WirexxPutEnv('nextText','Zum Fortfahren "Weiter" ausw„hlen.')
+    rc =WirexxPutEnv('cancelText','Zum Abbrechen "Cancel" ausw„hlen.')
   end
   when lang = 'NL' then do
     rc =WirexxPutEnv('title','Lucide - Document Bekijker')
@@ -70,6 +75,8 @@ select
     rc =WirexxPutEnv('license','I ~accept')
     rc =WirexxPutEnv('next','~Next')
     rc =WirexxPutEnv('nl_sel','SELECT DESELECT')
+    rc =WirexxPutEnv('nextText','Select "Next" to continue.')
+    rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
   end
   when lang = 'ES' Then Do
     rc =WirexxPutEnv('title','Lucide - Visor de documentos')
@@ -88,6 +95,8 @@ select
     rc =WirexxPutEnv('license','I ~accept')
     rc =WirexxPutEnv('next','~Next')
     rc =WirexxPutEnv('es_sel','SELECT DESELECT')
+    rc =WirexxPutEnv('nextText','Select "Next" to continue.')
+    rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
   end
   when lang = 'SV' Then Do
     rc =WirexxPutEnv('title','Lucide - Dokumentvisare')
@@ -106,6 +115,8 @@ select
     rc =WirexxPutEnv('license','I ~accept')
     rc =WirexxPutEnv('next','~Next')
     rc =WirexxPutEnv('sv_sel','SELECT DESELECT')
+    rc =WirexxPutEnv('nextText','Select "Next" to continue.')
+    rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
   end
   otherwise do
     rc =WirexxPutEnv('title','Lucide - Document Viewer')
@@ -124,6 +135,8 @@ select
     rc =WirexxPutEnv('license','I ~accept')
     rc =WirexxPutEnv('next','~Next')
     rc =WirexxPutEnv('en_sel','SELECT DESELECT')
+    rc =WirexxPutEnv('nextText','Select "Next" to continue.')
+    rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
   end
 end
 return ''
@@ -259,8 +272,8 @@ return readme
 <PAGE INDEX=1 TYPE=README>
 <NEXTBUTTON TARGET=2>=("get_env next")</NEXTBUTTON>
 <TEXT>
-Select "=("get_env next")" to continue.
-Select "Cancel" to abort installation.
+=("get_env nextText")
+=("get_env cancelText")
 </TEXT>
 
 <README FORMAT=HTML>
