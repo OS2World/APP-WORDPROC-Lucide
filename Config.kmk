@@ -12,7 +12,7 @@
 # This always has a format of X.Y.Z where each letter is a positive decimal
 # number representing the major version, minor version and revision accordingly.
 #
-VERSION		= 1.3.3
+VERSION		= 1.3.4
 
 #
 # Lucide build string.
@@ -20,19 +20,19 @@ VERSION		= 1.3.3
 # This is usually "beta" for the development phase and "GA" for the releases.
 # See also GENERATING DISTRIBUTION ARCHIVES in README.DEV for more information.
 #
-BUILD		= GA
+BUILD		= beta
 
 #
 # Lucide build number for the WPI archive.
 #
 # By agreement, this number is 0 for "beta" builds and 1 for "GA" builds.
 #
-WPIBUILD	= 1
+WPIBUILD	= 0
 
 #
 # Lucide version date in the format YYYY-MM-DD.
 #
-VERSIONDATE	= 2011-04-20
+VERSIONDATE	= 2011-xx-xx
 
 #------------------------------------------------------------------------------
 # Common libraries referenced by components
