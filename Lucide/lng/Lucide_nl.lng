@@ -1,5 +1,5 @@
 #
-# Lucide language file, NL (1.31)
+# Lucide language file, NL (1.3.3)
 #
 
 #
@@ -140,6 +140,7 @@ DOCINFO_CREATOR=Gemaakt in:
 DOCINFO_PRODUCER=Met:
 DOCINFO_CREATION_DATE=Gemaakt op:
 DOCINFO_MOD_DATE=Veranderd op:
+DOCINFO_NAME=Documentnaam:
 
 #
 # "Find" dialog
@@ -152,6 +153,7 @@ FIND_CANCEL=~Annuleren
 # other 'find'-related messages
 FIND_SEARCH_PAGE_OF=Doorzoeken pagina %d van %d...
 FIND_NOT_FOUND=Onderwerp is niet gevonden!
+FIND_BACK=~Zoek Achteruit
 
 #
 # "Progress" dialog

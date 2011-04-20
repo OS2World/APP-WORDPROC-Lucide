@@ -13,13 +13,11 @@ call SysLoadFuncs
 langs = "EN,FR,DE,NL,ES,SV"
 lang = translate(left(strip(value("LANG",,"OS2ENVIRONMENT")),2))
 if pos(lang,langs) = 0 then lang = 'EN'
+rc =WirexxPutEnv('prog','Lucide')
+rc =WirexxPutEnv('brand','eCS (OS/2)')
 select
   when lang = 'FR' then do
     rc =WirexxPutEnv('title','Lucide - Afficheur de document')
-    rc =WirexxPutEnv('folder','Lucide pour eCS (OS/2)')
-    rc =WirexxPutEnv('prog','Lucide')
-    rc =WirexxPutEnv('readme','Lucide Readme')
-    rc =WirexxPutEnv('change','Lucide Change Log')
     rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
     rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
     rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
@@ -37,14 +35,9 @@ select
     rc =WirexxPutEnv('nextText','Select "Suivant" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
     rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
-    rc =WirexxPutEnv('readmeF','readme_fr.txt')
   end
   when lang = 'DE' then do
     rc =WirexxPutEnv('title','Lucide - Dokumentenbetrachter')
-    rc =WirexxPutEnv('folder','Lucide fÅr eCS (OS/2)')
-    rc =WirexxPutEnv('prog','Lucide')
-    rc =WirexxPutEnv('readme','Lucide Readme')
-    rc =WirexxPutEnv('change','Lucide Change Log')
     rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
     rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
     rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
@@ -59,14 +52,9 @@ select
     rc =WirexxPutEnv('nextText','Zum Fortfahren "Weiter" auswÑhlen.')
     rc =WirexxPutEnv('cancelText','Zum Abbrechen "Cancel" auswÑhlen.')
     rc =WirexxPutEnv('installText','Bitte "Installieren" auswÑhlen, um die Installation des Archivs zu starten.')
-    rc =WirexxPutEnv('readmeF','readme_de.txt')
   end
   when lang = 'NL' then do
     rc =WirexxPutEnv('title','Lucide - Document Bekijker')
-    rc =WirexxPutEnv('folder','Lucide voor eCS (OS/2)')
-    rc =WirexxPutEnv('prog','Lucide')
-    rc =WirexxPutEnv('readme','Lucide Lees mij')
-    rc =WirexxPutEnv('change','Lucide Change Log')
     rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
     rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
     rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
@@ -81,14 +69,9 @@ select
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
     rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
-    rc =WirexxPutEnv('readmeF','readme')
   end
   when lang = 'ES' Then Do
     rc =WirexxPutEnv('title','Lucide - Visor de documentos')
-    rc =WirexxPutEnv('folder','Lucide para eCS (OS/2)')
-    rc =WirexxPutEnv('prog','Lucide')
-    rc =WirexxPutEnv('readme','LÇeme de Lucide')
-    rc =WirexxPutEnv('change','Lucide Change Log')
     rc =WirexxPutEnv('plug_pdf','Plugin PDF para Lucide')
     rc =WirexxPutEnv('plug_djvu','Plugin DjVu para Lucide')
     rc =WirexxPutEnv('plug_jpeg','Plugin JPEG para Lucide')
@@ -103,14 +86,9 @@ select
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
     rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
-    rc =WirexxPutEnv('readmeF','readme_es.txt')
   end
   when lang = 'SV' Then Do
     rc =WirexxPutEnv('title','Lucide - Dokumentvisare')
-    rc =WirexxPutEnv('folder','Lucide fîr eCS (OS/2)')
-    rc =WirexxPutEnv('prog','Lucide')
-    rc =WirexxPutEnv('readme','Lucide LÑs mig')
-    rc =WirexxPutEnv('change','Lucide Change Log')
     rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
     rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
     rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
@@ -125,14 +103,9 @@ select
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
     rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
-    rc =WirexxPutEnv('readmeF','readme')
   end
   otherwise do
     rc =WirexxPutEnv('title','Lucide - Document Viewer')
-    rc =WirexxPutEnv('folder','Lucide for eCS (OS/2)')
-    rc =WirexxPutEnv('prog','Lucide')
-    rc =WirexxPutEnv('readme','Lucide Readme')
-    rc =WirexxPutEnv('change','Lucide Change Log')
     rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
     rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
     rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
@@ -147,7 +120,6 @@ select
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
     rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
-    rc =WirexxPutEnv('readmeF','readme')
   end
 end
 return ''
@@ -163,6 +135,7 @@ If ans = 6 Then Do
   Call SysIni 'USER','PMWP_ASSOC_FILTER','*.PDF','DELETE:'
   Call SysIni 'USER','PMWP_ASSOC_FILTER','*PDF','DELETE:'
   Call SysIni 'USER','PMWP_ASSOC_TYPE','Acrobat Document','DELETE:'
+  Call SysIni 'USER','PMWP_ASSOC_TYPE','Adobe Portable Document Format','DELETE:'
 End
 Return ''
 </REXX>
@@ -213,9 +186,9 @@ return readme
      PACKAGEID="netlabs.org\Lucide\english\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
      TITLE="English"
-     CREATEOBJECT='WPFolder|Lucide for eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide for eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPFolder|=("get_env prog") for =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") for =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|ReadMe")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=ReadMe;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|ReadMe")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=ReadMe;PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Changelog")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env en_sel")
      >English</PCK>
@@ -223,9 +196,9 @@ return readme
      PACKAGEID="netlabs.org\Lucide\francais\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
      TITLE="Francais"
-     CREATEOBJECT='WPFolder|Lucide pour eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide pour eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
-     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE=Lucide;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|Lucide LisezMoi|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lisez Moi;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
+     CREATEOBJECT='WPFolder|=("get_env prog") pour =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") pour =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
+     CREATEOBJECT='WPProgram|Lucide LisezMoi|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lisez Moi;PROGTYPE=PM;PARAMETERS=$(1)\readme_fr.txt;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Change Log|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Change Log;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env fr_sel")
      >Francais</PCK>
@@ -233,9 +206,9 @@ return readme
      PACKAGEID="netlabs.org\Lucide\deutsch\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
      TITLE="Deutsch"
-     CREATEOBJECT='WPFolder|Lucide fÅr eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide fÅr eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
-     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE=Lucide;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|Lies mich!|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lies mich!;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
+     CREATEOBJECT='WPFolder|=("get_env prog") fÅr =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") fÅr =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
+     CREATEOBJECT='WPProgram|Lies mich!|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lies mich!;PROGTYPE=PM;PARAMETERS=$(1)\readme_de.txt;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Entwicklungsgeschichte)|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Entwicklungsgeschichte;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env de_sel")
      >Deutsch</PCK>
@@ -243,9 +216,9 @@ return readme
      PACKAGEID="netlabs.org\Lucide\dutch\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
      TITLE="Dutch"
-     CREATEOBJECT='WPFolder|Lucide voor eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide voor eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPFolder|=("get_env prog") voor =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") voor =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|Lees mij")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lees mij;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|Lees mij")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lees mij;PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Changelog")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env nl_sel")
      >Dutch</PCK>
@@ -253,9 +226,9 @@ return readme
      PACKAGEID="netlabs.org\Lucide\espanol\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
      TITLE="Espanol"
-     CREATEOBJECT='WPFolder|Lucide para eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide para eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
-     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE=Lucide;PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|LÇeme de Lucide|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=LÇeme de Lucide;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
+     CREATEOBJECT='WPFolder|=("get_env prog") para =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") para =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
+     CREATEOBJECT='WPProgram|LÇeme de Lucide|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=LÇeme de Lucide;PROGTYPE=PM;PARAMETERS=$(1)\readme_es.txt;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Change Log|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env es_sel")
      >Espanol</PCK>
@@ -263,9 +236,9 @@ return readme
      PACKAGEID="netlabs.org\Lucide\sverige\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
      TITLE="Sverige"
-     CREATEOBJECT='WPFolder|Lucide fîr eCS (OS/2)|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE=Lucide fîr eCS (OS/2);ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPFolder|=("get_env prog") fîr =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") fîr =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|LÑs mig")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=LÑs mig;PROGTYPE=PM;PARAMETERS=$(1)\=("get_env readmeF");STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|LÑs mig")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=LÑs mig;PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Changelog")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env sv_sel")
      >Sverige</PCK>
@@ -291,7 +264,7 @@ return readme
 <B>=("get_env welcome")=("get_env title"), version ${VERSION}.${WPIBUILD}</B>
 
 <P>
-Lucide is a plugin based document viewer for eComStation. In its first incarnation
+=("get_env prog") is a plugin based document viewer for eComStation. In its first incarnation
 it supports PDF, DjVu and JPEG files but new document types can easily be added to it.
 <P>
 <P>
@@ -304,7 +277,7 @@ Features:
 </UL>
 <P>
 <BR>
-For further details please visit the Lucide project homepage:<BR>
+For further details please visit the =("get_env prog") project homepage:<BR>
 <U><a href="http://svn.netlabs.org/lucide/">http://svn.netlabs.org/lucide/</a></U>
 <BR>
 </README>
@@ -313,7 +286,7 @@ For further details please visit the Lucide project homepage:<BR>
 <PAGE INDEX=2 TYPE=README>
 <NEXTBUTTON TARGET=3>=("get_env next")</NEXTBUTTON>
 <TEXT>
-The following list describes what is new in this version of Lucide.
+The following list describes what is new in this version of =("get_env prog").
 </TEXT>
 <README FORMAT=PLAIN EXTRACTFROMPCK="1">changelog</README>
 </PAGE>
