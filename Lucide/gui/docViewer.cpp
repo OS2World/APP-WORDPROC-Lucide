@@ -56,6 +56,15 @@
 // ASYNCH_RENDER_ENABLE, normally must be defined
 #define ASYNCH_RENDER_ENABLE
 
+// FILL_PAGE_BACKGROUND: when asynchronous rendering is enabled and active
+// for the current document, quickly fill the page with PAGEBACK_COLOR before
+// rendering its contents. This is disabled for now because PAGEBACK_COLOR
+// is currently hard coded to white and this creates the annoying flicker when
+// switching pages in documents with dark page backgrounds. A possible solution
+// would be to introduce a method to the document interface that returns the
+// background color for the given page and use this color instead. 
+//#define FILL_PAGE_BACKGROUND
+
 typedef LuDocument_LuRectSequence    *PLuRectSequence;
 typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 
@@ -907,6 +916,9 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
         return;
     }
 
+    BOOL sizeChanged = cxClient != SHORT1FROMMP( mp2 ) ||
+                       cyClient != SHORT2FROMMP( mp2 );
+
     cxClient = SHORT1FROMMP( mp2 );
     cyClient = SHORT2FROMMP( mp2 );
 
@@ -915,15 +927,21 @@ void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
 
     adjustSize();
 
-    if ( ( hpsBuffer != NULLHANDLE ) && ( hdcBuffer != NULLHANDLE ) ) {
-        DestroyGraphicsBuffer( hpsBuffer, hdcBuffer );
-        hpsBuffer = hdcBuffer = NULLHANDLE;
-    }
+    if ( sizeChanged || hpsBuffer == NULLHANDLE )
+    {
+        if ( ( hpsBuffer != NULLHANDLE ) && ( hdcBuffer != NULLHANDLE ) )
+        {
+            DestroyGraphicsBuffer( hpsBuffer, hdcBuffer );
+            hpsBuffer = hdcBuffer = NULLHANDLE;
+        }
 
-    HPS hps = WinGetPS( hwnd );
-    RECTL rectl = { 0, 0, cxClient, cyClient };
-    CreateGraphicsBuffer( hab, &rectl, hps, &hpsBuffer, &hdcBuffer );
-    WinReleasePS( hps );
+        HPS hps = WinGetPS( hwnd );
+        RECTL rectl = { 0, 0, cxClient, cyClient };
+        CreateGraphicsBuffer( hab, &rectl, hps, &hpsBuffer, &hdcBuffer );
+        WinReleasePS( hps );
+
+        GpiCreateLogColorTable( hpsBuffer, 0, LCOLF_RGB, 0, 0, NULL );
+    }
 
     sHscrollMax = (SHORT)std::max( 0., ( isContinuous() ? fullwidth : width ) - cxClient );
     sHscrollPos = std::min( sHscrollPos, sHscrollMax );
@@ -1108,7 +1126,9 @@ void DocumentViewer::wmPaintAsynch( HWND hwnd )
     RECTL rclPage = { 0 };
     RECTL rcl;
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
-    GpiCreateLogColorTable( hpsBuffer, 0, LCOLF_RGB, 0, 0, NULL );
+
+#if FILL_PAGE_BACKGROUND
+
     WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
     if ( doc != NULL )
     {
@@ -1126,6 +1146,42 @@ void DocumentViewer::wmPaintAsynch( HWND hwnd )
         WinFillRect( hpsBuffer, &rclPage, PAGEBACK_COLOR );
     }
     BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
+
+#else
+
+    GpiCreateLogColorTable( hps, 0, LCOLF_RGB, 0, 0, NULL );
+
+    if ( doc != NULL )
+    {
+        if ( width < cxClient ) {
+            xPos = ( cxClient - width ) / 2;
+        }
+        if ( height < cyClient ) {
+            yPos = ( cyClient - height ) / 2;
+        }
+
+        rclPage.xLeft   = xPos;
+        rclPage.yBottom = yPos;
+        rclPage.xRight  = width + xPos;
+        rclPage.yTop    = height + yPos;
+
+        HRGN hrgnBorder = GpiCreateRegion( hps, 1, &rcl );
+        HRGN hrgnPage = GpiCreateRegion( hps, 1, &rclPage );
+        LONG res = GpiCombineRegion( hps, hrgnBorder, hrgnBorder, hrgnPage,
+                                     CRGN_DIFF );
+        if ( res != RGN_NULL )
+        {
+            GpiSetColor( hps, BORDER_COLOR );
+            GpiPaintRegion( hps, hrgnBorder );
+        }
+        GpiDestroyRegion( hps, hrgnPage );
+        GpiDestroyRegion( hps, hrgnBorder );
+    }
+    else
+        WinFillRect( hps, &rcl, BORDER_COLOR );
+
+#endif
+
     WinEndPaint( hps );
 
     if ( doc != NULL )
@@ -1185,7 +1241,9 @@ void DocumentViewer::wmPaintContAsynch( HWND hwnd )
 {
     RECTL rcl, rclWin, rclDraw = { 0 };
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
-    GpiCreateLogColorTable( hpsBuffer, 0, LCOLF_RGB, 0, 0, NULL );
+
+#if FILL_PAGE_BACKGROUND
+
     WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
 
     if ( doc != NULL )
@@ -1211,6 +1269,51 @@ void DocumentViewer::wmPaintContAsynch( HWND hwnd )
     }
 
     BlitGraphicsBuffer( hps, hpsBuffer, &rcl );
+
+#else
+
+    GpiCreateLogColorTable( hps, 0, LCOLF_RGB, 0, 0, NULL );
+
+    if ( doc != NULL )
+    {
+        HRGN hrgnBorder = GpiCreateRegion( hps, 1, &rcl );
+        HRGN hrgnPage = GpiCreateRegion( hps, 0, NULL );
+        LONG res = RGN_NULL;
+
+        long foundpage = -1;
+        double pageRest;
+        for ( LONG i = rcl.yTop; i >= rcl.yBottom; i-- )
+        {
+            pageRest = 0;
+            long pg = posToPagenum( i, &pageRest );
+            if ( ( pg != foundpage ) && ( pg != -1 ) )
+            {
+                RECTL rclPage = { 0 };
+                LuRectangle lr = { 0, 0,
+                    isRotated() ? (pagesizes[ pg ].y - 1) : (pagesizes[ pg ].x - 1),
+                    isRotated() ? (pagesizes[ pg ].x - 1) : (pagesizes[ pg ].y - 1) };
+                docPosToWinPos( pg, &lr, &rclPage );
+                GpiSetRegion( hps, hrgnPage, 1, &rclPage );
+                res = GpiCombineRegion( hps, hrgnBorder, hrgnBorder, hrgnPage,
+                                        CRGN_DIFF );
+                foundpage = pg;
+                i -= pageRest;
+            }
+        }
+
+        if ( res != RGN_NULL )
+        {
+            GpiSetColor( hps, BORDER_COLOR );
+            GpiPaintRegion( hps, hrgnBorder );
+        }
+        GpiDestroyRegion( hps, hrgnPage );
+        GpiDestroyRegion( hps, hrgnBorder );
+    }
+    else
+        WinFillRect( hps, &rcl, BORDER_COLOR );
+
+#endif
+
     WinEndPaint( hps );
 
     if ( doc != NULL )
@@ -1277,7 +1380,6 @@ void DocumentViewer::wmPaint( HWND hwnd )
 {
     RECTL rcl;
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
-    GpiCreateLogColorTable( hpsBuffer, 0, LCOLF_RGB, 0, 0, NULL );
     WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
 
     if ( doc != NULL )
@@ -1584,7 +1686,6 @@ void DocumentViewer::wmPaintCont( HWND hwnd )
 {
     RECTL rcl;
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
-    GpiCreateLogColorTable( hpsBuffer, 0, LCOLF_RGB, 0, 0, NULL );
     WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
 
     if ( doc != NULL )
