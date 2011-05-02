@@ -2671,7 +2671,15 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
             return (MRESULT)FALSE;
 
         case WM_ERASEBACKGROUND:
+#ifdef FILL_PAGE_BACKGROUND
+            // returning TRUE causes PM to fill the window with white which is
+            // annoying for documents with dark backgrounds (see the description
+            // of FILL_PAGE_BACKGROUND at the top for more details and a
+            // possible solution)
             return (MRESULT)TRUE;
+#else
+            return (MRESULT)FALSE;
+#endif
 
         case WM_SIZE:
             _this->wmSize( hwnd, mp2 );
