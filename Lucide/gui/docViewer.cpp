@@ -62,7 +62,7 @@
 // is currently hard coded to white and this creates the annoying flicker when
 // switching pages in documents with dark page backgrounds. A possible solution
 // would be to introduce a method to the document interface that returns the
-// background color for the given page and use this color instead. 
+// background color for the given page and use this color instead.
 //#define FILL_PAGE_BACKGROUND
 
 typedef LuDocument_LuRectSequence    *PLuRectSequence;
@@ -912,10 +912,6 @@ MRESULT DocumentViewer::horizScroll( HWND hwnd, MPARAM mp2 )
 // creates appropriate hps buffer, sets scrollbars limits
 void DocumentViewer::wmSize( HWND hwnd, MPARAM mp2 )
 {
-    if ( !WinIsWindowShowing( hwnd ) ) {
-        return;
-    }
-
     BOOL sizeChanged = cxClient != SHORT1FROMMP( mp2 ) ||
                        cyClient != SHORT2FROMMP( mp2 );
 
