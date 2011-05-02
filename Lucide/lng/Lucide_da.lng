@@ -163,7 +163,7 @@ PDLG_CANCEL=~Afbryd
 #
 AD_ABOUT=Om
 AD_DESCRIPTION=Plugin-baseret dokument fremviser med underst›ttelse for mange forskellige formater
-AD_COPYRIGHTS=(c) Eugene Romanenko, netlabs.org in co-operation with Serenity Systems International
+AD_COPYRIGHTS=(c) Eugene Romanenko, Dmitriy Kuminov (netlabs.org) in co-operation with Serenity Systems International
 AD_OK=~OK
 
 #

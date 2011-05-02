@@ -113,5 +113,5 @@ http://www.ecomstation.com
 :: Copyright ::
 
 (c) 2006-2007 por Eugene Romanenko, netlabs.org
-(c) 2010 por Dmitry A. Kuminov, netlabs.org
+(c) 2010-2011 por Dmitriy Kuminov, netlabs.org
     en cooperaci¢n con Serenity Systems International

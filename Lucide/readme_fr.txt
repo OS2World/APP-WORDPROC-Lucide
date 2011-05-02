@@ -120,7 +120,7 @@ http://www.ecomstation.com
 :: Copyright ::
 
 (c) 2006-2007 par Eugene Romanenko, netlabs.org
-(c) 2010 par Dmitry A. Kuminov, netlabs.org
+(c) 2010-2011 par Dmitriy Kuminov, netlabs.org
     en coop‚ration avec Serenity Systems International
 
 Traduction fran‡aise du 2011-03-08 par Guillaume Gay <guillaume.gay@bigfoot.com>

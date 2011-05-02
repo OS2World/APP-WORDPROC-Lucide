@@ -25,7 +25,7 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * Dmitry A. Kuminov, netlabs.org.
+ * Dmitriy Kuminov, netlabs.org.
  *
  * Alternatively, the contents of this file may be used under the terms of
  * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),

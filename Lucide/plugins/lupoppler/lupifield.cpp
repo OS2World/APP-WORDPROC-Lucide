@@ -20,7 +20,7 @@
  * License.
  *
  * The Initial Developer of the Original Code is
- * Dmitry A. Kuminov, netlabs.org.
+ * Dmitriy Kuminov, netlabs.org.
  * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *

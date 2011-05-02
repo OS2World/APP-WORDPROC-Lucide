@@ -166,7 +166,7 @@ PDLG_CANCEL=~Annuleren
 #
 AD_ABOUT=Info
 AD_DESCRIPTION=Op plug-ins gebaseerde document bekijker met ondersteuning voor diverse bestandsindelingen
-AD_COPYRIGHTS=(c) van Eugene Romanenko, netlabs.org in samenwerking met Serenity Systems International
+AD_COPYRIGHTS=(c) van Eugene Romanenko, Dmitriy Kuminov (netlabs.org) in samenwerking met Serenity Systems International
 AD_OK=~OK
 
 #

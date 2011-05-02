@@ -163,7 +163,7 @@ PDLG_CANCEL=A~nnulla
 #
 AD_ABOUT=Informazioni sul prodotto
 AD_DESCRIPTION=Visualizzatore di documenti basato su plugin, con supporto per molteplici formati di file
-AD_COPYRIGHTS=(c) Eugene Romanenko, netlabs.org in cooperazione con Serenity Systems International
+AD_COPYRIGHTS=(c) Eugene Romanenko, Dmitriy Kuminov (netlabs.org) in cooperazione con Serenity Systems International
 AD_OK=~OK
 
 #
