@@ -19,7 +19,7 @@ Lucide_dll_NAME		 = Lucide
 Lucide_dll_INCS		 = \
 	os2tk                                                                     \
 	lupoppler                                                                 \
-	../plugins/ludoc $(PATH_Lucide_dll)/../ludoc
+	../plugins/ludoc $(Lucide_dll_0_OUTDIR)/../ludoc
 Lucide_dll_CXXFLAGS	 = -DVERSION="\"$(VERSION)\"" -DBUILD=\""$(BUILD)\"" -DVERSIONDATE="\"$(VERSIONDATE)\""
 Lucide_dll_DEFS.debug	 = __TEST__
 Lucide_dll_SOURCES	 = \

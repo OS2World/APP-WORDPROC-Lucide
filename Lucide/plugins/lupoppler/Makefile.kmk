@@ -15,7 +15,7 @@ DLLS		+= lupoppler
 lupoppler_TEMPLATE	 = SomDll
 lupoppler_NAME		 = lupplr
 lupoppler_INCS		 = \
-	../ludoc $(PATH_lupoppler)/../ludoc                                       \
+	../ludoc $(lupoppler_0_OUTDIR)/../ludoc                                   \
 	../../../poppler/mypoppler                                                \
 	../../../poppler/mypoppler/poppler                                        \
 	../../../poppler/fc-emulate-os2

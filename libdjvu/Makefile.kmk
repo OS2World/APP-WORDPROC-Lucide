@@ -15,7 +15,7 @@ djvu_TEMPLATE	 = LucideCxx
 djvu_CXXFLAGS	 =
 djvu_DEFS		 = HAVE_CONFIG_H
 djvu_INCS		 =
-djvu_SOURCES	 = $(wildcard $(djvu_PATH)/*.cpp)
+djvu_SOURCES	 = $(wildcard $(djvu_DEFPATH)/*.cpp)
 
 include $(FILE_KBUILD_SUB_FOOTER)
 

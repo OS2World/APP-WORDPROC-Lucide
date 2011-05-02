@@ -299,7 +299,7 @@ $(out) + $(output) +| $(output_maybe) : \
 	$(foreach f,$(out) $(output) $(output_maybe),\
 		$(if $(findstring $(notdir $f),$(notdir $($(target)_IDLSOURCES))),\
 			$$(QUIET)$(CP) --ignore-non-existing \
-				$(abspathex $(filter %$(notdir $f),$($(target)_IDLSOURCES)),$($(target)_PATH)) \
+				$(abspathex $(filter %$(notdir $f),$($(target)_IDLSOURCES)),$($(target)_DEFPATH)) \
 				$f))
 
 $(cmds)
@@ -308,7 +308,7 @@ $(cmds)
 		$(if $(findstring $(notdir $f),$(notdir $($(target)_IDLSOURCES))),\
 			$$(QUIET)$(CP) --changed \
 				$f \
-				$(abspathex $(filter %$(notdir $f),$($(target)_IDLSOURCES)),$($(target)_PATH))))
+				$(abspathex $(filter %$(notdir $f),$($(target)_IDLSOURCES)),$($(target)_DEFPATH))))
 
 ifndef NO_COMPILE_CMDS_DEPS
 	%$$(QUIET2)$$(APPEND) '$(dep)'

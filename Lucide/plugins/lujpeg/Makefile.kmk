@@ -15,7 +15,7 @@ DLLS		+= lujpeg
 lujpeg_TEMPLATE	 = SomDll
 lujpeg_INCS		 = \
 	lujpeg                                                                    \
-	../ludoc $(PATH_lujpeg)/../ludoc                                          \
+	../ludoc $(lujpeg_0_OUTDIR)/../ludoc                                      \
 	../../../libjpeg
 lujpeg_SOURCES	 = \
 	jpscale.cpp                                                               \

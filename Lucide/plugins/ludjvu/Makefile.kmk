@@ -15,7 +15,7 @@ DLLS		+= ludjvu
 ludjvu_TEMPLATE	 = SomDll
 ludjvu_INCS		 = \
 	ludjvu                                                                    \
-	../ludoc $(PATH_ludjvu)/../ludoc                                          \
+	../ludoc $(ludjvu_0_OUTDIR)/../ludoc                                      \
 	../../../libdjvu
 ludjvu_SOURCES	 = \
 	ludjvu.idl                                                                \
