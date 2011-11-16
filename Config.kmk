@@ -41,7 +41,7 @@ VERSIONDATE	= 2011-xx-xx
 #
 # poppler
 #
-LIB_POPPLER_LIBS	=  $(patsubst %,$(PATH_LIB)/%$(SUFF_LIB), \
+LIB_POPPLER_LIBS	=  $(patsubst %,$(PATH_STAGE_LIB)/%$(SUFF_LIB), \
 	fofi goo poppler splash fontconfig freetype2 jpeg)
 
 #------------------------------------------------------------------------------

@@ -23,8 +23,8 @@ ludjvu_SOURCES	 = \
 ludjvu_IDLSOURCES	 = \
 	ludjvu.cpp
 ludjvu_LIBS		 = \
-	$(PATH_LIB)/ludoc$(SUFF_LIB) \
-	$(PATH_LIB)/djvu$(SUFF_LIB)
+	$(PATH_STAGE_LIB)/ludoc$(SUFF_LIB) \
+	$(PATH_STAGE_LIB)/djvu$(SUFF_LIB)
 
 include $(FILE_KBUILD_SUB_FOOTER)
 

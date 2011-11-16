@@ -24,8 +24,8 @@ lujpeg_SOURCES	 = \
 lujpeg_IDLSOURCES	 = \
 	lujpeg.cpp
 lujpeg_LIBS		 = \
-	$(PATH_LIB)/ludoc$(SUFF_LIB) \
-	$(PATH_LIB)/jpeg$(SUFF_LIB)
+	$(PATH_STAGE_LIB)/ludoc$(SUFF_LIB) \
+	$(PATH_STAGE_LIB)/jpeg$(SUFF_LIB)
 
 include $(FILE_KBUILD_SUB_FOOTER)
 

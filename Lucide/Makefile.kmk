@@ -18,7 +18,7 @@ INSTALLS += Lucide_doc
 #
 # Lucide documentation
 #
-Lucide_doc_INST		 = $(notdir $(PATH_BIN))
+Lucide_doc_INST		 = $(INST_BIN)
 Lucide_doc_SOURCES	:= \
 	changelog readme $(wildcard $(PATH_SUB_CURRENT)/readme_*.txt) \
 	$(wildcard $(PATH_SUB_CURRENT)/LICENSE.*) \

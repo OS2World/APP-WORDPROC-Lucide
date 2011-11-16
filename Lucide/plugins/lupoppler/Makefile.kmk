@@ -33,7 +33,7 @@ lupoppler_IDLSOURCES	 = \
 	lupitext.cpp                                                              \
 	lupichoice.cpp
 lupoppler_LIBS		 = \
-	$(PATH_LIB)/ludoc$(SUFF_LIB) \
+	$(PATH_STAGE_LIB)/ludoc$(SUFF_LIB) \
 	$(LIB_POPPLER_LIBS)
 
 include $(FILE_KBUILD_SUB_FOOTER)

@@ -14,9 +14,9 @@
  */
 
 /**
- * Path to kBuild.
+ * Path to kBuild. Leave it empty if you already have kBuild in path.
  */
-G.PATH_TOOL_KBUILD      = 'D:\Coding\libc\kBuild'
+G.PATH_TOOL_KBUILD      = ''
 
 /**
  * Path to the GCC 4.x.x environment script. Leave it empty if you already have

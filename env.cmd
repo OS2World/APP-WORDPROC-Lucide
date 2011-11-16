@@ -40,15 +40,17 @@ if (EnvGet('BUILD_PLATFORM') == 'OS2') then
     call EnvSet 'BUILD_PLATFORM', 'os2'
 
 /* setup kBuild */
-cmdline = 'call' G.PATH_TOOL_KBUILD'\envos2.cmd'
-cmdline
-drop cmdline
+if (symbol('G.PATH_TOOL_KBUILD') \== 'LIT' & G.PATH_TOOL_KBUILD \== '') then do
+    cmdline = 'call' G.PATH_TOOL_KBUILD'\envos2.cmd'
+    cmdline
+    drop cmdline
+end
 
 /* setup GCC */
-if (G.PATH_TOOL_GCC4_ENV \== '') then do
-cmdline = 'call' G.PATH_TOOL_GCC4_ENV
-cmdline
-drop cmdline
+if (symbol('G.PATH_TOOL_GCC4_ENV') \== 'LIT' & G.PATH_TOOL_GCC4_ENV \== '') then do
+    cmdline = 'call' G.PATH_TOOL_GCC4_ENV
+    cmdline
+    drop cmdline
 end
 
 /* fix the outdated kBuild setting in GCC environment */
