@@ -16,6 +16,9 @@
 /* Build against libpng. */
 /* #undef ENABLE_LIBPNG */
 
+/* Build against libtiff. */
+/* #undef ENABLE_LIBTIFF */
+
 /* Do not hardcode the library location */
 /* #undef ENABLE_RELOCATABLE */
 
@@ -61,6 +64,9 @@
 
 /* Define to 1 if you have the `openjpeg' library (-lopenjpeg). */
 /* #undef HAVE_LIBOPENJPEG */
+
+/* Define to 1 if you have the `tiff' library (-ltiff). */
+/* #undef HAVE_LIBTIFF */
 
 /* Define to 1 if you have the `z' library (-lz). */
 /* #undef HAVE_LIBZ */
@@ -121,6 +127,9 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
 
+/* Define to 1 if you have the <tiffio.h> header file. */
+/* #undef HAVE_TIFFIO_H */
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
@@ -150,7 +159,7 @@
 #define PACKAGE_NAME "poppler"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "poppler 0.16.3"
+#define PACKAGE_STRING "poppler 0.18.1"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "poppler"
@@ -159,16 +168,13 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.16.3"
+#define PACKAGE_VERSION "0.18.1"
 
 /* Poppler data dir */
 #define POPPLER_DATADIR "/@unixroot/usr/local/share/poppler"
 
 /* Support for curl based doc builder is compiled in. */
 /* #undef POPPLER_HAS_CURL_SUPPORT */
-
-/* Have GDK */
-/* #undef POPPLER_WITH_GDK */
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -190,7 +196,7 @@
 /* #undef USE_FLOAT */
 
 /* Version number of package */
-#define VERSION "0.16.3"
+#define VERSION "0.18.1"
 
 /* Use fontconfig font configuration backend */
 #define WITH_FONTCONFIGURATION_FONTCONFIG 1

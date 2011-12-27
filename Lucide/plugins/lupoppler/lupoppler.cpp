@@ -718,10 +718,7 @@ SOM_Scope LuDocument_LuLinkMapSequence*  SOMLINK getLinkMapping(LuPopplerDocumen
     PopplerDocument *document = (PopplerDocument *)somThis->data;
     PopplerPage *page = &( document->pages[ pagenum ] );
 
-    Object obj;
-    Links *links = new Links( page->page->getAnnots( &obj ),
-                            document->doc->getCatalog()->getBaseURI() );
-    obj.free();
+    Links *links = new Links( page->page->getAnnots(document->doc->getCatalog()) );
 
     if ( links == NULL ) {  // No links, return empty LuLinkMapSequence
         return mapping;
@@ -740,7 +737,7 @@ SOM_Scope LuDocument_LuLinkMapSequence*  SOMLINK getLinkMapping(LuPopplerDocumen
 
     for ( int i = 0; i < len; i++ )
     {
-        Link *link = links->getLink( i );
+        AnnotLink *link = links->getLink( i );
         LinkAction *link_action = link->getAction();
         build_link( document->doc, &(mapping->_buffer[ i ].link), NULL, link_action );
 
@@ -1438,7 +1435,7 @@ SOM_Scope boolean  SOMLINK isHaveInputFields(LuPopplerDocument *somSelf,
     PopplerDocument *doc = (PopplerDocument *)somThis->data;
     for (int i = 0; i < doc->doc->getNumPages(); ++i) {
         Page *page = doc->pages[ i ].page;
-        FormPageWidgets *widgets = page->getPageWidgets();
+        FormPageWidgets *widgets = page->getFormWidgets(doc->doc->getCatalog());
         if (widgets == NULL || widgets->getNumWidgets() > 0)
             return TRUE;
     }
@@ -1452,9 +1449,10 @@ SOM_Scope LuDocument_LuInputFieldSequence*  SOMLINK getInputFields(LuPopplerDocu
 {
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
 
-    Page *page = ((PopplerDocument *)somThis->data)->pages[ pagenum ].page;
+    PopplerDocument *doc = (PopplerDocument *)somThis->data;
+    Page *page = doc->pages[ pagenum ].page;
 
-    FormPageWidgets *widgets = page->getPageWidgets();
+    FormPageWidgets *widgets = page->getFormWidgets(doc->doc->getCatalog());
 
     LuDocument_LuInputFieldSequence *fields = (LuDocument_LuInputFieldSequence *)
         SOMMalloc( sizeof( LuDocument_LuInputFieldSequence ) );
