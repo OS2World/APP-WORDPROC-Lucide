@@ -218,7 +218,7 @@ return readme
      TITLE="Dutch"
      CREATEOBJECT='WPFolder|=("get_env prog") voor =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") voor =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|Lees mij")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lees mij;PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|Lees mij")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lees mij;PROGTYPE=PM;PARAMETERS=$(1)\readme_nl.txt;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Changelog")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env nl_sel")
      >Dutch</PCK>
