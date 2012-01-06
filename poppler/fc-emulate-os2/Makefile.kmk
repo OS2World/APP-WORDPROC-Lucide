@@ -20,7 +20,8 @@ fontconfig_INCS		 = . ../freetype2/include
 fontconfig_SOURCES	 = \
 	fontconfig/fontconfig.c \
 	fontconfig/fcpat.c \
-	fontconfig/fclang.c
+	fontconfig/fclang.c \
+	fontconfig/fcstr.c
 
 include $(FILE_KBUILD_SUB_FOOTER)
 

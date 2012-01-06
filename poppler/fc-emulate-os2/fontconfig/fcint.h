@@ -40,6 +40,42 @@
 #endif
 #define FC_CACHE_VERSION_STRING "v1.3_with_GCC"
 
+#define FC_MEM_CHARSET	    0
+#define FC_MEM_CHARLEAF	    1
+#define FC_MEM_FONTSET	    2
+#define FC_MEM_FONTPTR	    3
+#define FC_MEM_OBJECTSET    4
+#define FC_MEM_OBJECTPTR    5
+#define FC_MEM_MATRIX	    6
+#define FC_MEM_PATTERN	    7
+#define FC_MEM_PATELT	    8
+#define FC_MEM_VALLIST	    9
+#define FC_MEM_SUBSTATE	    10
+#define FC_MEM_STRING	    11
+#define FC_MEM_LISTBUCK	    12
+#define FC_MEM_STRSET	    13
+#define FC_MEM_STRLIST	    14
+#define FC_MEM_CONFIG	    15
+#define FC_MEM_LANGSET	    16
+#define FC_MEM_ATOMIC	    17
+#define FC_MEM_BLANKS	    18
+#define FC_MEM_CACHE	    19
+#define FC_MEM_STRBUF	    20
+#define FC_MEM_SUBST	    21
+#define FC_MEM_OBJECTTYPE   22
+#define FC_MEM_CONSTANT	    23
+#define FC_MEM_TEST	    24
+#define FC_MEM_EXPR	    25
+#define FC_MEM_VSTACK	    26
+#define FC_MEM_ATTR	    27
+#define FC_MEM_PSTACK	    28
+#define FC_MEM_STATICSTR    29
+
+#define FC_MEM_NUM	    30
+
+#define FC_MIN(a,b) ((a) < (b) ? (a) : (b))
+#define FC_MAX(a,b) ((a) > (b) ? (a) : (b))
+#define FC_ABS(a)   ((a) < 0 ? -(a) : (a))
 
 #ifdef FC_EXPORT_FUNCTIONS
 # define fcExport __declspec(dllexport)
@@ -92,7 +128,33 @@ struct _FcPattern
     int ref;
     char *lang;
     FontDescriptionCache_p pFontDesc;
+    FcLangSet *langset;
 };
+
+struct _FcCharSet {
+    int		    ref;	/* reference count */
+    int		    num;	/* size of leaves and numbers arrays */
+    intptr_t	    leaves_offset;
+    intptr_t	    numbers_offset;
+};
+
+typedef struct _FcCharLeaf {
+    FcChar32	map[256/32];
+} FcCharLeaf;
+
+struct _FcStrSet {
+    int		    ref;	/* reference count */
+    int		    num;
+    int		    size;
+    FcChar8	    **strs;
+};
+
+struct _FcStrList {
+    FcStrSet	    *set;
+    int		    n;
+};
+
+#define FC_REF_CONSTANT	    -1
 
 void *pConfig;
 

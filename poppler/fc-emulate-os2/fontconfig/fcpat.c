@@ -32,6 +32,7 @@ fcExport FcPattern *FcPatternCreate(void)
   pResult->family = NULL;
   pResult->style = NULL;
   pResult->lang = NULL;
+  pResult->langset = NULL;
   pResult->ref = 1;
   return pResult;
 }
@@ -49,6 +50,8 @@ fcExport void FcPatternDestroy(FcPattern *p)
     free(p->style);
   if (p->lang)
     free(p->lang);
+  if (p->langset)
+    FcLangSetDestroy(p->langset);
   free(p);
 }
 
@@ -196,6 +199,19 @@ fcExport FcResult FcPatternGet(const FcPattern *p, const char *object, int id, F
   return FcResultNoMatch;
 }
 
+fcExport FcResult FcPatternGetLangSet(const FcPattern *p, const char *object, int id, FcLangSet **ls)
+{
+
+  if (id) // we don't support more than one property of the same type
+    return FcResultNoId;
+
+  if (p->langset)
+  {
+    *ls = p->langset;
+    return FcResultMatch;
+  }
+  return FcResultNoMatch;
+}
 
 fcExport FcBool FcPatternAddInteger(FcPattern *p, const char *object, int i)
 {
@@ -304,6 +320,22 @@ fcExport FcBool FcPatternAddString(FcPattern *p, const char *object, const FcCha
       free(p->lang); p->lang = NULL;
     }
     p->lang = strdup((const char *)s);
+
+/* as in newer fontconfig also the langset is built we need to do that here also */
+    if (p->langset)
+    {
+      FcLangSetDestroy(p->langset); p->langset = NULL;
+    }
+    p->langset = FcLangSetCreate();
+    if (p->langset)
+    {
+      if (!FcLangSetAdd (p->langset, p->lang))
+         {
+	    FcLangSetDestroy(p->langset);
+            p->langset = NULL;
+         }
+
+    }
     return FcTrue;
   }
 
@@ -486,6 +518,8 @@ fcExport FcPattern *FcPatternDuplicate(const FcPattern *p)
       pResult->style = strdup(p->style);
     if (p->lang)
       pResult->lang = strdup(p->lang);
+    if (p->langset)
+      pResult->langset = FcLangSetCopy(p->langset);
 
     /* this is doubtful, but for now set the reference to 1,
      * so that the duplicate pattern is treated like a new one

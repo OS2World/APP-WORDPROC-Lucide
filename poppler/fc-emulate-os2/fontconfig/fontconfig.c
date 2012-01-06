@@ -1470,13 +1470,3 @@ fcExport FcFontSet *FcConfigGetFonts(FcConfig *config, FcSetName set)
   return s;
 }
 
-fcExport int FcStrCmpIgnoreCase(const FcChar8 *s1, const FcChar8 *s2)
-{
-  /* It's actually wrong to use stricmp here, because this doesn't know
-   * anything about UTF-8. But in the original FC package this also just
-   * lowers ASCII characters for comparison, so this should be a good
-   * and simple replacement.
-   */
-  return stricmp((char *)s1, (char *)s2);
-}
-
