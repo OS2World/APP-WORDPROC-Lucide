@@ -64,20 +64,20 @@ PACKING		 = $(LUCIDE_WPI) $(LUCIDE_ZIP)
 
 Lucide_wpi_1_INST		 = $(notdir $(PATH_PACKING))/wpi/1/
 Lucide_wpi_1_SOURCES	 = \
-	$(TARGET_Lucide) \
-	$(TARGET_Lucide_dll) \
-	$(TARGET_ludoc) \
-	$(abspathex $(Lucide_doc_SOURCES),$(Lucide_doc_PATH)) \
-	$(abspathex $(Lucide_lng_SOURCES),$(Lucide_lng_PATH))
+	$(Lucide_1_TARGET) \
+	$(Lucide_dll_1_TARGET) \
+	$(ludoc_1_TARGET) \
+	$(abspathex $(Lucide_doc_SOURCES),$(Lucide_doc_DEFPATH)) \
+	$(abspathex $(Lucide_lng_SOURCES),$(Lucide_lng_DEFPATH))
 
 Lucide_wpi_2_INST		 = $(notdir $(PATH_PACKING))/wpi/2/
-Lucide_wpi_2_SOURCES	 = $(TARGET_lupoppler)
+Lucide_wpi_2_SOURCES	 = $(lupoppler_1_TARGET)
 
 Lucide_wpi_3_INST		 = $(notdir $(PATH_PACKING))/wpi/3/
-Lucide_wpi_3_SOURCES	 = $(TARGET_ludjvu)
+Lucide_wpi_3_SOURCES	 = $(ludjvu_1_TARGET)
 
 Lucide_wpi_4_INST		 = $(notdir $(PATH_PACKING))/wpi/4/
-Lucide_wpi_4_SOURCES	 = $(TARGET_lujpeg)
+Lucide_wpi_4_SOURCES	 = $(lujpeg_1_TARGET)
 
 Lucide_wpi_5_INST		 = $(notdir $(PATH_PACKING))/wpi/5/
 Lucide_wpi_5_SOURCES	 = warpin/LngDummy.txt
