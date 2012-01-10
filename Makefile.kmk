@@ -101,9 +101,8 @@ Lucide_wpi_10_SOURCES	 = warpin/LngDummy.txt
 $(LUCIDE_WPI): $(LUCIDE_WIS) install
 	$(call MSG_L1,Packing $@)
 	-$(QUIET)$(RM) -f $@
-	echo $(Lucide_wpi_1_INST)
-	echo > $(abspathex $(Lucide_wpi_1_INST),$(PATH_OUT)/dist)/lucide.fcf
-	wic -a $@ \
+	$(QUIET)echo > $(abspathex $(Lucide_wpi_1_INST),$(PATH_OUT)/dist)/lucide.fcf
+	$(QUIET)wic -a $@ \
 		$(foreach p,$(patsubst Lucide_wpi_%,%,$(filter Lucide_wpi_%,$(INSTALLS))),\
 			$(p) -c$(abspathex $(Lucide_wpi_$(p)_INST),$(PATH_OUT)/dist) \*) \
 		-s $(LUCIDE_WIS)
