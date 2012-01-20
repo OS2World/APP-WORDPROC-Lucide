@@ -7,6 +7,35 @@
 <HEAD>
 
 <!-- Every .WPI archive contains one or more packages. -->
+<REXX NAME=ChkREQ>
+call RxFuncAdd 'SysLoadFuncs', 'REXXUTIL', 'SysLoadFuncs'
+call SysLoadFuncs
+
+parse arg TestDll " Package:" Package
+
+/* get the temp dir */
+temp = WirexxGetEnv("TEMP")
+/* extract look4dll from package 99 to the temp location */
+rc = WirexxExtract(99,'look4dll.exe',temp)
+
+/* see if the dll is in the path */
+address cmd temp'\look4dll.exe 'TestDll' | rxqueue'
+
+/* remove look4dll again */
+ok = SysFileDelete(temp'\look4dll.exe')
+
+/* get the result from look4dll and parse its rc */
+pull look4dllout
+parse var look4dllout "RC="RC" - "Message
+RC = strip(RC)
+Message = strip(Message)
+Package = 'REQUIRES="' || strip(Package) || '"'
+
+/* generate the message string to return */
+if RC = 0 then MsgStr = ""; else MsgStr = Package
+return MsgStr
+</REXX>
+
 <REXX NAME=nls>
 call RxFuncAdd 'SysLoadFuncs', 'REXXUTIL', 'SysLoadFuncs'
 call SysLoadFuncs
@@ -154,8 +183,9 @@ return readme
      TITLE="=("get_env title")"
      WRITEPROFILE="USER\Lucide\Path|$(1)"
      CLEARPROFILE="USER\Lucide\Path"
-     REQUIRES="netlabs.org\kLIBC\LIBC 0.6 Runtime\0\6\3"
-     REQUIRES="netlabs.org\GCC4\Runtime\4\4\2\20091204"
+     =("ChkREQ LIBC064.DLL Package:netlabs.org\kLIBC\LIBC 0.6 Runtime\0\6\4")
+     =("ChkREQ GCC446.DLL Package:netlabs.org\GCC4\Core\1\2\0")
+     =("ChkREQ STDCPP.DLL Package:netlabs.org\GCC4\Core\1\2\1")
      SELECT
      >=("get_env title").</PCK>
 

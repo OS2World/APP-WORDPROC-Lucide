@@ -24,13 +24,12 @@ program tor…m jednoduçe pýid vat dalç¡ moduly.
 
 Program Lucide vy§aduje n sleduj¡c¡ bal¡ky:
 
-  - libc 0.6.3:
-  - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.3-csd3.zip (form t zip)
-    nebo ftp://ftp.netlabs.org/pub/gcc/libc-0_6_3-csd3.wpi (form t WarpIn)
+  - libc 0.6.4:
+  - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.zip (form t zip)
+    nebo ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.wpi (form t WarpIn)
 
-  - gcc442.dll:
-    - http://download.smedley.info/gcc442.zip (zip format)
-      or ftp://ftp.netlabs.org/pub/qt4/gcc-lib-4_4_2-20091204.wpi (WarpIn format)
+  - gcc446.dll:
+    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (WarpIn format)
 
 
 Voliteln‚: chcete-li uschovat ve schr nce text v k¢dov n¡ unicode ve form tu

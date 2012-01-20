@@ -25,12 +25,11 @@ de terceras partes a¤adir f cilmente m s plugins.
 
 Lucide requiere lo siguiente:
 
-  - libc 0.6.3:
-    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.3-csd3.zip (formato zip)
-      or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_3-csd3.wpi (formato WarpIn)
-  - gcc442.dll:
-    - http://download.smedley.info/gcc442.zip (formato zip)
-      or ftp://ftp.netlabs.org/pub/qt4/gcc-lib-4_4_2-20091204.wpi (formato WarpIn)
+  - libc 0.6.4:
+    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd3.zip (formato zip)
+      or ftp://ftp.netlabs.org/pub/gcc/libc-0.6-3-csd4.wpi (formato WarpIn)
+  - gcc446.dll:
+    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (formato WarpIn)
 
 
 Opcional: para poner texto unicode en el portapapeles  en programas compatibles

@@ -24,12 +24,11 @@ facilmente ulteriori plugins.
 
 Lucide richiede i seguenti pacchetti per il suo funzionamento:
 
-  - libc 0.6.3:
-    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.3-csd3.zip (format zip)
-      or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_3-csd3.wpi (formato WarpIn)
-  - gcc442.dll:
-    - http://download.smedley.info/gcc442.zip (formato zip)
-      or ftp://ftp.netlabs.org/pub/qt4/gcc-lib-4_4_2-20091204.wpi (formato WarpIn)
+  - libc 0.6.4:
+    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.zip (format zip)
+      or ftp://ftp.netlabs.org/pub/gcc/libc-0..6.4-csd4.wpi (formato WarpIn)
+  - gcc446.dll:
+    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (formato WarpIn)
 
 Opzionale: per inserire testo unicode dagli appunti in formato compatibile
 Openoffice.org, e' necessario installare il pacchetto UClip (supporto appunti

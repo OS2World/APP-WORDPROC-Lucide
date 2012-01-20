@@ -24,12 +24,11 @@ relative einfach ermîglich weitere Plugins hinzuzufÅgen.
 
 Lucide erfordert Folgendes:
 
-  - Libc 0.6.3:
-    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.3-csd3.zip (zip-Format)
-      oder ftp://ftp.netlabs.org/pub/gcc/libc-0_6_3-csd3.wpi (WarpIn-Format)
-  - Gcc442.dll:
-    - http://download.smedley.info/gcc442.zip (zip-Format)
-      oder ftp://ftp.netlabs.org/pub/qt4/gcc-lib-4_4_2-20091204.wpi (WarpIn-Format)
+  - Libc 0.6.4:
+    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.zip (zip-Format)
+      oder ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.wpi (WarpIn-Format)
+  - Gcc446.dll:
+    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (WarpIn-Format)
 
 
 Optional: Um Unicode-Text in die Zwischenablage im OpenOffice.org-kompatiblen

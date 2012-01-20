@@ -25,12 +25,11 @@ programmeurs tiers d'ajouter ais‚ment de nouveaux composants.
 
 Lucide n‚cessite : 
 
-  - libc 0.6.3:
-    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.3-csd3.zip (format zip)
-      ou ftp://ftp.netlabs.org/pub/gcc/libc-0_6_3-csd3.wpi (format WarpIn)
-  - gcc442.dll:
-    - http://download.smedley.info/gcc442.zip (format zip)
-      ou ftp://ftp.netlabs.org/pub/qt4/gcc-lib-4_4_2-20091204.wpi (format WarpIn)
+  - libc 0.6.4:
+    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.zip (format zip)
+      ou ftp://ftp.netlabs.org/pub/gcc/libc-0.6.3-csd4.wpi (format WarpIn)
+  - gcc446.dll:
+    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (format WarpIn)
 
 
 En option : pour pouvoir placer du texte Unicode dans le presse-papiers
