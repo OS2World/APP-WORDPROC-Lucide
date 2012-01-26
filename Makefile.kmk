@@ -97,9 +97,6 @@ Lucide_wpi_9_SOURCES	 = warpin/LngDummy.txt
 Lucide_wpi_10_INST		 = $(notdir $(PATH_PACKING))/wpi/10/
 Lucide_wpi_10_SOURCES	 = warpin/LngDummy.txt
 
-Lucide_wpi_99_INST		 = $(notdir $(PATH_PACKING))/wpi/99/
-Lucide_wpi_99_SOURCES	 = warpin/look4dll.exe
-
 
 $(LUCIDE_WPI): $(LUCIDE_WIS) install
 	$(call MSG_L1,Packing $@)
@@ -133,7 +130,7 @@ Lucide_zip_SOURCES	 = \
 $(LUCIDE_ZIP): install
 	$(call MSG_L1,Packing $@)
 	-$(QUIET)$(RM) -f $@
-	$(QUIET)$(REDIRECT) -C $(PATH_PACKING)/zip -- zip -Sr9 $@ \* -x look4dll.exe
+	$(QUIET)$(REDIRECT) -C $(PATH_PACKING)/zip -- zip -Sr9 $@ \*
 
 endif # IN_PACKING
 

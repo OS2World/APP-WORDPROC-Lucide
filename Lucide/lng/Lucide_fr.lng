@@ -1,9 +1,9 @@
 #
-# Lucide language file, FR (1.3.3)
+# Lucide language file, FR (1.3.4)
 # Fichier de langue de Lucide, FR (1.3.3)
 # 2010-10-??
 # Translator : Guillaume Gay <guillaume.gay@bigfoot.com>
-# Translation : 2011-03-08
+# Translation : 2012-01-12
 
 #
 # Main menu
@@ -48,7 +48,7 @@ MENU_ROTATE_CCW=Rotation de 90ø vers la ~gauche\tCtrl+Maj+-
 MENU_SINGLE_PAGE=Page ~simple
 MENU_CONTINUOUS=En ~continu
 MENU_DOCUMENT_INFO=~Info. sur le document...\tCtrl+I
-MENU_FONTS_INFO=I~nfo. sur les ~polices...
+MENU_FONTS_INFO=I~nfo. sur les polices...
 MENU_WINDOW=~Fenˆtres
 MENU_SHOW_NAV_PANE=Afficher le panneau de ~navigation
 MENU_FULLSCREEN=~Plein ‚cran\tF11

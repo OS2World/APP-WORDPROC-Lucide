@@ -8,33 +8,42 @@
 
 <!-- Every .WPI archive contains one or more packages. -->
 <REXX NAME=ChkREQ>
-call RxFuncAdd 'SysLoadFuncs', 'REXXUTIL', 'SysLoadFuncs'
-call SysLoadFuncs
+    call RxFuncAdd 'SysLoadFuncs', 'REXXUTIL', 'SysLoadFuncs'
+    call SysLoadFuncs
+    /* based upon work from Dmitriy Kuminov */
+    parse arg aFile " Package:" Package
+    name = filespec('N', aFile)
+    ext = translate(right(name, 4))
+    search_path = ""
+    select
+      when (ext == '.DLL') then do
+        config_sys = SysBootDrive()'\CONFIG.SYS'
+        do while lines(config_sys)
+          line = strip(linein(config_sys))
+          if (left(line, 8) == 'LIBPATH=') then do
+            search_path = substr(line, 9)
+            leave
+          end
+        end
+        call lineout config_sys
+        search_path = SysQueryExtLibPath('B')';'search_path';'SysQueryExtLibPath('E')
+      end
+      when (ext == '.EXE') then search_path = value('PATH',, 'OS2ENVIRONMENT')
+      when (ext == '.HLP') then search_path = value('BOOKSHELF',, 'OS2ENVIRONMENT')
+      otherwise search_path = ''
+    end
+    if (search_path \= '') then do
+      ok = value('CHKREQ_SEARCH_PATH', search_path, 'OS2ENVIRONMENT')
+      real_file = SysSearchPath('CHKREQ_SEARCH_PATH', name)
+      ok = value('CHKREQ_SEARCH_PATH', '', 'OS2ENVIRONMENT')
+    end
+    else real_file = ""
 
-parse arg TestDll " Package:" Package
-
-/* get the temp dir */
-temp = WirexxGetEnv("TEMP")
-/* extract look4dll from package 99 to the temp location */
-rc = WirexxExtract(99,'look4dll.exe',temp)
-
-/* see if the dll is in the path */
-address cmd temp'\look4dll.exe 'TestDll' | rxqueue'
-
-/* remove look4dll again */
-ok = SysFileDelete(temp'\look4dll.exe')
-
-/* get the result from look4dll and parse its rc */
-pull look4dllout
-parse var look4dllout "RC="RC" - "Message
-RC = strip(RC)
-Message = strip(Message)
-Package = 'REQUIRES="' || strip(Package) || '"'
-
-/* generate the message string to return */
-if RC = 0 then MsgStr = ""; else MsgStr = Package
-return MsgStr
+    /* generate the message string to return */
+    if real_file <> "" then MsgStr = ""; else MsgStr = 'REQUIRES="' || strip(Package) || '"'
+    return MsgStr
 </REXX>
+
 
 <REXX NAME=nls>
 call RxFuncAdd 'SysLoadFuncs', 'REXXUTIL', 'SysLoadFuncs'
