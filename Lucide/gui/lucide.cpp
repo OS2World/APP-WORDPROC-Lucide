@@ -1319,8 +1319,14 @@ static MRESULT EXPENTRY frameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 
             // all disabled items work through accelerators which is completely
             // unexpected. Fix it by translating accels manually and checking
             // if they are disabled in the hidden menu
-            if ( WinTranslateAccel( hab, hwnd, WinQueryAccelTable( hab, hwnd ),
-                                    pqmsg ) )
+            BOOL ok = WinTranslateAccel( hab, hwnd,
+                                         WinQueryAccelTable( hab, hwnd ),
+                                         pqmsg );
+            // try the menu mnemonics if no explicit accels found
+            if ( !ok )
+                ok = (BOOL)WinSendMsg( hwnd, 0x0195 /*WM_TRANSLATEMNEMONIC*/,
+                                       MPFROMP( pqmsg ), NULL );
+            if ( ok )
             {
                 if ( pqmsg->msg == WM_COMMAND ) {
                     SHORT cm = SHORT1FROMMP(pqmsg->mp1);
