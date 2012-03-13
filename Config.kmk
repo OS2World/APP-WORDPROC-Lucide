@@ -27,12 +27,12 @@ BUILD		= GA
 #
 # By agreement, this number is 0 for "beta" builds and 1 for "GA" builds.
 #
-WPIBUILD	= 0
+WPIBUILD	= 1
 
 #
 # Lucide version date in the format YYYY-MM-DD.
 #
-VERSIONDATE	= 2011-xx-xx
+VERSIONDATE	= 2012-03-13
 
 #------------------------------------------------------------------------------
 # Common libraries referenced by components
