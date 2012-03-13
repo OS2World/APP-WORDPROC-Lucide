@@ -1,5 +1,5 @@
 #
-# Lucide language file, ES (1.3.3)
+# Lucide language file, ES (1.3.4)
 #
 
 #
@@ -166,7 +166,7 @@ PDLG_CANCEL=~Cancelar
 #
 AD_ABOUT=Acerca de
 AD_DESCRIPTION=Visor de documentos con arquitectura de plugins y soporte para varios formatos de archivo
-AD_COPYRIGHTS=(c) Eugene Romanenko, Dmitriy Kuminov (netlabs.org) en colaboraci¢n con Serenity Systems International
+AD_COPYRIGHTS=(c) Eugene Romanenko, Dmitriy Kuminov, Silvan Scherrer (netlabs.org) en colaboraci¢n con Serenity Systems International
 AD_OK=~Bien
 
 #

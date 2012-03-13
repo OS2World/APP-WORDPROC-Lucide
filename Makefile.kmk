@@ -55,7 +55,7 @@ else
 #
 INSTALLS	 = Lucide_wpi_1 Lucide_wpi_2 Lucide_wpi_3 Lucide_wpi_4 Lucide_wpi_5 \
 		   Lucide_wpi_6 Lucide_wpi_7 Lucide_wpi_8 Lucide_wpi_9 Lucide_wpi_10 \
-		   Lucide_wpi_99 Lucide_zip
+		   Lucide_zip
 PACKING		 = $(LUCIDE_WPI) $(LUCIDE_ZIP)
 
 #
