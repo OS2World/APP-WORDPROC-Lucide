@@ -20,7 +20,7 @@ VERSION		= 1.3.4
 # This is usually "beta" for the development phase and "GA" for the releases.
 # See also GENERATING DISTRIBUTION ARCHIVES in README.DEV for more information.
 #
-BUILD		= beta
+BUILD		= GA
 
 #
 # Lucide build number for the WPI archive.
