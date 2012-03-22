@@ -29,7 +29,7 @@ Program Lucide vy§aduje n sleduj¡c¡ bal¡ky:
     nebo ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.wpi (form t WarpIn)
 
   - gcc446.dll:
-    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (WarpIn format)
+    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (form t WarpIn)
 
 
 Voliteln‚: chcete-li uschovat ve schr nce text v k¢dov n¡ unicode ve form tu
@@ -39,6 +39,13 @@ eComStation verze 2.0 RC1 a vyçç¡):
 
   - http://hobbes.nmsu.edu/cgi-bin/h-search?key=UClip
   
+Voliteln‚: chcete-li pou§¡vat Japonsk‚ fonty, potýebujete bal¡Ÿek poppler-data.
+
+  - Rozbalte 4 adres ýe z bal¡Ÿku dostupn‚ho na http://poppler.freedesktop.org
+    do adres ýe %unixroot%/usr/local/share/poppler nebo do adres ýe
+    obsahuj¡c¡ho nainstalovanì soubor lucide.exe.
+  - Zkontrolujte, §e m te nainstalovanì font "Times New Roman WT J". Tento font
+    je pou§itì jako z lo§n¡ varianta.
 
 Tisk ve form tu PostScript vy§aduje tisk rnu podporuj¡c¡ tento standard
 (pscript.drv).
