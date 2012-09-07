@@ -244,12 +244,12 @@ PSW_CANCEL=Отказ
 # Open file dialog
 #
 FDLG_OPEN=Открыть
-#FDLG_FILENAME=File~name
-#FDLG_DRIVE=D~rive
-#FDLG_FILETYPE=File ~Type
-#FDLG_FILE=~File
-#FDLG_DIRECTORY=~Directory
-#FDLG_OK=~OK
+FDLG_FILENAME=~Имя файла
+FDLG_DRIVE=~Диск
+FDLG_FILETYPE=~Тип файла
+FDLG_FILE=~Файл
+FDLG_DIRECTORY=~Папка
+FDLG_OK=~ОК
 FDLG_CANCEL=Отказ
 FDLG_NO_PREVIEW_AVAILABLE=Предпросмотр недоступен
 FDLG_ALL_SUPPORTED_TYPES=<Все поддерживаемые типы>
