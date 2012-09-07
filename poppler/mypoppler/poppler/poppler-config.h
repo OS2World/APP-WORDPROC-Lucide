@@ -3,7 +3,7 @@
 //
 // poppler-config.h
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2011 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -14,6 +14,11 @@
 // used in some of the header files we install.  The #ifndef/#endif
 // around #undef look odd, but it's to silence warnings about
 // redefining those symbols.
+
+/* Defines the poppler version. */
+#ifndef POPPLER_VERSION
+#define POPPLER_VERSION "0.20.3"
+#endif
 
 /* Enable multithreading support. */
 #ifndef MULTITHREADED
@@ -62,12 +67,12 @@
 
 /* Build against libtiff. */
 #ifndef ENABLE_LIBTIFF
-/* #undef ENABLE_LIBTIFF */
+//#define ENABLE_LIBTIFF 1
 #endif
 
 /* Build against libpng. */
 #ifndef ENABLE_LIBPNG
-/* #undef ENABLE_LIBPNG */
+//#define ENABLE_LIBPNG 1
 #endif
 
 /* Use zlib instead of builtin zlib decoder. */
@@ -110,7 +115,7 @@
 
 /* Defines if use cms */
 #ifndef USE_CMS
-/* #undef USE_CMS */
+// #define USE_CMS 1
 #endif
 
 // Also, there are preprocessor symbols in the header files
@@ -123,8 +128,8 @@
 //------------------------------------------------------------------------
 
 // copyright notice
-#define popplerCopyright "Copyright 2005-2011 The Poppler Developers - http://poppler.freedesktop.org"
-#define xpdfCopyright "Copyright 1996-2004 Glyph & Cog, LLC"
+#define popplerCopyright "Copyright 2005-2012 The Poppler Developers - http://poppler.freedesktop.org"
+#define xpdfCopyright "Copyright 1996-2011 Glyph & Cog, LLC"
 
 //------------------------------------------------------------------------
 // popen

@@ -29,26 +29,26 @@ LIBRARIES += fofi goo splash poppler
 
 fofi_TEMPLATE	= PopplerLib
 fofi_SOURCES	= $(wildcard $(fofi_DEFPATH)/fofi/*.cc)
+fofi_INCS	= poppler
 
 goo_TEMPLATE	= PopplerLib
-goo_INCS		= ../../libjpeg
+goo_INCS		= poppler ../../libjpeg
 goo_SOURCES		= $(wildcard $(goo_DEFPATH)/goo/*.cc)
 
 splash_TEMPLATE	= PopplerLib
-splash_INCS		= ../freetype2/include ../../libjpeg
+splash_INCS		= poppler ../freetype2/include ../../libjpeg
 splash_SOURCES	= $(wildcard $(splash_DEFPATH)/splash/*.cc)
 
 poppler_TEMPLATE	= PopplerLib
 poppler_INCS		= goo poppler ../fc-emulate-os2 ../../libjpeg
 poppler_SOURCES		= $(filter-out \
-	$(addprefix $(poppler_DEFPATH)/poppler/,                                  \
-		ABWOutputDev.cc                                                       \
-		ArthurOutputDev.cc                                                    \
-		CairoFontEngine.cc                                                    \
-		CairoOutputDev.cc                                                     \
-		FlateStream.cc                                                        \
-		GlobalParamsWin.cc                                                    \
-		JPEG2000Stream.cc)                                                    \
+	$(addprefix $(poppler_DEFPATH)/poppler/, \
+		ArthurOutputDev.cc \
+		CairoFontEngine.cc \
+		CairoOutputDev.cc \
+		FlateStream.cc \
+		GlobalParamsWin.cc \
+		JPEG2000Stream.cc) \
 	,$(wildcard $(poppler_DEFPATH)/poppler/*.cc))
 
 include $(FILE_KBUILD_SUB_FOOTER)

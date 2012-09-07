@@ -14,10 +14,10 @@
 /* #undef ENABLE_LIBOPENJPEG */
 
 /* Build against libpng. */
-/* #undef ENABLE_LIBPNG */
+// #define ENABLE_LIBPNG 1
 
 /* Build against libtiff. */
-/* #undef ENABLE_LIBTIFF */
+// #define ENABLE_LIBTIFF 1
 
 /* Do not hardcode the library location */
 /* #undef ENABLE_RELOCATABLE */
@@ -61,9 +61,6 @@
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
-
-/* Define to 1 if you have the `openjpeg' library (-lopenjpeg). */
-/* #undef HAVE_LIBOPENJPEG */
 
 /* Define to 1 if you have the `tiff' library (-ltiff). */
 /* #undef HAVE_LIBTIFF */
@@ -128,7 +125,7 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <tiffio.h> header file. */
-/* #undef HAVE_TIFFIO_H */
+#define HAVE_TIFFIO_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
@@ -159,7 +156,7 @@
 #define PACKAGE_NAME "poppler"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "poppler 0.18.1"
+#define PACKAGE_STRING "poppler 0.20.3"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "poppler"
@@ -168,17 +165,20 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.18.1"
+#define PACKAGE_VERSION "0.20.3"
 
 /* Poppler data dir */
-#define POPPLER_DATADIR "/@unixroot/usr/local/share/poppler"
+#define POPPLER_DATADIR "/usr/local/share/poppler"
 
 /* Support for curl based doc builder is compiled in. */
 /* #undef POPPLER_HAS_CURL_SUPPORT */
 
+/* Defines the poppler version */
+#define POPPLER_VERSION "0.20.3"
+
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
-#define PTHREAD_CREATE_JOINABLE unknown
+/* #undef PTHREAD_CREATE_JOINABLE */
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -187,7 +187,7 @@
 #define TEXTOUT_WORD_LIST 1
 
 /* Defines if use cms */
-//#define USE_CMS 1
+// #define USE_CMS 1
 
 /* Use fixed point arithmetic in the Splash backend */
 /* #undef USE_FIXEDPOINT */
@@ -195,14 +195,20 @@
 /* Use single precision arithmetic in the Splash backend */
 /* #undef USE_FLOAT */
 
+/* Defines if use lcms1 */
+// #define USE_LCMS1 1
+
 /* Version number of package */
-#define VERSION "0.18.1"
+#define VERSION "0.20.3"
 
 /* Use fontconfig font configuration backend */
 #define WITH_FONTCONFIGURATION_FONTCONFIG 1
 
 /* Use win32 font configuration backend */
 /* #undef WITH_FONTCONFIGURATION_WIN32 */
+
+/* OpenJPEG with the OPJ_DPARAMETERS_IGNORE_PCLR_CMAP_CDEF_FLAG flag. */
+/* #undef WITH_OPENJPEG_IGNORE_PCLR_CMAP_CDEF_FLAG */
 
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */

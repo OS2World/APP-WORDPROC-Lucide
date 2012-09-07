@@ -351,8 +351,7 @@ SOM_Scope boolean  SOMLINK renderPageToPixbuf(LuPopplerDocument *somSelf,
                 gTrue, /* Crop */
                 src_x, src_y,
                 src_width, src_height,
-                gFalse, /* printing (allow links) */
-                document->doc->getCatalog() );
+                gFalse /* printing (allow links) */ );
 
     DosReleaseMutexSem( document->mutex );
 
@@ -455,7 +454,6 @@ SOM_Scope void  SOMLINK renderPageToPixbufAsynch(LuPopplerDocument *somSelf,
                 src_x, src_y,
                 src_width, src_height,
                 NULL, /* links */
-                document->doc->getCatalog(),
                 abortCheckCbk, &acd );
     DosReleaseMutexSem( document->mutex );
 
@@ -469,16 +467,15 @@ static TextOutputDev *get_text_output_dev( PopplerPage *page,
     if ( page->text_dev == NULL )
     {
         DosRequestMutexSem( document->mutex, SEM_INDEFINITE_WAIT );
-        page->text_dev = new TextOutputDev( NULL, gTrue, gFalse, gFalse );
+        page->text_dev = new TextOutputDev( NULL, gTrue, 0, gFalse, gFalse );
 
         page->gfx = page->page->createGfx(page->text_dev,
                           72.0, 72.0, 0,
                           gFalse, /* useMediaBox */
                           gTrue, /* Crop */
                           -1, -1, -1, -1,
-                          NULL, /* links */
-                          document->doc->getCatalog(),
-                          NULL, NULL, NULL, NULL);
+                          NULL, /* printing */
+                          NULL, NULL);
 
         page->page->display( page->gfx );
         page->text_dev->endPage();
@@ -718,7 +715,7 @@ SOM_Scope LuDocument_LuLinkMapSequence*  SOMLINK getLinkMapping(LuPopplerDocumen
     PopplerDocument *document = (PopplerDocument *)somThis->data;
     PopplerPage *page = &( document->pages[ pagenum ] );
 
-    Links *links = new Links( page->page->getAnnots(document->doc->getCatalog()) );
+    Links *links = new Links( page->page->getAnnots() );
 
     if ( links == NULL ) {  // No links, return empty LuLinkMapSequence
         return mapping;
@@ -804,7 +801,7 @@ SOM_Scope boolean SOMLINK exportToPostScript(LuPopplerDocument *somSelf,
     LuPopplerDocumentData *somThis = LuPopplerDocumentGetData(somSelf);
     PDFDoc *doc = ((PopplerDocument *)somThis->data)->doc;
 
-    PSOutputDev *out = new PSOutputDev( filename, doc, doc->getXRef(), doc->getCatalog(), NULL,
+    PSOutputDev *out = new PSOutputDev( filename, doc, NULL,
                                 (first_page <= last_page) ? (first_page + 1) : (last_page + 1),
                                 (first_page <= last_page) ? (last_page + 1) : (first_page + 1),
                                         psModePS, (int)width, (int)height, gFalse );
@@ -1341,9 +1338,9 @@ SOM_Scope LuDocument_LuRectSequence*  SOMLINK searchText(LuPopplerDocument *somS
     Page *page = document->pages[ pagenum ].page;
 
     DosRequestMutexSem( document->mutex, SEM_INDEFINITE_WAIT );
-    TextOutputDev *output_dev = new TextOutputDev( NULL, gTrue, gFalse, gFalse );
+    TextOutputDev *output_dev = new TextOutputDev( NULL, gTrue, 0, gFalse, gFalse );
     page->display( output_dev, 72, 72, 0, gFalse,
-                   gTrue, NULL, document->doc->getCatalog() );
+                   gTrue, NULL );
     DosReleaseMutexSem( document->mutex );
 
 
@@ -1378,6 +1375,7 @@ SOM_Scope LuDocument_LuRectSequence*  SOMLINK searchText(LuPopplerDocument *somS
                    gFalse, gTrue, // startAtTop, stopAtBottom
                    gTrue, gFalse, // startAtLast, stopAtLast
                    caseSensitive, gFalse, // caseSensitive, backwards
+                   gFalse, //whole word
                    &xMin, &yMin, &xMax, &yMax ) )
     {
         LuRectangle r;
@@ -1435,7 +1433,7 @@ SOM_Scope boolean  SOMLINK isHaveInputFields(LuPopplerDocument *somSelf,
     PopplerDocument *doc = (PopplerDocument *)somThis->data;
     for (int i = 0; i < doc->doc->getNumPages(); ++i) {
         Page *page = doc->pages[ i ].page;
-        FormPageWidgets *widgets = page->getFormWidgets(doc->doc->getCatalog());
+        FormPageWidgets *widgets = page->getFormWidgets();
         if (widgets == NULL || widgets->getNumWidgets() > 0)
             return TRUE;
     }
@@ -1452,7 +1450,7 @@ SOM_Scope LuDocument_LuInputFieldSequence*  SOMLINK getInputFields(LuPopplerDocu
     PopplerDocument *doc = (PopplerDocument *)somThis->data;
     Page *page = doc->pages[ pagenum ].page;
 
-    FormPageWidgets *widgets = page->getFormWidgets(doc->doc->getCatalog());
+    FormPageWidgets *widgets = page->getFormWidgets();
 
     LuDocument_LuInputFieldSequence *fields = (LuDocument_LuInputFieldSequence *)
         SOMMalloc( sizeof( LuDocument_LuInputFieldSequence ) );
@@ -1605,7 +1603,7 @@ SOM_Scope boolean  SOMLINK loadFile(LuPopplerDocument *somSelf,
     white[1] = 255;
     white[2] = 255;
     document->output_dev = new SplashOutputDev( splashModeXBGR8, 4, gFalse, white );
-    document->output_dev->startDoc( document->doc->getXRef() );
+    document->output_dev->startDoc( document->doc );
 
     long numpages = document->doc->getNumPages();
     document->pages = new PopplerPage[ numpages ];
