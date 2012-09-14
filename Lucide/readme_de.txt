@@ -24,9 +24,9 @@ relative einfach ermîglich weitere Plugins hinzuzufÅgen.
 
 Lucide erfordert Folgendes:
 
-  - Libc 0.6.4:
-    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.zip (zip-Format)
-      oder ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.wpi (WarpIn-Format)
+  - Libc 0.6.5:
+    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.5-csd5.zip (zip-Format)
+      oder ftp://ftp.netlabs.org/pub/gcc/libc-0_6_5-csd5.wpi (WarpIn-Format)
   - Gcc446.dll:
     - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (WarpIn-Format)
 

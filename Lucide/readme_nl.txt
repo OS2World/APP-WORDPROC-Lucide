@@ -23,9 +23,9 @@ Het biedt een plug-in architectuur op basis van SOM, die het andere programmeurs
 
 Lucide vereist het volgende:
 
-  - Libc 0.6.4:
-    - FTP://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.zip (zip formaat)
-      of ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.wpi (WarpIn formaat)
+  - Libc 0.6.5:
+    - FTP://ftp.netlabs.org/pub/gcc/libc-0.6.5-csd5.zip (zip formaat)
+      of ftp://ftp.netlabs.org/pub/gcc/libc-0_6_5-csd5.wpi (WarpIn formaat)
   - Gcc446.dll:
     - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (WarpIn formaat)
 

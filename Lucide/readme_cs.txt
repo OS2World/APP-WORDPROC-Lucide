@@ -24,9 +24,9 @@ program tor…m jednoduçe pýid vat dalç¡ moduly.
 
 Program Lucide vy§aduje n sleduj¡c¡ bal¡ky:
 
-  - libc 0.6.4:
-  - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.zip (form t zip)
-    nebo ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.wpi (form t WarpIn)
+  - libc 0.6.5:
+  - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.5-csd5.zip (form t zip)
+    nebo ftp://ftp.netlabs.org/pub/gcc/libc-0_6_5-csd5.wpi (form t WarpIn)
 
   - gcc446.dll:
     - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (form t WarpIn)

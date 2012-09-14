@@ -192,7 +192,7 @@ return readme
      TITLE="=("get_env title")"
      WRITEPROFILE="USER\Lucide\Path|$(1)"
      CLEARPROFILE="USER\Lucide\Path"
-     =("ChkREQ LIBC064.DLL Package:netlabs.org\kLIBC\LIBC 0.6 Runtime\0\6\4")
+     =("ChkREQ LIBC065.DLL Package:netlabs.org\kLIBC\LIBC 0.6 Runtime\0\6\5")
      =("ChkREQ GCC446.DLL Package:netlabs.org\GCC4\Core\1\2\0")
      =("ChkREQ STDCPP.DLL Package:netlabs.org\GCC4\Core\1\2\1")
      SELECT

@@ -25,9 +25,9 @@ programmeurs tiers d'ajouter ais‚ment de nouveaux composants.
 
 Lucide n‚cessite : 
 
-  - libc 0.6.4:
-    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.4-csd4.zip (format zip)
-      ou ftp://ftp.netlabs.org/pub/gcc/libc-0.6.3-csd4.wpi (format WarpIn)
+  - libc 0.6.5:
+    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.5-csd5.zip (format zip)
+      ou ftp://ftp.netlabs.org/pub/gcc/libc-0_6_5-csd5.wpi (format WarpIn)
   - gcc446.dll:
     - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (format WarpIn)
 
