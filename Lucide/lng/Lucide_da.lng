@@ -1,5 +1,5 @@
 #
-# Lucide language file, DK (1.3.5)
+# Lucide language file, DK (1.5.0)
 #
 
 #
@@ -15,9 +15,13 @@ MENU_NEXT=N‘ste\tShift+PgDn
 MENU_LAST=Sidste\tShift+End
 MENU_RECENT_FILES=~Nyeste filer
 MENU_CLEAR_LIST=~Slet liste
-MENU_SAVE_AS=~Gem som...
+MENU_BACK=~Back\tCtrl+B
+MENU_BACKNAV=Last lin~k origin\tCtrl+K
+MENU_SAVE=~Save...\tCtrl+S
+MENU_SAVE_AS=~Gem som...\tCtrl+A
 MENU_CLOSE=Lu~k
 # MENU_PAGE_SETUP=Side ~ops‘tning...
+MENU_PAGE_SETUP=Pa~ge setup...
 MENU_PRINT=~Print...\tCtrl+P
 MENU_PLUGINS_LIST=Plugin ~liste...
 MENU_EXIT=~Afslut\tCtrl+X
@@ -46,11 +50,15 @@ MENU_CONTINUOUS=~Kontinuerlig
 MENU_DOCUMENT_INFO=~Dokument info...\tCtrl+I
 MENU_FONTS_INFO=Font ~info...
 MENU_WINDOW=~Vindue
-MENU_SHOW_NAV_PANE=~Vis navigations panel
+MENU_SHOW_NAV_PANE=~Vis navigations panel\tF9
 MENU_FULLSCREEN=~Fuldsk‘rm\tF11
 MENU_PRESENTATION=~Pr‘sentation\tF5
 MENU_HELP=~Hj‘lp
 MENU_PRODUCT_INFORMATION=~Produkt Information
+MENU_HELP_CONTENTS=~Contents\tF1
+MENU_HELP_KEYS=~Keys help
+MENU_HELP_PDF=P~DF file help
+MENU_HELP_IMAGES=~Image file help
 
 #
 # Toolbar hints
@@ -68,6 +76,7 @@ TBHINT_FIT_WIDTH=Tilpas til vinduets bredde
 TBHINT_FIND=Find...
 TBHINT_FINDAGAIN=Find igen
 TBHINT_ZOOM_IN_OUT=Zoom ind/ud
+TBHINT_BACK=Return to last link origin
 # toolbar's page number
 TB_PAGENUM=af %d
 
@@ -86,6 +95,11 @@ MSGS_PAGE=Side
 MSGS_ERROR_STARTING_BROWSER=Fejl ved start af browser!
 MSGS_CLOSE_MODIFIED_DOCUMENT=Dokumentet er blevet ‘ndret. Gem?
 MSGS_FILE_COPY_SUFFIX=%s Kopi
+MSGS_TEMP_FILE_LOAD_ERROR=Temp file load error!
+MSGS_TEMP_FILE_SAVE_ERROR=Error saving temp file!
+MSGS_NO_TEMP_DIR_ERROR=No temporary directory found!
+MSGS_NO_PRINTER_FOUND_ERROR=No printers found!
+MSGS_HELP_INSTANCE_FAILED=WinCreateHelpInstance failed!
 
 MSGS_LDERR=Fejl ved indl‘sning af fil: %s!
 MSGS_LDERR_OUT_OF_MEMORY=Ikke mere RAM
@@ -98,6 +112,12 @@ MSGS_LDERR_ENCRYPTED=Filen er krypteret
 MSGS_RERR_OUT_OF_MEMORY=Ikke mere RAM
 MSGS_RERR_CORRUPTED_PAGE_DATA=Beskadiget information p† siden
 MSGS_RERR_FONT_NOT_FOUND=Fonten %s kunne ikke findes
+
+#
+# Help button for all dialogs 
+#
+
+DIALOG_HELP=~Help
 
 #
 # "Plugins list" dialog
@@ -119,6 +139,7 @@ FONTINFO_ENUMERATING=Sm›lfer fontene, tag en slapper...
 FONTINFO_NAME=Navn
 FONTINFO_TYPE=Type
 FONTINFO_EMBEDDED=Indbygget?
+FONTINFO_SUBNAME=Substitute Font
 # Embedded types
 FONTINFO_EMBED_NOT_EMBEDDED=Nej
 FONTINFO_EMBED_EMBEDDED=Ja
@@ -139,6 +160,7 @@ DOCINFO_CREATOR=Kreat›r:.
 DOCINFO_PRODUCER=Producent:
 DOCINFO_CREATION_DATE=Dato:
 DOCINFO_MOD_DATE=’ndret:
+DOCINFO_NAME=Document:
 
 #
 # "Find" dialog
@@ -146,6 +168,7 @@ DOCINFO_MOD_DATE=’ndret:
 FIND_FIND=Find
 FIND_FIND_WHAT=~Hvad kunne du t‘nke dig at finde
 FIND_MATCH_CASE=~Skal STORE/sm† passe ?
+FIND_BACK=Find ~Backwards
 FIND_OK=~OK
 FIND_CANCEL=~Afbryd
 # other 'find'-related messages
@@ -174,6 +197,7 @@ SD_DEFAULT_PAGE_LAYOUT=Standard ~Side Udl‘g
 SD_DEFAULT_ZOOM=Standard ~Zoom
 SD_SINGLE_PAGE=Enkelt side
 SD_CONTINUOUS=Kontinuerlig
+SD_THUMBNAIL=~Make thumbnails
 SD_OK=~OK
 SD_CANCEL=~Afbryd
 
@@ -196,6 +220,7 @@ PD_JOB_PROPERTIES=~Job indstillinger
 PD_DRIVER_LABEL=Driver
 PD_PRINT_RANGE_AND_COPIES=Print ~f›lgende sider
 PD_RANGE_ALL=A~lle
+PD_REVESE_PRINT=Re~verse
 PD_RANGE_CURRENT_PAGE=N~uv‘rende side
 PD_RANGE_PAGES=S~ider
 PD_FROM=~Fra
@@ -250,4 +275,10 @@ FDLG_OK=~OK
 FDLG_CANCEL=~Afbryd
 FDLG_NO_PREVIEW_AVAILABLE=Billede kan ikke vises
 FDLG_ALL_SUPPORTED_TYPES=<Alle underst›ttede typer>
+FDLG_ALL_FILES=<All files>
+FDLG_THUMBNAIL=~Make thumbnail
 
+#
+# Help file title
+#
+HLP_TITLE=Lucide User's Guide

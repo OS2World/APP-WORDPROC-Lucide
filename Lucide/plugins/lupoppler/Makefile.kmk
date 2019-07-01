@@ -15,10 +15,10 @@ DLLS		+= lupoppler
 lupoppler_TEMPLATE	 = SomDll
 lupoppler_NAME		 = lupplr
 lupoppler_INCS		 = \
-	../ludoc $(lupoppler_0_OUTDIR)/../ludoc                                   \
-	../../../poppler/mypoppler                                                \
-	../../../poppler/mypoppler/poppler                                        \
-	../../../poppler/fc-emulate-os2
+	../ludoc $(lupoppler_0_OUTDIR)/../ludoc \
+	$(UNIXROOT)/usr/include \
+	$(UNIXROOT)/usr/include/poppler \
+	$(UNIXROOT)/usr/include/os2tk45
 lupoppler_SOURCES	 = \
 	lupoppler.idl                                                             \
 	lupifield.idl                                                             \
@@ -33,8 +33,11 @@ lupoppler_IDLSOURCES	 = \
 	lupitext.cpp                                                              \
 	lupichoice.cpp
 lupoppler_LIBS		 = \
-	$(PATH_STAGE_LIB)/ludoc$(SUFF_LIB) \
-	$(LIB_POPPLER_LIBS)
+	$(PATH_STAGE_LIB)\ludoc$(SUFF_LIB) \
+	$(LIB_POPPLER_LIBS) \
+	$(UNIXROOT)/usr/lib/poppler_dll.a\
+#	U:\PMPrintf\PMPRINTF.LIB
 
 include $(FILE_KBUILD_SUB_FOOTER)
 
+

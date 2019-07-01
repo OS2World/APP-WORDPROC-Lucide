@@ -62,7 +62,7 @@ SOM_Scope void SOMLINK init_widgetText(LuPopplerInputText *somSelf,
                                        long aPagenum, Page* aPage,
                                        FormWidgetText* aFormWidgetText)
 {
-    LuPopplerInputTextData *somThis; /* set in BeginInitializer */
+    LuPopplerInputTextData *somThis = NULL; /* set in BeginInitializer */
     somInitCtrl globalCtrl;
     somBooleanVector myMask;
     LuPopplerInputText_BeginInitializer_init_widgetText;
@@ -82,7 +82,7 @@ SOM_Scope void SOMLINK init_widgetText(LuPopplerInputText *somSelf,
 SOM_Scope void SOMLINK somDestruct(LuPopplerInputText *somSelf,
                                    octet doFree, som3DestructCtrl* ctrl)
 {
-    LuPopplerInputTextData *somThis; /* set in BeginDestructor */
+    LuPopplerInputTextData *somThis = NULL; /* set in BeginDestructor */
     somDestructCtrl globalCtrl;
     somBooleanVector myMask;
     LuPopplerInputText_BeginDestructor;

@@ -61,7 +61,7 @@ SOM_Scope void SOMLINK init_widgetButton(LuPopplerInputButton *somSelf,
                                          long aPagenum, Page* aPage,
                                          FormWidgetButton* aFormWidgetButton)
 {
-    LuPopplerInputButtonData *somThis; /* set in BeginInitializer */
+    LuPopplerInputButtonData *somThis = NULL; /* set in BeginInitializer */
     somInitCtrl globalCtrl;
     somBooleanVector myMask;
     LuPopplerInputButton_BeginInitializer_init_widgetButton;
@@ -138,7 +138,8 @@ SOM_Scope LuInputButton_SiblingSequence*  SOMLINK getSiblings(LuPopplerInputButt
 {
     LuPopplerInputButtonData *somThis = LuPopplerInputButtonGetData(somSelf);
 
-    int count = somThis->widget->getNumSiblingsID();
+    // int count = somThis->widget->getNumSiblingsID();
+    int count = 0;
 
     LuInputButton_SiblingSequence* siblings = (LuInputButton_SiblingSequence *)
         SOMMalloc( sizeof( LuInputButton_SiblingSequence ) );
@@ -146,7 +147,8 @@ SOM_Scope LuInputButton_SiblingSequence*  SOMLINK getSiblings(LuPopplerInputButt
     siblings->_length = count;
     siblings->_buffer = (unsigned long *)SOMMalloc( sizeof( unsigned long * ) * count );
 
-    unsigned *ids = somThis->widget->getSiblingsID();
+    // unsigned *ids = somThis->widget->getSiblingsID();
+    unsigned *ids = 0;
     for ( int i = 0; i < count; ++i )
         siblings->_buffer[ i ] = ids[ i ];
 

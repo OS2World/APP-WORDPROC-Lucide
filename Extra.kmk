@@ -1,0 +1,43 @@
+## @file
+# Extra definitions for kBuild implemented using a UNIT so that some things
+# can be overriden/hacked at the right time.
+#
+
+ifdef UNIT_Extra
+ $(error kBuild: The Extra unit was included twice!)
+endif
+UNIT_Extra = Extra
+
+#
+# Rules to generate .sym/.xqs files from .map files. (This works only for the GXX3OMF
+# tool so far. A proper solution would be to extend GXX3OMF but something
+# doesn't work right in kBuild, e.g. _COMPILE_*_OUTPUT and friends are not
+# inherited). This note is from the odin SVN and doesn't appear to be true
+# any more.
+#
+
+define TOOL_BUILD_SYM_CMDS
+#ifeq ($(ld_debug),split)
+		$(QUIET)$(if $(PATH_SDK_OS2TK4),PATH="$(PATH_SDK_OS2TK4)/bin;$(PATH);") \
+		$(PATH_ROOT)/tools/runmapsym.cmd $(PATH_ROOT)/tools/wmapsym.cmd \
+		$(outbase).map $(outbase).sym \
+		1>nul
+#endif
+endef
+
+define TOOL_BUILD_XQS_CMDS
+#ifeq ($(ld_debug),split)    
+		$(QUIET)mapxqs.exe  $(outbase).map -o $(outbase).xqs \
+		1>nul
+#endif
+endef
+
+TOOL_GXX3OMF_LINK_DLL_OUTPUT += $(outbase).sym
+TOOL_GXX3OMF_LINK_DLL_OUTPUT += $(outbase).xqs
+TOOL_GXX3OMF_LINK_DLL_CMDS += $(TOOL_BUILD_SYM_CMDS)
+TOOL_GXX3OMF_LINK_DLL_CMDS += $(TOOL_BUILD_XQS_CMDS)
+
+TOOL_GCC3OMF_LINK_PROGRAM_OUTPUT += $(outbase).sym
+TOOL_GCC3OMF_LINK_PROGRAM_OUTPUT += $(outbase).xqs
+TOOL_GCC3OMF_LINK_PROGRAM_CMDS += $(TOOL_BUILD_SYM_CMDS)
+TOOL_GCC3OMF_LINK_PROGRAM_CMDS += $(TOOL_BUILD_XQS_CMDS)

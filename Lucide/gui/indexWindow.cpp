@@ -42,6 +42,7 @@
 #include "luutils.h"
 #include "tb_spl.h"
 #include "messages.h"
+#include "lucide_res.h"
 
 
 #define ID_BAR      1
@@ -58,7 +59,7 @@ IndexWindow::IndexWindow( HWND hWndFrame )
 
     hWndPanel = WinCreateWindow( hWndFrame, WC_ER_SPLITTER, "",
                                  WS_VISIBLE | SBS_HSPLIT | SBS_SECONDFIXED,
-                                 0, 0, 0, 0, hWndFrame, HWND_TOP, 0, NULL, NULL );
+                                0, 0, 0, 0, hWndFrame, HWND_TOP, 0, NULL, NULL );
     WinSetWindowULong( hWndPanel, QWL_USER, (ULONG)this );
     pOldPanelProc = WinSubclassWindow( hWndPanel, panelProc );
 
@@ -74,7 +75,6 @@ IndexWindow::IndexWindow( HWND hWndFrame )
                         WS_VISIBLE|CCS_MINIRECORDCORE|CCS_READONLY|CCS_MINIICONS,
                         0, 0, 0, 0, hWndPanel, HWND_TOP, ID_INDEX, NULL, NULL );
     WinSetPresParam( hWndIndex, PP_FONTNAMESIZE, deffontlen, deffont );
-
     WinSendMsg( hWndPanel, SBM_SETWINDOWS,
                 MPFROMHWND( hWndIndex ), MPFROMHWND( hWndBar ) );
     WinSendMsg( hWndPanel, SBM_SETFIXEDSIZE, MPFROMSHORT( 0 ), MPVOID );

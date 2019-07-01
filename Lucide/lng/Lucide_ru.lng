@@ -1,5 +1,5 @@
 #
-# Lucide language file, RU (1.3.5)
+# Lucide language file, RU (1.5.0)
 #
 
 #
@@ -15,7 +15,10 @@ MENU_NEXT=Следующий\tShift+PgDn
 MENU_LAST=Последний\tShift+End
 MENU_RECENT_FILES=Не~давние файлы
 MENU_CLEAR_LIST=~Очистить
-MENU_SAVE_AS=~Сохранить как...
+MENU_BACK=~Back\tCtrl+B
+MENU_BACKNAV=Last lin~k origin\tCtrl+K
+MENU_SAVE=~Save...\tCtrl+S
+MENU_SAVE_AS=~Сохранить как...\tCtrl+A
 MENU_CLOSE=~Закрыть
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Па~раметры страницы...
@@ -47,11 +50,15 @@ MENU_CONTINUOUS=Пос~ледовательно
 MENU_DOCUMENT_INFO=Информация о ~документе...\tCtrl+I
 MENU_FONTS_INFO=Информация о ~шрифтах...
 MENU_WINDOW=~Окно
-MENU_SHOW_NAV_PANE=~Отображать панель навигации
+MENU_SHOW_NAV_PANE=~Отображать панель навигации\tF9
 MENU_FULLSCREEN=~Полноэкранный режим\tF11
 MENU_PRESENTATION=П~резентация\tF5
 MENU_HELP=~Справка
 MENU_PRODUCT_INFORMATION=~О программе
+MENU_HELP_CONTENTS=~Contents\tF1
+MENU_HELP_KEYS=~Keys help
+MENU_HELP_PDF=P~DF file help
+MENU_HELP_IMAGES=~Image file help
 
 #
 # Toolbar hints
@@ -69,6 +76,7 @@ TBHINT_FIT_WIDTH=По ширине
 TBHINT_FIND=Искать...
 TBHINT_FINDAGAIN=Искать далее
 TBHINT_ZOOM_IN_OUT=Приблизить/отдалить
+TBHINT_BACK=Return to last link origin
 # toolbar's page number
 TB_PAGENUM=из %d
 
@@ -87,6 +95,11 @@ MSGS_PAGE=Страница
 MSGS_ERROR_STARTING_BROWSER=Ошибка запуска браузера!
 MSGS_CLOSE_MODIFIED_DOCUMENT=Документ был изменён. Сохранить?
 MSGS_FILE_COPY_SUFFIX=Копия %s
+MSGS_TEMP_FILE_LOAD_ERROR=Temp file load error!     
+MSGS_TEMP_FILE_SAVE_ERROR=Error saving temp file!   
+MSGS_NO_TEMP_DIR_ERROR=No temporary directory found!
+MSGS_NO_PRINTER_FOUND_ERROR=No printers found!
+MSGS_HELP_INSTANCE_FAILED=WinCreateHelpInstance failed!      
 
 MSGS_LDERR=Ошибка загрузки файла: %s!
 MSGS_LDERR_OUT_OF_MEMORY=Недостаточно памяти
@@ -99,6 +112,12 @@ MSGS_LDERR_ENCRYPTED=Файл зашифрован
 MSGS_RERR_OUT_OF_MEMORY=Недостаточно памяти
 MSGS_RERR_CORRUPTED_PAGE_DATA=Страница испорчена
 MSGS_RERR_FONT_NOT_FOUND=Фонт %s не найден
+
+#
+# Help button for all dialogs 
+#
+
+DIALOG_HELP=~Help
 
 #
 # "Plugins list" dialog
@@ -120,6 +139,7 @@ FONTINFO_ENUMERATING=Определяю шрифты, пожалуйста подождите...
 FONTINFO_NAME=Имя
 FONTINFO_TYPE=Тип
 FONTINFO_EMBEDDED=Встроенный?
+FONTINFO_SUBNAME=Substitute Font
 # Embedded types
 FONTINFO_EMBED_NOT_EMBEDDED=Не встроенный
 FONTINFO_EMBED_EMBEDDED=Встроенный
@@ -140,6 +160,7 @@ DOCINFO_CREATOR=Создатель:
 DOCINFO_PRODUCER=Изготовитель:
 DOCINFO_CREATION_DATE=Создан:
 DOCINFO_MOD_DATE=Модифицирован:
+DOCINFO_NAME=Document:
 
 #
 # "Find" dialog
@@ -176,9 +197,9 @@ SD_DEFAULT_PAGE_LAYOUT=Тип ~просмотра по умолчанию
 SD_DEFAULT_ZOOM=~Масштаб по умолчанию
 SD_SINGLE_PAGE=Одиночная страница
 SD_CONTINUOUS=Последовательно
+SD_THUMBNAIL=~Make thumbnails
 SD_OK=ОК
 SD_CANCEL=Отказ
-
 
 #
 # 'Go to page' dialog
@@ -199,6 +220,7 @@ PD_JOB_PROPERTIES=~Свойства
 PD_DRIVER_LABEL=Драйвер
 PD_PRINT_RANGE_AND_COPIES=Диапазон и копии
 PD_RANGE_ALL=~Все
+PD_REVESE_PRINT=Re~verse
 PD_RANGE_CURRENT_PAGE=~Текущую страницу
 PD_RANGE_PAGES=~Страницы
 PD_FROM=~От
@@ -253,3 +275,10 @@ FDLG_OK=~ОК
 FDLG_CANCEL=Отказ
 FDLG_NO_PREVIEW_AVAILABLE=Предпросмотр недоступен
 FDLG_ALL_SUPPORTED_TYPES=<Все поддерживаемые типы>
+FDLG_ALL_FILES=<All files>
+FDLG_THUMBNAIL=~Make thumbnail
+
+#
+# Help file title
+#
+HLP_TITLE=Lucide User's Guide

@@ -157,13 +157,18 @@ void loadLang()
 
     afbuf lfile( _MAX_PATH );
 
+    bool enloaded = false;
     snprintf( lfile.buffer, lfile.getSize(), lfilespec2, appdir, "EN" );
     if ( access( lfile.buffer, F_OK ) == 0 ) {
         loadLng( langDefault, lfile.buffer, true );
+        enloaded = true;
     }
     else {
         snprintf( lfile.buffer, lfile.getSize(), lfilespec3, appdir );
-        loadLng( langDefault, lfile.buffer, true );
+        if ( access( lfile.buffer, F_OK ) == 0 ) {
+            loadLng( langDefault, lfile.buffer, true );
+            enloaded = true;
+        }
     }
 
     char *lng = getenv("LC_ALL");
@@ -186,6 +191,9 @@ void loadLang()
     char lngSpec[ 4 ];
     memset( lngSpec, 0, sizeof( lngSpec ) );
     strncpy( lngSpec, lng, lngSpecLen );
+
+    if ( enloaded && !stricmp( lngSpec, "en" ) )
+        return;
 
     // Find territory specifier
     char *lrest = upos + 1;
@@ -211,7 +219,64 @@ void loadLang()
     {
         // File with territory specifier not found, load file without territory specifier
         snprintf( lfile.buffer, lfile.getSize(), lfilespec2, appdir, lngSpec );
-        loadLng( langCurrent, lfile.buffer, false );
+        if ( access( lfile.buffer, F_OK ) == 0 ) {
+            // File with language specifier exist, load it
+            loadLng( langCurrent, lfile.buffer, false );
+            nlsLoaded = true;
+        }
+    }
+    if ( !nlsLoaded && !enloaded )
+    {
+        for (int i = 0; i < 11; i++) {
+            switch (i) {
+            case 0:
+                strcpy(lngSpec, "de");
+                break;
+            case 1:
+                strcpy(lngSpec, "es");
+                break;
+            case 2:
+                strcpy(lngSpec, "fr");
+                break;
+            case 3:
+                strcpy(lngSpec, "it");
+                break;
+            case 4:
+                strcpy(lngSpec, "sv");
+                break;
+            case 5:
+                strcpy(lngSpec, "da");
+                break;
+            case 6:
+                strcpy(lngSpec, "nl");
+                break;
+            case 7:
+                strcpy(lngSpec, "ru");
+                break;
+            case 8:
+                strcpy(lngSpec, "pl");
+                break;
+            case 9:
+                strcpy(lngSpec, "cs");
+                strcpy(terrSpec, "cz");
+                break;
+            case 10:
+                strcpy(lngSpec, "zh");
+                strcpy(terrSpec, "tw");
+                break;
+            }
+            // File based on lang not found, load lng file if found
+            if ( i < 9 )
+                snprintf( lfile.buffer, lfile.getSize(), lfilespec2, appdir, lngSpec );
+            else
+                snprintf( lfile.buffer, lfile.getSize(), lfilespec1, appdir, lngSpec, terrSpec );
+            if ( access( lfile.buffer, F_OK ) == 0 ) {
+                // File with language specifier exist, load it
+                loadLng( langCurrent, lfile.buffer, false );
+                nlsLoaded = true;
+                break;
+            }
+        }
     }
 }
 

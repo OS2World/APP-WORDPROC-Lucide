@@ -42,22 +42,30 @@ static const char * const Layout = "Layout";
 static const char * const Zoom   = "Zoom";
 
 LuSettings::LuSettings() :
-    layout( SinglePage ), zoom( 1 )
+    layout( Continuous ), zoom( 1 )
 {
 }
 
 void LuSettings::load()
 {
-    layout = (PgLayout)PrfQueryProfileInt( HINI_USERPROFILE, appName, Layout, layout );
+    layout = (PgLayout)PrfQueryProfileInt( hinilucideprofile, appName, Layout, layout );
     ULONG sz = sizeof( zoom );
-    PrfQueryProfileData( HINI_USERPROFILE, appName, Zoom, &zoom, &sz );
+    PrfQueryProfileData( hinilucideprofile, appName, Zoom, &zoom, &sz );
+    if (zoom <= -3 || zoom >= 17)
+        zoom = 1;
+    sz = sizeof( bool);
+    PrfQueryProfileData( hinilucideprofile, appName, "thumbnail", &Lucide::Thumbnail, &sz );
+
 }
 
 void LuSettings::save()
 {
     char buf[ 10 ];
-    PrfWriteProfileString( HINI_USERPROFILE, appName, Layout, itoa( layout, buf, 10 ) );
-    PrfWriteProfileData( HINI_USERPROFILE, appName, Zoom, &zoom, sizeof( zoom ) );
+    PrfWriteProfileString( hinilucideprofile, appName, Layout, itoa( layout, buf, 10 ) );
+    ULONG sz = sizeof( zoom );
+    PrfWriteProfileData( hinilucideprofile, appName, Zoom, &zoom, sz );
+    PrfWriteProfileData( hinilucideprofile, appName, "thumbnail", &Lucide::Thumbnail,
+                         sizeof( bool ) );
 
     // also set the actual pagelayout to the new settings
     Lucide::setPageLayout(layout );

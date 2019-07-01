@@ -69,7 +69,8 @@ static MRESULT EXPENTRY LinkLabelProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
                     POINTL ptl;
                     ptl.x = SHORT1FROMMP( mp1 );
                     ptl.y = SHORT2FROMMP( mp1 );
-                    if ( WinPtInRect( WinQueryAnchorBlock( hwnd ), &ld->textRect, &ptl) )
+                    if ( WinPtInRect( WinQueryAnchorBlock( hwnd ),
+                                     &ld->textRect, &ptl) )
                     {
                         WinSetPointer( HWND_DESKTOP, handPtr );
                         return (MRESULT)FALSE;

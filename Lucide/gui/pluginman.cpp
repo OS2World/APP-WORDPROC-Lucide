@@ -72,13 +72,13 @@ PluginManager::PluginManager()
     strcat( buffer, "LU*.DLL" );
 
     // enum plugins, (LU*.DLL) except for LUDOC.DLL, which is 'null' plugin
-    // and Lucide.dll, which is not a plugin.
+    // and Lucide1.dll, which is not a plugin.
     find_t ffblk;
     unsigned done = _dos_findfirst( buffer, _A_RDONLY | _A_NORMAL, &ffblk );
     while ( done == 0 )
     {
         if ( ( stricmp( find_t_name( ffblk ), "LUDOC.DLL" ) != 0 ) &&
-             ( stricmp( find_t_name( ffblk ), "LUCIDE.DLL" ) != 0 ) )
+             ( stricmp( find_t_name( ffblk ), "LUCIDE1.DLL" ) != 0 ) )
         {
             loadPlugin( path, find_t_name( ffblk ) );
         }
@@ -195,14 +195,14 @@ LuDocument *PluginManager::createDocumentForExt( const char *ext, bool checkOnly
             LuDocument *d = createDocFromDll( pi->handle, checkOnly );
             if ( d != NULL )
             {
-                delete cExt;
-                delete cExts;
+                delete[] cExt;
+                delete[] cExts;
                 return d;
             }
         }
 
-        delete cExt;
-        delete cExts;
+        delete[] cExt;
+        delete[] cExts;
     }
 
     return NULL;
@@ -214,7 +214,7 @@ static bool checkSignature( LuSignature *signature, int h )
     char *buf = new char[ signature->length ];
     read( h, buf, signature->length );
     bool result = ( memcmp( signature->data, buf, signature->length ) == 0 );
-    delete buf;
+    delete[] buf;
     return result;
 }
 
@@ -262,16 +262,6 @@ LuDocument *PluginManager::createDocumentForFile( const char *file, bool checkOn
 {
     LuDocument *ld = NULL;
 
-    // Search by extension
-    char *ext = strrchr( file, '.' );
-    if ( ext != NULL ) {
-        ld = createDocumentForExt( ext + 1, checkOnly );
-    }
-
-    if ( ld != NULL ) {
-        return ld;
-    }
-
     // Search by checkstruct
     for ( int i = 0; i < plugins->size(); i++ )
     {
@@ -308,6 +298,16 @@ LuDocument *PluginManager::createDocumentForFile( const char *file, bool checkOn
                 }
             }
         }
+    }
+
+    // Search by extension
+    char *ext = strrchr( file, '.' );
+    if ( ext != NULL ) {
+        ld = createDocumentForExt( ext + 1, checkOnly );
+    }
+
+    if ( ld != NULL ) {
+        return ld;
     }
 
     return NULL;

@@ -1,17 +1,28 @@
 #
-# Lucide language file, TW
+# Lucide language file, TW (1.5.0)
 #
 
 #
 # Main menu
 #
 MENU_DOCUMENT=文件(~D)
-MENU_OPEN=開啟(~O)...\tCtrl+O
-MENU_SAVE_AS=另存新檔(~S)...
+MENU_NEW_WINDOW=~New window
+MENU_OPEN=~Open...\tCtrl+O
+MENU_NEXT_PREVIOUS=Next/Pre~vious
+MENU_FIRST=First\tShift+Home
+MENU_PREVIOUS=Previous\tShift+PgUp
+MENU_NEXT=Next\tShift+PgDn
+MENU_LAST=Last\tShift+End
+MENU_RECENT_FILES=~Recent files
+MENU_CLEAR_LIST=~Clear list
+MENU_BACK=~Back\tCtrl+B
+MENU_BACKNAV=Last lin~k origin\tCtrl+K
+MENU_SAVE=~Save...\tCtrl+S
+MENU_SAVE_AS=另存新檔(~S)...\tCtrl+A
+MENU_CLOSE=~Close
+# MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=設定頁面(~G)...
 MENU_PRINT=列印(~P)...\tCtrl+P
-MENU_DOCUMENT_INFO=文件資訊(~D)...\tCtrl+I
-MENU_FONTS_INFO=字體資訊(~I)...
 MENU_PLUGINS_LIST=Plugins 列表(~L)...
 MENU_EXIT=離開(~X)\tCtrl+X
 MENU_EDIT=編輯(~E)
@@ -20,24 +31,34 @@ MENU_SELECT_ALL=全部選取(~A)\tCtrl+/
 MENU_FIND=搜尋(~F)...\tCtrl+F
 MENU_FINDAGAIN=再搜尋(~G)\tCtrl+G
 MENU_SETTINGS=設定(~S)
+MENU_VIEW=顯示(~V)
+MENU_FIT_WINDOW=符合視窗(~T)\tCtrl+0
+MENU_ACTUAL_SIZE=實際尺寸(~A)\tCtrl+1
+MENU_FIT_WIDTH=符合寬度(~W)\tCtrl+2
+# - unused - MENU_ZOOM_IN_OUT=~Zoom in/out
+MENU_ZOOM_IN=Zoom in\tCtrl++
+MENU_ZOOM_OUT=Zoom out\tCtrl+-
 MENU_FIRST_PAGE=第一頁(~F)
 MENU_PREV_PAGE=上一頁(~P)\t-
 MENU_NEXT_PAGE=下一頁(~N)\t+
 MENU_LAST_PAGE=最後一頁(~L)
 MENU_GO_TO_PAGE=跳頁(~G)...\tCtrl+N
-MENU_VIEW=顯示(~V)
-MENU_FIT_WINDOW=符合視窗(~T)\tCtrl+0
-MENU_ACTUAL_SIZE=實際尺寸(~A)\tCtrl+1
-MENU_FIT_WIDTH=符合寬度(~W)\tCtrl+2
 MENU_ROTATE_CW=順時鐘方向90度(~R)\tCtrl+Shift++
 MENU_ROTATE_CCW=逆時鐘方向90度(~C)\tCtrl+Shift+-
 MENU_SINGLE_PAGE=單頁(~S)
 MENU_CONTINUOUS=連續(~O)
+MENU_DOCUMENT_INFO=文件資訊(~D)...\tCtrl+I
+MENU_FONTS_INFO=字體資訊(~I)...
 MENU_WINDOW=視窗(~W)
-MENU_SHOW_NAV_PANE=顯示導引框(~S)
+MENU_SHOW_NAV_PANE=顯示導引框(~S)\tF9
 MENU_FULLSCREEN=全螢幕(~F)\tF11
+MENU_PRESENTATION=~Presentation\tF5
 MENU_HELP=解說(~H)
 MENU_PRODUCT_INFORMATION=產品資訊(~P)
+MENU_HELP_CONTENTS=~Contents\tF1
+MENU_HELP_KEYS=~Keys help
+MENU_HELP_PDF=P~DF file help
+MENU_HELP_IMAGES=~Image file help
 
 #
 # Toolbar hints
@@ -54,6 +75,8 @@ TBHINT_FIT_WINDOW=符合視窗
 TBHINT_FIT_WIDTH=符合寬度
 TBHINT_FIND=搜尋...
 TBHINT_FINDAGAIN=再搜尋
+TBHINT_ZOOM_IN_OUT=Zoom in/out
+TBHINT_BACK=Return to last link origin
 # toolbar's page number
 TB_PAGENUM=之 %d
 
@@ -64,10 +87,37 @@ MSGS_MAIN_WIN_TITLE=%APPNAME% - 文件檢視器
 MSGS_NO_SUIT_PLUG=無法找到適合此文件的 Plugin!
 MSGS_FILE_LOAD_ERROR=檔案載入錯誤!
 MSGS_LOADING_DOCUMENT=載入文件中，請稍候...
+MSGS_CREATING_THUMBNAIL=Creating thumbnail for document, please wait...
 MSGS_WARNING=警告!
 MSGS_OVERWRITE_FILE=檔案已存在，要取代嗎？
 MSGS_FILE_SAVE_ERROR=存案錯誤!
 MSGS_PAGE=頁
+MSGS_ERROR_STARTING_BROWSER=Error starting browser!
+MSGS_CLOSE_MODIFIED_DOCUMENT=Document has been modified. Save?
+MSGS_FILE_COPY_SUFFIX=%s Copy
+MSGS_TEMP_FILE_LOAD_ERROR=Temp file load error!     
+MSGS_TEMP_FILE_SAVE_ERROR=Error saving temp file!   
+MSGS_NO_TEMP_DIR_ERROR=No temporary directory found!
+MSGS_NO_PRINTER_FOUND_ERROR=No printers found!   
+MSGS_HELP_INSTANCE_FAILED=WinCreateHelpInstance failed!   
+
+MSGS_LDERR=File load error: %s!
+MSGS_LDERR_OUT_OF_MEMORY=Out of memory
+MSGS_LDERR_OPEN_ERROR=Open error
+MSGS_LDERR_READ_ERROR=Read error
+MSGS_LDERR_DAMAGED=File damaged
+MSGS_LDERR_WRONG_FORMAT=Wrong format
+MSGS_LDERR_ENCRYPTED=File is encrypted
+
+MSGS_RERR_OUT_OF_MEMORY=Out of memory
+MSGS_RERR_CORRUPTED_PAGE_DATA=Corrupted page data
+MSGS_RERR_FONT_NOT_FOUND=Font %s not found
+
+#
+# Help button for all dialogs 
+#
+
+DIALOG_HELP=~Help
 
 #
 # "Plugins list" dialog
@@ -89,6 +139,7 @@ FONTINFO_ENUMERATING=列出字體中，請稍候...
 FONTINFO_NAME=名稱
 FONTINFO_TYPE=類型
 FONTINFO_EMBEDDED=嵌入?
+FONTINFO_SUBNAME=Substitute Font
 # Embedded types
 FONTINFO_EMBED_NOT_EMBEDDED=未嵌入
 FONTINFO_EMBED_EMBEDDED=已嵌入
@@ -109,6 +160,7 @@ DOCINFO_CREATOR=建立者:
 DOCINFO_PRODUCER=製作者:
 DOCINFO_CREATION_DATE=建立日期:
 DOCINFO_MOD_DATE=修改日期:
+DOCINFO_NAME=Document:
 
 #
 # "Find" dialog
@@ -116,6 +168,7 @@ DOCINFO_MOD_DATE=修改日期:
 FIND_FIND=搜尋
 FIND_FIND_WHAT=搜尋目標(~F)
 FIND_MATCH_CASE=區分大小寫(~M)
+FIND_BACK=Find ~Backwards
 FIND_OK=~OK
 FIND_CANCEL=取消(~C)
 # other 'find'-related messages
@@ -144,6 +197,7 @@ SD_DEFAULT_PAGE_LAYOUT=預設頁頁面設定(~P)
 SD_DEFAULT_ZOOM=預設縮放大小(~Z)
 SD_SINGLE_PAGE=單頁
 SD_CONTINUOUS=連續
+SD_THUMBNAIL=~Make thumbnails
 SD_OK=~OK
 SD_CANCEL=取消(~C)
 
@@ -166,19 +220,26 @@ PD_JOB_PROPERTIES=工作屬性(~J)
 PD_DRIVER_LABEL=印表機程式
 PD_PRINT_RANGE_AND_COPIES=列印範圍及份數(~R)
 PD_RANGE_ALL=全部(~A)
+PD_REVESE_PRINT=Re~verse
 PD_RANGE_CURRENT_PAGE=目前頁面(~U)
 PD_RANGE_PAGES=頁面(~G)
 PD_FROM=從(~F)
 PD_TO=到(~T)
 PD_NUMBER_OF_COPIES=列印份數(~N)
+PD_RANGE_EVEN_ODD_LABEL=Print ~range
+PD_RANGE_EVEN_ODD=Even and Odd pages
+PD_RANGE_ODD=Odd pages only
+PD_RANGE_EVEN=Even pages only
 PD_PRINT_TYPE=列印類型
 PD_TYPE_POSTSCRIPT=Post~script
+PD_PRINT_TO_FILE=Print to ~file
 PD_TYPE_ASIMAGE=以圖形方式列印(~I)
 PD_HIGHER_IMAGE_QUALITY=高品質圖形(~H) (較慢且需較多記憶體)
 PD_PAGE_ORIENTATION=頁面方向
 PD_PORTRAIT=直印
 PD_LANDSCAPE=橫印
 PD_MARGINS=邊界 (mm)
+PD_IGNORE_PRINTER_MARGINS=Ignore printer ~margins
 PD_MLEFT=左邊
 PD_MRIGHT=右邊
 PD_MTOP=頂端
@@ -193,3 +254,31 @@ PRINT_GENERATING_POSTSCRIPT=產生 Postscript 檔...
 PRINT_SPOOLING_POSTSCRIPT=排存 Postscript 資料...
 PRINT_FAILED=列印錯誤!
 
+#
+# Password dialog
+#
+PSW_TITLE=Document is encrypted
+PSW_PASSWORD=~Password
+PSW_OK=~OK
+PSW_CANCEL=~Cancel
+
+#
+# Open file dialog
+#
+FDLG_OPEN=Open
+FDLG_FILENAME=File~name
+FDLG_DRIVE=D~rive
+FDLG_FILETYPE=File ~Type
+FDLG_FILE=~File
+FDLG_DIRECTORY=~Directory
+FDLG_OK=~OK
+FDLG_CANCEL=~Cancel
+FDLG_NO_PREVIEW_AVAILABLE=No preview available
+FDLG_ALL_SUPPORTED_TYPES=<All supported types>
+FDLG_ALL_FILES=<All files>
+FDLG_THUMBNAIL=~Make thumbnail
+
+#
+# Help file title
+#
+HLP_TITLE=Lucide User's Guide

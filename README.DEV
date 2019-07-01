@@ -6,22 +6,27 @@ REQUIREMENTS
 
 In order to build Lucide, you will need the following tools:
 
-  - kBuild version 0.1.5 (r2206) or later. Get it with the following command:
-
-      svn co http://svn.netlabs.org/repos/kbuild/trunk/kBuild -r 2206
-
-  - GCC compiler version 3.3.5 or 4.4.2 for OS/2 and the patched OpenWatcom
+  - kBuild version 0.1.998 or later. Get it from the netlabs-rel RPM repository
+    either use ANPM or YUM install kbuild
+      
+  - GCC compiler version 4.9.2 for OS/2 and the patched OpenWatcom
     linker. The GCC compiler must be set up to use the OpenWatcom linker for
     linking. Note that GCC 4.4.4 is known to have problems with the _System
     modifier and is not suitable for building Lucide SOM DLLs for this reason.
 
-    If you do not have a working GCC environment with the above requirements, it
-    is recommended to download a ready-to-use GCC 4.2.2 distribution from here:
-
-      ftp://ftp.netlabs.org/pub/qt4/tools/gcc-4_4_2-complete-20091205.zip
-
-    Follow the installation instructions contained in the README file inside
-    this ZIP archive to set up the GCC environment.
+      If you do not have a working GCC environment with the above requirements, it
+      is recommended that you use the ANPM to install GCC 4.9.2 distribution from 
+      the Netlabs RPM repository. Follow the installation instructions contained 
+      in the README file to set up the GCC environment.
+    
+  - The 2.0 Beta 1 or later  Open Watcom linker (wl.exe), resource compiler 
+    (wrc.exe) and the ipf (help file) compiler (wipfc.exe). 
+    
+  - Mapxqs.exe from the exceptq-devel package
+  
+      Exceptq-devel, Watcom-Wlink-hll, Watcom-rc and Watcom-ipfc are available
+      from the Netlabs RPM repository using ANPM or the appropriate yum commands.
+      Note wipfc.exe is currently also in the tools directory. 
 
   - SOM SDK 2.x. The one that is part of the OS/2 Tooklit version 4.5 is known
     to work and recommended. Note that installing the Toolkit is not required
@@ -29,16 +34,29 @@ In order to build Lucide, you will need the following tools:
     (with all its contents) out of the Toolkit and place it to some directory.
     You don't need to put any statements in CONFIG.SYS in this case.
     
-  - A recent version of the CURL library (headers and .a/.lib files).
+  - A recent version of the CURL library (headers and .a/.lib files). libcurl-devel
+    and curl-debug are available on the Netlabs RPM repository
 
-  - RC.EXE version 4 or 5 which should be located in a directory listed in PATH.
+  - LxLite 1.3.9 or above should also be located in PATH, otherwise packing the
+    resulting EXEs and DLLs will be disabled. Lxlite is available on the 
+    netlabs-rel RPM repository.
+  
+  - poppler_dll.a.and its include files which are part of poppler-devl
+  - poppler 0.59.0
+  
+      yum install poppler poppler-devl   from http://rpm.netlabs.org/release
+      
+  - djvulibre_dll.a.and its include files which are part of djvulibre-devl
+  - djvulibre-libs
+  
+      yum install djvulibre-libs djvulibre-devl  from http://rpm.netlabs.org/release    
 
-  - LxLite 1.3.3 or above should also be located in PATH, otherwise packing the
-    resulting EXEs and DLLs will be disabled. You can take LxLite here:
-
-      http://www.os2site.com/sw/util/archiver/lxlt133.zip
-
-
+  - jpeg_dll.a and its include files which are part of libjpeg-devl
+  - libjpeg
+  
+      yum install libjpeg libjpeg-devl   from http://rpm.netlabs.org/release
+  
+  - GBMDLL and GBM-DEVEL also from the netlabs RPM repository.    
 
 SETTING UP THE ENVIRONMENT
 
@@ -49,26 +67,27 @@ does.
 You may also want to adjust the configuration of the Lucide build according to
 your needs. To do so, copy "LocalConfig.kmk.tpl" to "LocalConfig.kmk" and adjust
 the copy to match your requirements. Each option in "LocalConfig.kmk.tpl" has a
-comment descriping what it does.
-
+comment describing what it does.
 
 
 BUILDING THE PRODUCT
 
 Now, start "env.cmd" to setup the environment and type "kmk" in the root
 directory of the Lucide source tree to start kBuild and build the release
-version of Lucide and all plugins.
+version of Lucide and all plugins. Note kmk runs one job per processor
+by default. This creates a race condition when building lucide with unpredictable
+results. To prevent this problem you need to use kmk -j1 or kmk --jobs=1
 
 If you are a developer, you may prefer to use the "se.cmd" script instead of
 starting "env.cmd" in each new shell. This script will allow you to run "kmk"
 in the correct environment from any directory inside the Lucide source tree by
-simply typing "se kmk" in that directory. This is especially handy if you use
-e.g. File Commander as your development IDE. The "se.cmd" script may be taken
-at:
+simply typing "se kmk" (se kmk -j1) in that directory. This is especially handy 
+if you use e.g. File Commander as your development IDE. The "se.cmd" script can 
+be found in the tools directory.
 
-  ftp://ftp.netlabs.org/pub/qt4/tools/se10.zip
-
-
+Copysyms.cmd copies the sym and xqs files to the bin directory for testing from
+there. It is not necessary to run it for releases as the PACKING logic packs
+the correct version.
 
 GENERATING DISTRIBUTION ARCHIVES
 
@@ -76,8 +95,9 @@ In order to generate WPI and ZIP distribution archives in the output directory,
 issue the following command in the root of the source tree (prefixed with "se"
 if you use it):
 
-  kmk packing
-
+  kmk -j1 DEFINES - Updates the def files with the settings from Config.kmk
+  kmk -j1 PACKING - Both are case sensitive
+  
 Note that this command will perform a complete cleanup before packing, to make
 sure everything is rebuilt from scratch. For testing purposes, you may omit
 the cleanup pass by invoking the "kmk fastpacking" which will only generate
@@ -85,13 +105,16 @@ the distribution archives from the existing build.
 
 IMPORTANT (for the release builder):
 
-    Do not forget to update VERSION, BUILD/WPIBUILD and VERSIONDATE in
-    Config.kmk. Note that you should immediately increase the version number
+    Do not forget to update VERSION, GBMVERSION (if appropriate), BUILD/WPIBUILD 
+    VERSIONDATE, VERSIONTIME and BUILDMACHINE in Config.kmk before running 
+    kmk -j1 DEFINES. Note that you should immediately increase the version number
     in SVN after the release (after tagging the SVN trunk with the release tag)
     and set BUILD to "beta" to indicate a new development phase. Right before
     the release, you end the development phase by changing BUILD from "beta"
     to "GA" and create a corresponding release tag in SVN.
-
+    
+    The version also needs to be updated in the lng files. The build level
+    strings in the def files also need to be updated using kmk -j1 DEFINES.
 
 
 USEFUL KBUILD TARGETS
@@ -100,7 +123,8 @@ The following kmk targets may be of interest:
 
   - clean           Cleans up the build by deleting all generated output.
   - uninstall       Deletes all installed files.
-  - packing,        Creates distribution archives in the output directory
+  - DEFINES         Builds the def files from the Config.kmk and the def.tpl files
+  - PACKING,        Creates distribution archives in the output directory
     fastpacking     (see GENERATING DISTRIBUTION ARCHIVES above).
 
 

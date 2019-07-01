@@ -58,7 +58,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <setjmp.h>
-#include "jversion.h"
+// #include "jversion.h"
+#define JVERSION "8d 07-Jan-2017"
 
 // jpeglib defines boolean as int while SOM defines it as unsigned char,
 // work this around (note that you need to use jpeg_boolean in this source if
@@ -314,7 +315,7 @@ SOM_Scope boolean  SOMLINK renderPageToPixbuf(LuJpegDocument *somSelf,
 SOM_Scope void SOMLINK somDefaultInit(LuJpegDocument *somSelf,
                                       som3InitCtrl* ctrl)
 {
-    LuJpegDocumentData *somThis;
+    LuJpegDocumentData *somThis = NULL;
     somInitCtrl globalCtrl;
     somBooleanVector myMask;
     LuJpegDocument_BeginInitializer_somDefaultInit;
@@ -330,7 +331,7 @@ SOM_Scope void SOMLINK somDefaultInit(LuJpegDocument *somSelf,
 SOM_Scope void SOMLINK somDestruct(LuJpegDocument *somSelf, octet doFree,
                                    som3DestructCtrl* ctrl)
 {
-    LuJpegDocumentData *somThis;
+    LuJpegDocumentData *somThis = NULL;
     somDestructCtrl globalCtrl;
     somBooleanVector myMask;
     LuJpegDocument_BeginDestructor;

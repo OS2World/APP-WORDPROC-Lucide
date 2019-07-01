@@ -41,7 +41,7 @@
 #include "luutils.h"
 #include "Lucide_res.h"
 #include "messages.h"
-
+#include "Lucide.h"
 
 SettingsDlg::SettingsDlg( HWND hWndFrame, LuSettings *s )
 {
@@ -97,6 +97,9 @@ MRESULT EXPENTRY SettingsDlg::settingsDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
 
             // init
 
+            // setup the accelerators
+            WinSetAccelTable( hab, WinLoadAccelTable( hab, _hmod, IDA_ADDHELPACCEL ), hwnd );
+
             // layout
             HWND hLayout = WinWindowFromID( hwnd, IDC_DEFPGLAYOUT );
             std::string spage = getLocalizedString( SD_SINGLE_PAGE );
@@ -121,6 +124,9 @@ MRESULT EXPENTRY SettingsDlg::settingsDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
             } else {
                 setZoomCombo( zoomCombo, -1, _this->settings->zoom );
             }
+
+            // thumbnails
+            WinCheckButton( hwnd, IDC_NEVERTHUMB, Lucide::Thumbnail );
 
             return (MRESULT)FALSE;
         }
@@ -151,6 +157,8 @@ MRESULT EXPENTRY SettingsDlg::settingsDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
                             }
                         }
 
+                        Lucide::Thumbnail = WinQueryButtonCheckstate( hwnd, IDC_NEVERTHUMB );
+
                         _this->settings->save();
 
                         WinDismissDlg( hwnd, DID_OK );
@@ -160,6 +168,12 @@ MRESULT EXPENTRY SettingsDlg::settingsDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
                 case DID_CANCEL:
                     WinDismissDlg( hwnd, DID_CANCEL );
                     return (MRESULT)FALSE;
+
+                case CM_HELP:
+                  if (Lucide::hwndHelp)
+                      WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                 MPFROM2SHORT(110, 0), MPFROMSHORT(HM_RESOURCEID));
+                  return (MRESULT)FALSE;
             };
             return (MRESULT)FALSE;
     }

@@ -46,6 +46,7 @@ extern Environment *ev;
 extern char deffont[];
 extern int deffontlen;
 extern HMODULE _hmod;
+extern HINI hinilucideprofile;
 
 #endif // __GLOBALS_H
 

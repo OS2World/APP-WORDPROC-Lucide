@@ -44,6 +44,7 @@
 #include "messages.h"
 
 #define TID_PAINT   1
+#define TID_SHOWCANCEL 2
 
 
 ProgressDlg::ProgressDlg( HWND hWndFrame )
@@ -119,6 +120,8 @@ MRESULT EXPENTRY ProgressDlg::progressDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
             _this->hDialog = hwnd;
             WinSetDlgItemText( hwnd, IDC_PTEXT, _this->text );
             WinEnableControl( hwnd, DID_CANCEL, _this->fn != NULL );
+            WinStartTimer( WinQueryAnchorBlock( hwnd ), hwnd,
+                          TID_SHOWCANCEL, 100);
 
             _this->startPos = 0;
             HWND hBar = WinWindowFromID( hwnd, IDC_PBAR );
@@ -145,6 +148,15 @@ MRESULT EXPENTRY ProgressDlg::progressDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
             return (MRESULT)FALSE;
         }
 
+        case WM_TIMER:
+            if ( SHORT1FROMMP( mp1 ) == TID_SHOWCANCEL )
+            {
+                WinEnableControl( hwnd, DID_CANCEL, TRUE);
+                WinStopTimer( WinQueryAnchorBlock( hwnd ), hwnd,
+                             TID_SHOWCANCEL );
+            }
+            break;
+
         case WM_DESTROY:
         {
             _this->hDialog = NULLHANDLE;
@@ -168,6 +180,7 @@ MRESULT EXPENTRY ProgressDlg::progressDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
                     if ( _this->fn != NULL ) {
                         _this->fn( _this->data );
                     }
+                    WinDismissDlg( hwnd, DID_OK );
                     return (MRESULT)FALSE;
             };
             return (MRESULT)FALSE;

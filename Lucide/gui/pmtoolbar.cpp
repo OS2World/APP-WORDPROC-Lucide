@@ -55,7 +55,7 @@ static char *newstrdup( HAB hab, ULONG resId, HMODULE hModule )
     char *pBuf = new char[ lBufMax ];
     WinLoadString( hab, hModule, resId, lBufMax, pBuf );
     char *b = newstrdup( pBuf );
-    delete pBuf;
+    delete[] pBuf;
     return b;
 }
 

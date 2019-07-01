@@ -11,6 +11,7 @@ include $(PATH_SUB_CURRENT)/ludoc/Makefile.kmk
 include $(PATH_SUB_CURRENT)/lupoppler/Makefile.kmk
 include $(PATH_SUB_CURRENT)/lujpeg/Makefile.kmk
 include $(PATH_SUB_CURRENT)/ludjvu/Makefile.kmk
+include $(PATH_SUB_CURRENT)/lugbm/Makefile.kmk
 
 include $(FILE_KBUILD_SUB_FOOTER)
 

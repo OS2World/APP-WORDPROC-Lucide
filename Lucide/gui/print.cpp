@@ -50,6 +50,9 @@
 #include "luutils.h"
 #include "messages.h"
 
+//#define INCL_EXCEPTQ_CLASS
+//#define INCL_LOADEXCEPTQ
+//#include "exceptq.h"
 
 #ifndef DEVESC_ERROR
 #define DEVESC_ERROR        (-1L)
@@ -200,7 +203,7 @@ bool LucidePrinting::doPmPrint( HAB lhab )
             snprintf( buf, 255, fmt, pg, j++, pagestoprint );
             progressDlg->setText( buf );
             delete fmt;
-            delete buf;
+            delete[] buf;
 
             printPagePm( pg - 1, hpsPrinter, &curForm );
 
@@ -445,7 +448,7 @@ bool LucidePrinting::queryCurrentForm( HAB lhab, PHCINFO pcurForm )
     memset( forms, 0, sizeof( HCINFO ) * lForms );
     lForms = DevQueryHardcopyCaps( hdcPrinterInfo, 0, lForms, forms );
     if ( lForms == DQHC_ERROR ) {
-        delete forms;
+        delete[] forms;
         DevCloseDC( hdcPrinterInfo );
         return false;
     }
@@ -457,7 +460,7 @@ bool LucidePrinting::queryCurrentForm( HAB lhab, PHCINFO pcurForm )
         }
     }
 
-    delete forms;
+    delete[] forms;
     DevCloseDC( hdcPrinterInfo );
     return true;
 }
@@ -471,6 +474,7 @@ void LucidePrinting::printabort( void *data )
 // static method, thread for asynchronous printing
 void LucidePrinting::printthread( void *p )
 {
+    //ScopedExceptqLoader sel;
     DosSetPriority( PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0 );
     LucidePrinting *_this = (LucidePrinting *)p;
 

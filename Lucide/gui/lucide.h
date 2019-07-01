@@ -94,11 +94,14 @@ class Lucide
         static SHORT splitterPos;
         static bool showIndex;
         static ActiveWindow activeWindow;
+        static bool Thumbnail;
+        static HWND hwndHelp;
 
         static void newWindow( char *file, bool addDir );
         static void openDocument();
         static bool closeDocument( bool force = false );
-        static void loadDocument( const char *fn );
+        static void loadDocument( const char *fn, bool saveme = false );
+        static bool saveDocument();
         static bool saveDocumentAs();
         static void setDocument( LuDocument *_doc );
         static void checkNavigationMenus();
@@ -119,12 +122,13 @@ class Lucide
         static void cmdMinimize();
         static void cmdSwitchToPresentation();
         static void cmdSwitchWindow();
-        static void createThumbnail( LuDocument *_doc );
+        static bool createThumbnail( LuDocument *_doc );
         static bool isThumbNeeded( const char *fn );
         static void writeThumbnail( const char *fn );
         static void gotoFile( FileList file );
         static void savePosition();
         static void restorePosition();
+        static void openProfile();
 };
 
 #endif // __LUCIDE_H

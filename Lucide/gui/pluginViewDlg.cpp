@@ -39,7 +39,7 @@
 #include "pluginViewDlg.h"
 #include "Lucide_res.h"
 #include "messages.h"
-
+#include "Lucide.h"
 
 PluginViewDlg::PluginViewDlg( HWND hWndFrame, PluginInfoList *plist )
 {
@@ -94,6 +94,9 @@ MRESULT EXPENTRY PluginViewDlg::pluginViewDlgProc( HWND hwnd, ULONG msg, MPARAM 
             localizeDialog( hwnd );
             centerWindow( _this->hFrame, hwnd );
 
+            // setup the accelerators
+            WinSetAccelTable( hab, WinLoadAccelTable( hab, _hmod, IDA_ADDHELPACCEL ), hwnd );
+
             // init container
             HWND cntr = WinWindowFromID( hwnd, IDC_PLUGINSLIST );
             CNRINFO ci;
@@ -108,21 +111,21 @@ MRESULT EXPENTRY PluginViewDlg::pluginViewDlgProc( HWND hwnd, ULONG msg, MPARAM 
             PFIELDINFO pFldInfo = pFieldInfo;
             pFldInfo->cb = sizeof( FIELDINFO );
             pFldInfo->flData = CFA_STRING | CFA_HORZSEPARATOR | CFA_SEPARATOR;
-            pFldInfo->flTitle = CFA_CENTER;
+            pFldInfo->flTitle = CFA_LEFT;
             pFldInfo->pTitleData = (PVOID)_this->pname;
             pFldInfo->offStruct = FIELDOFFSET( ListRec, miniRecordCore.pszIcon );
             pFldInfo = pFldInfo->pNextFieldInfo;
             pFldInfo->cb = sizeof( FIELDINFO );
             pFldInfo->flData = CFA_STRING | CFA_HORZSEPARATOR | CFA_SEPARATOR;
-            pFldInfo->flTitle = CFA_CENTER;
-            pFldInfo->pTitleData = (PVOID)_this->suppexts;
-            pFldInfo->offStruct = FIELDOFFSET( ListRec, extensions );
+            pFldInfo->flTitle = CFA_LEFT;
+            pFldInfo->pTitleData = (PVOID)_this->pdesc;
+            pFldInfo->offStruct = FIELDOFFSET( ListRec, description );
             pFldInfo = pFldInfo->pNextFieldInfo;
             pFldInfo->cb = sizeof( FIELDINFO );
             pFldInfo->flData = CFA_STRING | CFA_HORZSEPARATOR | CFA_SEPARATOR;
-            pFldInfo->flTitle = CFA_CENTER;
-            pFldInfo->pTitleData = (PVOID)_this->pdesc;
-            pFldInfo->offStruct = FIELDOFFSET( ListRec, description );
+            pFldInfo->flTitle = CFA_LEFT;
+            pFldInfo->pTitleData = (PVOID)_this->suppexts;
+            pFldInfo->offStruct = FIELDOFFSET( ListRec, extensions );
 
             FIELDINFOINSERT fieldInfoInsert;
             fieldInfoInsert.cb = sizeof( FIELDINFOINSERT );
@@ -159,6 +162,21 @@ MRESULT EXPENTRY PluginViewDlg::pluginViewDlgProc( HWND hwnd, ULONG msg, MPARAM 
             }
 
             return (MRESULT)FALSE;
+        }
+
+        case WM_COMMAND:
+        {
+            switch( SHORT1FROMMP(mp1) )
+            {
+              case CM_HELP:
+                  if (Lucide::hwndHelp)
+                      WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                 MPFROM2SHORT(106, 0), MPFROMSHORT(HM_RESOURCEID));
+                  return (MRESULT)FALSE;
+
+                default:
+                    break;
+            }
         }
 
         case WM_DESTROY:

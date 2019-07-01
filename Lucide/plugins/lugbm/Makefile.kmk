@@ -1,0 +1,58 @@
+## @file
+#
+
+SUB_DEPTH = ../../..
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Include sub-makefiles
+#
+include $(PATH_SUB_CURRENT)/doc/Makefile.kmk
+
+#
+# Target lists
+#
+DLLS		+= lugbm
+
+#
+# LugbmDocument SOM Class
+#
+lugbm_TEMPLATE	 = SomDll
+lugbm_INCS	 = \
+	../ludoc $(lugbm_0_OUTDIR)/../ludoc \
+	$(UNIXROOT)/usr/include \
+	$(UNIXROOT)/usr/include/gbm \
+	$(UNIXROOT)/usr/include/os2tk45\
+	common
+lugbm_SOURCES	 = \
+	WGbmDocument.cpp       \
+	ConfigHandler.cpp      \
+	GbmAccessor.cpp        \
+	GbmDialogAccessor.cpp  \
+	GbmDocument.cpp        \
+	GbmDocumentPage.cpp    \
+	GbmException.cpp       \
+	GbmRenderer.cpp        \
+	Semaphore.cpp          \
+	Thread.cpp             \
+	lugbm.idl              \
+	lugbm_gcc.def
+lugbm_IDLSOURCES	 = \
+	lugbm.cpp
+lugbm_LIBS		 = \
+	$(PATH_STAGE_LIB)/ludoc$(SUFF_LIB)\
+	$(UNIXROOT)/usr/lib/GBM/gbm$(SUFF_LIB)    \
+	$(UNIXROOT)/usr/lib/GBM/gbmerr$(SUFF_LIB)  \
+	$(UNIXROOT)/usr/lib/GBM/gbmhist$(SUFF_LIB)  \
+	$(UNIXROOT)/usr/lib/GBM/gbmht$(SUFF_LIB)    \
+	$(UNIXROOT)/usr/lib/GBM/gbmmcut$(SUFF_LIB)  \
+	$(UNIXROOT)/usr/lib/GBM/gbmmem$(SUFF_LIB)   \
+	$(UNIXROOT)/usr/lib/GBM/gbmmir$(SUFF_LIB)   \
+	$(UNIXROOT)/usr/lib/GBM/gbmmthrd$(SUFF_LIB) \
+	$(UNIXROOT)/usr/lib/GBM/gbmrect$(SUFF_LIB)  \
+	$(UNIXROOT)/usr/lib/GBM/gbmscale$(SUFF_LIB)  \
+	$(UNIXROOT)/usr/lib/GBM/gbmtool$(SUFF_LIB)   \
+	$(UNIXROOT)/usr/lib/GBM/gbmtrunc$(SUFF_LIB)  \
+#	U:\PMPrintf\PMPRINTF.LIB
+	
+include $(FILE_KBUILD_SUB_FOOTER)

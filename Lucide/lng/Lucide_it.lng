@@ -1,5 +1,5 @@
 #
-# Lucide language file, IT (1.3.5)
+# Lucide language file, IT (1.5.0)
 #
 
 #
@@ -15,7 +15,10 @@ MENU_NEXT=Prossimo\tShift+PgDn
 MENU_LAST=Ultimo\tShift+End
 MENU_RECENT_FILES=~Files recenti
 MENU_CLEAR_LIST=~Cancella lista
-MENU_SAVE_AS=~Salva come...
+MENU_BACK=~Back\tCtrl+B
+MENU_BACKNAV=Last lin~k origin\tCtrl+K
+MENU_SAVE=~Save...\tCtrl+S
+MENU_SAVE_AS=~Salva come...\tCtrl+A
 MENU_CLOSE=~Chiudi
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Impostazioni pa~gina...
@@ -47,11 +50,15 @@ MENU_CONTINUOUS=Pagina ~continua
 MENU_DOCUMENT_INFO=In~formazioni documento...\tCtrl+I
 MENU_FONTS_INFO=Informazioni ~tipi di carattere...
 MENU_WINDOW=~Finestra
-MENU_SHOW_NAV_PANE=Mostra il pannello di ~navigazione
+MENU_SHOW_NAV_PANE=Mostra il pannello di ~navigazione\tF9
 MENU_FULLSCREEN=Schermo ~intero\tF11
 MENU_PRESENTATION=~Presentazione\tF5
 MENU_HELP=A~iuto
 MENU_PRODUCT_INFORMATION=Informazioni sul prodotto
+MENU_HELP_CONTENTS=~Contents\tF1
+MENU_HELP_KEYS=~Keys help
+MENU_HELP_PDF=P~DF file help
+MENU_HELP_IMAGES=~Image file help
 
 #
 # Toolbar hints
@@ -69,6 +76,7 @@ TBHINT_FIT_WIDTH=Adatta alla larghezza
 TBHINT_FIND=Cerca nel documento
 TBHINT_FINDAGAIN=Cerca ancora
 TBHINT_ZOOM_IN_OUT=Ingrandisci/rimpicciolisci
+TBHINT_BACK=Return to last link origin
 # toolbar's page number
 TB_PAGENUM=di %d
 
@@ -79,6 +87,7 @@ MSGS_MAIN_WIN_TITLE=%APPNAME%
 MSGS_NO_SUIT_PLUG=Impossibile trovare un plugin adatto al tipo di documento selezionato!
 MSGS_FILE_LOAD_ERROR=Errore di apertura file!
 MSGS_LOADING_DOCUMENT=Apertura documento, attendere...
+MSGS_CREATING_THUMBNAIL=Creating thumbnail for document, please wait...
 MSGS_WARNING=Attenzione!
 MSGS_OVERWRITE_FILE=Il file esiste gi…. Sovrascrivere?
 MSGS_FILE_SAVE_ERROR=Errore salvataggio file!
@@ -86,6 +95,11 @@ MSGS_PAGE=Pagina
 MSGS_ERROR_STARTING_BROWSER=Errore di scorrimento file!
 MSGS_CLOSE_MODIFIED_DOCUMENT=Il documento Š stato modificato. Vuoi salvare?
 MSGS_FILE_COPY_SUFFIX=%s Copia
+MSGS_TEMP_FILE_LOAD_ERROR=Temp file load error!     
+MSGS_TEMP_FILE_SAVE_ERROR=Error saving temp file!   
+MSGS_NO_TEMP_DIR_ERROR=No temporary directory found!
+MSGS_NO_PRINTER_FOUND_ERROR=No printers found!
+MSGS_HELP_INSTANCE_FAILED=WinCreateHelpInstance failed!      
 
 MSGS_LDERR=File load error: %s!
 MSGS_LDERR_OUT_OF_MEMORY=Memoria esaurita
@@ -98,6 +112,12 @@ MSGS_LDERR_ENCRYPTED=Il file Š cifrato
 MSGS_RERR_OUT_OF_MEMORY=Memoria esaurita
 MSGS_RERR_CORRUPTED_PAGE_DATA=Pagina dati corrotta
 MSGS_RERR_FONT_NOT_FOUND=Font %s non trovato
+
+#
+# Help button for all dialogs 
+#
+
+DIALOG_HELP=~Help
 
 #
 # "Plugins list" dialog
@@ -119,6 +139,7 @@ FONTINFO_ENUMERATING=Caricamento font, attendere...
 FONTINFO_NAME=Nome
 FONTINFO_TYPE=Tipo
 FONTINFO_EMBEDDED=Incorporato?
+FONTINFO_SUBNAME=Substitute Font
 # Embedded types
 FONTINFO_EMBED_NOT_EMBEDDED=Non incorporato
 FONTINFO_EMBED_EMBEDDED=Incorporato
@@ -139,6 +160,7 @@ DOCINFO_CREATOR=Creatore:
 DOCINFO_PRODUCER=Prodotto:
 DOCINFO_CREATION_DATE=Creato:
 DOCINFO_MOD_DATE=Modificato:
+DOCINFO_NAME=Document:
 
 #
 # "Find" dialog
@@ -146,6 +168,7 @@ DOCINFO_MOD_DATE=Modificato:
 FIND_FIND=Trova
 FIND_FIND_WHAT=~Trova
 FIND_MATCH_CASE=~Corrispondenza esatta
+FIND_BACK=Find ~Backwards
 FIND_OK=~OK
 FIND_CANCEL=A~nnulla
 # other 'find'-related messages
@@ -174,6 +197,7 @@ SD_DEFAULT_PAGE_LAYOUT=Im~paginazione predefinita
 SD_DEFAULT_ZOOM=Valore di ~ingrandimento predefinito
 SD_SINGLE_PAGE=Pagina singola
 SD_CONTINUOUS=Continua
+SD_THUMBNAIL=~Make thumbnails
 SD_OK=~OK
 SD_CANCEL=A~nnulla
 
@@ -196,6 +220,7 @@ PD_JOB_PROPERTIES=P~ropriet… di stampa
 PD_DRIVER_LABEL=Driver
 PD_PRINT_RANGE_AND_COPIES=~Intervallo di stampa e copie
 PD_RANGE_ALL=~Tutto
+PD_REVESE_PRINT=Re~verse
 PD_RANGE_CURRENT_PAGE=Pa~gina corrente
 PD_RANGE_PAGES=~Pagine
 PD_FROM=~Da
@@ -207,6 +232,7 @@ PD_RANGE_ODD=Solo pagine dispari
 PD_RANGE_EVEN=Solo pagine pari
 PD_PRINT_TYPE=Tipo di stampa
 PD_TYPE_POSTSCRIPT=Post~script
+PD_PRINT_TO_FILE=Print to ~file
 PD_TYPE_ASIMAGE=Come ~immagine
 PD_HIGHER_IMAGE_QUALITY=Immagine ad alta ~qualit… (stampa lenta, richiede molta memoria)
 PD_PAGE_ORIENTATION=Orientamento pagina
@@ -249,3 +275,10 @@ FDLG_OK=~OK
 FDLG_CANCEL=~Annulla
 FDLG_NO_PREVIEW_AVAILABLE=Anteprima non disponibile
 FDLG_ALL_SUPPORTED_TYPES=<Tutti i tipi supportati>
+FDLG_ALL_FILES=<All files>
+FDLG_THUMBNAIL=~Make thumbnail
+
+#
+# Help file title
+#
+HLP_TITLE=Lucide User's Guide

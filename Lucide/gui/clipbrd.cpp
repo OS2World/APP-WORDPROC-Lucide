@@ -151,7 +151,7 @@ void textToClipbrd( HAB hab, const char *text )
                 unsigned ulen_tmp = ( unilen + liglen + 1 ) * sizeof( UniChar );
                 char *uni_tmp = new char[ ulen_tmp ];
                 uniReplaceLigatures( (UniChar *)memuni, (UniChar *)uni_tmp );
-                delete memuni;
+                delete[] memuni;
                 memuni = uni_tmp;
                 unilen = UniStrlen( (UniChar *)memuni );
             }
@@ -173,7 +173,7 @@ void textToClipbrd( HAB hab, const char *text )
                     WinSetClipbrdData( hab, (ULONG)shmemsys, CF_TEXT, CFI_POINTER );
                 }
             }
-            delete memuni;
+            delete[] memuni;
         }
 
         if ( uclipLoaded ) {

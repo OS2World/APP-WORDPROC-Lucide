@@ -10,12 +10,13 @@ include $(KBUILD_PATH)/subheader.kmk
 DLLS		+= Lucide_dll
 PROGRAMS	+= Lucide
 INSTALLS	+= Lucide_lng
+INSTALLS	+= Lucide_symbols
 
 #
 # Lucide DLL
 #
 Lucide_dll_TEMPLATE	 = SomDll
-Lucide_dll_NAME		 = Lucide
+Lucide_dll_NAME		 = Lucide1
 Lucide_dll_INCS		 = \
 	os2tk                                                                     \
 	lupoppler                                                                 \
@@ -23,6 +24,7 @@ Lucide_dll_INCS		 = \
 Lucide_dll_CXXFLAGS	 = -DVERSION="\"$(VERSION)\"" -DBUILD=\""$(BUILD)\"" -DVERSIONDATE="\"$(VERSIONDATE)\""
 Lucide_dll_DEFS.debug	 = __TEST__
 Lucide_dll_SOURCES	 = \
+        lucide1.def                                                                \
 	lucide.cpp                                                                \
 	luutils.cpp                                                               \
 	clipbrd.cpp                                                               \
@@ -53,10 +55,14 @@ Lucide_dll_SOURCES	 = \
 	recent.cpp                                                                \
 	lcdfdlg.cpp                                                               \
 	Lucide.rc
-Lucide_dll_LIBPATH	 = $(PATH_STAGE_LIB)
+Lucide_dll_LIBPATH	 = $(PATH_STAGE_LIB) \
+	$(LIB_POPPLER_LIBS) \
+	$(UNIXROOT)/usr/lib
 Lucide_dll_LIBS		 = \
-	ludoc.lib
-
+	ludoc.lib \
+	libcx.a  \
+#	U:\PMPrintf\PMPRINTF.LIB
+	
 Lucide.rc_DEPS = dialogs.rc
 
 #
@@ -66,7 +72,9 @@ Lucide_TEMPLATE	 = LucideC-PM
 Lucide_INCS		 =
 Lucide_CFLAGS	 = -DVERSION="\"$(VERSION)\""
 Lucide_DEFS.debug	 = __TEST__
-Lucide_SOURCES	 = lcd.c lcd.rc
+Lucide_SOURCES	 = lcd.def lcd.c lcd.rc
+Lucide_LIBPATH   = $(UNIXROOT)/usr/lib
+Lucide_LIBS      = libcx.a
 
 #
 # Lucide language files
@@ -74,5 +82,11 @@ Lucide_SOURCES	 = lcd.c lcd.rc
 Lucide_lng_INST		 = $(INST_BIN)
 Lucide_lng_SOURCES	:= $(wildcard $(PATH_SUB_CURRENT)/../lng/*.lng)
 
-include $(FILE_KBUILD_SUB_FOOTER)
+#
+# Lucide symbol files
+#
+Lucide_symbols_INST	 = $(INST_BIN)
+Lucide_symbols_SOURCES	 = $(wildcard $(PATH_OBJ)/*/*.sym) \
+			   $(wildcard $(PATH_OBJ)/*/*.xqs)
 
+include $(FILE_KBUILD_SUB_FOOTER)

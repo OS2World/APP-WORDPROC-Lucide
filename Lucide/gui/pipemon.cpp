@@ -40,7 +40,9 @@
 
 #include "Lucide_res.h"
 
-
+//#define INCL_EXCEPTQ_CLASS
+//#define INCL_LOADEXCEPTQ
+//#include "exceptq.h"
 static const char *pipeName    = "\\PIPE\\LUCIDE";
 
 // Commands
@@ -56,6 +58,7 @@ static const char *cmZoomOrig     = "$zoomoriginal";
 
 static void pipeMonitor( void *p )
 {
+    //ScopedExceptqLoader sel;
     HWND hWndFrame = (HWND)p;
 
     HAB thab = WinInitialize( 0 );

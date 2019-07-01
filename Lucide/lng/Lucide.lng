@@ -1,5 +1,5 @@
 #
-# Lucide language file, EN (1.3.5)
+# Lucide language file, EN (1.5.0)
 #
 
 #
@@ -9,13 +9,16 @@ MENU_DOCUMENT=~Document
 MENU_NEW_WINDOW=~New window
 MENU_OPEN=~Open...\tCtrl+O
 MENU_NEXT_PREVIOUS=Next/Pre~vious
-MENU_FIRST=First\tShift+Home
-MENU_PREVIOUS=Previous\tShift+PgUp
-MENU_NEXT=Next\tShift+PgDn
-MENU_LAST=Last\tShift+End
+MENU_FIRST=~First\tCtrl+Shift+Home
+MENU_PREVIOUS=~Previous\tCtrl+Shift+PgUp
+MENU_NEXT=~Next\tCtrl+Shift+PgDn
+MENU_LAST=~Last\tCtrl+Shift+End
 MENU_RECENT_FILES=~Recent files
 MENU_CLEAR_LIST=~Clear list
-MENU_SAVE_AS=~Save As...
+MENU_BACK=Last lin~k origin\tCtrl+K
+MENU_BACKNAV=Last lin~k origin\tCtrl+K
+MENU_SAVE=~Save...\tCtrl+S
+MENU_SAVE_AS=Save ~as...\tCtrl+A
 MENU_CLOSE=~Close
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Pa~ge setup...
@@ -35,10 +38,10 @@ MENU_FIT_WIDTH=Fit ~width\tCtrl+2
 # - unused - MENU_ZOOM_IN_OUT=~Zoom in/out
 MENU_ZOOM_IN=Zoom in\tCtrl++
 MENU_ZOOM_OUT=Zoom out\tCtrl+-
-MENU_FIRST_PAGE=~First page
+MENU_FIRST_PAGE=~First page\tHome
 MENU_PREV_PAGE=~Previous page\t-
 MENU_NEXT_PAGE=~Next page\t+
-MENU_LAST_PAGE=~Last page
+MENU_LAST_PAGE=~Last page\tEnd
 MENU_GO_TO_PAGE=~Go to page...\tCtrl+N
 MENU_ROTATE_CW=~Rotate 90ø CW\tCtrl+Shift++
 MENU_ROTATE_CCW=Rotate 90ø ~CCW\tCtrl+Shift+-
@@ -47,11 +50,15 @@ MENU_CONTINUOUS=C~ontinuous
 MENU_DOCUMENT_INFO=~Document info...\tCtrl+I
 MENU_FONTS_INFO=Fonts ~info...
 MENU_WINDOW=~Window
-MENU_SHOW_NAV_PANE=~Show navigation pane
+MENU_SHOW_NAV_PANE=~Show navigation pane\tF9
 MENU_FULLSCREEN=~Full screen\tF11
 MENU_PRESENTATION=~Presentation\tF5
 MENU_HELP=~Help
-MENU_PRODUCT_INFORMATION=~Product Information
+MENU_PRODUCT_INFORMATION=~Product information
+MENU_HELP_CONTENTS=~Contents\tF1
+MENU_HELP_KEYS=~Keys help
+MENU_HELP_PDF=P~DF file help
+MENU_HELP_IMAGES=~Image file help
 
 #
 # Toolbar hints
@@ -69,6 +76,7 @@ TBHINT_FIT_WIDTH=Fit width
 TBHINT_FIND=Find...
 TBHINT_FINDAGAIN=Find again
 TBHINT_ZOOM_IN_OUT=Zoom in/out
+TBHINT_BACK=Return to last link origin
 # toolbar's page number
 TB_PAGENUM=of %d
 
@@ -81,12 +89,17 @@ MSGS_FILE_LOAD_ERROR=File load error!
 MSGS_LOADING_DOCUMENT=Loading document, please wait...
 MSGS_CREATING_THUMBNAIL=Creating thumbnail for document, please wait...
 MSGS_WARNING=Warning!
-MSGS_OVERWRITE_FILE=File already exist. Overwrite?
+MSGS_OVERWRITE_FILE=File already exists. Overwrite?
 MSGS_FILE_SAVE_ERROR=Error saving file!
 MSGS_PAGE=Page
 MSGS_ERROR_STARTING_BROWSER=Error starting browser!
 MSGS_CLOSE_MODIFIED_DOCUMENT=Document has been modified. Save?
 MSGS_FILE_COPY_SUFFIX=%s Copy
+MSGS_TEMP_FILE_LOAD_ERROR=Temp file load error!
+MSGS_TEMP_FILE_SAVE_ERROR=Error saving temp file!
+MSGS_NO_TEMP_DIR_ERROR=No temporary directory found! 
+MSGS_NO_PRINTER_FOUND_ERROR=No printers found!
+MSGS_HELP_INSTANCE_FAILED=WinCreateHelpInstance failed!
 
 MSGS_LDERR=File load error: %s!
 MSGS_LDERR_OUT_OF_MEMORY=Out of memory
@@ -99,6 +112,12 @@ MSGS_LDERR_ENCRYPTED=File is encrypted
 MSGS_RERR_OUT_OF_MEMORY=Out of memory
 MSGS_RERR_CORRUPTED_PAGE_DATA=Corrupted page data
 MSGS_RERR_FONT_NOT_FOUND=Font %s not found
+
+#
+# Help button for all dialogs 
+#
+
+DIALOG_HELP=~Help
 
 #
 # "Plugins list" dialog
@@ -120,6 +139,7 @@ FONTINFO_ENUMERATING=Enumerating fonts, please wait...
 FONTINFO_NAME=Name
 FONTINFO_TYPE=Type
 FONTINFO_EMBEDDED=Embedded?
+FONTINFO_SUBNAME=Substitute Font
 # Embedded types
 FONTINFO_EMBED_NOT_EMBEDDED=Not embedded
 FONTINFO_EMBED_EMBEDDED=Embedded
@@ -140,13 +160,13 @@ DOCINFO_CREATOR=Creator:
 DOCINFO_PRODUCER=Producer:
 DOCINFO_CREATION_DATE=Created:
 DOCINFO_MOD_DATE=Modified:
-DOCINFO_NAME=Documentname:
+DOCINFO_NAME=Document:
 
 #
 # "Find" dialog
 #
 FIND_FIND=Find
-FIND_FIND_WHAT=~Find what
+FIND_FIND_WHAT=~Find what?
 FIND_MATCH_CASE=~Match case
 FIND_BACK=Find ~Backwards
 FIND_OK=~OK
@@ -166,7 +186,7 @@ PDLG_CANCEL=~Cancel
 #
 AD_ABOUT=About
 AD_DESCRIPTION=Plugin-based document viewer with support for various file formats
-AD_COPYRIGHTS=(c) Eugene Romanenko, Dmitriy Kuminov, Silvan Scherrer, bww bitwise works GmbH in co-operation with Mensys
+AD_COPYRIGHTS=(c) 2016 netlabs.org in cooperation with Arca Noae, LLC, formerly (c): Eugene Romanenko, Dmitriy Kuminov, Silvan Scherrer, bww bitwise works GmbH in cooperation with Mensys
 AD_OK=~OK
 
 #
@@ -177,6 +197,7 @@ SD_DEFAULT_PAGE_LAYOUT=Default ~Page Layout
 SD_DEFAULT_ZOOM=Default ~Zoom
 SD_SINGLE_PAGE=Single page
 SD_CONTINUOUS=Continuous
+SD_THUMBNAIL=~Make thumbnails
 SD_OK=~OK
 SD_CANCEL=~Cancel
 
@@ -197,45 +218,46 @@ PD_PRINTER=Printer
 PD_NAME_LABEL=~Name
 PD_JOB_PROPERTIES=~Job properties
 PD_DRIVER_LABEL=Driver
-PD_PRINT_RANGE_AND_COPIES=Print ~range and copies
+PD_PRINT_RANGE_AND_COPIES=Print range and copies
 PD_RANGE_ALL=~All
+PD_REVESE_PRINT=Re~verse
 PD_RANGE_CURRENT_PAGE=C~urrent page
 PD_RANGE_PAGES=Pa~ges
 PD_FROM=~From
 PD_TO=~To
-PD_NUMBER_OF_COPIES=Number of ~copies
-PD_RANGE_EVEN_ODD_LABEL=Print range
+PD_NUMBER_OF_COPIES=Number of copi~es
+PD_RANGE_EVEN_ODD_LABEL=Print ~range
 PD_RANGE_EVEN_ODD=Even and Odd pages
 PD_RANGE_ODD=Odd pages only
 PD_RANGE_EVEN=Even pages only
 PD_PRINT_TYPE=Print type
-PD_TYPE_POSTSCRIPT=Post~script
-PD_PRINT_TO_FILE=Print to file
+PD_TYPE_POSTSCRIPT=Post~Script
+PD_PRINT_TO_FILE=Print to ~file
 PD_TYPE_ASIMAGE=As ~image
-PD_HIGHER_IMAGE_QUALITY=~Higher image quality (slower and require more memory)
+PD_HIGHER_IMAGE_QUALITY=Higher image ~quality (slower and require more memory)
 PD_PAGE_ORIENTATION=Page orientation
-PD_PORTRAIT=Portrait
-PD_LANDSCAPE=Landscape
+PD_PORTRAIT=P~ortrait
+PD_LANDSCAPE=~Landscape
 PD_MARGINS=Margins (mm)
-PD_IGNORE_PRINTER_MARGINS=Ignore printer margins
+PD_IGNORE_PRINTER_MARGINS=Ignore printer ~margins
 PD_MLEFT=Left
 PD_MRIGHT=Right
 PD_MTOP=Top
 PD_MBOTTOM=Bottom
 PD_SELECTED_FORM=Selected form
 PD_BTNPRINT=~Print
-PD_BTNCANCEL=Cancel
-PD_WRONG_MARGINS=Wrong margins!
+PD_BTNCANCEL=~Cancel
+PD_WRONG_MARGINS=Invalid margins!
 # other 'print'-related messages
 PRINT_PRINTING_PAGE_OF=Printing page %d (%d of %d)...
-PRINT_GENERATING_POSTSCRIPT=Generating postscript file...
-PRINT_SPOOLING_POSTSCRIPT=Spooling postscript data...
+PRINT_GENERATING_POSTSCRIPT=Generating PostScript file...
+PRINT_SPOOLING_POSTSCRIPT=Spooling PostScript data...
 PRINT_FAILED=Print failed!
 
 #
 # Password dialog
 #
-PSW_TITLE=Document is encrypted!
+PSW_TITLE=Document is encrypted
 PSW_PASSWORD=~Password
 PSW_OK=~OK
 PSW_CANCEL=~Cancel
@@ -253,3 +275,10 @@ FDLG_OK=~OK
 FDLG_CANCEL=~Cancel
 FDLG_NO_PREVIEW_AVAILABLE=No preview available
 FDLG_ALL_SUPPORTED_TYPES=<All supported types>
+FDLG_ALL_FILES=<All files>
+FDLG_THUMBNAIL=~Make thumbnail
+
+#
+# Help file title
+#
+HLP_TITLE=Lucide User's Guide

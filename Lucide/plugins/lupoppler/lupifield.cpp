@@ -62,7 +62,7 @@ SOM_Scope void SOMLINK init_widget(LuPopplerInputField *somSelf,
                                    LuPopplerDocument* aDoc, long aPagenum,
                                    Page* aPage, FormWidget* aFormWidget)
 {
-    LuPopplerInputFieldData *somThis; /* set in BeginInitializer */
+    LuPopplerInputFieldData *somThis = NULL; /* set in BeginInitializer */
     somInitCtrl globalCtrl;
     somBooleanVector myMask;
     LuPopplerInputField_BeginInitializer_init_widget;
@@ -85,7 +85,7 @@ SOM_Scope void SOMLINK init_widget(LuPopplerInputField *somSelf,
 SOM_Scope void SOMLINK somDestruct(LuPopplerInputField *somSelf,
                                    octet doFree, som3DestructCtrl* ctrl)
 {
-    LuPopplerInputFieldData *somThis; /* set in BeginDestructor */
+    LuPopplerInputFieldData *somThis = NULL; /* set in BeginDestructor */
     somDestructCtrl globalCtrl;
     somBooleanVector myMask;
     LuPopplerInputField_BeginDestructor;
@@ -145,14 +145,6 @@ SOM_Scope unsigned long  SOMLINK getID(LuPopplerInputField *somSelf,
     LuPopplerInputFieldData *somThis = LuPopplerInputFieldGetData(somSelf);
 
     return somThis->widget->getID();
-}
-
-SOM_Scope boolean  SOMLINK isModified(LuPopplerInputField *somSelf,
-                                       Environment *ev)
-{
-    LuPopplerInputFieldData *somThis = LuPopplerInputFieldGetData(somSelf);
-
-    return somThis->widget->isModified();
 }
 
 SOM_Scope boolean  SOMLINK isReadOnly(LuPopplerInputField *somSelf,

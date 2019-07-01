@@ -44,6 +44,11 @@
 #include "Lucide_res.h"
 #include "messages.h"
 #include "cpconv.h"
+#include "Lucide.h"
+
+//#define INCL_EXCEPTQ_CLASS
+//#define INCL_LOADEXCEPTQ
+//#include "exceptq.h"
 
 
 FontsInfoDlg::FontsInfoDlg( HWND hWndFrame, LuDocument *_doc )
@@ -55,6 +60,7 @@ FontsInfoDlg::FontsInfoDlg( HWND hWndFrame, LuDocument *_doc )
     name       = newstrdupL( FONTINFO_NAME );
     type       = newstrdupL( FONTINFO_TYPE );
     embed      = newstrdupL( FONTINFO_EMBEDDED );
+    subname    = newstrdupL( FONTINFO_SUBNAME );
     emb_notembedded    = newstrdupL( FONTINFO_EMBED_NOT_EMBEDDED );
     emb_embedded       = newstrdupL( FONTINFO_EMBED_EMBEDDED );
     emb_embeddedsubset = newstrdupL( FONTINFO_EMBED_EMBEDDED_SUBSET );
@@ -65,6 +71,7 @@ FontsInfoDlg::~FontsInfoDlg()
     delete name;
     delete type;
     delete embed;
+    delete subname;
     delete emb_notembedded;
     delete emb_embedded;
     delete emb_embeddedsubset;
@@ -83,6 +90,7 @@ struct ListRec
     MINIRECORDCORE miniRecordCore;
     PSZ type;
     PSZ embed;
+    PSZ subname;
 };
 
 
@@ -118,7 +126,8 @@ void FontsInfoDlg::loadList()
                     r->embed = newstrdup( emb_embeddedsubset );
                     break;
             }
-
+            r->subname = newstrdup( fonts->_buffer[i].subname );
+            
             RECORDINSERT ri;
             ri.cb = sizeof( RECORDINSERT );
             ri.pRecordParent= NULL;
@@ -135,7 +144,9 @@ void FontsInfoDlg::loadList()
 
 void FontsInfoDlg::loadthread( void *p )
 {
+    //ScopedExceptqLoader sel;
     FontsInfoDlg *_this = (FontsInfoDlg *)p;
+
     HAB thab = WinInitialize( 0 );
     HMQ thmq = WinCreateMsgQueue( thab, 0 );
 
@@ -161,6 +172,10 @@ static bool addPropToString( HWND hwndCntr, PRECORDCORE pRec, void *pUser )
     *str += rec->type;
     *str += " | ";
     *str += rec->embed;
+    if ( rec->subname ) {
+    *str += " | ";
+    *str += rec->subname;
+    }
     return true;
 }
 
@@ -207,30 +222,36 @@ MRESULT EXPENTRY FontsInfoDlg::fontsInfoDlgProc( HWND hwnd, ULONG msg, MPARAM mp
             WinSendMsg( _this->hContainer, CM_SETCNRINFO, MPFROMP( &ci ), MPFROMLONG( CMA_FLWINDOWATTR ) );
 
             PFIELDINFO pFieldInfo = (PFIELDINFO)WinSendMsg( _this->hContainer, CM_ALLOCDETAILFIELDINFO,
-                                             MPFROMSHORT( 3 ), MPVOID );
+                                             MPFROMSHORT( 4 ), MPVOID );
             PFIELDINFO pFldInfo = pFieldInfo;
             pFldInfo->cb = sizeof( FIELDINFO );
             pFldInfo->flData = CFA_STRING | CFA_HORZSEPARATOR | CFA_SEPARATOR;
-            pFldInfo->flTitle = CFA_CENTER;
+            pFldInfo->flTitle = CFA_LEFT;
             pFldInfo->pTitleData = (PVOID)_this->name;
             pFldInfo->offStruct = FIELDOFFSET( ListRec, miniRecordCore.pszIcon );
             pFldInfo = pFldInfo->pNextFieldInfo;
             pFldInfo->cb = sizeof( FIELDINFO );
             pFldInfo->flData = CFA_STRING | CFA_HORZSEPARATOR | CFA_SEPARATOR;
-            pFldInfo->flTitle = CFA_CENTER;
+            pFldInfo->flTitle = CFA_LEFT;
             pFldInfo->pTitleData = (PVOID)_this->type;
             pFldInfo->offStruct = FIELDOFFSET( ListRec, type );
             pFldInfo = pFldInfo->pNextFieldInfo;
             pFldInfo->cb = sizeof( FIELDINFO );
             pFldInfo->flData = CFA_STRING | CFA_HORZSEPARATOR | CFA_SEPARATOR;
-            pFldInfo->flTitle = CFA_CENTER;
+            pFldInfo->flTitle = CFA_LEFT;
             pFldInfo->pTitleData = (PVOID)_this->embed;
             pFldInfo->offStruct = FIELDOFFSET( ListRec, embed );
+            pFldInfo = pFldInfo->pNextFieldInfo;
+            pFldInfo->cb = sizeof( FIELDINFO );
+            pFldInfo->flData = CFA_STRING | CFA_HORZSEPARATOR | CFA_SEPARATOR;
+            pFldInfo->flTitle = CFA_LEFT;
+            pFldInfo->pTitleData = (PVOID)_this->subname;
+            pFldInfo->offStruct = FIELDOFFSET( ListRec, subname );
 
             FIELDINFOINSERT fieldInfoInsert;
             fieldInfoInsert.cb = sizeof( FIELDINFOINSERT );
             fieldInfoInsert.pFieldInfoOrder = (PFIELDINFO)CMA_FIRST;
-            fieldInfoInsert.cFieldInfoInsert = 3;
+            fieldInfoInsert.cFieldInfoInsert = 4;
             fieldInfoInsert.fInvalidateFieldInfo = TRUE;
             WinSendMsg( _this->hContainer, CM_INSERTDETAILFIELDINFO,
                         MPFROMP( pFieldInfo ), MPFROMP( &fieldInfoInsert ) );
@@ -251,6 +272,7 @@ MRESULT EXPENTRY FontsInfoDlg::fontsInfoDlgProc( HWND hwnd, ULONG msg, MPARAM mp
                 delete pr->miniRecordCore.pszIcon;
                 delete pr->type;
                 delete pr->embed;
+                delete pr->subname;
                 pr = (ListRec *)WinSendMsg( _this->hContainer, CM_QUERYRECORD,
                                     MPFROMP( pr ), MPFROM2SHORT( CMA_NEXT, CMA_ITEMORDER ) );
             }
@@ -283,6 +305,12 @@ MRESULT EXPENTRY FontsInfoDlg::fontsInfoDlgProc( HWND hwnd, ULONG msg, MPARAM mp
                     enumCntrRecords( cntr, selectProp, NULL );
                 }
                 return (MRESULT)FALSE;
+
+                case CM_HELP:
+                  if (Lucide::hwndHelp)
+                      WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                 MPFROM2SHORT(116, 0), MPFROMSHORT(HM_RESOURCEID));
+                  return (MRESULT)FALSE;
 
                 default:
                     break;

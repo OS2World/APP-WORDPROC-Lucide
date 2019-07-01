@@ -51,6 +51,7 @@ const char *TBHINT_FIT_WIDTH     = "TBHINT_FIT_WIDTH";
 const char *TBHINT_FIND          = "TBHINT_FIND";
 const char *TBHINT_FINDAGAIN     = "TBHINT_FINDAGAIN";
 const char *TBHINT_ZOOM_IN_OUT   = "TBHINT_ZOOM_IN_OUT";
+const char *TBHINT_BACK          = "TBHINT_BACK";
 // toolbar's page number
 const char *TB_PAGENUM           = "TB_PAGENUM";
 
@@ -68,6 +69,11 @@ const char *MSGS_PAGE                     = "MSGS_PAGE";
 const char *MSGS_ERROR_STARTING_BROWSER   = "MSGS_ERROR_STARTING_BROWSER";
 const char *MSGS_CLOSE_MODIFIED_DOCUMENT  = "MSGS_CLOSE_MODIFIED_DOCUMENT";
 const char *MSGS_FILE_COPY_SUFFIX         = "MSGS_FILE_COPY_SUFFIX";
+const char *MSGS_TEMP_FILE_LOAD_ERROR     = "MSGS_TEMP_FILE_LOAD_ERROR";
+const char *MSGS_TEMP_FILE_SAVE_ERROR     = "MSGS_TEMP_FILE_SAVE_ERROR";
+const char *MSGS_NO_TEMP_DIR_ERROR        = "MSGS_NO_TEMP_DIR_ERROR";
+const char *MSGS_NO_PRINTER_FOUND_ERROR   = "MSGS_NO_PRINTER_FOUND_ERROR";
+const char *MSGS_HELP_INSTANCE_FAILED     = "MSGS_HELP_INSTANCE_FAILED";
 
 const char *MSGS_LDERR                    = "MSGS_LDERR";
 const char *MSGS_LDERR_OUT_OF_MEMORY      = "MSGS_LDERR_OUT_OF_MEMORY";
@@ -95,6 +101,7 @@ const char *PLUGLIST_PLUGIN_DESC = "PLUGLIST_PLUGIN_DESC";
 const char *FONTINFO_NAME     = "FONTINFO_NAME";
 const char *FONTINFO_TYPE     = "FONTINFO_TYPE";
 const char *FONTINFO_EMBEDDED = "FONTINFO_EMBEDDED";
+const char *FONTINFO_SUBNAME  = "FONTINFO_SUBNAME";
 // 'Fonts Info' Embedded types
 const char *FONTINFO_EMBED_NOT_EMBEDDED    = "FONTINFO_EMBED_NOT_EMBEDDED";
 const char *FONTINFO_EMBED_EMBEDDED        = "FONTINFO_EMBED_EMBEDDED";
@@ -134,3 +141,6 @@ const char *PRINT_FAILED                = "PRINT_FAILED";
 // Open file dialog
 const char *FDLG_NO_PREVIEW_AVAILABLE = "FDLG_NO_PREVIEW_AVAILABLE";
 const char *FDLG_ALL_SUPPORTED_TYPES  = "FDLG_ALL_SUPPORTED_TYPES";
+
+// Help file title
+const char *HLP_TITLE = "HLP_TITLE";

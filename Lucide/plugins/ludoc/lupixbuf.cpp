@@ -65,7 +65,7 @@ SOM_Scope void SOMLINK LuPixbufInit(LuPixbuf *somSelf,  Environment *ev,
                                     long h, short bpp)
 {
     APIRET rc = 0;
-    LuPixbufData *somThis;
+    LuPixbufData *somThis = NULL;
     somInitCtrl globalCtrl;
     somBooleanVector myMask;
     LuPixbuf_BeginInitializer_LuPixbufInit;
@@ -148,7 +148,7 @@ SOM_Scope void  SOMLINK putAt(LuPixbuf *somSelf,  Environment *ev,
 SOM_Scope void SOMLINK somDestruct(LuPixbuf *somSelf, octet doFree,
                                    som3DestructCtrl* ctrl)
 {
-    LuPixbufData *somThis;
+    LuPixbufData *somThis = NULL;
     somDestructCtrl globalCtrl;
     somBooleanVector myMask;
     LuPixbuf_BeginDestructor;

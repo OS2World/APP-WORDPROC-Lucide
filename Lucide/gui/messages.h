@@ -53,6 +53,7 @@ extern const char *TBHINT_FIT_WIDTH;
 extern const char *TBHINT_FIND;
 extern const char *TBHINT_FINDAGAIN;
 extern const char *TBHINT_ZOOM_IN_OUT;
+extern const char *TBHINT_BACK;
 // toolbar's page number
 extern const char *TB_PAGENUM;
 
@@ -69,6 +70,11 @@ extern const char *MSGS_PAGE;
 extern const char *MSGS_ERROR_STARTING_BROWSER;
 extern const char *MSGS_CLOSE_MODIFIED_DOCUMENT;
 extern const char *MSGS_FILE_COPY_SUFFIX;
+extern const char *MSGS_TEMP_FILE_LOAD_ERROR;
+extern const char *MSGS_TEMP_FILE_SAVE_ERROR;
+extern const char *MSGS_NO_TEMP_DIR_ERROR;
+extern const char *MSGS_NO_PRINTER_FOUND_ERROR;
+extern const char *MSGS_HELP_INSTANCE_FAILED;
 
 extern const char *MSGS_LDERR;
 extern const char *MSGS_LDERR_OUT_OF_MEMORY;
@@ -96,6 +102,7 @@ extern const char *PLUGLIST_PLUGIN_DESC;
 extern const char *FONTINFO_NAME;
 extern const char *FONTINFO_TYPE;
 extern const char *FONTINFO_EMBEDDED;
+extern const char *FONTINFO_SUBNAME;
 // 'Fonts Info' Embedded types
 extern const char *FONTINFO_EMBED_NOT_EMBEDDED;
 extern const char *FONTINFO_EMBED_EMBEDDED;
@@ -135,6 +142,9 @@ extern const char *PRINT_FAILED;
 // Open file dialog
 extern const char *FDLG_NO_PREVIEW_AVAILABLE;
 extern const char *FDLG_ALL_SUPPORTED_TYPES;
+
+// Help file title
+extern const char *HLP_TITLE;
 
 
 #endif // __MESSAGES_H

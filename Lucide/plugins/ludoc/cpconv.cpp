@@ -161,7 +161,7 @@ extern "C" char *APIENTRY uniConvertString( const char *s, size_t len, UconvObje
         size_t ulen_tmp = ( unilen + liglen + 1 ) * sizeof( UniChar );
         char *uni_tmp = new char[ ulen_tmp ];
         uniReplaceLigatures( unibuf, (UniChar *)uni_tmp );
-        delete unibuf;
+        delete[] unibuf;
         unibuf = (UniChar *)uni_tmp;
         unilen = UniStrlen( unibuf );
     }
@@ -176,7 +176,7 @@ extern "C" char *APIENTRY uniConvertString( const char *s, size_t len, UconvObje
     tmpuni = unibuf;
     cSubs = 0;
     UniUconvFromUcs( to, &tmpuni, &unilen, (void **)&b, &blen, &cSubs );
-    delete unibuf;
+    delete[] unibuf;
 
     // tailor the buffer size and append 4 zeros as an all-in-one terminator
     blen = blensav - blen;

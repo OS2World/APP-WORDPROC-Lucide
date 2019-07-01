@@ -2,19 +2,30 @@
 #define lupichoice_idl
 
 #include <luichoice.idl>
+#include <lupifield.idl>
+
+interface FormWidgetChoice; // declared in poppler/Form.h
 
 /**
  * LuPopplerInputChoice represents a choice box in the PDF docuemnt.
  *
  * This interface exposes the FormWidgetChoice poppler class.
  */
-interface LuPopplerInputChoice : LuInputChoice
+interface LuPopplerInputChoice : LuPopplerInputField, LuInputChoice
 {
+     void init_widgetChoice( inout somInitCtrl ctrl, in LuPopplerDocument aDoc,
+                            in long aPagenum, in Page aPage,
+                            in FormWidgetChoice aFormWidgetChoice );
 
 #ifdef __SOMIDL__
 
     implementation
     {
+        releaseorder: init_widgetChoice;
+
+        init_widgetChoice: init;
+        somDestruct: override;
+
         getCount: override;
         getChoice: override;
         select: override;
@@ -34,6 +45,19 @@ interface LuPopplerInputChoice : LuInputChoice
         boolean mIsEditable;
         boolean mIsMultiSelectable;
         boolean mIsSpellCheckable;
+
+        FormWidgetChoice widget;
+
+        passthru C_h_before =  ""
+            ""
+            "#include <poppler/Form.h>"
+            "";
+
+        passthru C_xh_before =  ""
+            ""
+            "#include <poppler/Form.h>"
+            "";
+
     };
 
 #endif // __SOMIDL__

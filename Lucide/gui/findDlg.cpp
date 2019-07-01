@@ -42,6 +42,7 @@
 #include "Lucide_res.h"
 #include "luutils.h"
 #include "messages.h"
+#include "Lucide.h"
 
 #define MAXSEARCHLENGTH 100
 
@@ -87,6 +88,9 @@ MRESULT EXPENTRY FindDlg::findDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
             localizeDialog( hwnd );
             centerWindow( _this->hFrame, hwnd );
 
+            // setup the accelerators
+            WinSetAccelTable( hab, WinLoadAccelTable( hab, _hmod, IDA_ADDHELPACCEL ), hwnd );
+
             WinSendDlgItemMsg( hwnd, IDC_FINDFIELD, EM_SETTEXTLIMIT,
                                MPFROMSHORT( MAXSEARCHLENGTH ), MPVOID );
             WinSetDlgItemText( hwnd, IDC_FINDFIELD, _this->searchString );
@@ -116,6 +120,12 @@ MRESULT EXPENTRY FindDlg::findDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
                 case DID_CANCEL:
                     WinDismissDlg( hwnd, DID_CANCEL );
                     return (MRESULT)FALSE;
+
+               case CM_HELP:
+                  if (Lucide::hwndHelp)
+                      WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                 MPFROM2SHORT(108, 0), MPFROMSHORT(HM_RESOURCEID));
+                  return (MRESULT)FALSE;
             };
             return (MRESULT)FALSE;
     }
@@ -168,6 +178,9 @@ MRESULT EXPENTRY GotoDlg::gotoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
             localizeDialog( hwnd );
             centerWindow( _this->hFrame, hwnd );
 
+            // setup the accelerators
+            WinSetAccelTable( hab, WinLoadAccelTable( hab, _hmod, IDA_ADDHELPACCEL ), hwnd );
+
             char pgnum[ 32 ];
 
             // set current page
@@ -215,6 +228,12 @@ MRESULT EXPENTRY GotoDlg::gotoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM 
                 case DID_CANCEL:
                     WinDismissDlg( hwnd, DID_CANCEL );
                     return (MRESULT)FALSE;
+
+                case CM_HELP:
+                  if (Lucide::hwndHelp)
+                      WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                 MPFROM2SHORT(112, 0), MPFROMSHORT(HM_RESOURCEID));
+                  return (MRESULT)FALSE;
             };
             return (MRESULT)FALSE;
     }

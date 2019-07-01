@@ -153,7 +153,7 @@ void RecentFiles::load()
     char *buf = new char[ bufsize ];
     memset( buf, 0, bufsize );
 
-    PrfQueryProfileString( HINI_USERPROFILE, appName, sRecentFiles, "", buf, bufsize );
+    PrfQueryProfileString( hinilucideprofile, appName, sRecentFiles, "", buf, bufsize );
 
     char *p = strtok( buf, "|" );
     while ( p != NULL ) {
@@ -161,7 +161,7 @@ void RecentFiles::load()
         p = strtok( NULL, "|" );
     }
 
-    delete buf;
+    delete[] buf;
 }
 
 void RecentFiles::save()
@@ -174,7 +174,7 @@ void RecentFiles::save()
         s += '|';
     }
 
-    PrfWriteProfileString( HINI_USERPROFILE, appName, sRecentFiles, s.c_str() );
+    PrfWriteProfileString( hinilucideprofile, appName, sRecentFiles, s.c_str() );
 }
 
 

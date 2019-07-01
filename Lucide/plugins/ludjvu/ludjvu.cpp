@@ -86,7 +86,7 @@ extern "C" LuSignatureCheck * EXPENTRY getSignatureCheck()
 
 extern "C" char * EXPENTRY getDescription()
 {
-    return "DjVu plugin, based on DjVuLibre v3.5.22";
+    return "DjVu plugin, based on DjVuLibre v3.5.27";
 }
 
 
@@ -426,7 +426,7 @@ SOM_Scope boolean  SOMLINK isCreateFileThumbnail(LuDjvuDocument *somSelf,
 SOM_Scope void SOMLINK somDefaultInit(LuDjvuDocument *somSelf,
                                       som3InitCtrl* ctrl)
 {
-    LuDjvuDocumentData *somThis;
+    LuDjvuDocumentData *somThis = NULL;
     somInitCtrl globalCtrl;
     somBooleanVector myMask;
     LuDjvuDocument_BeginInitializer_somDefaultInit;
@@ -447,7 +447,7 @@ SOM_Scope void SOMLINK somDefaultInit(LuDjvuDocument *somSelf,
 SOM_Scope void SOMLINK somDestruct(LuDjvuDocument *somSelf, octet doFree,
                                    som3DestructCtrl* ctrl)
 {
-    LuDjvuDocumentData *somThis; // set in BeginDestructor
+    LuDjvuDocumentData *somThis = NULL; // set in BeginDestructor
     somDestructCtrl globalCtrl;
     somBooleanVector myMask;
     LuDjvuDocument_BeginDestructor;

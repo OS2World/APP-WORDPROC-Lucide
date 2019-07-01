@@ -81,6 +81,7 @@ struct LuFontInfo
     char  *name;
     char  *type;
     short embedded;
+    char  *subname;
 };
 
     

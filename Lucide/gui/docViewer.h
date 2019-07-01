@@ -42,6 +42,7 @@
 
 class ProgressDlg;
 class LuInputText;
+class LuInputChoice;
 
 struct LuSize  { double x, y; };
 
@@ -83,10 +84,14 @@ class DocumentViewer
         HWND getFrameHWND() { return hWndDocFrame; }
         HWND getViewHWND() { return hWndDoc; }
 
+        short getVscrollPos() { return sVscrollPos; }
+        short getHscrollPos() { return sHscrollPos; }
         void setDocument( LuDocument *_doc );
         bool close( bool force = false );
         void goToPage( long page );
         long getCurrentPage() { return currentpage; }  // Zero based
+        long getPreviousPage() { return previouspage; }  // Zero based
+        void unsetPreviousPage() { previouspage = -1; }
         void setZoom( double _zoom );
         double getZoom() { return zoom; }
         double getRealZoom() { return realzoom; }
@@ -105,15 +110,15 @@ class DocumentViewer
 
         static void registerClass();
 
+        MRESULT vertScroll( HWND hwnd, MPARAM mp2 );
+        MRESULT horizScroll( HWND hwnd, MPARAM mp2 );
         // Internal stuffs
     private:
 
         void drawPage();
         void adjustSize();
         void countPagesizes();
-
-        MRESULT vertScroll( HWND hwnd, MPARAM mp2 );
-        MRESULT horizScroll( HWND hwnd, MPARAM mp2 );
+        
         MRESULT wmDragOver( PDRAGINFO dragInfo );
         void wmDrop( PDRAGINFO dragInfo );
         void wmSize( HWND hwnd, MPARAM mp2 );
@@ -151,6 +156,9 @@ class DocumentViewer
         void showTextField( long page, long index, PRECTL r = NULL );
         void positionTextField( PRECTL r = NULL );
         void hideTextField( bool apply = true, PPOINTL ptl = NULL );
+        void showChoiceField( long page, long index, PRECTL r = NULL );
+        void positionChoiceField( PRECTL r = NULL );
+        void hideChoiceField( bool apply = true, PPOINTL ptl = NULL );
 
         static MRESULT EXPENTRY docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
         static MRESULT EXPENTRY docFrameProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 );
@@ -163,12 +171,18 @@ class DocumentViewer
         LuDocument *doc;
         HWND hMainFrame;
         HWND hWndDocFrame;
+        HWND hWndPopupMenu;
         HWND hWndDoc;
         HWND hWndEntry;
         HWND hWndMLE;
+        HWND hWndList;
+        HWND hWndBubble;
         LuInputText *textField;
+        LuInputChoice *choiceField;
         long textFieldPage;
         long textFieldIndex;
+        long choiceFieldPage;
+        long choiceFieldIndex;
         PFNWP oldFrameProc;
         HWND hWndHscroll;
         HWND hWndVscroll;
@@ -190,7 +204,7 @@ class DocumentViewer
         double width, height, zoom, realzoom, fullwidth, fullheight;
         boolean zoomMode;
         long rotation;
-        long totalpages, currentpage;
+        long totalpages, currentpage, previouspage;
         ProgressDlg *progressDlg;
         DrawAreas *drawareas;
         int drawareaIndex;

@@ -1,9 +1,9 @@
 #
-# Lucide language file, FR (1.3.5)
-# Fichier de langue de Lucide, FR (1.3.3)
-# 2010-10-??
+# Lucide language file, FR (1.5.0)
+# Fichier de langue de Lucide, FR (1.5.0)
+# 2016-08-06
 # Translator : Guillaume Gay <guillaume.gay@bigfoot.com>
-# Translation : 2012-01-12
+# Translation : 2016-08-09
 
 #
 # Main menu
@@ -18,7 +18,10 @@ MENU_NEXT=~Suivant\tMaj+PgBas
 MENU_LAST=~Dernier\tMaj+Fin
 MENU_RECENT_FILES=Fichiers ~rÇcents
 MENU_CLEAR_LIST=~Effacer la liste
-MENU_SAVE_AS=~Enregistrer sous...
+MENU_BACK=~Back\tCtrl+B
+MENU_BACKNAV=Last lin~k origin\tCtrl+K
+MENU_SAVE=~Save...\tCtrl+S
+MENU_SAVE_AS=~Enregistrer sous...\tCtrl+A
 MENU_CLOSE=~Fermer
 # MENU_PAGE_SETUP: to delete
 MENU_PAGE_SETUP=Mise en ~page...
@@ -50,11 +53,15 @@ MENU_CONTINUOUS=En ~continu
 MENU_DOCUMENT_INFO=~Info. sur le document...\tCtrl+I
 MENU_FONTS_INFO=I~nfo. sur les polices...
 MENU_WINDOW=~Fenàtres
-MENU_SHOW_NAV_PANE=Afficher le panneau de ~navigation
+MENU_SHOW_NAV_PANE=Afficher le panneau de ~navigation\tF9
 MENU_FULLSCREEN=~Plein Çcran\tF11
 MENU_PRESENTATION=~PrÇsentation\tF5
 MENU_HELP=~Aide
 MENU_PRODUCT_INFORMATION=Info. ~produit
+MENU_HELP_CONTENTS=~Contents\tF1
+MENU_HELP_KEYS=~Keys help
+MENU_HELP_PDF=P~DF file help
+MENU_HELP_IMAGES=~Image file help
 
 #
 # Toolbar hints
@@ -72,6 +79,7 @@ TBHINT_FIT_WIDTH=Adapter la page Ö la largeur
 TBHINT_FIND=Lancement de la recherche...
 TBHINT_FINDAGAIN=Poursuite de la recherche
 TBHINT_ZOOM_IN_OUT=Agrandissement/diminution de la vue
+TBHINT_BACK=Return to last link origin
 # toolbar's page number
 TB_PAGENUM=sur %d
 
@@ -90,6 +98,11 @@ MSGS_PAGE=Page
 MSGS_ERROR_STARTING_BROWSER=Erreur au lancement du navigateur ! 
 MSGS_CLOSE_MODIFIED_DOCUMENT=Le document a ÇtÇ modifiÇ. Voulez-vous l'enregistrer ?
 MSGS_FILE_COPY_SUFFIX=Copie de %s
+MSGS_TEMP_FILE_LOAD_ERROR=Temp file load error!     
+MSGS_TEMP_FILE_SAVE_ERROR=Error saving temp file!   
+MSGS_NO_TEMP_DIR_ERROR=No temporary directory found!
+MSGS_NO_PRINTER_FOUND_ERROR=No printers found! 
+MSGS_HELP_INSTANCE_FAILED=WinCreateHelpInstance failed!     
 
 MSGS_LDERR=Erreur de chargement de fichier : %s !
 MSGS_LDERR_OUT_OF_MEMORY=Hors mÇmoire
@@ -102,6 +115,12 @@ MSGS_LDERR_ENCRYPTED=Le fichier est chiffrÇ
 MSGS_RERR_OUT_OF_MEMORY=Hors mÇmoire
 MSGS_RERR_CORRUPTED_PAGE_DATA=DonnÇes de page corrompues
 MSGS_RERR_FONT_NOT_FOUND=Police %s non trouvÇe
+
+#
+# Help button for all dialogs 
+#
+
+DIALOG_HELP=~Help
 
 #
 # "Plugins list" dialog
@@ -122,7 +141,8 @@ FONTINFO_ENUMERATING=ênumÇration des polices, veuillez patienter...
 # List columns titles
 FONTINFO_NAME=Nom
 FONTINFO_TYPE=Type
-FONTINFO_EMBEDDED=IntrÇgrÇe ? 
+FONTINFO_EMBEDDED=IntÇgrÇe ? 
+FONTINFO_SUBNAME=Substitute Font
 # Embedded types
 FONTINFO_EMBED_NOT_EMBEDDED=Non
 FONTINFO_EMBED_EMBEDDED=Oui
@@ -150,14 +170,13 @@ DOCINFO_NAME=Nom du document :
 #
 FIND_FIND=Recherche
 FIND_FIND_WHAT=~Quoi chercher :
-FIND_BACK=Recherche en ~arriäre
 FIND_MATCH_CASE=~Respecter la casse
+FIND_BACK=Recherche en ~arriäre
 FIND_OK=~OK
 FIND_CANCEL=~Annuler
 # other 'find'-related messages
 FIND_SEARCH_PAGE_OF=Recherche : page %d sur %d...
 FIND_NOT_FOUND=Non trouvÇ !
-
 
 #
 # "Progress" dialog
@@ -165,13 +184,12 @@ FIND_NOT_FOUND=Non trouvÇ !
 PDLG_PROGRESS=êtat d'avancement
 PDLG_CANCEL=~Annuler
 
-
 #
 # About dialog
 #
 AD_ABOUT=Informations sur le produit
 AD_DESCRIPTION=Afficheur de documents basÇ sur des composants enfichables prenant en charge divers formats de fichiers
-AD_COPYRIGHTS=(c) par Eugene Romanenko, Dmitriy Kuminov, Silvan Scherrer, bww bitwise works GmbH en coopÇration avec Mensys
+AD_COPYRIGHTS=(c) 2016 netlabs.org en coopÇration avec Arca Noae, LLC, anciennement (c): Eugene Romanenko, Dmitriy Kuminov, Silvan Scherrer, bww bitwise works GmbH en coopÇration avec Mensys
 AD_OK=~OK
 
 #
@@ -182,6 +200,7 @@ SD_DEFAULT_PAGE_LAYOUT=Mise en ~page par dÇfaut
 SD_DEFAULT_ZOOM=~Zoom par dÇfaut
 SD_SINGLE_PAGE=Page simple
 SD_CONTINUOUS=En continu
+SD_THUMBNAIL=~Make thumbnails
 SD_OK=~OK
 SD_CANCEL=~Annuler
 
@@ -204,6 +223,7 @@ PD_JOB_PROPERTIES=Paramätres du ~travail
 PD_DRIVER_LABEL=Pilote
 PD_PRINT_RANGE_AND_COPIES=ê~tendue et nombre de copies
 PD_RANGE_ALL=T~outes
+PD_REVESE_PRINT=In~versÇ
 PD_RANGE_CURRENT_PAGE=Page en co~urs
 PD_RANGE_PAGES=Pa~ges
 PD_FROM=~De
@@ -222,7 +242,7 @@ PD_PAGE_ORIENTATION=Orientation de la page
 PD_PORTRAIT=Po~rtrait
 PD_LANDSCAPE=Pa~ysage
 PD_MARGINS=Marges (mm)
-PD_IGNORE_PRINTER_MARGINS=Ignorer les marges de l'imprimante
+PD_IGNORE_PRINTER_MARGINS=Ignorer les ~marges de l'imprimante
 PD_MLEFT=~Gauche
 PD_MRIGHT=~Droite
 PD_MTOP=~Haut
@@ -230,11 +250,11 @@ PD_MBOTTOM=~Bas
 PD_SELECTED_FORM=SÇlection du formulaire
 PD_BTNPRINT=Im~primer
 PD_BTNCANCEL=~Annuler
-PD_WRONG_MARGINS=Marges icorrectes ! 
+PD_WRONG_MARGINS=Marges incorrectes ! 
 # other 'print'-related messages
 PRINT_PRINTING_PAGE_OF=Impression de la page %d (%d sur %d)...
-PRINT_GENERATING_POSTSCRIPT=GÇnÇration du fichier postscript...
-PRINT_SPOOLING_POSTSCRIPT=Mise en file des donnÇes postscript...
+PRINT_GENERATING_POSTSCRIPT=GÇnÇration du fichier PostScript...
+PRINT_SPOOLING_POSTSCRIPT=Mise en file des donnÇes PostScript...
 PRINT_FAILED=êchec Ö l'impression ! 
 
 #
@@ -246,3 +266,22 @@ PSW_OK=~OK
 PSW_CANCEL=~Annuler
 
 #
+# Open file dialog
+#
+FDLG_OPEN=Ouverture de fichier
+FDLG_FILENAME=~Nom du fichier
+FDLG_DRIVE=~UnitÇ
+FDLG_FILETYPE=~Type de fichier
+FDLG_FILE=~Fichiers
+FDLG_DIRECTORY=~RÇpertoires
+FDLG_OK=~OK
+FDLG_CANCEL=~Annuler
+FDLG_NO_PREVIEW_AVAILABLE=Aucun aperáu disponible
+FDLG_ALL_SUPPORTED_TYPES=<Types pris en charge>
+FDLG_ALL_FILES=<Tous les fichiers>
+FDLG_THUMBNAIL=~Make thumbnail
+
+#
+# Help file title
+#
+HLP_TITLE=Lucide User's Guide

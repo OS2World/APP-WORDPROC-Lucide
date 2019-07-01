@@ -44,12 +44,48 @@
 #include "Lucide_res.h"
 #include "luutils.h"
 #include "messages.h"
-
+#include "docViewer.h"
 
 PFNWP pOldTbProc; // Old toolbar window proc
 PFNWP pOldZeProc; // Old zoom entryfield window proc
+PFNWP pOldSbProc;  // Old page number window proc
+HEV   hevEvent   = 0;
 
+// Page # window proc
+static MRESULT EXPENTRY sbProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
+{
+    if ( msg == WM_CHAR ) // Make page up/down behave as expected in a document.
+    {
+        USHORT usch = SHORT1FROMMP( mp2 );
+        USHORT usvk = SHORT2FROMMP( mp2 );
 
+        if ( usvk == VK_PAGEUP ) {
+            mp2 = MPFROM2SHORT( usch, VK_PAGEDOWN );
+        }
+        else if ( usvk == VK_PAGEDOWN ) {
+            mp2 = MPFROM2SHORT( usch, VK_PAGEUP );
+        }
+    }
+    else if ( msg == SPBM_SPINDOWN ) // prevent the spin button from looping
+    {
+        LONG upLimit = 0, lowLimit = 0, curVal = 0;
+        WinSendMsg( hwnd, SPBM_QUERYLIMITS, MPFROMP( &upLimit ), MPFROMP( &lowLimit ) );
+        WinSendMsg( hwnd, SPBM_QUERYVALUE, MPFROMP( &curVal ), MPFROM2SHORT( 0, SPBQ_DONOTUPDATE ) );
+        if ( curVal <= lowLimit ) {
+            return (MRESULT)TRUE;
+        }
+    }
+    else if ( msg == SPBM_SPINUP )
+    {
+        LONG upLimit = 0, lowLimit = 0, curVal = 0;
+        WinSendMsg( hwnd, SPBM_QUERYLIMITS, MPFROMP( &upLimit ), MPFROMP( &lowLimit ) );
+        WinSendMsg( hwnd, SPBM_QUERYVALUE, MPFROMP( &curVal ), MPFROM2SHORT( 0, SPBQ_DONOTUPDATE ) );
+        if ( curVal >= upLimit ) {
+            return (MRESULT)TRUE;
+        }
+    }
+    return pOldSbProc( hwnd, msg, mp1, mp2 );
+}
 // Toolbar window proc
 static MRESULT EXPENTRY tbProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
@@ -60,21 +96,21 @@ static MRESULT EXPENTRY tbProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                 SHORT controlId = SHORT1FROMMP( mp1 );
                 SHORT notifyCode = SHORT2FROMMP( mp1 );
 
-                if ( ( controlId == TBID_PAGENUM ) && ( notifyCode == EN_CHANGE )
+                if ( ( controlId == TBID_PAGENUM ) && ( notifyCode == EN_CHANGE || CBN_ENTER)
                      && !Lucide::dontSwitchPage )
                 {
-                        char szText[256];
-                        LONG newPage = 0;
-                        ULONG retLen = 0;
-                        retLen = WinQueryDlgItemText( hwnd, TBID_PAGENUM, sizeof(szText),
-                                            szText );
-
-                        if ( retLen > 0) {
-                                newPage = atol(szText);
-                                if (newPage > 0) {
-                                    Lucide::goToPage(newPage - 1);
-                                }
-                        }
+                    LONG newPage = 0;
+                    ULONG upLimit = 0, lowLimit = 0, ulPostCount;
+                    DosWaitEventSem(hevEvent, 10);
+                    WinSendDlgItemMsg( hwnd, TBID_PAGENUM, SPBM_QUERYVALUE,
+                                      MPFROMP( &newPage ),
+                                      MPFROM2SHORT( 0, SPBQ_ALWAYSUPDATE ) );
+                    WinSendDlgItemMsg( hwnd, TBID_PAGENUM, SPBM_QUERYLIMITS,
+                                      MPFROMP( &upLimit ),
+                                      MPFROMP( &lowLimit ) );
+                    if (newPage > 0 && newPage <= upLimit) {
+                        Lucide::goToPage(newPage - 1);
+                    }
                 }
 
                 if ( ( controlId == TBID_PAGENUM ) && ( notifyCode == EN_SETFOCUS )
@@ -162,7 +198,7 @@ HWND createToolbar( HWND hwnd )
                                 WS_VISIBLE, 0, 0, 0, 0, hwnd, HWND_TOP,
                                 0, NULL, NULL );
     pOldTbProc = WinSubclassWindow( hToolBar, tbProc );
-
+    DosCreateEventSem(NULL, &hevEvent, 0L, TRUE);
     // used for different purposes
     char pgnum[ 32 ];
     HPS hps;
@@ -235,9 +271,10 @@ HWND createToolbar( HWND hwnd )
 
     // pages text
     AddCtrlStruct cs;
-    cs.ctrlHandle = WinCreateWindow( hToolBar, WC_ENTRYFIELD, NULL,
-                                     WS_VISIBLE|ES_CENTER|ES_MARGIN|ES_AUTOSCROLL,
+    cs.ctrlHandle = WinCreateWindow( hToolBar, WC_SPINBUTTON , NULL,
+                                     WS_VISIBLE| SPBS_NUMERICONLY | SPBS_JUSTCENTER,
                                      0,0,0,0, hToolBar, HWND_TOP, TBID_PAGENUM, NULL, NULL );
+    pOldSbProc = WinSubclassWindow(cs.ctrlHandle , sbProc );
     WinSetPresParam( cs.ctrlHandle, PP_FONTNAMESIZE, deffontlen, deffont );
     // calculate the width
     snprintf( pgnum, sizeof( pgnum ), "%d", 99999 );
@@ -250,7 +287,7 @@ HWND createToolbar( HWND hwnd )
     WinSendMsg( hToolBar, TBM_ADDCONTROL, (MPARAM)&cs, MPVOID );
 
     cs.ctrlHandle = WinCreateWindow( hToolBar, WC_STATIC, NULL,
-                                     WS_VISIBLE | SS_TEXT | DT_CENTER | DT_VCENTER,
+                                     WS_VISIBLE | SS_TEXT | DT_LEFT | DT_VCENTER,
                                      0,0,0,0, hToolBar, HWND_TOP, TBID_OFPAGES, NULL, NULL );
     WinSetPresParam( cs.ctrlHandle, PP_FONTNAMESIZE, deffontlen, deffont );
     ULONG syscmenu = SYSCLR_MENU;
@@ -259,7 +296,7 @@ HWND createToolbar( HWND hwnd )
     snprintf( pgnum, sizeof( pgnum ), pgfrm, 99999 );
     delete pgfrm;
     hps = WinGetPS( cs.ctrlHandle );
-    cs.cx = getStringPixSize( hps, pgnum );
+    cs.cx = getStringPixSize( hps, pgnum ) + 4;
     WinReleasePS( hps );
     cs.cy = 0;
     cs.bubbleText = NULL;
@@ -372,6 +409,20 @@ HWND createToolbar( HWND hwnd )
     bs.bubbleRes = 0;
     bs.bubbleHmod = NULLHANDLE;
     bs.pictRes = IDB_MGLASS;
+    bs.pictHmod = _hmod;
+    bs.menuRes = 0;
+    bs.menuHmod = NULLHANDLE;
+    bs.checked = FALSE;
+    bs.enabled = TRUE;
+    WinSendMsg( hToolBar, TBM_ADDBUTTON, (MPARAM)&bs, MPVOID );
+
+    WinSendMsg( hToolBar, TBM_ADDSEPARATOR, MPVOID, MPVOID );
+
+    bs.cmd = CM_BACK;
+    bs.bubbleText = newstrdupL( TBHINT_BACK );
+    bs.bubbleRes = 0;
+    bs.bubbleHmod = NULLHANDLE;
+    bs.pictRes = IDB_BACK;
     bs.pictHmod = _hmod;
     bs.menuRes = 0;
     bs.menuHmod = NULLHANDLE;

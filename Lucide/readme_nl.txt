@@ -23,12 +23,40 @@ Het biedt een plug-in architectuur op basis van SOM, die het andere programmeurs
 
 Lucide vereist het volgende:
 
-  - Libc 0.6.5:
-    - FTP://ftp.netlabs.org/pub/gcc/libc-0.6.5-csd5.zip (zip formaat)
-      of ftp://ftp.netlabs.org/pub/gcc/libc-0_6_5-csd5.wpi (WarpIn formaat)
-  - Gcc446.dll:
-    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (WarpIn formaat)
+  - Libc 0.6.6:
+    - http://rpm.netlabs.org/release/00/zip/libc-0_6_6-38_oc00.zip (zip formaat)
+      of ftp://ftp.netlabs.org/pub/gcc/libc-0_6_6-csd6.wpi (WarpIn formaat)
+      or "yum install libc" (from the netlabs-rel repository)
+  - libcx 0.6.3
+    - http://rpm.netlabs.org/release/00/zip/libcx-0_6_4-1_oc00.zip (zip format)
+       or "yum install libcx" (from the netlabs-rel repository)
+  - Gcc492.dll:
+    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_3_1.wpi (WarpIn formaat)
+      or "yum install libgcc1 libgcc-fwd" (from the netlabs-rel repository)
+      
+For rendering PDFs, Lucide's plugin requires the following:
 
+    - poppler 0.59.0:
+    - "yum install poppler" (from the netlabs-rel repository)
+    
+For rendering DjVu files, Lucide's plugin requires the following:
+
+    - djvulibre 3.5.27:
+    - "yum install djvulibre" (from the netlabs-rel repository)
+    
+For rendering multiple bitmap format files (GBM), Lucide's plugin 
+requires the following:
+
+    - GBMDLL 1.76:
+    - "yum install GBMDLL" (from the netlabs-rel repository)
+    - Installed by default on ArcaOS 5.0.3 and higher
+
+For rendering JPEGs, Lucide's plugin requires the following:
+
+    - libjpeg 8d:
+    - "yum install libjpeg" (from the netlabs-rel repository)
+    - Only needed if you install the JPG plugin GBM provides JPG support
+    - You should not install  JPG and GBM at the same time. (GBM is recommended)
 
 Optioneel: om unicode-tekst naar het klembord in het OpenOffice.org-compatibele formaat
 te plaasten, moet u het pakket UClip (enhanced OS/2 clipboard support installeren, standaard 
@@ -113,4 +141,6 @@ http://www.ecomstation.com
 (C) 2006-2007 door Eugene Romanenko, netlabs.org
 (C) 2010 door Dmitry A. Kuminov, netlabs.org
     in samenwerking met Serenity Systems International
+(c) 2016-2019 by netlabs.org
+    in co-operation with Arca Noae, LLC
 

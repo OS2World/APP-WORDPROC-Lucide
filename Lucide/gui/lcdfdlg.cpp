@@ -4,12 +4,14 @@
 #include <stdlib.h>
 #include <io.h>
 #include <fcntl.h>
+#include <emx\umalloc.h>
 
 #include "globals.h"
 #include "pluginman.h"
 #include "lucide_res.h"
 #include "luutils.h"
 #include "messages.h"
+#include "lucide.h"
 
 
 static HWND hWndFrame            = NULLHANDLE;
@@ -202,11 +204,20 @@ static MRESULT EXPENTRY LcdFileDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM
             resizePreview( hwnd );
             localizeDialog( hwnd );
             centerWindow( hWndFrame, hwnd );
+
+            // setup the accelerators
+            WinSetAccelTable( hab, WinLoadAccelTable( hab, _hmod, IDA_ADDHELPACCEL ), hwnd );
+
             previewImageCreate( WinWindowFromID( hwnd, IDC_PREVIEW ) );
             SHORT sInx = SHORT1FROMMR( WinSendDlgItemMsg( hwnd, DID_FILTER_CB, LM_SEARCHSTRING,
                     MPFROM2SHORT( LSS_CASESENSITIVE, 0 ), MPFROMP( szAllSupportedTypes ) ) );
             WinSendDlgItemMsg( hwnd, DID_FILTER_CB, LM_SELECTITEM,
-                               MPFROMSHORT( sInx ), MPFROMSHORT( TRUE ) );
+                              MPFROMSHORT( sInx ), MPFROMSHORT( TRUE ) );
+            WinCheckButton( hwnd, IDC_NOTHUMBONCE, Lucide::Thumbnail );
+            if (!WinIsControlEnabled(hwnd, DID_DRIVE_CB)) {
+                WinShowWindow(WinWindowFromID(hwnd, DID_DRIVE_TXT), FALSE);
+                WinShowWindow(WinWindowFromID(hwnd, DID_DRIVE_CB), FALSE);
+            }
 
             ((LcdFDlgData *)pfild->ulUser)->isAllFiles = isAllFiles( hwnd );
         }
@@ -242,6 +253,12 @@ static MRESULT EXPENTRY LcdFileDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM
                             strcpy( fn, pfild->szFullFile );
                             strcat( fn, itemText );
                             previewFile( WinWindowFromID( hwnd, IDC_PREVIEW ), fn );
+			    short fcr;
+			    __asm__ volatile ("fstcw        %0 \n"
+					      "or      $0x3f, %0 \n"
+					      "fldcw        %0 \n"
+					      : "=m"(fcr));
+
                         }
 
                         return mr;
@@ -250,6 +267,24 @@ static MRESULT EXPENTRY LcdFileDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM
 
                 case DID_FILTER_CB:
                     ((LcdFDlgData *)pfild->ulUser)->isAllFiles = isAllFiles( hwnd );
+                    break;
+
+                case IDC_NOTHUMBONCE:
+                    Lucide::Thumbnail = !Lucide::Thumbnail;
+                    break;
+            }
+        }
+        case WM_COMMAND:
+        {
+            switch( SHORT1FROMMP(mp1) )
+            {
+              case CM_HELP:
+                  if (Lucide::hwndHelp)
+                      WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                 MPFROM2SHORT(102, 0), MPFROMSHORT(HM_RESOURCEID));
+                  return (MRESULT)FALSE;
+
+                default:
                     break;
             }
         }
@@ -276,22 +311,16 @@ HWND LcdFileDlg( HWND hwndP, HWND hwndO, FILEDLG *pfild )
 
     pfild->hMod    = _hmod;
     pfild->usDlgId = IDD_LCD_FILEDLG;
-
-    char **apsz;
-    apsz = (char **)malloc( sizeof( char* ) * 2 );
-    apsz[ 0 ] = szAllSupportedTypes;
-    apsz[ 1 ] = NULL;
-    pfild->papszITypeList = (PAPSZ)apsz;
+    pfild->pszIType = szAllSupportedTypes;
     pfild->ulUser = (ULONG)new LcdFDlgData;
     pluginMan->getExtsList( ((LcdFDlgData *)pfild->ulUser)->extList );
     HWND hDlg = WinFileDlg( hwndP, hwndO, pfild );
-    free( apsz );
     delete ((LcdFDlgData *)pfild->ulUser);
     return hDlg;
 }
 
 
-#define BUFSIZE      2000
+//#define BUFSIZE      40000
 #define BUFSIZEEAOP2 65000
 
 static PVOID getEA( const char *pszPath, const char *pszEAname, PULONG ealen )
@@ -310,12 +339,13 @@ static PVOID getEA( const char *pszPath, const char *pszEAname, PULONG ealen )
     *ealen = 0;
     count = -1;
 
-    if ( ( pBuffer = (char*)malloc(BUFSIZE) ) != NULL )
+    if ( ( pBuffer = (char*)_lmalloc( 65000 ) ) != NULL )
     {
-        memset( pBuffer, 127, BUFSIZE );
-
-        if ( DosEnumAttribute( ENUMEA_REFTYPE_PATH, (PSZ)pszPath, 1, pBuffer, BUFSIZE,
-                               &count, ENUMEA_LEVEL_NO_VALUE ) == 0 )
+        memset( pBuffer, 127, 65000 );
+        // This was trapping because apparently it isn't high mem safe
+        // passing the bufsize on the stack fixes the trap
+        if ( DosEnumAttribute( ENUMEA_REFTYPE_PATH, (PSZ)pszPath, 1, pBuffer,
+                              65000, &count, ENUMEA_LEVEL_NO_VALUE ) == 0 )
         {
             pDena = (PDENA2)pBuffer;
             offset = 0;
@@ -670,7 +700,7 @@ static void previewFile( HWND hwnd, const char *fn )
             }
             unlink( tmpgif );
         }
-        delete tmpgif;
+        delete[] tmpgif;
         free( eadata );
     }
     else // eadata == NULL

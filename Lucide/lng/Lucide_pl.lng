@@ -1,0 +1,284 @@
+#
+# Lucide language file, PL (1.5.0)
+#
+
+#
+# Main menu
+#
+MENU_DOCUMENT=~Dokument
+MENU_NEW_WINDOW=~Nowe okno
+MENU_OPEN=~Otw¢rz...\tCtrl+O
+MENU_NEXT_PREVIOUS=Poprzedniej/Nast©pnej
+MENU_FIRST=Pierwszej\tShift+Home
+MENU_PREVIOUS=Poprzedniej\tShift+PgUp
+MENU_NEXT=Nast©pnej\tShift+PgDn
+MENU_LAST=Ostatniej\tShift+End
+MENU_RECENT_FILES=~Ostatnio uæywane pliky
+MENU_CLEAR_LIST=U~su‰ lista
+MENU_BACK=~Wr¢Ü\tCtrl+B
+MENU_BACKNAV=Last lin~k origin\tCtrl+K
+MENU_SAVE=~Zapisz...\tCtrl+S
+MENU_SAVE_AS=~Zapisz jako...\tCtrl+A
+MENU_CLOSE=~Zamknij
+# MENU_PAGE_SETUP: usu‰
+MENU_PAGE_SETUP=~Ustawienia strona...
+MENU_PRINT=~Druk...\tCtrl+P
+MENU_PLUGINS_LIST=~Lista moduà¢w...
+MENU_EXIT=~Koniec\tCtrl+X
+MENU_EDIT=~Edituj
+MENU_COPY=~Kopiuj\tCtrl+Insert
+MENU_SELECT_ALL=Wybierz ~wszystkie\tCtrl+/
+MENU_FIND=~Szukaj...\tCtrl+F
+MENU_FINDAGAIN=Szukaj ~nast©pna\tCtrl+G
+MENU_SETTINGS=U~stawienia
+MENU_VIEW=~Widok
+MENU_FIT_WINDOW=Dopasowanie rozmiar o~kno\tCtrl+0
+MENU_ACTUAL_SIZE=~Aktualny rozmiar\tCtrl+1
+MENU_FIT_WIDTH=Dopasowanie do szerokoòci\tCtrl+2
+# - unused - MENU_ZOOM_IN_OUT=P~owi©ksza/zmniejsza
+MENU_ZOOM_IN=P~owi©ksza\tCtrl++
+MENU_ZOOM_OUT=Z~mniejsza\tCtrl+-
+MENU_FIRST_PAGE=Pierwszej strona
+MENU_PREV_PAGE=Pop~rzedniej strona\t-
+MENU_NEXT_PAGE=~Nast©pnej strona\t+
+MENU_LAST_PAGE=~Ostatniej strona
+MENU_GO_TO_PAGE=Przejd´ ~strona...\tCtrl+N
+MENU_ROTATE_CW=~Obr¢cenie 90¯ w lewo\tCtrl+Shift++
+MENU_ROTATE_CCW=O~br¢cenie 90¯ w prawo\tCtrl+Shift+-
+MENU_SINGLE_PAGE=~Jedna strona
+MENU_CONTINUOUS=Ci•~gày
+MENU_DOCUMENT_INFO=~Informacja o dokumenty...\tCtrl+I
+MENU_FONTS_INFO=In~formacja o czcionky...
+MENU_WINDOW=~Okno
+MENU_SHOW_NAV_PANE=~Wyòwietlania paska nawigacji\tF9
+MENU_FULLSCREEN=~Peàny ekran\tF11
+MENU_PRESENTATION=~Presentacja\tF5
+MENU_HELP=~Pomoc
+MENU_PRODUCT_INFORMATION=~Informacja o programa
+MENU_HELP_CONTENTS=~Zawartoòci...\tF1
+MENU_HELP_KEYS=Pomoc w kozystaniu z ~klawiszy...
+MENU_HELP_PDF=Pomoc dla plik¢w P~DF...  
+MENU_HELP_IMAGES=Pomoc dla plik¢w o~brazky...
+
+#
+# Toolbar hints
+#
+TBHINT_OPEN=Otw¢rz dokumenty...
+TBHINT_PRINT=Drukuj...
+TBHINT_SHOW_NAV_PANE=Wyòwietlania/ukryj paska nawigacji
+TBHINT_FIRST_PAGE=Pierwszej strona
+TBHINT_PREV_PAGE=Poprzedniej strona
+TBHINT_NEXT_PAGE=Nast©pnej strona
+TBHINT_LAST_PAGE=Ostatniej strona
+TBHINT_ACTUAL_SIZE=Aktualny rozmiar
+TBHINT_FIT_WINDOW=Dopasowanie rozmiar okno
+TBHINT_FIT_WIDTH=Dopasowanie do szerokoòci
+TBHINT_FIND=Szukaj...
+TBHINT_FINDAGAIN=Szukaj znowy
+TBHINT_ZOOM_IN_OUT=Powi©ksza/zmniejsza
+TBHINT_BACK=Return to last link origin
+# toolbar's page number
+TB_PAGENUM=z %d
+
+#
+# Lucide messages
+#
+MSGS_MAIN_WIN_TITLE=%APPNAME%
+MSGS_NO_SUIT_PLUG=Nie mog© znale´Ü odpowiedniego moduàu dla wybranego dokumentu!
+MSGS_FILE_LOAD_ERROR=Bà•d podczas àadowania pliku!
+MSGS_LOADING_DOCUMENT=ùadowanie dokumentu, prosz© czekaÜ...
+MSGS_CREATING_THUMBNAIL=Tworz© podgl•d dokumentu, prosz© czekaÜ...
+MSGS_WARNING=Uwaga!
+MSGS_OVERWRITE_FILE=Plik juæ istnieje. Zast•piÜ?
+MSGS_FILE_SAVE_ERROR=Bà•d podczas zapiszanie pliku!
+MSGS_PAGE=Strona
+MSGS_ERROR_STARTING_BROWSER=Bà•d podczas uruchamiania przegl•darki!
+MSGS_CLOSE_MODIFIED_DOCUMENT=Zmieniono dokument. Zapisz?
+MSGS_FILE_COPY_SUFFIX=Kopie %s
+MSGS_TEMP_FILE_LOAD_ERROR=Temp file load error!
+MSGS_TEMP_FILE_SAVE_ERROR=Error saving temp file!
+MSGS_NO_TEMP_DIR_ERROR=No temporary directory found!
+MSGS_NO_PRINTER_FOUND_ERROR=No printers found!
+MSGS_HELP_INSTANCE_FAILED=WinCreateHelpInstance failed!
+
+MSGS_LDERR=Bà•d podczas àadowania pliku: %s!
+MSGS_LDERR_OUT_OF_MEMORY=Brak pami©ci
+MSGS_LDERR_OPEN_ERROR=Bà•d podczas otwierania
+MSGS_LDERR_READ_ERROR=Bà•d odczytu
+MSGS_LDERR_DAMAGED=Plik jest uszkodzony
+MSGS_LDERR_WRONG_FORMAT=Zày format
+MSGS_LDERR_ENCRYPTED=Plik jest zaszyfrowany
+
+MSGS_RERR_OUT_OF_MEMORY=Brak pami©ci
+MSGS_RERR_CORRUPTED_PAGE_DATA=Uszkodzone strony danych
+MSGS_RERR_FONT_NOT_FOUND=Nie znaleziono czcionki %s
+
+#
+# Help button for all dialogs 
+#
+
+DIALOG_HELP=~Pomoc
+
+#
+# "Plugins list" dialog
+#
+PLUGLIST_PLUGINS_LIST=Lista moduà¢w
+PLUGLIST_CLOSE=~Zamknij
+# List columns titles
+PLUGLIST_PLUGIN_NAME=Nazwa moduàu
+PLUGLIST_SUPP_EXTS=Obsàugiwane rozszerzenia
+PLUGLIST_PLUGIN_DESC=Opis moduàu
+
+#
+# "Font info" dialog
+#
+FONTINFO_FONTINFO=Informacja o czcionky
+FONTINFO_CLOSE=~Zamknij
+FONTINFO_ENUMERATING=ùadowanie czcionky, prosz© czekaÜ...
+# List columns titles
+FONTINFO_NAME=Nazwa
+FONTINFO_TYPE=Typ
+FONTINFO_EMBEDDED=Osadzony?
+FONTINFO_SUBNAME=Czcionka zast©pcza
+# Embedded types
+FONTINFO_EMBED_NOT_EMBEDDED=Nie osadzony
+FONTINFO_EMBED_EMBEDDED=Osadzony
+FONTINFO_EMBED_EMBEDDED_SUBSET=Osadzony podzestaw
+
+#
+# "Document info" dialog
+#
+DOCINFO_DOCUMENT_INFO=Informace o dokumentu
+DOCINFO_CLOSE=~Zamknij
+# Document info keys
+DOCINFO_TITLE=Nazwa:
+DOCINFO_FORMAT=Formaty:
+DOCINFO_AUTHOR=Autor:
+DOCINFO_SUBJECT=Temat:
+DOCINFO_KEYWORDS=Sàowa kluczowe:
+DOCINFO_CREATOR=Tw¢rcy:
+DOCINFO_PRODUCER=Producent:
+DOCINFO_CREATION_DATE=Utworzony:
+DOCINFO_MOD_DATE=Edytowany:
+DOCINFO_NAME=Dokument:
+
+#
+# "Find" dialog
+#
+FIND_FIND=Szukaj
+FIND_FIND_WHAT=~Szukaj tekst
+FIND_MATCH_CASE=~Rozr¢ænianie maàych/duæych
+FIND_BACK=Szukaj ~wr¢Ü
+FIND_OK=~OK
+FIND_CANCEL=~Anuluj
+# other 'find'-related messages
+FIND_SEARCH_PAGE_OF=Wyszukiwanie strona %d z %d...
+FIND_NOT_FOUND=Nie odnaleziono!
+
+#
+# "Progress" dialog
+#
+PDLG_PROGRESS=Post©p
+PDLG_CANCEL=~Anuluj
+
+#
+# About dialog
+#
+AD_ABOUT=O programy
+AD_DESCRIPTION=Moduàowa przegl•darka dokument¢w obsàuguj•ca r¢æne formaty plik¢w.
+AD_COPYRIGHTS=(c) 2016 netlabs.org we wsp¢àpracy z Arca Noae, LLC, wczeòniejszym (c) Eugene Romanenko, Dmitriy Kuminov, Silvan Scherrer, bww bitwise works GmbH we wsp¢àpracy z Mensys
+AD_OK=~OK
+
+#
+# Settings dialog
+#
+SD_SETTINGS=Ustawienia
+SD_DEFAULT_PAGE_LAYOUT=Standardowy ukàad ~strony
+SD_DEFAULT_ZOOM=Standardowy ~rozmiar
+SD_SINGLE_PAGE=Jedna strony
+SD_CONTINUOUS=Ci•gày
+SD_THUMBNAIL=Tworzenie ~miniatur
+SD_OK=~OK
+SD_CANCEL=~Anuluj
+
+#
+# 'Go to page' dialog
+#
+GTP_GOTOPAGE=Przejd´ strony
+GTP_PAGE=Strona
+GTP_OF=z %d
+GTP_OK=~OK
+GTP_CANCEL=~Anuluj
+
+#
+# Print dialog
+#
+PD_TITLE=Drukuj
+PD_PRINTER=Drukowania
+PD_NAME_LABEL=~Nazwa
+PD_JOB_PROPERTIES=W~àaòciwoòci zadania
+PD_DRIVER_LABEL=Sterownik
+PD_PRINT_RANGE_AND_COPIES=Zakres wydruku i liczba kopii
+PD_RANGE_ALL=~Wszystkie
+PD_REVESE_PRINT=Wstec~z
+PD_RANGE_CURRENT_PAGE=~Bieæ•ca strona
+PD_RANGE_PAGES=~Strony
+PD_FROM=~Od
+PD_TO=~Do
+PD_NUMBER_OF_COPIES=Liczba kop~ii
+PD_RANGE_EVEN_ODD_LABEL=~Zakres drukowania
+PD_RANGE_EVEN_ODD=Strony parzyste i nieparzyste
+PD_RANGE_ODD=Strony nieparzyste
+PD_RANGE_EVEN=Strony parzyste
+PD_PRINT_TYPE=Typ drukuj
+PD_TYPE_POSTSCRIPT=PostS~cript
+PD_PRINT_TO_FILE=Druk~uj od plik
+PD_TYPE_ASIMAGE=Jak o~braz
+PD_HIGHER_IMAGE_QUALITY=~Lepszy obraz (woljniejsze i wyæsze wymagania dotycz•cze pami©ci)
+PD_PAGE_ORIENTATION=Orientacja strony
+PD_PORTRAIT=~Portret
+PD_LANDSCAPE=Kra~jobraz
+PD_MARGINS=Marginesy (mm)
+PD_IGNORE_PRINTER_MARGINS=I~gnorowanie marginesy drukarki
+PD_MLEFT=Lewo
+PD_MRIGHT=Prawo
+PD_MTOP=G¢ra
+PD_MBOTTOM=Niæsza
+PD_SELECTED_FORM=Wybrana forma
+PD_BTNPRINT=~Druk
+PD_BTNCANCEL=~Anuluj
+PD_WRONG_MARGINS=Nieprawidàowe marginesy!
+# other 'print'-related messages
+PRINT_PRINTING_PAGE_OF=Drukuj strony %d (%d z %d)...
+PRINT_GENERATING_POSTSCRIPT=Generuj© plik PostScript...
+PRINT_SPOOLING_POSTSCRIPT=Przekazuj© dane do PostScript...
+PRINT_FAILED=Bà•d podczas drukuj!
+
+#
+# Password dialog
+#
+PSW_TITLE=Plik jest zaszyfrowany
+PSW_PASSWORD=~Hasào
+PSW_OK=~OK
+PSW_CANCEL=~Anuluj
+
+#
+# Open file dialog
+#
+FDLG_OPEN=Otw¢rz
+FDLG_FILENAME=~Nazwa plik
+FDLG_DRIVE=~Dysk
+FDLG_FILETYPE=~Typ plik
+FDLG_FILE=~Plik
+FDLG_DIRECTORY=~Adresarz
+FDLG_OK=~OK
+FDLG_CANCEL=~Anuluj
+FDLG_NO_PREVIEW_AVAILABLE=Brak podgl•du
+FDLG_ALL_SUPPORTED_TYPES=<Wszystkie obsàugiwane typy>
+FDLG_ALL_FILES=<Wszystkie plik¢w>
+FDLG_THUMBNAIL=Tworzenie ~miniatur
+
+#
+# Help file title
+#
+HLP_TITLE=Lucide User's Guide

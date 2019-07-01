@@ -38,6 +38,8 @@
 #include <string.h>
 #include <process.h>
 
+//#define INCL_LOADEXCEPTQ
+//#include "exceptq.h"
 //
 // Lcd.exe sets BEGINLIBPATH to directory where Lucide resides
 // and executes Lucide.exe
@@ -52,18 +54,23 @@ int main( int argc, char *argv[] )
     char buf[ CCHMAXPATH + 15 /*";%BEGINLIBPATH%"*/ ] = { 0 };
     HMODULE hmod = NULLHANDLE;
     APIRET rc = 0;
+    //EXCEPTIONREGISTRATIONRECORD exRegRec;
 
 #ifdef __TEST__
     PPIB pib;
     PTIB tib;
+    //LoadExceptq(&exRegRec, "I", "Lucide "VERSION);
     DosGetInfoBlocks(&tib, &pib);
     pib->pib_ultype = 3;
+#else
+    //LoadExceptq(&exRegRec, "I", "Lucide "VERSION);
 #endif
 
     // fill lucide dir
     strcpy( buf, argv[0] );
     if ( ( last_slash = strrchr( buf, '\\' ) ) == NULL )
     {
+        //UninstallExceptq(&exRegRec);
         return 1;
     }
     else
@@ -76,7 +83,7 @@ int main( int argc, char *argv[] )
     // set beginlibpath
     DosSetExtLIBPATH( buf, BEGIN_LIBPATH );
 
-    rc = DosLoadModule( buf, sizeof( buf ), "Lucide", &hmod );
+    rc = DosLoadModule( buf, sizeof( buf ), "Lucide1", &hmod );
     if ( rc == 0 )
     {
         PFN pfn = NULL;
@@ -97,11 +104,11 @@ int main( int argc, char *argv[] )
         hmq = WinCreateMsgQueue( hab, 0 );
 
         if ( buf[0] == 0 ) { // No modulename
-            snprintf( msg, sizeof( msg ), "Error loading Lucide.dll: SYS%04u", rc );
+            snprintf( msg, sizeof( msg ), "Error loading Lucide1.dll: SYS%04u", rc );
         }
         else {
             snprintf( msg, sizeof( msg ),
-                      "Error loading Lucide.dll: can't find module '%s' (SYS%04u)",
+                      "Error loading Lucide1.dll: can't find module '%s' (SYS%04u)",
                       buf, rc );
         }
         WinMessageBox( HWND_DESKTOP, NULLHANDLE, msg, NULL, 1, MB_OK | MB_MOVEABLE );
@@ -109,7 +116,7 @@ int main( int argc, char *argv[] )
         WinDestroyMsgQueue( hmq );
         WinTerminate( hab );
     }
-
+    //UninstallExceptq(&exRegRec);
     return result;
 }
 

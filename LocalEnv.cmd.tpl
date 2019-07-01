@@ -20,7 +20,7 @@ G.PATH_TOOL_KBUILD      = ''
 
 /**
  * Path to the GCC 4.x.x environment script. Leave it empty if you already have
- * GCC 4.x.x in path.
+ * already setup the GCC 4.x.x environment.
  */
 G.PATH_TOOL_GCC4_ENV    = ''
 
@@ -35,3 +35,17 @@ G.PATH_SDK_SOM          = ''
  */
 G.PATH_LIB_CURL_INCS    = ''
 G.PATH_LIB_CURL_LIBPATH = ''
+
+/**
+ * Path where wic.exe and WPIRTL.DLL Leave it
+ * empty if you have them in paths.
+ */
+
+G.PATH_TOOL_WARPIN      = ''
+
+/**
+ * Path to the SOM environment script. Leave it empty if you already have
+ * setup the SOM environment.
+ */
+
+G.PATH_TOOL_SOM_ENV     = ''

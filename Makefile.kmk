@@ -8,9 +8,8 @@ include $(KBUILD_PATH)/subheader.kmk
 #
 # Include sub-makefiles
 #
-include $(PATH_SUB_CURRENT)/poppler/Makefile.kmk
-include $(PATH_SUB_CURRENT)/libdjvu/Makefile.kmk
-include $(PATH_SUB_CURRENT)/libjpeg/Makefile.kmk
+#include $(PATH_SUB_CURRENT)/libdjvu/Makefile.kmk
+#include $(PATH_SUB_CURRENT)/libjpeg/Makefile.kmk
 include $(PATH_SUB_CURRENT)/Lucide/Makefile.kmk
 
 #
@@ -26,8 +25,96 @@ LUCIDE_WPI	 = $(PATH_OUT)/Lucide-$(FILE_VERSION).wpi
 LUCIDE_ZIP	 = $(PATH_OUT)/Lucide-$(FILE_VERSION).zip
 
 LUCIDE_WIS	 = $(PATH_PACKING)/wpi/lucide.wis
+WIC              = WIC.EXE
+
+LCD_DEF          = $(PATH_ROOT)/lucide/gui/lcd.def
+LUCIDE1_DEF      = $(PATH_ROOT)/lucide/gui/lucide1.def
+LUDJVU_DEF       = $(PATH_ROOT)/lucide/plugins/ludjvu/ludjvu.def
+LUDOC_DEF        = $(PATH_ROOT)/lucide/plugins/ludoc/ludoc.def
+LUJPEG_DEF       = $(PATH_ROOT)/lucide/plugins/lujpeg/lujpeg.def
+LUPOPPLER_DEF    = $(PATH_ROOT)/lucide/plugins/lupoppler/lupoppler.def
+LUGBM_DEF        = $(PATH_ROOT)/lucide/plugins/lugbm/lugbm_gcc.def
 
 OTHER_CLEAN	+= $(LUCIDE_WPI) $(LUCIDE_ZIP) $(LUCIDE_WIS)
+
+#
+# Fixme PACKING fails on missing def if this is enabled 
+#
+
+# OTHER_CLEAN	+= $(LUDJVU_DEF) $(LUDOC_DEF) $(LUJPEG_DEF) $(LUPOPPLER_DEF) $(LCD_DEF) $(LUCIDE1_DEF)
+
+#
+# Add target to build the def files from template set/update VERSION, VERSIONDATE
+# VERSIONTIME and BUILDMACHINE in Config.kmk first. Always run kmk -B DEFINES to
+# force them to rebuild.
+#
+
+DEFINES: $(LUCIDE1_DEF) $(LCD_DEF) $(LUDJVU_DEF) $(LUDOC_DEF) $(LUJPEG_DEF) $(LUPOPPLER_DEF) $(LUGBM_DEF)
+
+$(LUCIDE1_DEF): lucide/gui/lucide1.def.tpl Config.kmk  | $$(call DIRDEP,$$(@D))
+	$(call MSG_L1,Generating $@)
+	$(QUIET)$(SED) \
+		-e "s;\\\$${VERSION};$(VERSION);g" \
+		-e "s;\\\$${BUILD};$(BUILD);g" \
+		-e "s;\\\$${VERSIONDATE};$(VERSIONDATE);g" \
+		-e "s;\\\$${VERSIONTIME};$(VERSIONTIME);g" \
+		-e "s;\\\$${BUILDMACHINE};$(BUILDMACHINE);g" \
+		--output $@  $<
+		
+$(LCD_DEF): lucide/gui/lcd.def.tpl Config.kmk | $$(call DIRDEP,$$(@D))
+	$(call MSG_L1,Generating $@)
+	$(QUIET)$(SED) \
+		-e "s;\\\$${VERSION};$(VERSION);g" \
+		-e "s;\\\$${BUILD};$(BUILD);g" \
+		-e "s;\\\$${VERSIONDATE};$(VERSIONDATE);g" \
+		-e "s;\\\$${VERSIONTIME};$(VERSIONTIME);g" \
+		-e "s;\\\$${BUILDMACHINE};$(BUILDMACHINE);g" \
+		--output $@  $<	  
+		
+$(LUDJVU_DEF): Lucide/plugins/ludjvu/ludjvu.def.tpl Config.kmk | $$(call DIRDEP,$$(@D))
+	$(call MSG_L1,Generating $@)
+	$(QUIET)$(SED) \
+		-e "s;\\\$${VERSION};$(VERSION);g" \
+		-e "s;\\\$${BUILD};$(BUILD);g" \
+		-e "s;\\\$${VERSIONDATE};$(VERSIONDATE);g" \
+		-e "s;\\\$${VERSIONTIME};$(VERSIONTIME);g" \
+		-e "s;\\\$${BUILDMACHINE};$(BUILDMACHINE);g" \
+		--output $@  $<	  
+$(LUDOC_DEF):  Lucide/plugins/ludoc/ludoc.def.tpl Config.kmk | $$(call DIRDEP,$$(@D))
+	$(call MSG_L1,Generating $@)
+	$(QUIET)$(SED) \
+		-e "s;\\\$${VERSION};$(VERSION);g" \
+		-e "s;\\\$${BUILD};$(BUILD);g" \
+		-e "s;\\\$${VERSIONDATE};$(VERSIONDATE);g" \
+		-e "s;\\\$${VERSIONTIME};$(VERSIONTIME);g" \
+		-e "s;\\\$${BUILDMACHINE};$(BUILDMACHINE);g" \
+		--output $@  $<	  
+$(LUJPEG_DEF): Lucide/plugins/lujpeg/lujpeg.def.tpl  Config.kmk | $$(call DIRDEP,$$(@D))
+	$(call MSG_L1,Generating $@)
+	$(QUIET)$(SED) \
+		-e "s;\\\$${VERSION};$(VERSION);g" \
+		-e "s;\\\$${BUILD};$(BUILD);g" \
+		-e "s;\\\$${VERSIONDATE};$(VERSIONDATE);g" \
+		-e "s;\\\$${VERSIONTIME};$(VERSIONTIME);g" \
+		-e "s;\\\$${BUILDMACHINE};$(BUILDMACHINE);g" \
+		--output $@  $<	  
+$(LUPOPPLER_DEF): Lucide/plugins/lupoppler/lupoppler.def.tpl Config.kmk | $$(call DIRDEP,$$(@D))
+	$(call MSG_L1,Generating $@)
+	$(QUIET)$(SED) \
+		-e "s;\\\$${VERSION};$(VERSION);g" \
+		-e "s;\\\$${BUILD};$(BUILD);g" \
+		-e "s;\\\$${VERSIONDATE};$(VERSIONDATE);g" \
+		-e "s;\\\$${VERSIONTIME};$(VERSIONTIME);g" \
+		-e "s;\\\$${BUILDMACHINE};$(BUILDMACHINE);g" \
+		--output $@  $<	  
+$(LUGBM_DEF): Lucide/plugins/lugbm/lugbm.def.tpl Config.kmk | $$(call DIRDEP,$$(@D))
+	$(call MSG_L1,Generating $@)
+	$(QUIET)$(SED) \
+		-e "s;\\\$${GBMVERSION};$(GBMVERSION);g" \
+		-e "s;\\\$${VERSIONDATE};$(VERSIONDATE);g" \
+		-e "s;\\\$${VERSIONTIME};$(VERSIONTIME);g" \
+		-e "s;\\\$${BUILDMACHINE};$(BUILDMACHINE);g" \
+		--output $@  $<	  
 
 ifeq ($(IN_PACKING),)
 
@@ -37,7 +124,7 @@ ifeq ($(IN_PACKING),)
 #
 PACKING		 = do_packing
 
-do_packing:
+PACKING:
 	$(RM) -fR $(PATH_PACKING)
 	$(QUIET)$(MAKE) IN_PACKING=1 uninstall rebuild packing
 
@@ -54,7 +141,10 @@ else
 # Real packing rules
 #
 INSTALLS	 = Lucide_wpi_1 Lucide_wpi_2 Lucide_wpi_3 Lucide_wpi_4 Lucide_wpi_5 \
-		   Lucide_wpi_6 Lucide_wpi_7 Lucide_wpi_8 Lucide_wpi_9 Lucide_wpi_10 \
+		   Lucide_wpi_6 Lucide_wpi_7 Lucide_wpi_8 Lucide_wpi_1033 \
+		   Lucide_wpi_1049 Lucide_wpi_1031 Lucide_wpi_1034 \
+		   Lucide_wpi_1046 Lucide_wpi_1039 Lucide_wpi_1421 Lucide_wpi_1045 \
+		   Lucide_wpi_1007 Lucide_wpi_1088 \
 		   Lucide_zip
 PACKING		 = $(LUCIDE_WPI) $(LUCIDE_ZIP)
 
@@ -67,8 +157,9 @@ Lucide_wpi_1_SOURCES	 = \
 	$(Lucide_1_TARGET) \
 	$(Lucide_dll_1_TARGET) \
 	$(ludoc_1_TARGET) \
+	$(Lucide_en.hlp_1_TARGET) \
 	$(abspathex $(Lucide_doc_SOURCES),$(Lucide_doc_DEFPATH)) \
-	$(abspathex $(Lucide_lng_SOURCES),$(Lucide_lng_DEFPATH))
+	$(PATH_OBJ)\Lucide_en.hlp\gbm_en.hlp
 
 Lucide_wpi_2_INST		 = $(notdir $(PATH_PACKING))/wpi/2/
 Lucide_wpi_2_SOURCES	 = $(lupoppler_1_TARGET)
@@ -80,32 +171,68 @@ Lucide_wpi_4_INST		 = $(notdir $(PATH_PACKING))/wpi/4/
 Lucide_wpi_4_SOURCES	 = $(lujpeg_1_TARGET)
 
 Lucide_wpi_5_INST		 = $(notdir $(PATH_PACKING))/wpi/5/
-Lucide_wpi_5_SOURCES	 = warpin/LngDummy.txt
+Lucide_wpi_5_SOURCES	 = $(lugbm_1_TARGET) \
+                           $(abspathex $(Lugbm_doc_SOURCES),$(Lugbm_doc_DEFPATH))
 
 Lucide_wpi_6_INST		 = $(notdir $(PATH_PACKING))/wpi/6/
-Lucide_wpi_6_SOURCES	 = warpin/LngDummy.txt
+Lucide_wpi_6_SOURCES	 = $(PATH_SUB_CURRENT)/Lucide/lng/Lucide.lng
 
 Lucide_wpi_7_INST		 = $(notdir $(PATH_PACKING))/wpi/7/
-Lucide_wpi_7_SOURCES	 = warpin/LngDummy.txt
+Lucide_wpi_7_SOURCES	 = $(wildcard $(PATH_SUB_CURRENT)/Lucide/gui/alticons/lucide_*.ICO)
 
 Lucide_wpi_8_INST		 = $(notdir $(PATH_PACKING))/wpi/8/
-Lucide_wpi_8_SOURCES	 = warpin/LngDummy.txt
+Lucide_wpi_8_SOURCES	 = $(wildcard $(PATH_OBJ)/*/*.map) \
+			   $(wildcard $(PATH_OBJ)/*/*.sym) \
+			   $(wildcard $(PATH_OBJ)/*/*.xqs)
 
-Lucide_wpi_9_INST		 = $(notdir $(PATH_PACKING))/wpi/9/
-Lucide_wpi_9_SOURCES	 = warpin/LngDummy.txt
+Lucide_wpi_1033_INST		 = $(notdir $(PATH_PACKING))/wpi/1033/
+Lucide_wpi_1033_SOURCES	 = $(PATH_SUB_CURRENT)/Lucide/readme_fr.txt \
+                           $(PATH_SUB_CURRENT)/Lucide/lng/Lucide_fr.lng
 
-Lucide_wpi_10_INST		 = $(notdir $(PATH_PACKING))/wpi/10/
-Lucide_wpi_10_SOURCES	 = warpin/LngDummy.txt
+Lucide_wpi_1049_INST		 = $(notdir $(PATH_PACKING))/wpi/1049/
+Lucide_wpi_1049_SOURCES	 = $(PATH_SUB_CURRENT)/Lucide/readme_de.txt \
+                           $(PATH_SUB_CURRENT)/Lucide/lng/Lucide_de.lng
+
+Lucide_wpi_1031_INST		 = $(notdir $(PATH_PACKING))/wpi/1031/
+Lucide_wpi_1031_SOURCES	 = $(PATH_SUB_CURRENT)/Lucide/readme_nl.txt \
+                           $(PATH_SUB_CURRENT)/Lucide/lng/Lucide_nl.lng
+
+Lucide_wpi_1034_INST		 = $(notdir $(PATH_PACKING))/wpi/1034/
+Lucide_wpi_1034_SOURCES	 = $(PATH_SUB_CURRENT)/Lucide/readme_es.txt \
+                           $(PATH_SUB_CURRENT)/Lucide/lng/Lucide_es.lng \
+			   $(PATH_SUB_CURRENT)/Lucide/plugins/lugbm/doc/readme_gbmlucide_es.txt \
+                           $(PATH_SUB_CURRENT)/Lucide/plugins/lugbm/doc/lugbm_es.cfg \
+			   $(PATH_OBJ)\Lucide_en.hlp\Lucide_es.hlp
+
+Lucide_wpi_1046_INST		 = $(notdir $(PATH_PACKING))/wpi/1046/
+Lucide_wpi_1046_SOURCES	 = $(PATH_SUB_CURRENT)/Lucide/lng/Lucide_sv.lng
+
+Lucide_wpi_1039_INST		 = $(notdir $(PATH_PACKING))/wpi/1039/
+Lucide_wpi_1039_SOURCES	 = $(PATH_SUB_CURRENT)/Lucide/readme_it.txt \
+                           $(PATH_SUB_CURRENT)/Lucide/lng/Lucide_it.lng
+
+Lucide_wpi_1421_INST		 = $(notdir $(PATH_PACKING))/wpi/1421/
+Lucide_wpi_1421_SOURCES	 = $(PATH_SUB_CURRENT)/Lucide/readme_cs.txt  \
+                           $(PATH_SUB_CURRENT)/Lucide/lng/lucide_cs_cz.lng
+
+Lucide_wpi_1045_INST		 = $(notdir $(PATH_PACKING))/wpi/1045/
+Lucide_wpi_1045_SOURCES	 = $(PATH_SUB_CURRENT)/Lucide/lng/Lucide_da.lng
+
+Lucide_wpi_1007_INST		 = $(notdir $(PATH_PACKING))/wpi/1007/
+Lucide_wpi_1007_SOURCES	 = $(PATH_SUB_CURRENT)/Lucide/lng/Lucide_ru.lng
+
+Lucide_wpi_1088_INST		 = $(notdir $(PATH_PACKING))/wpi/1088/
+Lucide_wpi_1088_SOURCES	 = $(PATH_SUB_CURRENT)/Lucide/lng/Lucide_zh_TW.lng
 
 
 $(LUCIDE_WPI): $(LUCIDE_WIS) install
 	$(call MSG_L1,Packing $@)
-	-$(QUIET)$(RM) -f $@
+	$(QUIET)$(RM) -f $@
 	$(QUIET)echo > $(abspathex $(Lucide_wpi_1_INST),$(PATH_OUT)/dist)/lucide.fcf
-	$(QUIET)wic -a $@ \
+	$(QUIET)$(WIC) -a $@ \
 		$(foreach p,$(patsubst Lucide_wpi_%,%,$(filter Lucide_wpi_%,$(INSTALLS))),\
 			$(p) -c$(abspathex $(Lucide_wpi_$(p)_INST),$(PATH_OUT)/dist) \*) \
-		-s $(LUCIDE_WIS)
+		-s $(LUCIDE_WIS) -v
 
 $(LUCIDE_WIS): warpin/lucide.wis.tpl Config.kmk | $$(call DIRDEP,$$(@D))
 	$(call MSG_L1,Generating $@)
@@ -136,3 +263,4 @@ endif # IN_PACKING
 
 include $(FILE_KBUILD_SUB_FOOTER)
 
+

@@ -31,7 +31,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-
+#define INCL_WIN
 #define INCL_SPL
 #define INCL_SPLDOSPRINT
 #include "os2all.h"
@@ -76,6 +76,9 @@ typedef _find find_t;
 #include "Lucide_res.h"
 #include "messages.h"
 
+//#define INCL_EXCEPTQ_CLASS
+//#define INCL_LOADEXCEPTQ
+//#include "exceptq.h"
 
 #define ID_SPLITTER 1
 
@@ -106,6 +109,8 @@ HWND  hHorizSplitter = NULLHANDLE;
 HWND  hFrameSysmenu  = NULLHANDLE;
 HWND  hFrameTitlebar = NULLHANDLE;
 HWND  hFrameMinMax   = NULLHANDLE;
+HELPINIT hini;
+HINI hinilucideprofile;
 
 Environment    *ev        = somGetGlobalEnvironment();
 LuDocument     *doc       = NULL;
@@ -123,6 +128,7 @@ SHORT        Lucide::splitterPos                   = 100;
 bool         Lucide::showIndex                     = true;
 bool         Lucide::isFullscreen                  = false;
 bool         Lucide::isPresentation                = false;
+bool         Lucide::Thumbnail                     = true;
 LuWindowPos  Lucide::winPos                        = {0};
 char         Lucide::docFullName[ CCHMAXPATH ]     = "";
 char         Lucide::docFileName[ CCHMAXPATHCOMP ] = "";
@@ -136,6 +142,7 @@ char        *Lucide::loadError                     = NULL;
 long         Lucide::loadErrorCode                 = LU_LDERR_NO_ERROR;
 char        *Lucide::thumbnailData                 = NULL;
 int          Lucide::thumbnailDataLen              = 0;
+HWND         Lucide::hwndHelp                      = NULLHANDLE;
 
 // List of files in current directory
 static std::vector<std::string> fileList;
@@ -215,19 +222,14 @@ void Lucide::setOfPages( long pages )
     char pgnum[ 32 ];
 
     // set current page
-    snprintf(pgnum, sizeof(pgnum), "%i", pages >0 ? 1:0);
-    WinSetDlgItemText(hToolBar, TBID_PAGENUM, pgnum);
+    WinSendDlgItemMsg( hToolBar, TBID_PAGENUM, SPBM_SETLIMITS,
+                      MPFROMLONG( pages ), MPFROMLONG( 1 ) );
 
     // set of pages
     char *pgfrm = newstrdupL( TB_PAGENUM );
     snprintf( pgnum, sizeof( pgnum ), pgfrm, pages );
     delete pgfrm;
     WinSetDlgItemText( hToolBar, TBID_OFPAGES, pgnum );
-
-    // set the maximum length for current page
-    snprintf(pgnum, sizeof(pgnum), "%d", pages);
-    WinSendDlgItemMsg( hToolBar, TBID_PAGENUM, EM_SETTEXTLIMIT,
-                              MPFROMSHORT((SHORT)strlen(pgnum)), NULL);
 
 }
 
@@ -244,13 +246,15 @@ void Lucide::checkNavigationMenus()
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_NEXTPAGE), (MPARAM)enlast );
     WinEnableMenuItem( hWndMenu, CM_LASTPAGE, enlast );
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_LASTPAGE), (MPARAM)enlast );
+    bool chkback = docViewer->getPreviousPage() >= 0;
+    WinEnableMenuItem( hWndMenu, CM_BACKNAV, chkback );
 
     // set actual page
     bool tmp = dontSwitchPage;
     dontSwitchPage = true;
     char pgnum[32];
-    snprintf(pgnum, sizeof(pgnum), "%i", docViewer->getCurrentPage() + 1);
-    WinSetDlgItemText(hToolBar, TBID_PAGENUM, pgnum);
+    WinSendDlgItemMsg( hToolBar, TBID_PAGENUM, SPBM_SETCURRENTVALUE,
+                               MPFROMLONG( docViewer->getCurrentPage() + 1 ), MPVOID );
     dontSwitchPage = tmp;
     indexWin->goToPage( NULL, docViewer->getCurrentPage() );
 }
@@ -335,6 +339,9 @@ void Lucide::checkMenus( bool initial )
             WinCheckMenuItem( hWndMenu, CM_SINGLEPAGE, TRUE );
         }
 
+        WinEnableMenuItem( hWndMenu, CM_BACK, FALSE );
+        WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_BACK), (MPARAM)FALSE );
+        WinEnableMenuItem( hWndMenu, CM_SAVE, FALSE );
         WinEnableMenuItem( hWndMenu, CM_SAVEAS, FALSE );
         WinEnableMenuItem( hWndMenu, CM_CLOSE, FALSE );
         WinEnableMenuItem( hWndMenu, CM_PRINT, FALSE );
@@ -358,6 +365,7 @@ void Lucide::checkMenus( bool initial )
         WinEnableMenuItem( hWndMenu, CM_LASTPAGE, FALSE );
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_LASTPAGE), (MPARAM)FALSE );
         WinEnableMenuItem( hWndMenu, CM_GOTOPAGE, FALSE );
+        WinEnableMenuItem( hWndMenu, CM_BACKNAV, FALSE );
 
         WinEnableMenuItem( hWndMenu, CM_FITWINDOW, FALSE );
         WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FITWINDOW), (MPARAM)FALSE );
@@ -386,6 +394,11 @@ void Lucide::checkMenus( bool initial )
 
     WinEnableMenuItem( hWndMenu, CM_PRINT, TRUE );
     WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_PRINT), (MPARAM)TRUE );
+    bool chkback = docViewer->getPreviousPage() >= 0;
+    WinEnableMenuItem( hWndMenu, CM_BACK, chkback );
+    WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_BACK), (MPARAM)chkback );
+    WinEnableMenuItem( hWndMenu, CM_SAVE, doc->isSaveable( ev ) &&
+                      doc->isHaveInputFields( ev ));
     WinEnableMenuItem( hWndMenu, CM_SAVEAS, doc->isSaveable( ev ) );
     WinEnableMenuItem( hWndMenu, CM_CLOSE, TRUE );
     setOfPages( doc->getPageCount( ev ) );
@@ -455,6 +468,8 @@ bool Lucide::closeDocument( bool force )
     if ( doc != NULL ) {
         if ( !docViewer->close( force ) && !force )
             return false;
+        WinSendDlgItemMsg( hToolBar, TBID_PAGENUM, SPBM_SETLIMITS,
+                      MPFROMLONG( 0 ), MPFROMLONG( 0 ) );
         delete doc;
         doc = NULL;
         WinSetWindowText( hWndFrame, title );
@@ -474,26 +489,58 @@ bool Lucide::closeDocument( bool force )
     return true;
 }
 
-void Lucide::loadthread( void* )
+void Lucide::loadthread( void* p)
 {
     HAB thab = WinInitialize( 0 );
     HMQ thmq = WinCreateMsgQueue( thab, 0 );
 
-    docLoaded = doc->loadFile( ev, docFullName, password, &loadErrorCode, &loadError );
-    if ( docLoaded ) {
-        if ( doc->isCreateFileThumbnail( ev ) && isThumbNeeded( docFullName ) ) {
-            loadProgressDlg->setText( getLocalizedString( MSGS_CREATING_THUMBNAIL ).c_str() );
-            createThumbnail( doc );
+    docLoaded = doc->loadFile( ev, docFullName, password, &loadErrorCode,
+                              &loadError );
+
+    //From FM2 valid.c 339
+    EASIZEBUF easize	= {0};
+    ULONG   ulDataLen	= sizeof(EASIZEBUF);
+    ULONG   ulParmLen	= 0;
+    CHAR szPath[4] = {0};
+
+    strncpy( szPath, docFullName, 3);
+    DosFSCtl(&easize, sizeof(EASIZEBUF), &ulDataLen, NULL, ulParmLen,
+             &ulParmLen, FSCTL_MAX_EASIZE, szPath, -1, FSCTL_PATHNAME);
+    //End FM2 code
+    
+    if ( !p && docLoaded && !password  && Thumbnail && easize.cbMaxEASize > 0 &&
+        doc->isCreateFileThumbnail( ev ) && isThumbNeeded( docFullName ) &&
+       doc->isScalable( ev )) {
+        loadProgressDlg->setText( getLocalizedString( MSGS_CREATING_THUMBNAIL ).c_str() );
+        if (!createThumbnail( doc ))
+        {
+            docLoaded = FALSE;
         }
     }
+    else if ( docLoaded && doc->getPageCount( ev ) > 0 ) {
+        double width = 0, height = 0;
+        doc->getPageSize( ev, 0, &width, &height );
+        if ( width <= 0.00001 || height <= 0.00001 )
+        {
+            docLoaded = FALSE;
+        }
+    }
+    else if (loadErrorCode != LU_LDERR_ENCRYPTED) // encrypted must loop to get password
+    {
+        docLoaded = FALSE;
+    }
+    if (!p) {
+    ULONG sz = sizeof( bool );
+    PrfQueryProfileData( hinilucideprofile, appName, "thumbnail", &Thumbnail, &sz );
     loadProgressDlg->hide();
+    }
 
     WinDestroyMsgQueue( thmq );
     WinTerminate( thab );
     _endthread();
 }
 
-void Lucide::loadDocument( const char *fn )
+void Lucide::loadDocument( const char *fn, bool saveme )
 {
     // test if file supported and then close previous opened document
     if ( pluginMan->createDocumentForFile( fn, true ) == NULL )
@@ -532,18 +579,24 @@ void Lucide::loadDocument( const char *fn )
                 loadError = NULL;
 
                 // Load document asynchronously
-                loadProgressDlg = new ProgressDlg( hWndFrame );
-                char *ldmsg = newstrdupL( MSGS_LOADING_DOCUMENT );
-                loadProgressDlg->setText( ldmsg );
-                delete ldmsg;
-                loadProgressDlg->show( loadthread, NULL ); // doc will be loaded
-                delete loadProgressDlg;
+                if ( saveme ) {
+                    _beginthread( loadthread, NULL, 262144,(void *) 1 );
+                    DosSleep(10);
+                }
+                else {
+                    loadProgressDlg = new ProgressDlg( hWndFrame );
+                    char *ldmsg = newstrdupL( MSGS_LOADING_DOCUMENT );
+                    loadProgressDlg->setText( ldmsg );
+                    delete ldmsg;
+                    loadProgressDlg->show( loadthread, NULL ); // doc will be loaded
+                    delete loadProgressDlg;
+                }
+                
 
                 if ( password != NULL ) {
                     delete password;
                     password = NULL;
                 }
-
                 if ( docLoaded )
                 {
                     char *t = new char[ 2048 ];
@@ -568,7 +621,8 @@ void Lucide::loadDocument( const char *fn )
                     {
                         char *m = newstrdupL( MSGS_FILE_LOAD_ERROR );
                         WinMessageBox( HWND_DESKTOP, hWndFrame, m,
-                                       NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
+                                      NULL, 0,
+                                      MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
                         delete m;
                     }
                     else
@@ -628,10 +682,10 @@ void Lucide::loadDocument( const char *fn )
                             WinMessageBox( HWND_DESKTOP, hWndFrame, errmsg, NULL, 0,
                                            MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
                         }
-                        delete errmsg;
+                        delete[] errmsg;
                     } // ( loadErrorCode == LU_LDERR_NO_ERROR )
 
-                    if ( password == NULL ) {
+                    if ( doc && !password ) {
                         delete doc;
                         doc = NULL;
                     }
@@ -665,7 +719,7 @@ void Lucide::readMask( const char *mask )
         _dos_findclose( &ffblk );
 
     }
-    delete buf;
+    delete[] buf;
 }
 
 // comparison, not case sensitive.
@@ -699,7 +753,7 @@ void Lucide::openDocument()
     memset( fd, 0, sizeof( FILEDLG ) );
     fd->cbSize = sizeof( FILEDLG );
     fd->fl = FDS_CENTER | FDS_OPEN_DIALOG;
-    PrfQueryProfileString( HINI_USERPROFILE, appName, prfLvd, "",
+    PrfQueryProfileString( hinilucideprofile, appName, prfLvd, "",
                            fd->szFullFile, sizeof( fd->szFullFile ) );
     LcdFileDlg( HWND_DESKTOP, hWndFrame, fd );
     if ( fd->lReturn == DID_OK )
@@ -709,13 +763,97 @@ void Lucide::openDocument()
         char buf[ _MAX_PATH ] = "";
         _splitpath( fd->szFullFile, drv, dir, NULL, NULL );
         _makepath( buf, drv, dir, NULL, NULL );
-        PrfWriteProfileString( HINI_USERPROFILE, appName, prfLvd, buf );
+        PrfWriteProfileString( hinilucideprofile, appName, prfLvd, buf );
 
         loadDocument( fd->szFullFile );
     }
     delete fd;
 }
+#if 1
+bool Lucide::saveDocument()
+{
+    bool saved = false;
+    bool loaded = false;
+    int buflen = 0;
+    short vposition;
+    short hposition;
+    double zoom;
+    long rotation;
+    long page;
+    char dirbuf[ CCHMAXPATH ];
+    char tempbuf[ CCHMAXPATH ];
 
+    if ( getenv( "TEMP" ))
+        strcpy(dirbuf,  getenv( "TEMP" ));
+    else if ( getenv( "TMP" ))
+        strcpy(dirbuf,  getenv( "TMP" ));
+    else if ( getenv( "TMPDIR" ))
+        strcpy(dirbuf,  getenv( "TMPDIR" ));
+    else
+    {
+        char *m = newstrdupL( MSGS_NO_TEMP_DIR_ERROR );
+        WinMessageBox( HWND_DESKTOP, hWndFrame, m, NULL,
+                       0, MB_OK | MB_ERROR | MB_MOVEABLE );
+        delete m;
+    }
+    buflen = strlen(dirbuf);
+    if ((dirbuf[buflen -1] != '\\') && (dirbuf[buflen -1] != '/') &&
+        (buflen < sizeof(dirbuf)))
+    {
+       strcat(dirbuf, "\\");
+    }
+
+    char fil[ _MAX_FNAME ] = "";
+    char ext[ _MAX_EXT ] = "";
+    _splitpath( docFullName, NULL, NULL, fil, ext );
+    strcat(dirbuf, fil);
+    strcat(dirbuf, ext);
+    strcpy(tempbuf, docFullName);
+    if (!(saved = doc->saveAs( ev, dirbuf )))
+    {
+        char *m = newstrdupL( MSGS_TEMP_FILE_SAVE_ERROR );
+        WinMessageBox( HWND_DESKTOP, hWndFrame, m, NULL,
+                       0, MB_OK | MB_ERROR | MB_MOVEABLE );
+        delete m;
+        return saved;
+    }
+    else
+    {
+        WinShowWindow(docViewer->getFrameHWND(), false);
+        WinShowWindow(docViewer->getViewHWND(), false);
+        docViewer->resetModifiedState();
+        rotation = docViewer->getRotation();
+        zoom = docViewer->getZoom();
+        vposition = docViewer->getVscrollPos();
+        hposition = docViewer->getHscrollPos();
+        page = docViewer->getCurrentPage();
+        loadDocument( dirbuf, true );
+    }
+    if (!( saved = doc->saveAs( ev, tempbuf ) ) )
+    {
+        char *m = newstrdupL( MSGS_FILE_SAVE_ERROR );
+        WinMessageBox( HWND_DESKTOP, hWndFrame, m, NULL,
+                       0, MB_OK | MB_ERROR | MB_MOVEABLE );
+        delete m;
+    }
+    else
+    {
+        loadDocument( tempbuf, true );
+        docViewer->setZoom( zoom );
+        docViewer->setRotation( rotation );
+        goToPage( page );
+        docViewer->vertScroll( docViewer->getViewHWND(),
+                              MPFROM2SHORT( vposition, SB_SLIDERPOSITION ) );
+        docViewer->horizScroll( docViewer->getViewHWND(),
+                               MPFROM2SHORT( hposition, SB_SLIDERPOSITION ) );
+    }
+    unlink( dirbuf );
+    docViewer->resetModifiedState();
+    WinShowWindow(docViewer->getFrameHWND(), true);
+    WinShowWindow(docViewer->getViewHWND(), true);
+    return saved;
+}
+#endif
 bool Lucide::saveDocumentAs()
 {
     bool saved = false;
@@ -725,8 +863,8 @@ bool Lucide::saveDocumentAs()
     PFILEDLG fd = new FILEDLG;
     memset( fd, 0, sizeof( FILEDLG ) );
     fd->cbSize = sizeof( FILEDLG );
-    fd->fl = FDS_CENTER | FDS_SAVEAS_DIALOG;
-    PrfQueryProfileString( HINI_USERPROFILE, appName, prfLvd, "",
+    fd->fl = FDS_CENTER | FDS_SAVEAS_DIALOG | FDS_ENABLEFILELB;
+    PrfQueryProfileString( hinilucideprofile, appName, prfLvd, "",
                            dirbuf, sizeof( dirbuf ) );
     // it may be possible that the trailing \ is missing, so add it
     buflen = strlen(dirbuf);
@@ -784,13 +922,13 @@ bool Lucide::saveDocumentAs()
             }
             else
             {
-                if ( stricmp( docFullName, fd->szFullFile ) == 0 )
-                    docViewer->resetModifiedState();
+                if ( stricmp( docFullName, fd->szFullFile ) != 0 )
+                    recent->addFile( fd->szFullFile );
+                docViewer->resetModifiedState();
             }
         }
     }
     delete fd;
-
     return saved;
 }
 
@@ -1064,7 +1202,7 @@ void Lucide::newWindow( char *file, bool addDir )
 
     WinStartApp( NULLHANDLE, &pd, param, NULL, 0 );
 
-    delete param;
+    delete[] param;
 }
 
 void Lucide::gotoFile( FileList file )
@@ -1107,7 +1245,97 @@ void Lucide::gotoFile( FileList file )
     strcat( fn, fname.c_str() );
 
     loadDocument( fn );
-    delete fn;
+    delete[] fn;
+}
+/*
+ * open Profile loads Lucide.ini and moves the ini entries from OS2.ini to itself.
+ * The ini entries in luutils.cpp and stbrowser.c should remain in OS2.ini
+ */
+void Lucide::openProfile()
+{
+    char filename[CCHMAXPATH];
+    ULONG sz = sizeof( filename );
+
+    if (PrfQueryProfileString( HINI_USERPROFILE, appName, "Path", "", filename, sz ))
+        strcat( strupr(filename), "\\LUCIDE.INI" );
+    else
+        strcpy( filename, "LUCIDE.INI" );
+    hinilucideprofile = PrfOpenProfile(hab, filename);
+
+    bool converted = FALSE;
+    sz = sizeof( bool );
+    PrfQueryProfileData(hinilucideprofile, appName, "convertedINI", &converted, &sz );
+    
+    if ( !converted ) {
+        sz = sizeof( bool );
+        PrfQueryProfileData( HINI_USERPROFILE, appName, "thumbnail", &Thumbnail, &sz );
+        sz = sizeof( bool );
+        PrfWriteProfileData( hinilucideprofile, appName, "thumbnail", &Thumbnail, sz );
+        sz = sizeof( bool );
+        PrfWriteProfileData( HINI_USERPROFILE, appName, "thumbnail", NULL, sz );
+        sz = sizeof( filename );
+        PrfQueryProfileString( HINI_USERPROFILE, appName, prfLvd, "", filename, sz );
+        PrfWriteProfileString( hinilucideprofile, appName,  prfLvd, filename );
+        PrfWriteProfileString( HINI_USERPROFILE, appName,  prfLvd, NULL );
+        char valbuf[ 3 ] = "";
+        PrfQueryProfileInt( HINI_USERPROFILE, appName, prfSplpos, Lucide::splitterPos );
+        PrfWriteProfileString( hinilucideprofile, appName, prfSplpos,
+                              itoa( Lucide::splitterPos, valbuf, 10 ) );
+        PrfWriteProfileString( HINI_USERPROFILE, appName, prfSplpos, NULL );
+        PrfQueryProfileInt( HINI_USERPROFILE, appName, prfShowind, Lucide::showIndex );
+        PrfWriteProfileString( hinilucideprofile, appName, prfShowind,
+                              itoa( Lucide::showIndex, valbuf, 10 ) );
+        PrfWriteProfileString( HINI_USERPROFILE, appName, prfShowind, NULL );
+        if ( PrfQueryProfileInt( HINI_USERPROFILE, appName, prfFullscreen, 0 ) == 1) {
+            PrfWriteProfileString( hinilucideprofile, appName, prfFullscreen, "1" );
+            PrfWriteProfileString( HINI_USERPROFILE, appName, prfFullscreen, NULL );
+        }
+        if (PrfQueryProfileInt( HINI_USERPROFILE, appName, prfPresentation, 0 ) == 1) {
+            PrfWriteProfileString( hinilucideprofile, appName, prfPresentation, "1" );
+            PrfWriteProfileString( HINI_USERPROFILE, appName, prfPresentation, NULL );
+        }
+        double   zoom;
+        sz = sizeof( zoom );
+        PrfQueryProfileData( HINI_USERPROFILE, appName, "Zoom", &zoom, &sz );
+        sz = sizeof( zoom );
+        PrfWriteProfileData( hinilucideprofile, appName, "Zoom", &zoom, sz );
+        sz = sizeof( zoom );
+        PrfWriteProfileData( HINI_USERPROFILE, appName, "Zoom", NULL, sz );
+        PgLayout layout;
+        char buff[ 10 ];
+        PrfQueryProfileInt( HINI_USERPROFILE, appName, "Layout", layout );
+        PrfWriteProfileString( hinilucideprofile, appName, "Layout", itoa( layout, buff, 10 ) );
+        PrfWriteProfileString( HINI_USERPROFILE, appName, "Layout", NULL );
+        int buttonctl = 0;
+        buttonctl = PrfQueryProfileInt(HINI_USERPROFILE, appName, "useAsImage", buttonctl);
+        PrfWriteProfileString(hinilucideprofile, appName, "useAsImage",
+                              itoa(buttonctl, buff, 10));
+        PrfWriteProfileString(HINI_USERPROFILE, appName, "useAsImage", NULL );
+        buttonctl = 0;
+        buttonctl = PrfQueryProfileInt(HINI_USERPROFILE, appName, "useHigherImageQuality", buttonctl);
+        PrfWriteProfileString(hinilucideprofile, appName, "useHigherImageQuality",
+                              itoa(buttonctl, buff, 10));
+        PrfWriteProfileString(HINI_USERPROFILE, appName, "useHigherImageQuality",NULL );
+        buttonctl = 0;
+        buttonctl = PrfQueryProfileInt(HINI_USERPROFILE, appName, "IgnMargins", buttonctl);
+        PrfWriteProfileString(hinilucideprofile, appName, "IgnMargins",
+                              itoa(buttonctl, buff, 10));
+        PrfWriteProfileString(HINI_USERPROFILE, appName, "IgnMargins", NULL);
+        buttonctl = 0;
+        buttonctl = PrfQueryProfileInt(HINI_USERPROFILE, appName, "PageRange", buttonctl);
+        PrfWriteProfileString(hinilucideprofile, appName, "PageRange",
+                              itoa(buttonctl, buff, 10));
+        PrfWriteProfileString(HINI_USERPROFILE, appName, "PageRange", NULL);
+        int bufsize = ( CCHMAXPATH * RECENT_SIZE ) + RECENT_SIZE + 2;
+        char *buf = new char[ bufsize ];
+        memset( buf, 0, bufsize );
+        PrfQueryProfileString( HINI_USERPROFILE, appName, "RecentFiles", "", buf, bufsize );
+        PrfWriteProfileString( hinilucideprofile, appName, "RecentFiles", buf );
+        PrfWriteProfileString( HINI_USERPROFILE, appName, "RecentFiles", NULL );
+        converted = TRUE;
+        sz = sizeof( bool );
+        PrfWriteProfileData( hinilucideprofile, appName, "convertedINI", &converted, sz );
+    }
 }
 
 void Lucide::savePosition()
@@ -1116,20 +1344,20 @@ void Lucide::savePosition()
         return;
 
     char valbuf[ 3 ] = "";
-    PrfWriteProfileString( HINI_USERPROFILE, appName, prfSplpos,
+    PrfWriteProfileString( hinilucideprofile, appName, prfSplpos,
                            itoa( Lucide::splitterPos, valbuf, 10 ) );
-    PrfWriteProfileString( HINI_USERPROFILE, appName, prfShowind,
+    PrfWriteProfileString( hinilucideprofile, appName, prfShowind,
                            itoa( Lucide::showIndex, valbuf, 10 ) );
 
     if ( isFullscreen )
-        PrfWriteProfileString( HINI_USERPROFILE, appName, prfFullscreen, "1" );
+        PrfWriteProfileString( hinilucideprofile, appName, prfFullscreen, "1" );
     else
-        PrfWriteProfileString( HINI_USERPROFILE, appName, prfFullscreen, NULL );
+        PrfWriteProfileString( hinilucideprofile, appName, prfFullscreen, NULL );
 
     if ( isPresentation )
-        PrfWriteProfileString( HINI_USERPROFILE, appName, prfPresentation, "1" );
+        PrfWriteProfileString( hinilucideprofile, appName, prfPresentation, "1" );
     else
-        PrfWriteProfileString( HINI_USERPROFILE, appName, prfPresentation, NULL );
+        PrfWriteProfileString( hinilucideprofile, appName, prfPresentation, NULL );
 
     if ( !isFullscreen && !isPresentation ) {
         WinQueryWindowPos( hWndFrame, &winPos.Swp );
@@ -1146,17 +1374,17 @@ void Lucide::savePosition()
 
 void Lucide::restorePosition()
 {
-    splitterPos = PrfQueryProfileInt( HINI_USERPROFILE, appName, prfSplpos,
+    splitterPos = PrfQueryProfileInt( hinilucideprofile, appName, prfSplpos,
                                       Lucide::splitterPos );
-    showIndex = PrfQueryProfileInt( HINI_USERPROFILE, appName, prfShowind,
+    showIndex = PrfQueryProfileInt( hinilucideprofile, appName, prfShowind,
                                     Lucide::showIndex );
 
     WinSendMsg( hVertSplitter, SBM_SETSPLITTERPOS,
                 MPFROMSHORT( showIndex ? splitterPos : 0 ), MPVOID );
 
-    bool fullscreen = PrfQueryProfileInt( HINI_USERPROFILE, appName,
+    bool fullscreen = PrfQueryProfileInt( hinilucideprofile, appName,
                                           prfFullscreen, 0 ) == 1;
-    bool presentation = PrfQueryProfileInt( HINI_USERPROFILE, appName,
+    bool presentation = PrfQueryProfileInt( hinilucideprofile, appName,
                                             prfPresentation, 0 ) == 1;
 
     LONG sx, sy;
@@ -1422,8 +1650,20 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     recent->clear();
                     return (MRESULT)FALSE;
 
+                case CM_BACK:
+                case CM_BACKNAV:
+                    docViewer->goToPage(docViewer->getPreviousPage());
+                    docViewer->unsetPreviousPage();
+                    Lucide::checkMenus( false );
+                    Lucide::checkNavigationMenus();
+                    return (MRESULT)FALSE;
+
                 case CM_SAVEAS:
                     Lucide::saveDocumentAs();
+                    return (MRESULT)FALSE;
+
+                case CM_SAVE:
+                    Lucide::saveDocument();
                     return (MRESULT)FALSE;
 
                 case CM_CLOSE:
@@ -1485,13 +1725,16 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
                 case CM_FIND:
                     if ( findDlg->showDialog() == DID_OK ) {
-                        if ( strlen( findDlg->getSearchString() ) > 0 )
+                        if ( strlen( findDlg->getSearchString() ) >= 0 )
                         {
+                            bool clear = TRUE;
                             docViewer->searchDocument( findDlg->getSearchString(),
                                             findDlg->isCaseSensitive(), false, findDlg->doFindBack() );
 
-                            WinEnableMenuItem( hWndMenu, CM_FINDAGAIN, TRUE );
-                            WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FINDAGAIN), (MPARAM)TRUE );
+                            if ( strlen( findDlg->getSearchString() ) == 0 )
+                                clear = FALSE;
+                            WinEnableMenuItem( hWndMenu, CM_FINDAGAIN, clear );
+                            WinSendMsg( hToolBar, TBM_ENABLEITEM, MPFROMSHORT(CM_FINDAGAIN), (MPARAM)clear );
                         }
                     }
                     return (MRESULT)FALSE;
@@ -1598,6 +1841,30 @@ static MRESULT EXPENTRY splProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     Lucide::togglePresentation();
                     return (MRESULT)FALSE;
 
+                case WM_HELP:
+                    if (Lucide::hwndHelp)
+                        WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                   MPFROM2SHORT(1, 0), MPFROMSHORT(HM_RESOURCEID));
+                    break;
+
+                case CM_HELPKEYS:
+                    if (Lucide::hwndHelp)
+                            WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                       MPFROM2SHORT(400, 0), MPFROMSHORT(HM_RESOURCEID));
+                    return (MRESULT)FALSE;
+
+                case CM_HELPPDF:
+                    if (Lucide::hwndHelp)
+                            WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                       MPFROM2SHORT(710, 0), MPFROMSHORT(HM_RESOURCEID));
+                    return (MRESULT)FALSE;
+
+                case CM_HELPDJVU:
+                    if (Lucide::hwndHelp)
+                            WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                       MPFROM2SHORT(780, 0), MPFROMSHORT(HM_RESOURCEID));
+                    return (MRESULT)FALSE;
+
                 case CM_PRODINFO:
                     AboutBox( hWndFrame );
                     return (MRESULT)FALSE;
@@ -1631,15 +1898,16 @@ int deffontlen = sizeof( deffont );
 
 __declspec(dllexport) _System APIRET APIENTRY LucideMain( int argc, char *argv[] )
 {
+    //ScopedExceptqLoader sel;
     HMQ   hmq;
     QMSG  qmsg;
+
     hab = WinInitialize( 0 );
     hmq = WinCreateMsgQueue( hab, 0 );
-
+    
     loadLang();
-
-    settings = new LuSettings;
-    settings->load();
+    // Open the INI file
+    Lucide::openProfile();
 
     pluginMan = new PluginManager;
 
@@ -1652,6 +1920,7 @@ __declspec(dllexport) _System APIRET APIENTRY LucideMain( int argc, char *argv[]
     hWndFrame = WinCreateStdWindow( HWND_DESKTOP, 0, &ulFrameFlags, NULL, title,
                                     WS_SYNCPAINT|WS_VISIBLE, _hmod, IDI_MAIN_ICON, NULL );
     pOldFrameProc = WinSubclassWindow( hWndFrame, frameProc );
+    WinSetWindowUShort( hWndFrame, QWS_ID, MAIN_FRAME );
 
     hFrameSysmenu  = WinWindowFromID( hWndFrame, FID_SYSMENU );
     hFrameTitlebar = WinWindowFromID( hWndFrame, FID_TITLEBAR );
@@ -1660,7 +1929,8 @@ __declspec(dllexport) _System APIRET APIENTRY LucideMain( int argc, char *argv[]
     hWndMenu = WinLoadMenu( hWndFrame, _hmod, IDM_MAINMENU );
     localizeMenu( hWndMenu );
     WinSetWindowUShort( hWndMenu, QWS_ID, FID_MENU );
-
+    
+    
     // Vertical splitter and his windows - Index and Document view
     hVertSplitter = WinCreateWindow( hWndFrame, WC_ER_SPLITTER, "",
                                      WS_VISIBLE | SBS_VSPLIT,
@@ -1688,17 +1958,19 @@ __declspec(dllexport) _System APIRET APIENTRY LucideMain( int argc, char *argv[]
 
     WinSendMsg( hHorizSplitter, SBM_SETWINDOWS,
                 MPFROMHWND( hVertSplitter ), MPFROMHWND( hToolBar ) );
-    // ��⠭����� 䨪�஢���� ࠧ��� ��� �㫡��
+    
     WinSendMsg( hHorizSplitter, SBM_SETFIXEDSIZE,
                 MPFROMSHORT( DEFAULT_PICTSIZE + TOOLBAR_HEIGHT_ADD ), MPVOID );
 
+    settings = new LuSettings;
+    settings->load();
     Lucide::checkMenus( true );
     Lucide::setPageLayout( settings->layout );
     Lucide::setZoom( settings->zoom );
 
     findDlg = new FindDlg( hWndFrame );
     recent  = new RecentFiles( hWndMenu );
-
+    
     Lucide::restorePosition();
 
     Lucide::focusDocview();
@@ -1710,6 +1982,93 @@ __declspec(dllexport) _System APIRET APIENTRY LucideMain( int argc, char *argv[]
     Lucide::checkNavpane();
     initPipeMon( hWndFrame );
 
+    // start help
+    FILESTATUS3 fs3;
+    char helpfile[CCHMAXPATH];
+    char *env  = getenv("LUCIDEHELP");
+    if (env)  {
+        strcpy(helpfile, env);
+    }
+    else {
+        char *lang = getenv("LANG");
+        if (lang) {
+            if (!strnicmp(lang, "es", 2)) {      //Spanish
+                strcpy(helpfile, "lucide_es.hlp");
+            }
+            else if (!strnicmp(lang, "de", 2)) { // German
+                strcpy(helpfile, "lucide_en.hlp"); 
+            }
+            else if (!strnicmp(lang, "cs", 2)) { // Czech
+                strcpy(helpfile, "lucide_en.hlp"); 
+            }
+            else if (!strnicmp(lang, "nl", 2)) { // Dutch
+                strcpy(helpfile, "lucide_en.hlp"); 
+            }
+            else if (!strnicmp(lang, "fr", 2)) { // French
+                strcpy(helpfile, "lucide_en.hlp"); 
+            }
+            else if (!strnicmp(lang, "it", 2)) { // Itailian
+                strcpy(helpfile, "lucide_en.hlp"); 
+            }
+            else if (!strnicmp(lang, "da", 2)) { // Norwegian
+                strcpy(helpfile, "lucide_en.hlp"); 
+            }
+            else if (!strnicmp(lang, "ru", 2)) { // Russian
+                strcpy(helpfile, "lucide_en.hlp"); 
+            }
+            else if (!strnicmp(lang, "sv", 2)) { //  Swedish
+                strcpy(helpfile, "lucide_en.hlp"); 
+            }
+            else if (!strnicmp(lang, "zh", 2)) { //  Chinese
+                strcpy(helpfile, "lucide_en.hlp"); 
+            }
+            else if (!strnicmp(lang, "pl", 2)) { //  Polish
+                strcpy(helpfile, "lucide_en.hlp"); 
+            }
+            else {
+                strcpy(helpfile, "lucide_en.hlp");
+            }
+        }
+        else
+            strcpy(helpfile, "lucide_en.hlp");
+    }
+    char *hlptitle = newstrdupL( HLP_TITLE );
+    memset(&hini, 0, sizeof(HELPINIT));
+    hini.cb = sizeof(HELPINIT);
+    hini.phtHelpTable = (PHELPTABLE) MAKELONG(ID_HELPTABLE, 0xffff);
+    hini.hmodAccelActionBarModule = (HMODULE) 0;
+    hini.pszHelpWindowTitle = (PSZ) hlptitle; //"Lucide User's Guide";
+    hini.hmodHelpTableModule = _hmod;
+    hini.fShowPanelId = CMIC_HIDE_PANEL_ID;
+    hini.pszHelpLibraryName = helpfile;
+    Lucide::hwndHelp = WinCreateHelpInstance(hab, &hini);
+    if (!Lucide::hwndHelp) {
+        char helppath[CCHMAXPATH];
+        char *env = getenv("LUCIDEINSTALLPATH");
+        if (env) {
+            strcpy(helppath, env);
+            DosError(FERR_DISABLEHARDERR);
+            if (!DosQueryPathInfo(helppath, FIL_STANDARD, &fs3, sizeof(fs3))) {
+                if (fs3.attrFile & FILE_DIRECTORY) {
+                    if (strrchr(helppath, '\\') != helppath + strlen(helppath))
+                        strcat(helppath, "\\");
+                    strcat(helppath,  helpfile); 
+                    hini.pszHelpLibraryName = (CHAR *) helppath;
+                    Lucide::hwndHelp = WinCreateHelpInstance(hab, &hini);
+                    if (!Lucide::hwndHelp) {
+                        char *msg = newstrdupL( MSGS_HELP_INSTANCE_FAILED );
+                        WinMessageBox( HWND_DESKTOP, hWndFrame, msg,
+                                      NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
+                        delete msg;
+                    }
+                }
+            }
+        }
+    }
+    delete hlptitle;
+    if ( Lucide::hwndHelp )
+        WinAssociateHelpInstance ( Lucide::hwndHelp, hWndFrame );
+    
     // Messsage loop
     while ( WinGetMsg( hab, &qmsg, 0, 0, 0 ) ) {
         WinDispatchMsg( hab, &qmsg );
@@ -1721,7 +2080,10 @@ __declspec(dllexport) _System APIRET APIENTRY LucideMain( int argc, char *argv[]
 
     recent->save();
 
+    PrfCloseProfile(hinilucideprofile);
+
     Lucide::closeDocument( true );
+
     delete docViewer;
     delete indexWin;
 

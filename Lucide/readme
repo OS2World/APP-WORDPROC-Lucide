@@ -5,113 +5,193 @@ Lucide is a plugin-based document viewer with support for various file formats.
 It provides a SOM based plugin architecture which allows 3rd party programmers
 to easily add more plugins.
 
-
 :: Plugins ::
 
    Supported file type         Supported features
   --------------------------------------------------------------------------
-         PDF                   Scaling, Rotation, Navigation, Text
-                               selection, Searching, Asynchronous rendering,
-                               PostScript printing
+         PDF                   scaling, rotation, navigation, text
+                               selection, searching, asynchronous rendering,
+                               form fill-in, PostScript printing
 
          DJVU                  Scaling, PostScript printing
+         
+         GBM                   document info, loading all formats supported 
+                               by GBM*, save loaded bitmap if it has only one 
+                               page, multipage bitmap viewing, load bitmap 
+                               page on demand, scaling and rotation, file 
+                               thumbnail creation, high quality scaling 
+                               algorithm for improved appearance, configurable 
+                               background rendering for fast page switching 
+                               and continuous scrolling
 
-         JPG                   Scaling
+
+         JPG                   Scaling, JPG is supported by GBM so this isn't
+                               part of the default install                                
+                              
   --------------------------------------------------------------------------
 
+*OS/2 / Windows Bitmap, CompuServe Graphics Interchange,
+ZSoft PC Paintbrush Image, Microsoft/Aldus Tagged Image,
+Truevision Targa/Vista, Amiga IFF/ILBM Interleaved Bitmap,
+YUV12C M-Motion Frame Buffer, Portable Bit-map, Portable Greyscale-map,
+Portable Pixel-map, Portable Anymap, Portable Network Graphics,
+IBM KIPS, IBM Image Access eXecutive, X Windows Bitmap, 
+X Windows PixMap, Archimedes Sprite from RiscOS,
+IBM Printer Page Segment, GEM Raster, Portrait, JPEG Interchange,
+JPEG2000 Graphics, JBIG Joint Bi-level Image experts Group,
+Camera RAW Image  
+  --------------------------------------------------------------------------
+
+:: Comparison to qPDFView ::
+
+Both Lucide and qPDFView utilize the poppler library for rendering PDFs.
+Internal differences between the two program result in some rendering more
+quickly in one program vs the other. Overall, we feel that Lucide has a more
+OS/2-like - or native - feel to its interface, and is better suited to the
+operating system. Lucide also supports native OS2 printers while qPDFView 
+requires CUPS The choice is left entirely to the user as to which is
+better suited to his needs.
 
 :: Requirements ::
 
-Lucide requires the following:
+To install all prerequisites in one go from Arca Noae Package Manager, simply
+copy and paste the following string into the Quick install dialog:
 
-  - libc 0.6.5:
-    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.5-csd5.zip (zip format)
-      or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_5-csd5.wpi (WarpIn format)
-  - gcc446.dll:
-    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (WarpIn format)
+    libc libcx libgcc1 libgcc-fwd libstdc++6 libsupc++6 poppler poppler-data libjpeg djvulibre uclip GBMDLL
 
+If you prefer the yum command line, please type
+
+    yum install libc libcx libgcc1 libgcc-fwd libstdc++6 libsupc++6 poppler poppler-data libjpeg djvulibre uclip GBMDLL
+
+and press <Enter>.
+
+
+Specifically, Lucide requires the following:
+
+  - libc 0.6.6:
+    - http://rpm.netlabs.org/release/00/zip/libc-0_6_6-38_oc00.zip (zip format)
+      or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_6-csd6.wpi (WarpIn format)
+      or "yum install libc" (from the netlabs-rel repository)
+  - libcx 0.6.3
+    - http://rpm.netlabs.org/release/00/zip/libcx-0_6_4-1_oc00.zip (zip format)
+       or "yum install libcx" (from the netlabs-rel repository)
+  - gcc492.dll:
+    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_3_1.wpi (WarpIn format)
+      or "yum install libgcc1 libgcc-fwd" (from the netlabs-rel repository)
+
+For rendering PDFs, Lucide's plugin requires the following:
+
+    - poppler 0.59.0:
+    - "yum install poppler" (from the netlabs-rel repository)
+    
+For rendering DjVu files, Lucide's plugin requires the following:
+
+    - djvulibre 3.5.27:
+    - "yum install djvulibre" (from the netlabs-rel repository)
+    
+For rendering multiple bitmap format files (GBM), Lucide's plugin 
+requires the following:
+
+    - GBMDLL 1.76:
+    - "yum install GBMDLL" (from the netlabs-rel repository)
+    - Installed by default on ArcaOS 5.0.3 and higher
+
+For rendering JPEGs, Lucide's plugin requires the following:
+
+    - libjpeg 8d:
+    - "yum install libjpeg" (from the netlabs-rel repository)
+    - Only needed if you install the JPG plugin GBM provides JPG support
+    - You should not install  JPG and GBM at the same time. (GBM is recommended)
 
 Optional: to place unicode text to the clipboard in OpenOffice.org-compatible
-format you need to install UClip package (enhanced OS/2 clipboard support, 
-installed by default in eComStation 2.0 RC1 and up):
+format you need to install UClip package (enhanced OS/2 clipboard support,
+installed by default in eComStation 2.0 RC1 and up, as well as ArcaOS Blue
+Lion):
 
-  - http://hobbes.nmsu.edu/cgi-bin/h-search?key=UClip
+    - http://hobbes.nmsu.edu/cgi-bin/h-search?key=UClip
+      or "yum install uclip" (from the netlabs-rel repository)
 
-Optional: to have japanese fonts working you need poppler-data pack.
+Optional: to have Japanese fonts working you need the poppler-data package.
 
-  - extract the 4 directories from the package found on http://poppler.freedesktop.org
-    to your %unixroot%/usr/local/share/poppler or to the dir where lucide.exe is installed
-  - take care that the "Times New Roman WT J" font is installed. This font is used 
-    as a fallback
-    
-PostScript printing requires PostScript-capable printer (pscript.drv).
+    - "yum install poppler-data" (from the netlabs-rel repository)
+
+Note: If you install Lucide during the ArcaOS install all these packages
+are installed.
+
+PostScript printing requires PostScript-capable printer (pscript.drv or
+psprint.drv).
 
 
 To see a full list of features and enhancements consult the Lucide TRAC at:
 
-  http://svn.netlabs.org/lucide/
+  https://trac.netlabs.org/lucide/
 
 If you encounter any bugs register them in the TRAC as well, see:
 
-  http://svn.netlabs.org/lucide/newticket
+  https://trac.netlabs.org/lucide/newticket
 
 Please make sure you select the correct version and component for your ticket.
 
-
 :: Known problems/limitations ::
 
-General: even/odd printing unavailable for postscript printing.
-          ( http://svn.netlabs.org/lucide/ticket/87#comment:4 )
-
+See: https://trac.netlabs.org/lucide/report/1
 
 :: Pipe commands ::
 
-The first instance of Lucide will create a named pipe \PIPE\LUCIDE. 
-You may send following commands to this pipe:
+The first instance of Lucide will create a named pipe \PIPE\LUCIDE.
+You may send the following commands to this pipe:
 
 $prev              - will switch to the previous page
 $next              - will switch to the next page
 $presentation      - will switch to presentation (even if minimized)
 $minimize          - will mimimize Lucide (even if fullscreen)
-$rotate            - will rotate 90ø CW
+$rotate            - will rotate 90ï¿½ CW
 $zoomin            - will zoom in
 $zoomout           - will zoom out
-$zoomoriginal      - will zoom to actual size
+$zoomoriginal      - will zoom to the actual size
 
 This can be useful for presentations with a remote control.
 
+:: License through version 1.21 ::
 
-:: License till version 1.21 ::
-
-Lucide version 1.21 and earlier are licensed for use with eComStation only. 
-You are not allowed to distribute the product by uploading it to public 
-Internet servers or make it publicly available by any other means.
-
+Lucide version 1.21 and earlier are licensed for use with eComStation only.
+You are not allowed to distribute the product by uploading it to public
+Internet servers or making it publicly available by any other means.
 
 :: License for version 1.3.0 and better ::
 
-Starting with version 1.3.0 Mensys BV and Serenity Systems International 
+Starting with version 1.3.0, Mensys BV and Serenity Systems International
 have agreed in opensourcing Lucide, while still investing in the product.
-Netlabs.org would like to express it's gratitude toward Mensys BV and 
+Netlabs.org would like to express its gratitude toward Mensys BV and
 Serenity Systems International.
+
+Arca Noae, LLC has agreed to foster development of Lucide from version
+1.3.6 onward. Lucide remains open source, and dual licensed.
 
 Lucide as of version 1.3.0 is released and distributed under CDDL/LGPL.
 
-
 :: Plugin License ::
+
 The plugins are released under CDDL/LGPL or GPL, depending on the plugin. See
 http://svn.netlabs.org/lucide/ for more information and source code.
-
 
 :: Links ::
 
 http://www.netlabs.org
-http://www.ecomstation.com
+https://www.arcanoae.com
 
+:: News groups ::
+   Developer:
+lucide-dev@netlabs.org
+To subscribe: lucide-dev-subscribe@netlabs.org
+   User:
+lucide-user@netlabs.org
+To subscribe: lucide-user-subscribe@netlabs.org
 
 :: Copyright ::
 
 (c) 2006-2007 by Eugene Romanenko, netlabs.org
 (c) 2010-2011 by Dmitriy Kuminov, netlabs.org
     in co-operation with Serenity Systems International
-
+(c) 2016-2019 by netlabs.org
+    in co-operation with Arca Noae, LLC

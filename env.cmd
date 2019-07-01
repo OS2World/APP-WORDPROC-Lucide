@@ -53,6 +53,13 @@ if (symbol('G.PATH_TOOL_GCC4_ENV') \== 'LIT' & G.PATH_TOOL_GCC4_ENV \== '') then
     drop cmdline
 end
 
+/* setup SOM*/
+if (symbol('G.PATH_TOOL_SOM_ENV') \== 'LIT' & G.PATH_TOOL_SOM_ENV \== '') then do
+   cmdline = 'call' G.PATH_TOOL_SOM_ENV
+   cmdline
+   drop cmdline
+end
+
 /* fix the outdated kBuild setting in GCC environment */
 if (EnvGet('BUILD_PLATFORM') == 'OS2') then
     call EnvSet 'BUILD_PLATFORM', 'os2'
@@ -62,6 +69,15 @@ if (EnvGet('BUILD_PLATFORM') == 'OS2') then
 call EnvSet 'PATH_SDK_SOM', translate(G.PATH_SDK_SOM, '/', '\')
 call EnvSet 'PATH_LIB_CURL_INCS', translate(G.PATH_LIB_CURL_INCS, '/', '\')
 call EnvSet 'PATH_LIB_CURL_LIBPATH', translate(G.PATH_LIB_CURL_LIBPATH, '/', '\')
+
+/* setup variables for help file bitmap location */
+call EnvSet 'IPFCARTWORK', translate( directory()'/Lucide/gui/bitmaps', '/', '\') 
+
+/* set path amd beginlib path for building the wpi*/
+if (symbol('G.PATH_TOOL_WARPIN') \== 'LIT' & G.PATH_TOOL_WARPIN \== '') then do
+   call EnvAddFront 'BEGINLIBPATH', G.PATH_TOOL_WARPIN
+   call EnvAddFront 'PATH', G.PATH_TOOL_WARPIN
+end
 
 /* setup OpenWatcom (not necessary any more) */
 /*

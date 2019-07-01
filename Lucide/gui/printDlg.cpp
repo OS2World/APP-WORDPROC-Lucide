@@ -45,11 +45,14 @@
 #include "Lucide_res.h"
 #include "luutils.h"
 #include "messages.h"
-
+#include "Lucide.h"
 
 char PrintDlg::defQueue[] = { 0 };
 static const char * const IgnMargins = "IgnMargins";
 static const char * const PageRange = "PageRange";
+static const char * const useAsImage = "useAsImage";
+static const char * const useHigherImageQuality = "useHigherImageQuality";
+bool canUsePS = false;
 
 
 PrintDlg::PrintDlg( HWND hWndFrame, LuDocument *_doc, const char *fname, long _currentpage )
@@ -98,13 +101,26 @@ void PrintDlg::setCurrentQInfo( HWND hwnd, PPRQINFO3 q )
 
     // Set the print type
     if ( doc->isPostScriptExportable( ev ) && isPostscriptDevice() ) {
+        canUsePS = true;
         WinEnableControl( hwnd, IDC_TYPE_POSTSCRIPT, TRUE );
-        WinCheckButton( hwnd, IDC_TYPE_POSTSCRIPT, TRUE );
+        int buttonctl = 0;
+        buttonctl = PrfQueryProfileInt(hinilucideprofile, appName, useAsImage, buttonctl);
+        if ( !buttonctl )
+            WinCheckButton( hwnd, IDC_TYPE_POSTSCRIPT, TRUE );
+        else
+            WinCheckButton( hwnd, IDC_TYPE_ASIMAGE, TRUE );
     }
     else {
         WinEnableControl( hwnd, IDC_TYPE_POSTSCRIPT, FALSE );
         WinCheckButton( hwnd, IDC_TYPE_ASIMAGE, TRUE );
     }
+    BOOL asimg = WinQueryButtonCheckstate( hwnd, IDC_TYPE_ASIMAGE );
+    int buttonctl = 0;
+    PrintDlg *_this = (PrintDlg *)WinQueryWindowULong( hwnd, QWL_USER );
+    buttonctl = PrfQueryProfileInt(hinilucideprofile, appName,
+                                   useHigherImageQuality, buttonctl);
+    if ( buttonctl )
+        WinCheckButton( hwnd, IDC_HIGHER_IMAGE_QUALITY, asimg && _this->scalable && !_this->fixed );
 
     WinSendMsg( hwnd, WM_CONTROL,
                 MPFROM2SHORT( IDC_TYPE_POSTSCRIPT, BN_CLICKED ),
@@ -119,14 +135,14 @@ void PrintDlg::setCurrentQInfo( HWND hwnd, PPRQINFO3 q )
     applyForm( hwnd );
 }
 
-void PrintDlg::enumQueues( HWND hwnd )
+int PrintDlg::enumQueues( HWND hwnd )
 {
     HWND list = WinWindowFromID( hwnd, IDC_PNAME );
     ULONG cReturned = 0, cTotal = 0, cbNeeded = 0;
     SPLERR se = SplEnumQueue( NULL, 3, NULL, 0L, &cReturned,
                               &cTotal, &cbNeeded, NULL );
-    if ( cTotal == 0L ) {
-        // TODO: 'no printers installed' message  (?)
+    if ( cTotal < 1L ) {
+        return 1;
     }
 
     if ( pQueueInfo != NULL ) {
@@ -137,11 +153,10 @@ void PrintDlg::enumQueues( HWND hwnd )
 
     se = SplEnumQueue( NULL, 3, pQueueInfo, cbNeeded, &cReturned,
                        &cTotal, &cbNeeded, NULL );
-    if ( se != NO_ERROR ) {
-        // TODO: error message
+    if ( se != NO_ERROR || cReturned < 1L ) {
         free( pQueueInfo );
         pQueueInfo = NULL;
-        return;
+        return 1;
     }
 
     USHORT sEntry;
@@ -162,6 +177,7 @@ void PrintDlg::enumQueues( HWND hwnd )
             }
         }
     }
+    return 0;
 }
 
 
@@ -224,7 +240,7 @@ HDC PrintDlg::getInfoDC()
 
     HDC hdcPrinterInfo = DevOpenDC( hab, OD_INFO, "*", 3L, (PDEVOPENDATA)dos, NULLHANDLE );
 
-    delete achDriverName;
+    delete[] achDriverName;
     delete dos;
 
     return hdcPrinterInfo;
@@ -427,7 +443,7 @@ bool PrintDlg::queryCurrentForm()
     memset( forms, 0, sizeof( HCINFO ) * lForms );
     lForms = DevQueryHardcopyCaps( hdcPrinterInfo, 0, lForms, forms );
     if ( lForms == DQHC_ERROR ) {
-        delete forms;
+        delete[] forms;
         DevCloseDC( hdcPrinterInfo );
         return false;
     }
@@ -439,7 +455,7 @@ bool PrintDlg::queryCurrentForm()
         }
     }
 
-    delete forms;
+    delete[] forms;
     DevCloseDC( hdcPrinterInfo );
     return true;
 }
@@ -540,9 +556,12 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
             localizeDialog( hwnd );
             centerWindow( _this->hFrame, hwnd );
 
+            // setup the accelerators
+            WinSetAccelTable( hab, WinLoadAccelTable( hab, _hmod, IDA_ADDHELPACCEL ), hwnd );
+
             // Page range
             int buttonctl = 0;
-            buttonctl = PrfQueryProfileInt(HINI_USERPROFILE, appName, PageRange, buttonctl);
+            buttonctl = PrfQueryProfileInt(hinilucideprofile, appName, PageRange, buttonctl);
             switch (buttonctl)
             {
                case 1:
@@ -559,10 +578,12 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                   WinCheckButton(hwnd, IDC_RANGEALL, TRUE);
                break;
             }
-
+            // Reverse grayed for single page documents
+            WinEnableControl( hwnd, IDC_REVERSEPRINT,
+                                         _this->doc->getPageCount( ev ) != 1 );
             // ignore margins
             buttonctl = 0;
-            buttonctl = PrfQueryProfileInt(HINI_USERPROFILE, appName, IgnMargins, buttonctl);
+            buttonctl = PrfQueryProfileInt(hinilucideprofile, appName, IgnMargins, buttonctl);
             if (buttonctl == 1)
             {
             WinCheckButton( hwnd, IDC_IGNMARGINS, TRUE );
@@ -580,7 +601,15 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                                MPFROMLONG( pages ), MPVOID );
 
             // Enum printer queues
-            _this->enumQueues( hwnd );
+            if ( _this->enumQueues( hwnd ) != 0)
+            {
+                WinDismissDlg( hwnd, DID_CANCEL );
+                char *m = newstrdupL( MSGS_NO_PRINTER_FOUND_ERROR );
+                WinMessageBox( HWND_DESKTOP, HWND_DESKTOP, m,
+                              NULL, 0, MB_OK | MB_ICONEXCLAMATION | MB_MOVEABLE );
+                delete m;
+                
+            }
 
             // Number of copies
             WinSendDlgItemMsg( hwnd, IDC_COPIES, SPBM_SETLIMITS,
@@ -636,12 +665,32 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                 case IDC_RANGEALL:
                 case IDC_RANGECURRENT:
                 case IDC_RANGEPAGES:
+                case IDC_PGFROM:
+                case IDC_PGTO:
                 {
                     BOOL en = WinQueryButtonCheckstate( hwnd, IDC_RANGEPAGES );
                     WinEnableControl( hwnd, IDC_LABELFROM, en );
                     WinEnableControl( hwnd, IDC_PGFROM, en );
                     WinEnableControl( hwnd, IDC_LABELTO, en );
                     WinEnableControl( hwnd, IDC_PGTO, en );
+                    if (WinQueryButtonCheckstate( hwnd, IDC_RANGECURRENT ))
+                        WinEnableControl( hwnd, IDC_REVERSEPRINT, FALSE );
+                    else if (_this->doc->getPageCount( ev ) != 1)
+                        WinEnableControl( hwnd, IDC_REVERSEPRINT, TRUE );
+                    if (WinQueryButtonCheckstate( hwnd, IDC_RANGEPAGES ))
+                    {
+                        LONG tmpVal = 0, tmpVal2 = 0 ;
+                        WinSendDlgItemMsg( hwnd, IDC_PGFROM, SPBM_QUERYVALUE,
+                                          MPFROMP( &tmpVal ),
+                                          MPFROM2SHORT( 0, SPBQ_ALWAYSUPDATE ) );
+                        WinSendDlgItemMsg( hwnd, IDC_PGTO, SPBM_QUERYVALUE,
+                                          MPFROMP( &tmpVal2 ),
+                                          MPFROM2SHORT( 0, SPBQ_ALWAYSUPDATE ) );
+                        if ( tmpVal != tmpVal2 )
+                            WinEnableControl( hwnd, IDC_REVERSEPRINT, TRUE );
+                        else
+                            WinEnableControl( hwnd, IDC_REVERSEPRINT, FALSE );
+                    }
                 }
                 break;
 
@@ -652,7 +701,13 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                     BOOL asimg = WinQueryButtonCheckstate( hwnd, IDC_TYPE_ASIMAGE );
                     WinEnableControl( hwnd, IDC_PRINT_TO_FILE, aspsc );
                     WinEnableControl( hwnd, IDC_HIGHER_IMAGE_QUALITY,
-                                      asimg && _this->scalable && !_this->fixed );
+                                     asimg && _this->scalable && !_this->fixed );
+                    WinCheckButton( hwnd, IDC_HIGHER_IMAGE_QUALITY, FALSE );
+                    int buttonctl = 0;
+                    if ( PrfQueryProfileInt(hinilucideprofile, appName,
+                                            useHigherImageQuality, buttonctl) && asimg )
+                        WinCheckButton( hwnd, IDC_HIGHER_IMAGE_QUALITY,
+                                        _this->scalable && !_this->fixed );
                     WinEnableControl( hwnd, IDC_RANGE_EVEN_ODD_LABEL, asimg );
                     WinEnableControl( hwnd, IDC_RANGE_EVEN_ODD, asimg );
                 }
@@ -745,26 +800,52 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                         {
                             _this->psetup->range = RangePages;
                             LONG tmpVal = 0;
-                            BOOL rc = (BOOL)WinSendDlgItemMsg( hwnd, IDC_PGFROM, SPBM_QUERYVALUE, MPFROMP( &tmpVal ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                            BOOL rc = (BOOL)WinSendDlgItemMsg( hwnd, IDC_PGFROM, SPBM_QUERYVALUE,
+                                                              MPFROMP( &tmpVal ),
+                                                              MPFROM2SHORT( 0, SPBQ_ALWAYSUPDATE ) );
                             if ( rc && ( tmpVal > 0 ) ) {
                                 _this->psetup->pgfrom = tmpVal;
                             }
-                            rc = (BOOL)WinSendDlgItemMsg( hwnd, IDC_PGTO, SPBM_QUERYVALUE, MPFROMP( &tmpVal ), MPFROM2SHORT( 0, SPBQ_UPDATEIFVALID ) );
+                            rc = (BOOL)WinSendDlgItemMsg( hwnd, IDC_PGTO, SPBM_QUERYVALUE,
+                                                         MPFROMP( &tmpVal ),
+                                                         MPFROM2SHORT( 0, SPBQ_ALWAYSUPDATE ) );
                             if ( rc && ( tmpVal > 0 ) ) {
                                 _this->psetup->pgto = tmpVal;
                             }
                             iniint = 2;
                         }
 
+                        if ( WinQueryButtonCheckstate( hwnd, IDC_REVERSEPRINT ) )
+                        {
+                            LONG tmpVal = _this->psetup->pgfrom;
+                            _this->psetup->pgfrom = _this->psetup->pgto;
+                            _this->psetup->pgto = tmpVal;
+                        }
                         // write ini pagerange
-                        PrfWriteProfileString(HINI_USERPROFILE, appName, PageRange, itoa(iniint, buf, 10));
+                        PrfWriteProfileString(hinilucideprofile, appName, PageRange, itoa(iniint, buf, 10));
 
                         // write ini ignore margins
                         iniint = 0;
                         if ( WinQueryButtonCheckstate( hwnd, IDC_IGNMARGINS ) ) {
                                 iniint = 1;
                         }
-                        PrfWriteProfileString(HINI_USERPROFILE, appName, IgnMargins, itoa(iniint, buf, 10));
+                        PrfWriteProfileString(hinilucideprofile, appName, IgnMargins, itoa(iniint, buf, 10));
+
+                        // write ini use asimage instead of PS
+                        if ( canUsePS ) {
+                            iniint = 0;
+                            if ( WinQueryButtonCheckstate( hwnd, IDC_TYPE_ASIMAGE ) ) {
+                                iniint = 1;
+                            }
+                            PrfWriteProfileString(hinilucideprofile, appName, useAsImage,
+                                                  itoa(iniint, buf, 10));
+                        }
+                        iniint = 0;
+                        if ( WinQueryButtonCheckstate( hwnd, IDC_HIGHER_IMAGE_QUALITY ) ) {
+                            iniint = 1;
+                        }
+                        PrfWriteProfileString(hinilucideprofile, appName, useHigherImageQuality,
+                                              itoa(iniint, buf, 10));
 
                         _this->psetup->ptype = TypePostScript;
                         if ( WinQueryButtonCheckstate( hwnd, IDC_TYPE_ASIMAGE ) ) {
@@ -823,6 +904,12 @@ MRESULT EXPENTRY PrintDlg::printDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARA
                 case DID_CANCEL:
                     WinDismissDlg( hwnd, DID_CANCEL );
                     return (MRESULT)FALSE;
+
+                case CM_HELP:
+                  if (Lucide::hwndHelp)
+                      WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                 MPFROM2SHORT(104, 0), MPFROMSHORT(HM_RESOURCEID));
+                  return (MRESULT)FALSE;
             };
             return (MRESULT)FALSE;
     }

@@ -115,7 +115,7 @@ SOM_Scope void SOMLINK LuIndexNodeInit(LuIndexNode *somSelf,
                                         Environment *ev, somInitCtrl* ctrl,
                                        LuLink* link)
 {
-    LuIndexNodeData *somThis;
+    LuIndexNodeData *somThis = NULL;
     somInitCtrl globalCtrl;
     somBooleanVector myMask;
     LuIndexNode_BeginInitializer_LuIndexNodeInit;
@@ -173,7 +173,7 @@ SOM_Scope LuLink*  SOMLINK getLink(LuIndexNode *somSelf,  Environment *ev)
 SOM_Scope void SOMLINK somDestruct(LuIndexNode *somSelf, octet doFree,
                                    som3DestructCtrl* ctrl)
 {
-    LuIndexNodeData *somThis;
+    LuIndexNodeData *somThis = NULL;
     somDestructCtrl globalCtrl;
     somBooleanVector myMask;
     LuIndexNode_BeginDestructor;

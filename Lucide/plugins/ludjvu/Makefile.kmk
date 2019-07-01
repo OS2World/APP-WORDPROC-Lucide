@@ -16,7 +16,7 @@ ludjvu_TEMPLATE	 = SomDll
 ludjvu_INCS		 = \
 	ludjvu                                                                    \
 	../ludoc $(ludjvu_0_OUTDIR)/../ludoc                                      \
-	../../../libdjvu
+	$(UNIXROOT)/usr/include/libdjvu
 ludjvu_SOURCES	 = \
 	ludjvu.idl                                                                \
 	ludjvu.def
@@ -24,7 +24,7 @@ ludjvu_IDLSOURCES	 = \
 	ludjvu.cpp
 ludjvu_LIBS		 = \
 	$(PATH_STAGE_LIB)/ludoc$(SUFF_LIB) \
-	$(PATH_STAGE_LIB)/djvu$(SUFF_LIB)
+	$(UNIXROOT)/usr/lib/djvulibre_dll.a
 
 include $(FILE_KBUILD_SUB_FOOTER)
 

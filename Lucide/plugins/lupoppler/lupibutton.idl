@@ -36,12 +36,12 @@ interface LuPopplerInputButton : LuPopplerInputField, LuInputButton
 
         passthru C_h_before =  ""
             ""
-            "#include <Form.h>"
+            "#include <poppler/Form.h>"
             "";
 
         passthru C_xh_before =  ""
             ""
-            "#include <Form.h>"
+            "#include <poppler/Form.h>"
             "";
     };
 

@@ -1,11 +1,88 @@
-1.3.5:
+1.5.0
+  - Update Poppler to version 0.59.0 fixes traps with loading large files
+    caused by mutex handle exhausion. Tickets 350, 355
+  - Masked floating point underflow exception caused by the Poppler update 
+  - link to libcx (0.6.3) for exceptq support and to place heap in high memory
+  - Fixed trap caused by DosEnumAttribute not being high mem safe.
+  - Prevent print dialog from opening if no printers are found Ticket 340
+  - Add SAVE for PDF form files Tickets 181, 254, 273, 238
+  - Allow file name selection in saveas dialog Ticket 349
+  - Don't prompt to save file on close after save/saveas Ticket 274
+  - Update wis to load readme licenses and changelog from archives Ticket 352
+  - Wis changes to facilitate translation (language selection based on Lang
+    environment variable)
+  - Remove option to not associate Lucide with PDFs. It actually was removing the 
+    association type and filters completely
+  - Add a set of alternate Lucide icons from David Graser to the install package 
+  - Update build system to build the wpi based on the updated wis
+  - Null string search now clears search highlighting and disables find again
+  - Fix failure to load some thumbnails in preview window
+  - Prevent Lucide from trying to open unsupported file types that happen to have 
+    supported extensions
+  - Allow opening of supported file types that have atypical extensions
+  - Prevent Lucide from attempting to open clearly broken files (0 pages etc)
+  - Prevent attempt to create thumbnails for files on drives that don't support EAs
+  - Update GBM documentation to reflect its addition to Lucide
+  - Deselect JPEG plugin in install in favor of GBM. They shouldn't be 
+    installed together
+  - Limit size of text fields in PDF forms to length returned from the document  
+  - Tooltip to show link URLs
+  - One level "back" on internal links
+  - Update documentation to reflect changes
+  - Improve index sync with scrolling 
+  - Add Spanish help file; Update Spanish readme and lng file.(Alfredo Fern ndez D¡az) 
+  - Add debug symbols to the installer.
+  - Add a contex menu to the document window.
+  - Made help instance language aware (only English and Spanish currectly)
+  - Update and sync dependencies in all the readmes.
+  - Add a partial Polish translation (Tae Wong)
+
+1.40:
+  - updated German messages
+  - updated Czech messages (ticket #310)
+  - added context-sensitive help (ticket #12)
+  - added buildlevel strings to exe and dlls (ticket #296)
+  - built against poppler 0.52.0 (ticket #295)
+  - updated jpeg plugin to 8d (using system-installed libjpeg)
+  - updated DjVu plugin to 3.5.22 (using system-installed djvulibre) (ticket #303)
+  - fixed do not create thumbnail for encrypted PDF (ticket #263)
+  - fixed make thumbnails optional (ticket #267)
+  - reworked dialog layouts and added context sensative help (ticket #12)
+  - added help menu items -- F1 now works to bring up help in all but a few places (ticket #12)
+  - updated build instructions
+  - move most setting from os2.ini to lucide.ini
+  - limited the page number box in the toolbar to only accept valid page numbers (ticket #314 #335)
+  - fixed clip text on page number box with very large documents (ticket #328)
+  - remove drives drop down from the file open dialog when the ArcaOS FOC is used improve 
+    button alingment improved (tickets #318 #329 #337 #339) 
+  - now remembers print type between jobs (ticket #299)
+  - updated product information dialog (ticket #323) 
+  - added gmb plugin to package (ticket #283)
+
+1.36:
+  - built against poppler 0.42.0
+  - updated build conf for GCC 4.9.2 / kBuild 0.1.9998 r2803
+  - added substitute font names to font dialog (ticket #280)
+  - fixed Save as text in menu and added accelerator (Ctrl-A) (ticket #275)
+  - added exceptq support (ticket #272)
+  - use poppler as system wide installed shared library (ticket #266)
+  - fixed missing mnemonics in print dialog (ticket #264)
+  - added hotkey (F9) to open/close navigation pane (ticket #212)
+  - added option to print in reverse page order (ticket #120)
+  - fixed inability to open AES-256-encrypted PDFs (ticket #91)
+  - reformatted plugin dialog (ticket #278)
+  - changed libc req to 0.6.6
+  - fixed trap on trying to create a thumbnail for a PDF with zero pages (ticket #288)
+  
+
+1.35:
   - updated poppler to 0.20.3
   - fixed a wpi problem (ticket #244)
   - updated cs language file (ticket #243)
   - changed libc req to 0.6.5
 
 
-1.3.4:
+1.34:
   - WPI: added a check, so also rpm installations work w/o installing the req wpi
   - updated poppler to 0.18.1
   - fixed an annoying flicker
@@ -13,7 +90,7 @@
   - fixed ALT-letter combination (ticket #211)
 
 
-1.3.3:
+1.33:
   - added backwards search (ticket #190)
   - fixed goto page handling (ticket #198)
   - some other small fixes
@@ -26,7 +103,7 @@
   - added a font hack to show japanese fonts (ticket #226)
 
 
-1.3.2:
+1.32:
   - WPI: Fixed mismatch between the package names and actual plugins they contain.
   - WPI: Fixed the version number.
   - WPI: Skip the WPS object creation dialog to avoid a possible WPS association

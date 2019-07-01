@@ -7,6 +7,34 @@
 <HEAD>
 
 <!-- Every .WPI archive contains one or more packages. -->
+<REXX NAME=ChkBldLvl>
+    call RxFuncAdd 'SysLoadFuncs', 'REXXUTIL', 'SysLoadFuncs'
+    call SysLoadFuncs
+    /* based upon work from Doug Bissett */
+    parse arg aFile " Package:" Package  
+    name = filespec('N', aFile)
+   /* clean up rxqueue */
+    '@rxqueue /clear'
+     val=0.0
+     compval=6.3
+     tag = 'VERSION'
+   /* consider libpath search for libcx0.dll? */  
+'@BLDLEVEL.EXE 'value('UNIXROOT',, 'OS2ENVIRONMENT')'\USR\LIB\'name' | RXQUEUE'
+
+do while queued() > 0
+  pull thisline
+  if pos(tag,thisline)>0 then do
+     foundval = strip(word(thisline,3))
+     val = right(foundval,3) 
+  end
+end
+if val > compval then do
+   MsgStr = "" 
+end
+else MsgStr = 'REQUIRES="' || strip(Package) || '"'
+    return MsgStr
+</REXX>
+
 <REXX NAME=ChkREQ>
     call RxFuncAdd 'SysLoadFuncs', 'REXXUTIL', 'SysLoadFuncs'
     call SysLoadFuncs
@@ -48,17 +76,21 @@
 <REXX NAME=nls>
 call RxFuncAdd 'SysLoadFuncs', 'REXXUTIL', 'SysLoadFuncs'
 call SysLoadFuncs
-langs = "EN,FR,DE,NL,ES,SV"
+langs = "EN,FR,DE,NL,ES,SV,IT,CS,DA,RU,ZH"
 lang = translate(left(strip(value("LANG",,"OS2ENVIRONMENT")),2))
 if pos(lang,langs) = 0 then lang = 'EN'
 rc =WirexxPutEnv('prog','Lucide')
-rc =WirexxPutEnv('brand','eCS (OS/2)')
-select
+/*Make sure you change the help file object name when adding a new translation*/
+select                                       
   when lang = 'FR' then do
-    rc =WirexxPutEnv('title','Lucide - Afficheur de document')
+                    /* Translate */
+    rc =WirexxPutEnv('title','Lucide Afficheur de document')
+    rc =WirexxPutEnv('uguide','Lucide User Guide')
     rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
     rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
     rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
+    rc =WirexxPutEnv('plug_gbm','Lucide GBM plugin')
+    rc =WirexxPutEnv('readmetitle','LisezMoi')
     rc =WirexxPutEnv('welcome','Bienvenue dans l''installation du ')
     rc =WirexxPutEnv('accept','Veuillez prendre connaissance et accepter l''accord de licence suivant.')
     rc =WirexxPutEnv('target','Veuillez sÇlectionner le dossier de destination')
@@ -69,16 +101,25 @@ select
     rc =WirexxPutEnv('install','~Install')
     rc =WirexxPutEnv('license','~J''accepte')
     rc =WirexxPutEnv('next','~Suivant')
-    rc =WirexxPutEnv('fr_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Suivant" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
     rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+                    /* End Translate */
+    rc =WirexxPutEnv('pkgnum','1033') 
+                    /* Update us if this translation is added */
+    rc =WirexxPutEnv('readme','readme_fr.txt')
+    rc =WirexxPutEnv('lucidehelp','lucide_en.hlp+gbm_en.hlp')
+    rc =WirexxPutEnv('fr_sel','SELECT DESELECT')
   end
   when lang = 'DE' then do
-    rc =WirexxPutEnv('title','Lucide - Dokumentenbetrachter')
+                    /* Translate */
+    rc =WirexxPutEnv('title','Lucide Dokumentenbetrachter')
+    rc =WirexxPutEnv('uguide','Lucide User Guide')
     rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
     rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
     rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
+    rc =WirexxPutEnv('plug_gbm','Lucide GBM plugin')
+    rc =WirexxPutEnv('readmetitle','Lies mich!')
     rc =WirexxPutEnv('welcome','Willkommen zur Installation des ')
     rc =WirexxPutEnv('accept','Bitte lesen Sie den folgenden Text und akzeptieren Sie die Lizenzvereinbarung.')
     rc =WirexxPutEnv('target','WÑhlen Sie bitte das Zielverzeichnis.')
@@ -86,78 +127,246 @@ select
     rc =WirexxPutEnv('install','~Installieren')
     rc =WirexxPutEnv('license','St~imme zu')
     rc =WirexxPutEnv('next','W~eiter')
-    rc =WirexxPutEnv('de_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Zum Fortfahren "Weiter" auswÑhlen.')
     rc =WirexxPutEnv('cancelText','Zum Abbrechen "Cancel" auswÑhlen.')
     rc =WirexxPutEnv('installText','Bitte "Installieren" auswÑhlen, um die Installation des Archivs zu starten.')
+                    /* End Translate */
+    rc =WirexxPutEnv('pkgnum','1049')
+                    /* Update us if this translation is added */
+    rc =WirexxPutEnv('readme','readme_de.txt')
+    rc =WirexxPutEnv('lucidehelp','lucide_en.hlp+gbm_en.hlp')
+    rc =WirexxPutEnv('de_sel','SELECT DESELECT')
   end
   when lang = 'NL' then do
-    rc =WirexxPutEnv('title','Lucide - Document Bekijker')
+                    /* Translate */
+    rc =WirexxPutEnv('title','Lucide Document Bekijker')
+    rc =WirexxPutEnv('uguide','Lucide User Guide')
     rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
     rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
     rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
+    rc =WirexxPutEnv('plug_gbm','Lucide GBM plugin')
+    rc =WirexxPutEnv('readmetitle','Lees mij')
     rc =WirexxPutEnv('welcome','Welcome to the installation of ')
     rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
     rc =WirexxPutEnv('target','Please select target directory.')
-    rc =WirexxPutEnv('re_install','If you are updating the Lucide for NetDrive, the default installation directory will be the current directory.')
+    rc =WirexxPutEnv('re_install','If you are updating the Lucide, the default installation directory will be the current directory.')
     rc =WirexxPutEnv('install','~Install')
     rc =WirexxPutEnv('license','I ~accept')
     rc =WirexxPutEnv('next','~Next')
-    rc =WirexxPutEnv('nl_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
     rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+                    /* End Translate */
+    rc =WirexxPutEnv('pkgnum','1031')
+                    /* Update us if this translation is added */
+    rc =WirexxPutEnv('readme','readme_nl.txt')
+    rc =WirexxPutEnv('lucidehelp','lucide_en.hlp+gbm_en.hlp')
+    rc =WirexxPutEnv('nl_sel','SELECT DESELECT')
   end
   when lang = 'ES' Then Do
-    rc =WirexxPutEnv('title','Lucide - Visor de documentos')
-    rc =WirexxPutEnv('plug_pdf','Plugin PDF para Lucide')
-    rc =WirexxPutEnv('plug_djvu','Plugin DjVu para Lucide')
-    rc =WirexxPutEnv('plug_jpeg','Plugin JPEG para Lucide')
-    rc =WirexxPutEnv('welcome','Welcome to the installation of ')
-    rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
-    rc =WirexxPutEnv('target','Please select target directory.')
-    rc =WirexxPutEnv('re_install','If you are updating the Lucide for NetDrive, the default installation directory will be the current directory.')
-    rc =WirexxPutEnv('install','~Install')
-    rc =WirexxPutEnv('license','I ~accept')
-    rc =WirexxPutEnv('next','~Next')
+                    /* Translate */
+    rc =WirexxPutEnv('title','Visor de documentos Lucide')
+    rc =WirexxPutEnv('uguide','Manual del usuario de Lucide')
+    rc =WirexxPutEnv('plug_pdf','M¢dulo PDF para Lucide')
+    rc =WirexxPutEnv('plug_djvu','M¢dulo DjVu para Lucide')
+    rc =WirexxPutEnv('plug_jpeg','M¢dulo JPEG para Lucide')
+    rc =WirexxPutEnv('plug_gbm',' M¢dulo GBM para Lucide')
+    rc =WirexxPutEnv('readmetitle','LÇame')
+    rc =WirexxPutEnv('welcome','Bienvenidos a la instalaci¢n de ')
+    rc =WirexxPutEnv('accept','Por favor, lea y acepte el siguiente acuerdo de licencia.')
+    rc =WirexxPutEnv('target','Por favor, seleccione el directorio de destino.')
+    rc =WirexxPutEnv('re_install','Si est† actualizando Lucide, el directorio de instalaci¢n por omisi¢n ser† el directorio actual.')
+    rc =WirexxPutEnv('install','~Instalar')
+    rc =WirexxPutEnv('license','~Acepto')
+    rc =WirexxPutEnv('next','~Siguiente')
+    rc =WirexxPutEnv('nextText','Seleccione ÆSiguienteØ para continuar.')
+    rc =WirexxPutEnv('cancelText','Seleccione ÆCancelarØ para abortar la instalaci¢n.')
+    rc =WirexxPutEnv('installText','Pulse ÆInstalarØ para iniciar la instalaci¢n de este archivo.')
+                    /* End Translate */
+    rc =WirexxPutEnv('pkgnum','1034')
+                    /* Update us if this translation is added */
+    rc =WirexxPutEnv('readme','readme_es.txt')
+    rc =WirexxPutEnv('lucidehelp','lucide_es.hlp+gbm_es.hlp')
     rc =WirexxPutEnv('es_sel','SELECT DESELECT')
-    rc =WirexxPutEnv('nextText','Select "Next" to continue.')
-    rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
-    rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
   end
   when lang = 'SV' Then Do
-    rc =WirexxPutEnv('title','Lucide - Dokumentvisare')
+                    /* Translate */
+    rc =WirexxPutEnv('title','Lucide Dokumentvisare')
+    rc =WirexxPutEnv('uguide','Lucide User Guide')
     rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
     rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
     rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
+    rc =WirexxPutEnv('plug_gbm','Lucide GBM plugin')
+    rc =WirexxPutEnv('readmetitle','LÑs mig')
     rc =WirexxPutEnv('welcome','Welcome to the installation of ')
     rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
     rc =WirexxPutEnv('target','Please select target directory.')
-    rc =WirexxPutEnv('re_install','If you are updating the Lucide for NetDrive, the default installation directory will be the current directory.')
+    rc =WirexxPutEnv('re_install','If you are updating the Lucide, the default installation directory will be the current directory.')
     rc =WirexxPutEnv('install','~Install')
     rc =WirexxPutEnv('license','I ~accept')
     rc =WirexxPutEnv('next','~Next')
-    rc =WirexxPutEnv('sv_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
     rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+                    /* End Translate */
+    rc =WirexxPutEnv('pkgnum','1')
+                    /* Update us if this translation is added */
+    rc =WirexxPutEnv('readme','readme')
+    rc =WirexxPutEnv('lucidehelp','lucide_en.hlp+gbm_en.hlp')
+    rc =WirexxPutEnv('sv_sel','SELECT DESELECT')
   end
-  otherwise do
-    rc =WirexxPutEnv('title','Lucide - Document Viewer')
+  when lang = 'IT' Then Do
+                    /* Translate */
+    rc =WirexxPutEnv('title','Lucide Document Viewer')
+    rc =WirexxPutEnv('uguide','Lucide User Guide')
     rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
     rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
     rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
-    rc =WirexxPutEnv('welcome','Welcome to the installation of the Lucide for NetDrive!')
+    rc =WirexxPutEnv('plug_gbm','Lucide GBM plugin')
+    rc =WirexxPutEnv('readmetitle','ReadMe')
+    rc =WirexxPutEnv('welcome','Welcome to the installation of the Lucide!')
     rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
     rc =WirexxPutEnv('target','Please select target directory.')
-    rc =WirexxPutEnv('re_install','If you are updating the Lucide for NetDrive, the default installation directory will be the current directory.')
+    rc =WirexxPutEnv('re_install','If you are updating the Lucide, the default installation directory will be the current directory.')
     rc =WirexxPutEnv('install','~Install')
     rc =WirexxPutEnv('license','I ~accept')
     rc =WirexxPutEnv('next','~Next')
-    rc =WirexxPutEnv('en_sel','SELECT DESELECT')
     rc =WirexxPutEnv('nextText','Select "Next" to continue.')
     rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
     rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+                    /* End Translate */
+    rc =WirexxPutEnv('pkgnum','1039')
+                    /* Update us if this translation is added */
+    rc =WirexxPutEnv('readme','readme_it.txt')
+    rc =WirexxPutEnv('lucidehelp','lucide_en.hlp+gbm_en.hlp')
+    rc =WirexxPutEnv('it_sel','SELECT DESELECT')
+  end
+  when lang = 'CS' Then Do
+                    /* Translate */
+    rc =WirexxPutEnv('title','Lucide Document Viewer')
+    rc =WirexxPutEnv('uguide','Lucide User Guide')
+    rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
+    rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
+    rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
+    rc =WirexxPutEnv('plug_gbm','Lucide GBM plugin')
+    rc =WirexxPutEnv('readmetitle','ReadMe')
+    rc =WirexxPutEnv('welcome','Welcome to the installation of the Lucide!')
+    rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
+    rc =WirexxPutEnv('target','Please select target directory.')
+    rc =WirexxPutEnv('re_install','If you are updating the Lucide, the default installation directory will be the current directory.')
+    rc =WirexxPutEnv('install','~Install')
+    rc =WirexxPutEnv('license','I ~accept')
+    rc =WirexxPutEnv('next','~Next')
+    rc =WirexxPutEnv('nextText','Select "Next" to continue.')
+    rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
+    rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+                    /* End Translate */
+    rc =WirexxPutEnv('pkgnum','1041')
+                    /* Update us if this translation is added */
+    rc =WirexxPutEnv('readme','readme_cs.txt')
+    rc =WirexxPutEnv('lucidehelp','lucide_en.hlp+gbm_en.hlp')
+    rc =WirexxPutEnv('cz_sel','SELECT DESELECT')
+  end
+  when lang = 'DA' Then Do
+                    /* Translate */
+    rc =WirexxPutEnv('title','Lucide Document Viewer')
+    rc =WirexxPutEnv('uguide','Lucide User Guide')
+    rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
+    rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
+    rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
+    rc =WirexxPutEnv('plug_gbm','Lucide GBM plugin')
+    rc =WirexxPutEnv('readmetitle','ReadMe')
+    rc =WirexxPutEnv('welcome','Welcome to the installation of the Lucide!')
+    rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
+    rc =WirexxPutEnv('target','Please select target directory.')
+    rc =WirexxPutEnv('re_install','If you are updating the Lucide, the default installation directory will be the current directory.')
+    rc =WirexxPutEnv('install','~Install')
+    rc =WirexxPutEnv('license','I ~accept')
+    rc =WirexxPutEnv('next','~Next')
+    rc =WirexxPutEnv('nextText','Select "Next" to continue.')
+    rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
+    rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+                    /* End Translate */
+    rc =WirexxPutEnv('pkgnum','1')
+                    /* Update us if this translation is added */
+    rc =WirexxPutEnv('readme','readme')
+    rc =WirexxPutEnv('lucidehelp','lucide_en.hlp+gbm_en.hlp')
+    rc =WirexxPutEnv('da_sel','SELECT DESELECT')
+  end
+  when lang = 'RU' Then Do
+                    /* Translate */
+    rc =WirexxPutEnv('title','Lucide Document Viewer')
+    rc =WirexxPutEnv('uguide','Lucide User Guide')
+    rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
+    rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
+    rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
+    rc =WirexxPutEnv('plug_gbm','Lucide GBM plugin')
+    rc =WirexxPutEnv('readmetitle','ReadMe')
+    rc =WirexxPutEnv('welcome','Welcome to the installation of the Lucide!')
+    rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
+    rc =WirexxPutEnv('target','Please select target directory.')
+    rc =WirexxPutEnv('re_install','If you are updating the Lucide, the default installation directory will be the current directory.')
+    rc =WirexxPutEnv('install','~Install')
+    rc =WirexxPutEnv('license','I ~accept')
+    rc =WirexxPutEnv('next','~Next')
+    rc =WirexxPutEnv('nextText','Select "Next" to continue.')
+    rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
+    rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+                    /* End Translate */
+    rc =WirexxPutEnv('pkgnum','1')
+                    /* Update us if this translation is added */
+    rc =WirexxPutEnv('readme','readme')
+    rc =WirexxPutEnv('lucidehelp','lucide_en.hlp+gbm_en.hlp')
+    rc =WirexxPutEnv('ru_sel','SELECT DESELECT')
+  end
+  when lang = 'ZH' Then Do
+                    /* Translate */
+    rc =WirexxPutEnv('title','Lucide Document Viewer')
+    rc =WirexxPutEnv('uguide','Lucide User Guide')
+    rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
+    rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
+    rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
+    rc =WirexxPutEnv('plug_gbm','Lucide GBM plugin')
+    rc =WirexxPutEnv('readmetitle','ReadMe')
+    rc =WirexxPutEnv('welcome','Welcome to the installation of the Lucide!')
+    rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
+    rc =WirexxPutEnv('target','Please select target directory.')
+    rc =WirexxPutEnv('re_install','If you are updating the Lucide, the default installation directory will be the current directory.')
+    rc =WirexxPutEnv('install','~Install')
+    rc =WirexxPutEnv('license','I ~accept')
+    rc =WirexxPutEnv('next','~Next')
+    rc =WirexxPutEnv('nextText','Select "Next" to continue.')
+    rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
+    rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+                    /* End Translate */
+    rc =WirexxPutEnv('pkgnum','1')
+                    /* Update us if this translation is added */
+    rc =WirexxPutEnv('readme','readme')
+    rc =WirexxPutEnv('lucidehelp','lucide_en.hlp+gbm_en.hlp')
+    rc =WirexxPutEnv('tw_sel','SELECT DESELECT')
+  end
+  otherwise do
+    rc =WirexxPutEnv('title','Lucide Document Viewer')
+    rc =WirexxPutEnv('uguide','Lucide User Guide')
+    rc =WirexxPutEnv('plug_pdf','Lucide PDF plugin')
+    rc =WirexxPutEnv('plug_djvu','Lucide DjVu plugin')
+    rc =WirexxPutEnv('plug_jpeg','Lucide JPEG plugin')
+    rc =WirexxPutEnv('plug_gbm','Lucide GBM plugin')
+    rc =WirexxPutEnv('readmetitle','ReadMe')
+    rc =WirexxPutEnv('welcome','Welcome to the installation of the Lucide!')
+    rc =WirexxPutEnv('accept','Please read and accept the following license-agreement.')
+    rc =WirexxPutEnv('target','Please select target directory.')
+    rc =WirexxPutEnv('re_install','If you are updating the Lucide, the default installation directory will be the current directory.')
+    rc =WirexxPutEnv('install','~Install')
+    rc =WirexxPutEnv('license','I ~accept')
+    rc =WirexxPutEnv('next','~Next')
+    rc =WirexxPutEnv('nextText','Select "Next" to continue.')
+    rc =WirexxPutEnv('cancelText','Select "Cancel" to abort installation.')
+    rc =WirexxPutEnv('installText','Press "Install" in order to start installation of this archive.')
+    rc =WirexxPutEnv('pkgnum','1')
+    rc =WirexxPutEnv('readme','readme')
+    rc =WirexxPutEnv('lucidehelp','lucide_en.hlp+gbm_en.hlp')
+    rc =WirexxPutEnv('en_sel','SELECT DESELECT')
   end
 end
 return ''
@@ -188,14 +397,17 @@ return readme
      TARGET="$(WARPIN_DEFAULTAPPSPATH)\Lucide"
      BASE
      =("nls")
-     =("set_assoc")
      TITLE="=("get_env title")"
      WRITEPROFILE="USER\Lucide\Path|$(1)"
      CLEARPROFILE="USER\Lucide\Path"
-     =("ChkREQ LIBC065.DLL Package:netlabs.org\kLIBC\LIBC 0.6 Runtime\0\6\5")
-     =("ChkREQ GCC446.DLL Package:netlabs.org\GCC4\Core\1\2\0")
-     =("ChkREQ STDCPP.DLL Package:netlabs.org\GCC4\Core\1\2\1")
+     =("ChkREQ LIBC066.DLL Package:netlabs-rel\libc\0\6\6\38")
+     =("ChkREQ GCC492.DLL Package:netlabs-rel\libgcc-fwd\4\9\2\1\3")
+     =("ChkREQ LIBCX0.DLL Package:netlabs-rel\libcx\0\6\3\1")
      SELECT
+     CONFIGSYS="SET HELP=$(1); | ADDRIGHT"
+     CONFIGSYS="SET BOOKSHELF=$(1); | ADDRIGHT"
+     CONFIGSYS="SET LUCIDEINSTALLPATH=$(1) | UNIQUE"
+     CONFIGSYS="SET LUCIDEHELP==("get_env lucidehelp") | UNIQUE"
      >=("get_env title").</PCK>
 
 <PCK INDEX=2
@@ -203,6 +415,7 @@ return readme
      TARGET="$(1)"
      TITLE="=("get_env plug_pdf")"
      REQUIRES=1
+     =("ChkREQ POPPLE70.DLL Package:netlabs-rel\poppler\0\59\0\3")
      SELECT | FIXED
      >=("get_env plug_pdf")</PCK>
 
@@ -211,76 +424,195 @@ return readme
      TARGET="$(1)"
      TITLE="=("get_env plug_djvu")"
      REQUIRES=1
+     =("ChkREQ DJVULI21.DLL Package:netlabs-rel\djvulibre\3\5\27\3")
      SELECT | FIXED
      >=("get_env plug_djvu")</PCK>
+
+<PCK INDEX=5
+     PACKAGEID="netlabs.org\Lucide\Lucide plugin GBM\1\4\4\0"
+     TARGET="$(1)"
+     TITLE="=("get_env plug_gbm")"
+     REQUIRES=1
+     SELECT | FIXED
+     =("ChkREQ GBM.DLL Package:netlabs-rel\GBMDLL\1\76\1")
+     >=("get_env plug_gbm")</PCK>
+
+     <GROUP TITLE="Optional components">
 
 <PCK INDEX=4
      PACKAGEID="netlabs.org\Lucide\Lucide plugin JPEG\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
      TITLE="=("get_env plug_jpeg")"
      REQUIRES=1
-     SELECT | FIXED
+     FIXED
+     =("ChkREQ JPEG8.DLL Package:netlabs-rel\libjpeg-turbo\1\5\1\1")
      >=("get_env plug_jpeg")</PCK>
-<PCK INDEX=5
+
+<PCK INDEX=7
+     PACKAGEID="netlabs.org\Lucide\AltIcons\${WPIVERSION}\${WPIBUILD}"
+     TARGET="$(1)\Alticons"
+     TITLE="AltIcons"
+     REQUIRES=1
+     FIXED
+     >This package contains alternative icons for Lucide.</PCK>
+     
+<PCK INDEX=8
+     PACKAGEID="netlabs.org\Lucide\Debug\${WPIVERSION}\${WPIBUILD}"
+     TARGET="$(1)"
+     TITLE="Debug symbols"
+     REQUIRES=1
+     FIXED
+     >This package contains debug symbols for Lucide.</PCK>     
+     
+     </GROUP>
+     <!-- Language support packages  -->
+
+    <GROUP TITLE="Language Support Packages selected based on system language">
+    
+/*Make sure you change the help file object name when adding a new translation*/
+/*Readme objects are all different*/
+
+<PCK INDEX=6
      PACKAGEID="netlabs.org\Lucide\english\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
      TITLE="English"
-     CREATEOBJECT='WPFolder|=("get_env prog") for =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") for =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPFolder|=("get_env title")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env title");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|ReadMe|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=ReadMe;PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
+     CREATEOBJECT="REPLACE WPProgram|=("get_env uguide")|<LUCIDEFOLDER>|EXENAME=view.exe;OBJECTID=<LUCIDEFOLDER_GUIDE>;TITLE==("get_env uguide");PROGTYPE=PM;PARAMETERS==("get_env lucidehelp");STARTUPDIR=$(1);"
+     CREATEOBJECT='WPProgram|=("get_env readmetitle")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE==("get_env readmetitle");PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Changelog|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env en_sel")
      >English</PCK>
-<PCK INDEX=6
+
+<PCK INDEX=1033
      PACKAGEID="netlabs.org\Lucide\francais\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
      TITLE="Francais"
-     CREATEOBJECT='WPFolder|=("get_env prog") pour =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") pour =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPFolder|=("get_env title")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env title");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|Lucide LisezMoi|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lisez Moi;PROGTYPE=PM;PARAMETERS=$(1)\readme_fr.txt;STARTUPDIR=$(1);'
+     CREATEOBJECT="REPLACE WPProgram|=("get_env uguide")|<LUCIDEFOLDER>|EXENAME=view.exe;OBJECTID=<LUCIDEFOLDER_GUIDE>;TITLE==("get_env uguide");PROGTYPE=PM;PARAMETERS=$(1)\Lucide_en.hlp;STARTUPDIR=$(1);"
+     CREATEOBJECT='WPProgram|=("get_env readmetitle")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_READMEFR>;TITLE==("get_env readmetitle");PROGTYPE=PM;PARAMETERS=$(1)\readme_fr.txt;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Change Log|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Change Log;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env fr_sel")
      >Francais</PCK>
-<PCK INDEX=7
+
+<PCK INDEX=1049
      PACKAGEID="netlabs.org\Lucide\deutsch\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
      TITLE="Deutsch"
-     CREATEOBJECT='WPFolder|=("get_env prog") fÅr =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") fÅr =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPFolder|=("get_env title")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env title");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|Lies mich!|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lies mich!;PROGTYPE=PM;PARAMETERS=$(1)\readme_de.txt;STARTUPDIR=$(1);'
+     CREATEOBJECT="REPLACE WPProgram|=("get_env uguide")|<LUCIDEFOLDER>|EXENAME=view.exe;OBJECTID=<LUCIDEFOLDER_GUIDE>;TITLE==("get_env uguide");PROGTYPE=PM;PARAMETERS==("get_env lucidehelp");STARTUPDIR=$(1);" 
+     CREATEOBJECT='WPProgram|=("get_env readmetitle")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_READMEDE>;TITLE==("get_env readmetitle");PROGTYPE=PM;PARAMETERS=$(1)\readme_de.txt;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Entwicklungsgeschichte|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Entwicklungsgeschichte;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env de_sel")
      >Deutsch</PCK>
-<PCK INDEX=8
+
+<PCK INDEX=1031
      PACKAGEID="netlabs.org\Lucide\dutch\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
      TITLE="Dutch"
-     CREATEOBJECT='WPFolder|=("get_env prog") voor =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") voor =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPFolder|=("get_env title")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env title");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|Lees mij|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=Lees mij;PROGTYPE=PM;PARAMETERS=$(1)\readme_nl.txt;STARTUPDIR=$(1);'
+     CREATEOBJECT="REPLACE WPProgram|=("get_env uguide")|<LUCIDEFOLDER>|EXENAME=view.exe;OBJECTID=<LUCIDEFOLDER_GUIDE>;TITLE==("get_env uguide");PROGTYPE=PM;PARAMETERS==("get_env lucidehelp");STARTUPDIR=$(1);" 
+     CREATEOBJECT='WPProgram|=("get_env readmetitle")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_READMENL>;TITLE==("get_env readmetitle");PROGTYPE=PM;PARAMETERS=$(1)\readme_nl.txt;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Changelog|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env nl_sel")
      >Dutch</PCK>
-<PCK INDEX=9
+
+<PCK INDEX=1034
      PACKAGEID="netlabs.org\Lucide\espanol\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
+     FIXED
      TITLE="Espanol"
-     CREATEOBJECT='WPFolder|=("get_env prog") para =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") para =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPFolder|=("get_env title")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env title");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|LÇeme de Lucide|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=LÇeme de Lucide;PROGTYPE=PM;PARAMETERS=$(1)\readme_es.txt;STARTUPDIR=$(1);'
+     CREATEOBJECT="REPLACE WPProgram|=("get_env uguide")|<LUCIDEFOLDER>|EXENAME=view.exe;OBJECTID=<LUCIDEFOLDER_GUIDEES>;TITLE==("get_env uguide");PROGTYPE=PM;PARAMETERS==("get_env lucidehelp");STARTUPDIR=$(1);" 
+     CREATEOBJECT='WPProgram|=("get_env readmetitle")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_READMEES>;TITLE==("get_env readmetitle");PROGTYPE=PM;PARAMETERS=$(1)\readme_es.txt;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Change Log|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env es_sel")
      >Espanol</PCK>
-<PCK INDEX=10
+
+<PCK INDEX=1046
      PACKAGEID="netlabs.org\Lucide\sverige\${WPIVERSION}\${WPIBUILD}"
      TARGET="$(1)"
+     FIXED
      TITLE="Sverige"
-     CREATEOBJECT='WPFolder|=("get_env prog") fîr =("get_env brand")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env prog") fîr =("get_env brand");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPFolder|=("get_env title")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env title");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
      CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
-     CREATEOBJECT='WPProgram|LÑs mig|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_README>;TITLE=LÑs mig;PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
+     CREATEOBJECT="REPLACE WPProgram|=("get_env uguide")|<LUCIDEFOLDER>|EXENAME=view.exe;OBJECTID=<LUCIDEFOLDER_GUIDE>;TITLE==("get_env uguide");PROGTYPE=PM;PARAMETERS==("get_env lucidehelp");STARTUPDIR=$(1);" 
+     CREATEOBJECT='WPProgram|=("get_env readmetitle")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_READMESV>;TITLE==("get_env readmetitle");PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
      CREATEOBJECT='WPProgram|Changelog|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
      =("get_env sv_sel")
      >Sverige</PCK>
+
+<PCK INDEX=1039
+     PACKAGEID="netlabs.org\Lucide\Italian\${WPIVERSION}\${WPIBUILD"
+     TITLE="Italian"
+     TARGET="$(1)"
+     FIXED
+     CREATEOBJECT='WPFolder|=("get_env title")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env title");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
+     CREATEOBJECT="REPLACE WPProgram|=("get_env uguide")|<LUCIDEFOLDER>|EXENAME=view.exe;OBJECTID=<LUCIDEFOLDER_GUIDE>;TITLE==("get_env uguide");PROGTYPE=PM;PARAMETERS==("get_env lucidehelp");STARTUPDIR=$(1);" 
+     CREATEOBJECT='WPProgram|=("get_env readmetitle")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_READMEIT>;TITLE==("get_env readmetitle");PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|Changelog|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
+     =("get_env it_sel")
+     >Italian language support files for Lucide.</PCK>
+
+<PCK INDEX=1421
+     PACKAGEID="netlabs.org\Lucide\Czech\${WPIVERSION}\${WPIBUILD"
+     TITLE="Czech"
+     TARGET="$(1)"
+     FIXED
+     CREATEOBJECT='WPFolder|=("get_env title")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env title");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
+     CREATEOBJECT="REPLACE WPProgram|=("get_env uguide")|<LUCIDEFOLDER>|EXENAME=view.exe;OBJECTID=<LUCIDEFOLDER_GUIDE>;TITLE==("get_env uguide");PROGTYPE=PM;PARAMETERS==("get_env lucidehelp");STARTUPDIR=$(1);"
+     CREATEOBJECT='WPProgram|=("get_env readmetitle")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_READMECS>;TITLE==("get_env readmetitle");PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|Changelog|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
+     =("get_env cz_sel")
+     >Czech language support files for Lucide.</PCK>
+
+<PCK INDEX=1045
+     PACKAGEID="netlabs.org\Lucide\Danish\${WPIVERSION}\${WPIBUILD"
+     TITLE="Danish"
+     TARGET="$(1)"
+     FIXED
+     CREATEOBJECT='WPFolder|=("get_env title")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env title");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
+     CREATEOBJECT="REPLACE WPProgram|=("get_env uguide")|<LUCIDEFOLDER>|EXENAME=view.exe;OBJECTID=<LUCIDEFOLDER_GUIDE>;TITLE==("get_env uguide");PROGTYPE=PM;PARAMETERS==("get_env lucidehelp");STARTUPDIR=$(1);" 
+     CREATEOBJECT='WPProgram|=("get_env readmetitle")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_READMEDA>;TITLE==("get_env readmetitle");PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|Changelog|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
+     =("get_env da_sel")
+     >Danish language support files for Lucide.</PCK>
+
+<PCK INDEX=1007
+     PACKAGEID="netlabs.org\Lucide\Russian\${WPIVERSION}\${WPIBUILD"
+     TITLE="Russian"
+     TARGET="$(1)"
+     FIXED
+     CREATEOBJECT='WPFolder|=("get_env title")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env title");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
+     CREATEOBJECT="REPLACE WPProgram|=("get_env uguide")|<LUCIDEFOLDER>|EXENAME=view.exe;OBJECTID=<LUCIDEFOLDER_GUIDE>;TITLE==("get_env uguide");PROGTYPE=PM;PARAMETERS==("get_env lucidehelp");STARTUPDIR=$(1);"
+     CREATEOBJECT='WPProgram|=("get_env readmetitle")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_READMERU>;TITLE==("get_env readmetitle");PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|Changelog|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
+     =("get_env ru_sel")
+     >Russian language support files for Lucide.</PCK>
+
+<PCK INDEX=1088
+     PACKAGEID="netlabs.org\Lucide\Chinese (TW)\${WPIVERSION}\${WPIBUILD"
+     TITLE="Chinese (TW)"
+     TARGET="$(1)"
+     FIXED
+     CREATEOBJECT='WPFolder|=("get_env title")|<WP_DESKTOP>|OBJECTID=<LUCIDEFOLDER>;TITLE==("get_env title");ICONFILE=$(1)\lucide_fldr_1.ico;ICONNFILE=1,$(1)\lucide_fldr_2.ico;OPEN=DEFAULT;ALWAYSSORT=YES;'
+     CREATEOBJECT='WPProgram|Lucide|<LUCIDEFOLDER>|EXENAME=$(1)\lucide.exe;OBJECTID=<LUCIDEFOLDER_LUCIDEEXE>;TITLE==("get_env prog");PROGTYPE=PM;STARTUPDIR=$(1);ASSOCFILTER=*.PDF,*.DJVU;ASSOCTYPE=Acrobat Document;CCVIEW=YES;'
+     CREATEOBJECT="REPLACE WPProgram|=("get_env uguide")|<LUCIDEFOLDER>|EXENAME=view.exe;OBJECTID=<LUCIDEFOLDER_GUIDE>;TITLE==("get_env uguide");PROGTYPE=PM;PARAMETERS==("get_env lucidehelp");STARTUPDIR=$(1);" 
+     CREATEOBJECT='WPProgram|=("get_env readmetitle")|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_READMETW>;TITLE==("get_env readmetitle");PROGTYPE=PM;PARAMETERS=$(1)\readme;STARTUPDIR=$(1);'
+     CREATEOBJECT='WPProgram|Changelog|<LUCIDEFOLDER>|EXENAME=e.exe;OBJECTID=<LUCIDEFOLDER_CHANGELOG>;TITLE=Changelog;PROGTYPE=PM;PARAMETERS=$(1)\changelog;STARTUPDIR=$(1);'
+     =("get_env tw_sel")
+     >Chinese (TW) language support files for Lucide.</PCK>
+
+    </GROUP>
+
 </HEAD>
 
 <!-- Here come the different pages. They are linked by
@@ -298,28 +630,7 @@ return readme
 =("get_env nextText")
 =("get_env cancelText")
 </TEXT>
-
-<README FORMAT=HTML>
-<B>=("get_env welcome")=("get_env title"), version ${VERSION}.${WPIBUILD}</B>
-
-<P>
-=("get_env prog") is a plugin based document viewer for eComStation. In its first incarnation
-it supports PDF, DjVu and JPEG files but new document types can easily be added to it.
-<P>
-<P>
-<BR>
-Features:
-<UL>
-  <LI>PDF, DjVu and JPEG Support
-  <LI>Drag and Drop Support
-  <LI>Fast and small
-</UL>
-<P>
-<BR>
-For further details please visit the =("get_env prog") project homepage:<BR>
-<U><a href="http://svn.netlabs.org/lucide/">http://svn.netlabs.org/lucide/</a></U>
-<BR>
-</README>
+<README FORMAT=PLAIN EXTRACTFROMPCK="=("get_env pkgnum")">=("get_env readme")</README>
 </PAGE>
 
 <PAGE INDEX=2 TYPE=README>
@@ -335,25 +646,21 @@ The following list describes what is new in this version of =("get_env prog").
 <TEXT>
 =("get_env accept")
 </TEXT>
-<README FORMAT=HTML>
-<B>LICENSE</B>
-<P>
-Starting with version 1.3.0 Mensys BV and Serenity Systems International
-have agreed in opensourcing Lucide, while still investing in the product.
-Netlabs.org would like to express it's gratitude toward Mensys BV and
-Serenity Systems International.</P>
-<P>
-Lucide as of version 1.3.0 is released and distributed under <U><a href="http://opensource.org/licenses/cddl1.php">CDDL</a></U>/<U><a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a></U>.</P>
-<P>
-The plugins are released under CDDL/LGPL or GPL, depending on the plugin. See
-<U><a href="http://svn.netlabs.org/lucide/">http://svn.netlabs.org/lucide/</a></U> for more information and source code.</P>
-</README>
+<README FORMAT=PLAIN EXTRACTFROMPCK="1">LICENSE.CDDL</README>
+</PAGE>
+
+<PAGE INDEX=4 TYPE=README>
+<NEXTBUTTON TARGET=5>=("get_env license")</NEXTBUTTON>
+<TEXT>
+=("get_env accept")
+</TEXT>
+<README FORMAT=PLAIN EXTRACTFROMPCK="1">LICENSE.LGPL</README>
 </PAGE>
 
 <!-- The TYPE=CONTAINER will list the packages which can be installed. -->
 
-<PAGE INDEX=4 TYPE=CONTAINER>
-<NEXTBUTTON TARGET=6>=("get_env next")</NEXTBUTTON>
+<PAGE INDEX=5 TYPE=CONTAINER>
+<NEXTBUTTON TARGET=7>=("get_env next")</NEXTBUTTON>
 <TEXT>
 =("get_env target")
 </TEXT>
@@ -367,8 +674,8 @@ The plugins are released under CDDL/LGPL or GPL, depending on the plugin. See
      happen should the user deselect creation of WPS objects (see ticket:128
      for details). -->
 
-<PAGE INDEX=5 TYPE=CONFIGURE>
-<NEXTBUTTON TARGET=6>=("get_env next")</NEXTBUTTON>
+<PAGE INDEX=6 TYPE=CONFIGURE>
+<NEXTBUTTON TARGET=7>=("get_env next")</NEXTBUTTON>
 <TEXT>
 
 Please select additional configuration that WarpIN should perform after installing this archive.
@@ -376,7 +683,7 @@ Please select additional configuration that WarpIN should perform after installi
 </TEXT>
 </PAGE>
 
-<PAGE INDEX=6 TYPE=TEXT>
+<PAGE INDEX=7 TYPE=TEXT>
 <NEXTBUTTON TARGET=0>=("get_env install")</NEXTBUTTON>
 <TEXT>
 

@@ -199,7 +199,7 @@ static BOOL set_ea( const char *file_name, const char *ea_name,
 
     int  ea_name_len = strlen( ea_name );
     if ( ea_name_len > 255 ) {
-        delete databuf;
+        delete[] databuf;
         return FALSE;
     }
 
@@ -232,7 +232,7 @@ static BOOL set_ea( const char *file_name, const char *ea_name,
 
     // Write EA
     rc = DosSetPathInfo( file_name, FIL_QUERYEASIZE, &op, sizeof(op), 0);
-    delete databuf;
+    delete[] databuf;
 
     // Restore timestamp
     if ( qpirc == 0 ) {
@@ -292,26 +292,30 @@ bool Lucide::isThumbNeeded( const char *fn )
 }
 
 
-void Lucide::createThumbnail( LuDocument *doc )
+bool Lucide::createThumbnail( LuDocument *doc )
 {
-    if ( !doc->isScalable( ev ) ) {
-        return;
-    }
+    //if ( !doc->isScalable( ev ) ) {
+    //    return;
+    //}
 
-    // render first page
+    // render first page if there is one
+    if ( doc->getPageCount( ev ) <= 0 )
+        return FALSE;
     double width = 0, height = 0;
     doc->getPageSize( ev, 0, &width, &height );
+    if ( width <= 0 || height <= 0 )
+        return FALSE;
     double zoom = std::min( (double)LUTHUMB_SIZE_X / width, (double)LUTHUMB_SIZE_Y / height );
     short bpp = doc->getBpp( ev );
 
     long rx = width * zoom;
     long ry = height * zoom;
     LuPixbuf *pixbuf = new LuPixbuf( ev, rx, ry, bpp );
-    if ( !doc->renderPageToPixbuf( ev, 0, 0, 0, rx, ry, zoom, 0, pixbuf, NULL, NULL ) ) {
+    if ( !doc->renderPageToPixbuf(ev, 0, 0, 0, rx, ry, zoom, 0, pixbuf,
+                                  NULL, NULL ) ) {
         delete pixbuf;
-        return;
+        return TRUE;
     }
-
     char *tmpgif = new char[ CCHMAXPATH ];
     getTmpDir( tmpgif );
     strcat( tmpgif, "LUTHUMB.TMP" );
@@ -375,7 +379,8 @@ void Lucide::createThumbnail( LuDocument *doc )
     if ( access( tmpgif, F_OK ) == 0 ) {
         unlink( tmpgif );
     }
-    delete tmpgif;
+    delete[] tmpgif;
+    return TRUE;
 }
 
 void Lucide::writeThumbnail( const char *fn )

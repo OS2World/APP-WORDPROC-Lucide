@@ -43,6 +43,7 @@
 #include <ludoc.xh>
 #include <luibutton.xh>
 #include <luitext.xh>
+#include <luichoice.xh>
 #include "lucide.h"
 #include "docViewer.h"
 #include "progressDlg.h"
@@ -52,7 +53,9 @@
 #include "messages.h"
 #include "cpconv.h"
 
-
+//#define INCL_EXCEPTQ_CLASS
+//#define INCL_LOADEXCEPTQ
+//#include "exceptq.h"
 // ASYNCH_RENDER_ENABLE, normally must be defined
 #define ASYNCH_RENDER_ENABLE
 
@@ -78,6 +81,8 @@ typedef LuDocument_LuLinkMapSequence *PLuLinkMapSequence;
 
 #define DOC_ID_ENTRY    0
 #define DOC_ID_MLE      1
+#define DOC_ID_COMBO    2
+//#define CHOICE_FIELDS
 
 void PageInputFields::fillCache( int i )
 {
@@ -104,7 +109,13 @@ void PageInputFields::fillCache( int i )
             entry.supported = true;
             break;
         }
-        case LuInputField_Choice:
+        case LuInputField_Choice: {
+#ifdef CHOICE_FIELDS
+	    LuInputChoice *choice = static_cast<LuInputChoice *>( field );
+	    entry.supported = true;
+#endif
+            break;
+        }
         case LuInputField_Signature:
         default:
             // these are currently not supported
@@ -148,12 +159,18 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     hWndDoc     = NULLHANDLE;
     hWndEntry   = NULLHANDLE;
     hWndMLE     = NULLHANDLE;
+    hWndList    = NULLHANDLE;
+    HWND hWndBubble = NULLHANDLE;
     textField   = NULL;
     textFieldPage = 0;
     textFieldIndex = 0;
+    choiceField   = NULL;
+    choiceFieldPage = 0;
+    choiceFieldIndex = 0;
     doc         = NULL;
     totalpages  = 0;
     currentpage = 0;
+    previouspage = -1;
     hpsBuffer   = NULLHANDLE;
     hdcBuffer   = NULLHANDLE;
     width       = 0;
@@ -220,6 +237,7 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
     hWndDocFrame = WinCreateStdWindow( hWndFrame, WS_VISIBLE, &dfFlags, NULL, NULL,
                                        WS_VISIBLE, _hmod, 0, NULL );
     WinSetWindowULong( hWndDocFrame, QWL_USER, (ULONG)this );
+    WinSetWindowUShort( hWndDocFrame, QWS_ID, DOC_WIN );
     oldFrameProc = WinSubclassWindow( hWndDocFrame, docFrameProc );
 
     hWndDoc = WinCreateWindow( hWndDocFrame, "er.docview", NULL,
@@ -232,6 +250,11 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
                                  0, 0, 0, 0, hWndDoc,
                                  HWND_TOP, DOC_ID_ENTRY, NULL, NULL );
 
+    hWndList = WinCreateWindow( hWndDoc, WC_COMBOBOX, NULL,
+                                CBS_DROPDOWNLIST | LS_HORZSCROLL | WS_VISIBLE,
+                                0, 0, 0, 0, hWndDoc,
+                                HWND_TOP, DOC_ID_COMBO, NULL, NULL );
+
     hWndMLE = WinCreateWindow( hWndDoc, WC_MLE, NULL,
                                MLS_BORDER,
                                0, 0, 0, 0, hWndDoc,
@@ -241,6 +264,9 @@ DocumentViewer::DocumentViewer( HWND hWndFrame )
 
     char *mleFont = "10.Helvetica Bold";
     WinSetPresParam( hWndMLE, PP_FONTNAMESIZE, strlen( mleFont ) + 1, mleFont );
+
+    hWndPopupMenu = WinLoadMenu( hWndDoc, _hmod, IDM_DOCPOPUPMENU);
+    localizeMenu( hWndPopupMenu );
 
     hWndHscroll = WinWindowFromID( hWndDocFrame, FID_HORZSCROLL );
     hWndVscroll = WinWindowFromID( hWndDocFrame, FID_VERTSCROLL );
@@ -392,7 +418,7 @@ bool DocumentViewer::close( bool force )
                 return false;
             }
             if ( response == MBID_YES ) {
-                if ( !Lucide::saveDocumentAs() )
+                if ( !Lucide::saveDocument() )
                     return false;
             }
         }
@@ -669,7 +695,7 @@ void DocumentViewer::searchDocument( const char *_searchString, bool _caseSensit
                                      bool _continueSearch, bool _findBack )
 {
     abortSearch = false;
-    if ( !continueSearch ) {
+    if ( !continueSearch || strlen(_searchString) == 0) {
         freeRects( foundrects );
     }
 
@@ -693,6 +719,7 @@ void DocumentViewer::searchabort( void *data )
 // static method, thread for asynchronous searching
 void DocumentViewer::searchthread( void *p )
 {
+    //ScopedExceptqLoader sel;
     DosSetPriority( PRTYS_THREAD, PRTYC_REGULAR, PRTYD_MINIMUM, 0 );
     DocumentViewer *_this = (DocumentViewer *)p;
 
@@ -700,43 +727,51 @@ void DocumentViewer::searchthread( void *p )
     HMQ thmq = WinCreateMsgQueue( thab, 0 );
 
     long i = _this->currentpage;
-if (!_this->findBack) {
-    if ( _this->continueSearch && ( _this->currentpage < ( _this->totalpages - 1 ) ) ) {
-        i = _this->currentpage + 1;
+    if (!_this->findBack) {
+        if ( _this->continueSearch && ( _this->currentpage < ( _this->totalpages - 1 ) ) ) {
+            i = _this->currentpage + 1;
+        }
+    } else {
+        if ( _this->continueSearch && ( _this->currentpage >= 1 ) ) {
+            i = _this->currentpage - 1;
+        }
     }
-} else {
-    if ( _this->continueSearch && ( _this->currentpage >= 1 ) ) {
-        i = _this->currentpage - 1;
-    }
-}
 
     bool found = false;
-    for ( ; _this->findBack ? i >=0 : i < _this->totalpages; _this->findBack ? i-- : i++ )
-    {
-        char *fmt = newstrdupL( FIND_SEARCH_PAGE_OF );
-        char *buf = new char[ 255 ];
-        snprintf( buf, 255, fmt, i + 1, _this->totalpages );
-        _this->progressDlg->setText( buf );
-        delete fmt;
-        delete buf;
 
-        _this->foundrects[ i ] = _this->doc->searchText( ev, i,
-                                        (char *)_this->searchString, _this->caseSensitive, _this->findBack );
-        if ( _this->foundrects[ i ] != NULL )
+    if (strlen(_this->searchString) == 0) {
+        found = true;
+        _this->progressDlg->hide();
+        _this->goToPage( i );
+    }
+    else {
+        for ( ; _this->findBack ? i >=0 : i < _this->totalpages; _this->findBack ? i-- : i++ )
         {
-            found = true;
-            _this->progressDlg->hide();
-            _this->goToPage( i );
-            if ( _this->foundrects[i]->_length > 0 ) {
-                RECTL r;
-                _this->docPosToWinPos( i, &(_this->foundrects[i]->_buffer[0]), &r );
-                _this->scrollToPos( _this->hWndDoc, r.xLeft, r.yBottom, false );
+            char *fmt = newstrdupL( FIND_SEARCH_PAGE_OF );
+            char *buf = new char[ 255 ];
+            snprintf( buf, 255, fmt, i + 1, _this->totalpages );
+            _this->progressDlg->setText( buf );
+            delete fmt;
+            delete[] buf;
+    
+            _this->foundrects[ i ] = _this->doc->searchText( ev, i,
+                                            (char *)_this->searchString, _this->caseSensitive, _this->findBack );
+            if ( _this->foundrects[ i ] != NULL )
+            {
+                found = true;
+                _this->progressDlg->hide();
+                _this->goToPage( i );
+                if ( _this->foundrects[i]->_length > 0 ) {
+                    RECTL r;
+                    _this->docPosToWinPos( i, &(_this->foundrects[i]->_buffer[0]), &r );
+                    _this->scrollToPos( _this->hWndDoc, r.xLeft, r.yBottom, false );
+                }
+                break;
             }
-            break;
-        }
-
-        if ( _this->abortSearch ) {
-            break;
+    
+            if ( _this->abortSearch ) {
+                break;
+            }
         }
     }
     _this->progressDlg->hide();
@@ -1034,6 +1069,8 @@ long _System DocumentViewer::asynchCallbackFnDraw( void *data )
 // static method, thread for asynchronous rendering
 void DocumentViewer::drawthread( void *p )
 {
+    //ScopedExceptqLoader sel;
+
     DosSetPriority( PRTYS_THREAD, PRTYC_REGULAR, PRTYD_MINIMUM, 0 );
     DocumentViewer *_this = (DocumentViewer *)p;
 
@@ -1123,7 +1160,7 @@ void DocumentViewer::wmPaintAsynch( HWND hwnd )
     RECTL rcl;
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
 
-#if FILL_PAGE_BACKGROUND
+#ifdef FILL_PAGE_BACKGROUND
 
     WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
     if ( doc != NULL )
@@ -1238,7 +1275,7 @@ void DocumentViewer::wmPaintContAsynch( HWND hwnd )
     RECTL rcl, rclWin, rclDraw = { 0 };
     HPS hps = WinBeginPaint( hwnd, 0L, &rcl );
 
-#if FILL_PAGE_BACKGROUND
+#ifdef FILL_PAGE_BACKGROUND
 
     WinFillRect( hpsBuffer, &rcl, BORDER_COLOR );
 
@@ -1388,7 +1425,7 @@ void DocumentViewer::wmPaint( HWND hwnd )
             yPos = ( cyClient - height ) / 2;
         }
 
-        RECTL rclPage = { xPos, yPos, width + xPos, height + yPos };
+        RECTL rclPage = { xPos, yPos, (LONG) width + xPos, (LONG) height + yPos };
         RECTL rclDraw = { 0 };
         if ( WinIntersectRect( hab, &rclDraw, &rcl, &rclPage ) )
         {
@@ -1478,6 +1515,82 @@ double DocumentViewer::pagenumToPos( long pagenum )
     }
     return ( ( ypos * realzoom ) + ( pagenum * VERT_SPACE ) );
 }
+#ifdef CHOICE_FIELDS
+void DocumentViewer::showChoiceField( long page, long index, PRECTL r )
+{
+    // save the previous changes if any
+    if ( choiceField != NULL )
+      hideTextField(true, NULL);
+
+    choiceField =
+        static_cast<LuInputChoice *>( inputFields[ page ].fields->_buffer[ index ] );
+    choiceFieldPage = page;
+    choiceFieldIndex = index;
+
+    positionChoiceField( r );
+
+    HWND hwnd = hWndList;
+
+    long count = choiceField->getCount(ev);
+    for (int i = 0; i < count; i++) {
+      const char *contents = choiceField->getChoice( ev, i );
+      char *str = uniUtf8ToSys( contents, NULL, NULL );
+      WinSendMsg( hwnd, LM_INSERTITEM, MPFROM2SHORT(LIT_END, 0),  MPFROMP(str));
+      delete[] str;
+    }
+
+    WinShowWindow( hwnd, TRUE );
+    WinSetFocus( HWND_DESKTOP, hwnd );
+}
+
+void DocumentViewer::positionChoiceField( PRECTL r )
+{
+    if ( choiceField == NULL )
+        return;
+
+    RECTL r2;
+    if ( r == NULL ) {
+        LuRectangle *rect = choiceField->getRectangle( ev );
+        docPosToWinPos( choiceFieldPage, rect, &r2 );
+    } else {
+        r2 = *r;
+    }
+
+    static LONG ulDpi = 0;
+    if ( ulDpi == 0 ) {
+        // DPI is constant beteen reboots
+        HPS hps = WinGetScreenPS( HWND_DESKTOP );
+        DevQueryCaps( GpiQueryDevice( hps ), CAPS_HORIZONTAL_FONT_RES,
+                      1, &ulDpi );
+        WinReleasePS( hps );
+    }
+
+    LONG points = -1;
+    HWND hwnd = hWndList;
+        // reduce the rectangle to compensate for the border
+        r2.xLeft += 1;
+        r2.yBottom += 1;
+        r2.xRight -= 1;
+        r2.yTop -= 1;
+        // set the font size to match the field height
+        points = ( r2.yTop - r2.yBottom ) * 72 / 120 - 2;
+        if ( points < 1 )
+            points = 1;
+
+
+    if (points >= 0 ) {
+        char font[ 32 ];
+        sprintf( font, "%d.Helvetica Bold", points );
+        WinSetPresParam( hWndList, PP_FONTNAMESIZE, strlen( font ) + 1, font );
+    }
+
+    WinSetWindowPos( hwnd, HWND_TOP,
+                     r2.xLeft, r2.yBottom,
+                     r2.xRight - r2.xLeft,
+                     r2.yTop - r2.yBottom,
+                     SWP_MOVE | SWP_SIZE | SWP_ZORDER );
+}
+#endif
 
 void DocumentViewer::showTextField( long page, long index, PRECTL r )
 {
@@ -1498,9 +1611,10 @@ void DocumentViewer::showTextField( long page, long index, PRECTL r )
         WinSendMsg( hwnd, MLM_SETTEXTLIMIT, MPFROMLONG( 65520 ), NULL );
     } else {
         hwnd = hWndEntry;
-        // @todo uncomment this once it returns anything useful
-        // int maxLen = textField->getMaximumLength( ev );
-        WinSendMsg( hwnd, EM_SETTEXTLIMIT, MPFROMLONG( 65520 ), NULL );
+        int maxLen = textField->getMaximumLength( ev );
+        if (!maxLen || maxLen < 1)
+            maxLen = 65520;
+        WinSendMsg( hwnd, EM_SETTEXTLIMIT, MPFROMLONG( maxLen ), NULL );
     }
 
     const char *contents = textField->getContents( ev );
@@ -1603,6 +1717,49 @@ void DocumentViewer::hideTextField( bool apply, PPOINTL ptl )
         // remove the focus from the window we hid
         WinSetFocus( HWND_DESKTOP, hWndDoc );
     }
+#ifdef CHOICE_FIELDS
+    else if ( choiceField != NULL ) {
+	HWND hwnd = hWndList;
+        SWP swp;
+        WinQueryWindowPos( hwnd, &swp );
+        RECTL r = { swp.x, swp.y, swp.x + swp.cx, swp.y + swp.cy };
+        if ( ptl && WinPtInRect( hab, &r, ptl ) ) {
+            // don't hide if the point is inside the field
+            return;
+        }
+        if ( apply ) {
+            LONG index = (LONG) WinSendMsg( hwnd, LM_QUERYSELECTION,
+                                           MPFROMSHORT(LIT_CURSOR), 0 );
+            if (index != LIT_NONE) {
+                //LONG len = WinQueryWindowTextLength( hwnd );
+                //char *str = new char [ len + 1 ];
+                //*str = 0;
+                char *str = choiceField->getChoice( ev, index );
+                //str[ len ] = 0;
+                char *contents = uniSysToUtf8( str, NULL, NULL );
+                char *oldContents = choiceField->getChoiceText( ev );
+                if ( (oldContents == NULL && contents != NULL) ||
+                     (oldContents != NULL && contents == NULL) ||
+                     strcmp( choiceField->getChoiceText( ev ), contents ) ) {
+                    // only modify the field if it differs
+                    choiceField->setChoiceText( ev, contents );
+                    inputFields[ choiceFieldPage ].cache[ choiceFieldIndex ].modified = true;
+                }
+                delete[] contents;
+                //delete[] str;
+            }
+	}
+	WinSendMsg( hwnd, LM_DELETEALL, 0, 0 );
+        choiceField = NULL;
+        WinShowWindow( hwnd, FALSE );
+        // repaint little bit more (rounding errors)
+        r.xLeft -= 1; r.yBottom -= 1;
+        r.xRight += 1; r.yTop += 1;
+        WinInvalidateRect( hWndDoc, &r, TRUE );
+        // remove the focus from the window we hid
+        WinSetFocus( HWND_DESKTOP, hWndDoc );
+    }
+#endif
 }
 
 // founds pages and it's areas to draw
@@ -1959,7 +2116,7 @@ void DocumentViewer::drawSelection( long pagenum, HPS hps, PRECTL r )
 void DocumentViewer::drawFound( long pagenum, HPS hps, PRECTL r )
 {
     GpiSetMix( hps, FM_XOR );
-    GpiSetColor( hps, CLR_CYAN );
+    GpiSetColor( hps, CLR_RED );
     HRGN selectRegion = rectsToRegion( pagenum, hps, foundrects[ pagenum ] );
     if ( r != NULL )
     {
@@ -2151,11 +2308,90 @@ BOOL DocumentViewer::wmMouseMove( HWND hwnd, SHORT xpos, SHORT ypos )
                     {
                         RECTL r = {0};
                         docPosToWinPos( pg, &(links[ pg ]->_buffer[i].area), &r );
+                        r.xLeft += 5;
+                        r.xRight -= 5;
+                        r.yTop  -= 5;
+                        r.yBottom += 5;
 
                         POINTL ptl = { xpos, ypos };
                         if ( WinPtInRect( hab, &r, &ptl ) ) {
+
+                            if ( hWndBubble == NULLHANDLE &&
+                                ((links[ pg ]->_buffer[i].link.type ==
+                                  LU_LINK_TYPE_EXTERNAL_URI) ||
+                                 (links[ pg ]->_buffer[i].link.type ==
+                                  LU_LINK_TYPE_EXTERNAL_FILE)))
+                            {
+                                HPS hpsTemp;
+                                HWND hwndBC;
+                                ULONG ulStyle = FCF_BORDER | FCF_NOBYTEALIGN;
+                                LONG  lWidth,lHight;
+                                POINTL txtPointl[ TXTBOX_COUNT ];
+                                CHAR *url = links[ pg ]->_buffer[i].link.uri;
+                                RECTL rcl;
+                                POINTL ptlWork;
+                                ptlWork.x = r.xLeft + ( ( r.xRight - r.xLeft ) / 2 );
+                                ptlWork.y = r.yBottom;
+
+                                hWndBubble =
+                                    WinCreateStdWindow( HWND_DESKTOP, 0,
+                                                       &ulStyle, WC_STATIC,
+                                                       "", SS_TEXT |
+                                                       DT_CENTER |  DT_VCENTER,
+                                                       NULLHANDLE, 3,
+                                                       &hwndBC );
+                                WinSetPresParam(hwndBC, PP_FONTNAMESIZE,
+                                                7, (PVOID) "8.Helv");
+                                RGB rgb = { (BYTE) 0, (BYTE) 255, (BYTE) 255 };
+                                WinSetPresParam(hwndBC,
+                                                PP_BACKGROUNDCOLOR,
+                                                sizeof(RGB), &rgb);
+                                rgb = { (BYTE) 0, (BYTE) 0, (BYTE) 0 };
+                                WinSetPresParam(hwndBC,
+                                                PP_FOREGROUNDCOLOR,
+                                                sizeof(RGB), &rgb);
+                                                hpsTemp = WinGetPS( hwndBC );
+        
+                                GpiQueryTextBox( hpsTemp, strlen( url ),
+                                                 url, TXTBOX_COUNT,
+                                                 (PPOINTL)&txtPointl[ 0 ] );
+                                WinReleasePS( hpsTemp );
+                                WinSetWindowText( hwndBC, url);
+            
+                                lWidth = txtPointl[ TXTBOX_TOPRIGHT ].x -
+                                         txtPointl[ TXTBOX_TOPLEFT ].x + 6;
+            
+                                lHight = txtPointl[TXTBOX_TOPLEFT   ].y -
+                                         txtPointl[TXTBOX_BOTTOMLEFT].y + 4;
+                               
+                                WinQueryWindowRect(hwnd, &rcl);
+                                if( ( ptlWork.y - ( lHight + 5 ) ) < 0 ) {
+                                    ptlWork.y = 20;
+                                } else {
+                                    ptlWork.y -= ( lHight + 5 );
+                                }
+                                
+                                if ( ( ptlWork.x + lWidth ) >= rcl.xRight) {
+                                    ptlWork.x = rcl.xRight - lWidth - 5;
+                                }
+                                WinMapWindowPoints( hwnd, HWND_DESKTOP, &ptlWork, 1 );
+                                WinSetWindowPos( hWndBubble, HWND_TOP, 
+                                                ptlWork.x, ptlWork.y - 5,
+                                                lWidth, lHight,
+                                                SWP_SHOW | SWP_MOVE | SWP_SIZE );
+                                DosSleep(100);
+                                WinSetPointer( HWND_DESKTOP, handPtr );
+                            }
+                            else {
                             WinSetPointer( HWND_DESKTOP, handPtr );
+                            }
                             return TRUE;
+                        }
+                        else if (hWndBubble != NULLHANDLE)
+                        {
+                            WinDestroyWindow( hWndBubble );
+                            hWndBubble = NULLHANDLE;
+                            DosSleep(1);
                         }
                     }
                 }
@@ -2285,6 +2521,12 @@ BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
                         }
                         else if ( links[ pg ]->_buffer[i].link.type == LU_LINK_TYPE_PAGE )
                         {
+                            if ( isContinuous() )
+                                previouspage = getCurrentPage();
+                            else
+                                previouspage = currentpage;
+                            Lucide::checkMenus( false );
+                            Lucide::checkNavigationMenus();
                             goToPage( links[ pg ]->_buffer[i].link.page );
                         }
 
@@ -2296,7 +2538,7 @@ BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
 
         if ( inputFields != NULL )
         {
-            if ( ( pg != -1 ) && ( inputFields[ pg ].fields != NULL ) )
+	    if ( ( pg != -1 ) && ( inputFields[ pg ].fields != NULL ) )
             {
                 for ( int i = 0; i < inputFields[ pg ].fields->_length; i++ )
                 {
@@ -2328,8 +2570,15 @@ BOOL DocumentViewer::wmClick( HWND hwnd, SHORT xpos, SHORT ypos )
                                     break;
                                 }
                                 case LuInputField_Text:
-                                {
+				{
                                     showTextField( pg, i, &r );
+                                    break;
+				}
+				case LuInputField_Choice:
+                                {
+#ifdef CHOICE_FIELDS
+                                    showChoiceField( pg, i, &r );
+#endif
                                     break;
                                 }
                                 default:
@@ -2708,6 +2957,23 @@ MRESULT EXPENTRY DocumentViewer::docViewProc( HWND hwnd, ULONG msg, MPARAM mp1, 
                 }
             }
             return (MRESULT)FALSE;
+
+        case WM_CONTEXTMENU:
+
+            if ( _this->doc != NULL && !_this->isZoomMode()) {
+              POINTL ptl;
+              WinQueryPointerPos(HWND_DESKTOP, &ptl);
+              WinPopupMenu(HWND_DESKTOP,
+                           hwnd, _this->hWndPopupMenu, ptl.x, ptl.y, 0,
+                           PU_HCONSTRAIN | PU_VCONSTRAIN | PU_MOUSEBUTTON1 |
+                           PU_MOUSEBUTTON2 | PU_KEYBOARD);
+           }
+           return (MRESULT)FALSE;
+
+        case WM_COMMAND:
+
+            WinSendMsg( _this->hMainFrame, msg, mp1, mp2 );
+            break;
 
         case WM_BUTTON1DOWN:
             _this->wmButton1Down( hwnd, SHORT1FROMMP( mp1 ), SHORT2FROMMP( mp1 ) );

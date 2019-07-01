@@ -14,15 +14,29 @@ include $(PATH_SUB_CURRENT)/gui/Makefile.kmk
 # Target lists
 #
 INSTALLS += Lucide_doc
+MISCBINS += Lucide_en.hlp
+#MISCBINS += gbm_en.hlp
 
 #
 # Lucide documentation
 #
 Lucide_doc_INST		 = $(INST_BIN)
 Lucide_doc_SOURCES	:= \
-	changelog readme $(wildcard $(PATH_SUB_CURRENT)/readme_*.txt) \
-	$(wildcard $(PATH_SUB_CURRENT)/LICENSE.*) \
+	changelog readme $(wildcard $(PATH_SUB_CURRENT)/LICENSE.*) \
 	gui/bitmaps/Lucide.ico
+	
+#
+# Lucide Help File
+#
+#Lucide_help_INST          = $(PATH_STAGE)\bin
+Lucide_en.hlp_SOURCES     = $(PATH_ROOT)\lucide\lng\lucide_en.ipf \
+			    -o $(PATH_OBJ)\lucide_en.hlp\Lucide_en.hlp
 
+gbm_en.hlp_SOURCES     = $(PATH_ROOT)\lucide\plugins\lugbm\doc\gbm_en.ipf \
+			    -o $(PATH_OBJ)\lucide_en.hlp\gbm_en.hlp  
+			    
+Lucide_es.hlp_SOURCES     = $(PATH_ROOT)\lucide\lng\lucide_es.ipf \
+			    -o $(PATH_OBJ)\lucide_en.hlp\Lucide_es.hlp			    
+			    
 include $(FILE_KBUILD_SUB_FOOTER)
 

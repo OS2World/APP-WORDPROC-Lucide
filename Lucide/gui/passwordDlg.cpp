@@ -38,6 +38,7 @@
 #include "passwordDlg.h"
 #include "Lucide_res.h"
 #include "luutils.h"
+#include "Lucide.h"
 
 #define MAXPASSWORDLENGTH 100
 
@@ -81,6 +82,9 @@ MRESULT EXPENTRY PasswordDlg::passwordDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
             localizeDialog( hwnd );
             centerWindow( _this->hFrame, hwnd );
 
+            // setup the accelerators
+            WinSetAccelTable( hab, WinLoadAccelTable( hab, _hmod, IDA_ADDHELPACCEL ), hwnd );
+
             WinSendDlgItemMsg( hwnd, IDC_PASSWORD, EM_SETTEXTLIMIT,
                                MPFROMSHORT( MAXPASSWORDLENGTH ), MPVOID );
             return (MRESULT)FALSE;
@@ -102,6 +106,12 @@ MRESULT EXPENTRY PasswordDlg::passwordDlgProc( HWND hwnd, ULONG msg, MPARAM mp1,
                 case DID_CANCEL:
                     WinDismissDlg( hwnd, DID_CANCEL );
                     return (MRESULT)FALSE;
+
+                case CM_HELP:
+                  if (Lucide::hwndHelp)
+                      WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                 MPFROM2SHORT(118, 0), MPFROMSHORT(HM_RESOURCEID));
+                  return (MRESULT)FALSE;
             };
             return (MRESULT)FALSE;
     }

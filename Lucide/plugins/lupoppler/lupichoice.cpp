@@ -45,7 +45,42 @@
 #define LuPopplerInputChoice_Class_Source
 
 #include "lupichoice.xih"
+#include "cpconv.h"
 
+SOM_Scope void SOMLINK init_widgetChoice(LuPopplerInputChoice *somSelf,
+                                          Environment *ev, somInitCtrl* ctrl,
+                                         LuPopplerDocument* aDoc,
+                                         long aPagenum, Page* aPage,
+                                         FormWidgetChoice* aFormWidgetChoice)
+{
+    LuPopplerInputChoiceData *somThis = NULL; /* set in BeginInitializer */
+    somInitCtrl globalCtrl;
+    somBooleanVector myMask;
+    LuPopplerInputChoice_BeginInitializer_init_widgetChoice;
+
+    LuPopplerInputChoice_Init_LuPopplerInputField_init_widget(somSelf, ev, ctrl,
+                                                              aDoc, aPagenum, aPage,
+                                                              aFormWidgetChoice);
+    LuPopplerInputChoice_Init_LuInputChoice_somDefaultInit(somSelf, ctrl);
+
+    /* local LuPopplerInputField initialization code */
+
+    somThis->widget = aFormWidgetChoice;
+}
+
+
+SOM_Scope void SOMLINK somDestruct(LuPopplerInputChoice *somSelf,
+                                   octet doFree, som3DestructCtrl* ctrl)
+{
+    LuPopplerInputChoiceData *somThis; /* set in BeginDestructor */
+    somDestructCtrl globalCtrl;
+    somBooleanVector myMask;
+    LuPopplerInputChoice_BeginDestructor;
+
+    /* local LuPopplerInputField deinitialization code */
+
+    LuPopplerInputChoice_EndDestructor;
+}
 
 SOM_Scope long  SOMLINK getCount(LuPopplerInputChoice *somSelf,
                                   Environment *ev)
@@ -53,8 +88,9 @@ SOM_Scope long  SOMLINK getCount(LuPopplerInputChoice *somSelf,
     LuPopplerInputChoiceData *somThis = LuPopplerInputChoiceGetData(somSelf);
     LuPopplerInputChoiceMethodDebug("LuPopplerInputChoice","getCount");
 
-    return (LuPopplerInputChoice_parent_LuInputChoice_getCount(somSelf,
-                                                               ev));
+    return somThis->widget->getNumChoices();
+      //(LuPopplerInputChoice_parent_LuInputChoice_getCount(somSelf,
+                                                             //  ev));
 }
 
 SOM_Scope string  SOMLINK getChoice(LuPopplerInputChoice *somSelf,
@@ -63,9 +99,18 @@ SOM_Scope string  SOMLINK getChoice(LuPopplerInputChoice *somSelf,
     LuPopplerInputChoiceData *somThis = LuPopplerInputChoiceGetData(somSelf);
     LuPopplerInputChoiceMethodDebug("LuPopplerInputChoice","getChoice");
 
-    return (LuPopplerInputChoice_parent_LuInputChoice_getChoice(somSelf,
-                                                                ev,
-                                                                aNumber));
+    delete[] somThis->mChoiceText;
+    somThis->mChoiceText = NULL;
+
+    GooString *gooStr = somThis->widget->getChoice(aNumber);
+    if (gooStr)
+      somThis->mChoiceText =  gooStr->getCString();
+            //uniUtf16BEToUtf8( gooStr->getCString(), gooStr->getLength(),
+            //                  NULL, NULL );
+    return somThis->mChoiceText;
+      //(LuPopplerInputChoice_parent_LuInputChoice_getChoice(somSelf,
+                                //                                ev,
+                                //                                aNumber));
 }
 
 SOM_Scope void  SOMLINK select(LuPopplerInputChoice *somSelf,

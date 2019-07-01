@@ -1,116 +1,201 @@
 :: Acerca de Lucide ::
 
-Lucide es un visor de documentos con arquitectura de plugins y soporte para
-varios formatos de archivo.
+Lucide es un visor de documentos con arquitectura modular que soporta distintos
+formatos de archivo.
 
-Provee una arquitectura de plugins basada en SOM la que permite a programadores
-de terceras partes a¤adir f cilmente m s plugins.
+La arquitectura de estos mï¿½dulos o ï¿½pluginsï¿½ estï¿½ basada en SOM, lo que permite
+a terceros programadores aï¿½adir fï¿½cilmente soporte para mï¿½s formatos.
 
 
-:: Plugins ::
+:: Mï¿½dulos ::
 
-   Tipo de archivo soportado   Caracter¡sticas soportadas
+   Tipos de archivo soportados  Funciones disponibles
   --------------------------------------------------------------------------
-         PDF                   Escalado, Rotaci¢n, Navegaci¢n, Selecci¢n de
-                               texto, B£squedas, Renderizado as¡ncrono,
-                               impresi¢n PostScript
+         PDF                    Escalado, rotaciï¿½n, navegaciï¿½n, selecciï¿½n de
+                                texto, bï¿½squeda, representaciï¿½n asï¿½ncrona,
+                                cumplimentado de formularios, impresiï¿½n
+                                PostScript
 
-         DJVU                  Escalado, impresi¢n PostScript
+         DJVU                   Escalado, impresiï¿½n PostScript
 
-         JPG                   Escalado
+         JPG                    Escalado
   --------------------------------------------------------------------------
+
+:: Comparaciï¿½n con qPDFView ::
+
+Tanto Lucide como qPDFView utilizan la misma biblioteca de ejecuciï¿½n ï¿½popplerï¿½
+para mostrar los archivos PDF. Las diferencias internas entre los dos pogramas
+pueden dar como resultado que un archivo determinado se abra con mayor rapidez
+en un programa o en el otro. Tenemos la sensaciï¿½n de que, en general, la
+interfaz de Lucide tiene un estilo mï¿½s parecido al de OS/2 -o nativo-, y encaja
+mejor en el sistema operativo. Por supuesto, queda a la entera discreciï¿½n del
+usuario la elecciï¿½n final de cuï¿½l se ajusta mejor a sus necesidades.
 
 
 :: Requisitos ::
 
-Lucide requiere lo siguiente:
+Para instalar todos los prerrequesitos de Lucide en una sola operaciï¿½n desde el
+Gestor de Paquetes de Arca Noae, simplemente copie la siguiente lista de
+paquetes y pï¿½guela en el diï¿½logo ï¿½Instalaciï¿½n rï¿½pidaï¿½:
 
-  - libc 0.6.5:
-    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.5-csd5.zip (formato zip)
-      or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_5-csd5.wpi (formato WarpIn)
-  - gcc446.dll:
-    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (formato WarpIn)
+libc libgcc1 libgcc-fwd libstdc++6 libsupc++6 poppler poppler-data libjpeg
+djvulibre uclip
+
+Si prefiere hacerlo desde el indicador de mandatos de yum, por favor teclee
+
+yum install libc libgcc1 libgcc-fwd libstdc++6 libsupc++6 poppler poppler-data
+libjpeg djvulibre uclip
+
+y pulse Enter.
 
 
-Opcional: para poner texto unicode en el portapapeles  en programas compatibles
-con el formato de OpenOffice.org, necesita instalar el paquete UClip (soporte
-mejorado de portapapeles para OS/2, instalado por defecto en eComStation 2.0
-RC1 y superiores):
+Especï¿½ficamente, Lucide requiere lo siguiente:
+
+  - libc 0.6.6:
+    - http://rpm.netlabs.org/release/00/zip/libc-0_6_6-38_oc00.zip (formato zip)
+      o ftp://ftp.netlabs.org/pub/gcc/libc-0_6_6-csd6.wpi (formato WarpIn)
+      o ï¿½yum install libcï¿½ (desde el repositorio netlabs-rel)
+  - libcx 0.6.3
+    - http://rpm.netlabs.org/release/00/zip/libcx-0_6_4-1_oc00.zip (formato zip)
+       o ï¿½yum install libcxï¿½ (desde el repositorio netlabs-rel)
+  - gcc492.dll:
+    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_3_1.wpi (formato WarpIn)
+      o ï¿½yum install libgcc1 libgcc-fwdï¿½ (desde el repositorio netlabs-rel)
+
+El mï¿½dulo que permite a Lucide mostrar PDFs requiere lo siguiente:
+
+    - poppler 0.59.0:
+    - ï¿½yum install popplerï¿½ (desde el repositorio netlabs-rel)
+
+Para mostrar los archivos DjVu, el mï¿½dulo correspondiente necesita:
+
+    - djvulibre 3.5.27:
+    - ï¿½yum install djvulibreï¿½ (desde el repositorio netlabs-rel)
+
+Para mostrar diversos formatos de imagen mapa de bits, el mï¿½dulo
+GBM necesita:
+
+    - GBMDLL 1.76:
+    - ï¿½yum install GBMDLLï¿½ (desde el repositorio netlabs-rel)
+    - Instalado por omisiï¿½n en ArcaOS 5.0.3 o mï¿½s reciente
+  
+El mï¿½dulo para JPEGs requiere:
+
+    - libjpeg 8d:
+    - ï¿½yum install libjpegï¿½ (desde el repositorio netlabs-rel)
+    - Sï¿½lo se necesita para el mï¿½dulo JPG; GBM ya da soporte a JPG
+    - No deberï¿½a instalar JPG y GBM a la vez. (Se recomienda GBM.)
+
+Opcional: para poner en el portapapeles texto unicode en formato compatible con
+OpenOffice.org, necesita instalar el paquete UClip (soporte mejorado de
+portapapeles para OS/2, instalado por omisiï¿½n en eComStation 2.0 RC1 y
+posteriores, asï¿½ como en ArcaOS Blue Lion):
 
   - http://hobbes.nmsu.edu/cgi-bin/h-search?key=UClip
+    o ï¿½yum install uclipï¿½ (desde el repositorio netlabs-rel)
 
-    
-La impresi¢n PostScript requiere una impresora PostScript (pscript.drv).
+Opcional: para que funcionen las fuentes japonesas necesita el paquete
+poppler-data.
+
+  - ï¿½yum install poppler-dataï¿½ (desde el repositorio netlabs-rel)
 
 
-Para ver una lista completa de caracter¡sticas y mejoras consulte el TRAC de
-Lucide en:
+La impresiï¿½n PostScript requiere una impresora PostScript (pscript.drv o
+psprint.drv).
 
-  http://svn.netlabs.org/lucide/
 
-Si encuentra fallos, reg¡strelos en el TRAC, vea:
+Para ver una lista completa de caracterï¿½sticas y mejoras consulte el sistema de
+seguimiento del desarrollo de Netlabs (TRAC) para Lucide en:
 
-  http://svn.netlabs.org/lucide/newticket
+  https://trac.netlabs.org/lucide/
 
-Por favor, aseg£rese de que selecciona la versi¢n y el componente correctos
-para su ticket.
+Si encuentra fallos, regï¿½strelos tambiï¿½n en TRAC; consulte:
+
+  https://trac.netlabs.org/lucide/newticket
+
+Por favor, asegï¿½rese de que selecciona la versiï¿½n y el componente correctos
+para su informe de incidencias.
 
 
 :: Problemas conocidos/limitaciones ::
 
-General: la impresi¢n de pares/impares no est  disponible para impresi¢n
-postscript.
-          ( http://svn.netlabs.org/lucide/ticket/87#comment:4 )
+Consulte: https://trac.netlabs.org/lucide/report/1
 
 
-:: Comandos de tuber¡a ::
+:: Mï¿½dulos de terceros ::
 
-La primera instancia de Lucide crear  una tuber¡a con nombre \PIPE\LUCIDE. 
-Puede enviar los siguientes comandos a esa tuber¡a:
+GBM (Generalised Bitmap Module) es una biblioteca para manipular muchos
+formatos de imagen diferentes. Incluye un conjunto de herramientas de indicador
+de mandatos muy ï¿½tiles para manipular imï¿½genes y convertir formatos. En esta
+versiï¿½n se incluye soporte adicional para BMP, JPG, JP2, PNG, TIF, PBM, PGM,
+PPM, PNM, XPM, JBG y RAW.
 
-$prev              - cambiar  a la p gina anterior
-$next              - cambiar  a la p gina siguiente
-$presentation      - cambiar  a presentaci¢n (incluso minimizado)
-$minimize          - minimizar  Lucide (incluso en pantalla completa)
-$rotate            - rotar  90ø en el sentido de las agujas del reloj
-$zoomin            - aumentar  el zoom
-$zoomout           - disminuir  el zoom
-$zoomoriginal      - ampliar  o reducir  al tama¤o normal
+http://hobbes.nmsu.edu/h-search.php?key=gbmos2pm160_gbm176_lu143_moz147_bin_wpi
 
-Esto puede ser £til para presentaciones con un control remoto.
+N.B.: Si utiliza GBM para mostrar imï¿½genes JPG, es aconsejable desactivar el
+mï¿½dulo para JPG incluido con Lucide para evitar conflictos (vea el ticket #236).
+Esto se puede hacer sin mï¿½s que renombrar lujpeg.dll en el directorio de Lucide
+a lujpeg.dl_ cuando Lucide no se estï¿½ ejecutando. Para restaurar el mï¿½dulo para
+JPG que se incluye, simplemente vuelva a renombrar el archivo e inicie Lucide.
 
+:: Canalizaciï¿½n de mandatos ::
 
-:: Licencia hasta la versi¢n 1.21 ::
+La primera instancia de Lucide crearï¿½ el canal de comunicaciï¿½n \PIPE\LUCIDE.
+Por ï¿½l puede enviar a Lucide las siguientes ï¿½rdenes:
 
-La versi¢n 1.21 y anteriores est n licenciadas para su uso exclusivo con
-eComStation. No se le permite distribuir el producto subi‚ndolo a servidores
-p£blicos de Internet o hacerlo disponible p£blicamente por otros medios.
+$prev              - cambiarï¿½ a la pï¿½gina anterior
+$next              - cambiarï¿½ a la pï¿½gina siguiente
+$presentation      - cambiarï¿½ a modo presentaciï¿½n (incluso minimizado)
+$minimize          - minimizarï¿½ Lucide (incluso en pantalla completa)
+$rotate            - rotarï¿½ 90ï¿½ en sentido horario
+$zoomin            - aumentarï¿½ el tamaï¿½o
+$zoomout           - disminuirï¿½ el tamaï¿½o
+$zoomoriginal      - cambiarï¿½ al tamaï¿½o real
 
-
-:: Licencia para versi¢n 1.3.0 y superiores ::
-
-Comenzando con la versi¢n 1.3.0, Mensys BV y Serenity Systems International
-han llegado al acuerdo de abrir el c¢digo de Lucide, mientras siguen
-invirtiendo en el producto. Netlabs.org desea expresar su gratitud hacia
-Mensys BV y Serenity Systems International.
-
-Lucide as of version 1.3.0 is released and distributed under CDDL/LGPL.
+Esto puede resultar ï¿½til para presentaciones con control remoto.
 
 
-:: Licencia de plugins ::
-Los plugins son distribuidos bajo licencias CDDL/LGPL o GPL, dependiendo del
-plugin. Vea http://svn.netlabs.org/lucide/ para m s informaci¢n y c¢digo
-fuente.
+:: Licencia hasta la versiï¿½n 1.21 ::
+
+La versiï¿½n 1.21 y anteriores se publicaron bajo licencia para su uso exclusivo
+con eComStation. No se permite distribuir el producto cargï¿½ndolo en servidores
+pï¿½blicos de Internet o haciï¿½ndolo disponible pï¿½blicamente por ningï¿½n otro
+medio.
+
+
+:: Licencia para versiï¿½n 1.3.0 y superiores ::
+
+Comenzando con la versiï¿½n 1.3.0, Mensys BV y Serenity Systems International
+han llegado al acuerdo de liberar el cï¿½digo de Lucide, mientras continï¿½an
+invirtiendo en el producto. Netlabs.org desea expresar su gratitud hacia Mensys
+BV y Serenity Systems International.
+
+Arca Noae, LLC ha accedido a patrocinar el desarrollo de Lucide desde la
+versiï¿½n 1.3.6 en adelante. Lucide continï¿½a siendo cï¿½digo abierto bajo licencia
+dual.
+
+Lucide, en su versiï¿½n 1.3.0, se publica y distribuye bajo licencia CDDL/LGPL.
+
+
+:: Licencia de los mï¿½dulos ::
+
+Los mï¿½dulos se publican bajo licencia CDDL/LGPL o GPL, dependiendo de cada
+caso. Consulte http://svn.netlabs.org/lucide/ para mï¿½s informaciï¿½n y acceder al
+cï¿½digo fuente.
 
 
 :: Enlaces ::
 
-http://www.netlabs.org
-http://www.ecomstation.com
+http://www.netlabs.org/
+http://www.arcanoae.com/
 
 
-:: Copyright ::
+:: Derechos de copia ::
 
-(c) 2006-2007 por Eugene Romanenko, netlabs.org
-(c) 2010-2011 por Dmitriy Kuminov, netlabs.org
-    en cooperaci¢n con Serenity Systems International
+ï¿½ 2006-2007 por Eugene Romanenko, netlabs.org
+ï¿½ 2010-2011 por Dmitriy Kuminov, netlabs.org
+  en colaboraciï¿½n con Serenity Systems International
+ï¿½ 2016-2019 por netlabs.org
+  en colaboraciï¿½n con Arca Noae, LLC
+
+

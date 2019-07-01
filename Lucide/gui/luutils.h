@@ -45,7 +45,7 @@ class afbuf
 	public:
 		char *buffer;
 		afbuf( unsigned int s );
-		~afbuf() { delete buffer; }
+		~afbuf() { delete[] buffer; }
 		unsigned int getSize() { return size; }
     private:
         // dummy copy constructor and operator= to prevent copying

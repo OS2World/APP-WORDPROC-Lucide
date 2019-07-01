@@ -1,0 +1,21 @@
+## @file
+#
+
+SUB_DEPTH = ../,,/,,/,,
+include $(KBUILD_PATH)/subheader.kmk
+
+#
+# Target lists
+#
+INSTALLS += Lugbm_doc
+
+#
+# Lucide documentation
+#
+Lugbm_doc_INST		 = $(INST_BIN)
+Lugbm_doc_SOURCES	:= \
+	license_gbmlucide.txt\
+	readme_gbmlucide.txt\
+	lugbm.cfg
+	
+include $(FILE_KBUILD_SUB_FOOTER)

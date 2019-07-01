@@ -44,6 +44,7 @@
 #include "Lucide_res.h"
 #include "messages.h"
 #include "cpconv.h"
+#include "Lucide.h"
 
 
 DocInfoDlg::DocInfoDlg( HWND hWndFrame, LuDocumentInfo *_dinfo, const char *fname )
@@ -259,6 +260,12 @@ MRESULT EXPENTRY DocInfoDlg::docInfoDlgProc( HWND hwnd, ULONG msg, MPARAM mp1, M
                     enumCntrRecords( cntr, selectProp, NULL );
                 }
                 return (MRESULT)FALSE;
+
+                case CM_HELP:
+                  if (Lucide::hwndHelp)
+                      WinSendMsg(Lucide::hwndHelp,HM_DISPLAY_HELP,
+                                 MPFROM2SHORT(114, 0), MPFROMSHORT(HM_RESOURCEID));
+                  return (MRESULT)FALSE;
 
                 default:
                     break;

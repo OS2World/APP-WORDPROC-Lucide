@@ -51,7 +51,7 @@ class PrintDlg
 
     private:
 
-        void enumQueues( HWND hwnd );
+        int enumQueues( HWND hwnd );
         void showJobProperties( HWND hwnd );
         void setCurrentQInfo( HWND hwnd, PPRQINFO3 q );
         HDC getInfoDC();

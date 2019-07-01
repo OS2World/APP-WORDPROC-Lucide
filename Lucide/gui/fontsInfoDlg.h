@@ -62,7 +62,7 @@ class FontsInfoDlg
         LuDocument *doc;
         
         // columns titles
-        PSZ name, type, embed;
+        PSZ name, type, embed, subname;
         // embed values
         PSZ emb_notembedded, emb_embedded, emb_embeddedsubset;
 };

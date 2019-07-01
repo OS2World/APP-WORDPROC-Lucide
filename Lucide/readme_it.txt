@@ -24,11 +24,40 @@ facilmente ulteriori plugins.
 
 Lucide richiede i seguenti pacchetti per il suo funzionamento:
 
-  - libc 0.6.5:
-    - ftp://ftp.netlabs.org/pub/gcc/libc-0.6.5-csd5.zip (format zip)
-      or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_5-csd5.wpi (formato WarpIn)
-  - gcc446.dll:
-    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_2_1.wpi (formato WarpIn)
+  - libc 0.6.6:
+    - http://rpm.netlabs.org/release/00/zip/libc-0_6_6-38_oc00.zip (format zip)
+      or ftp://ftp.netlabs.org/pub/gcc/libc-0_6_6-csd6.wpi (formato WarpIn)
+      or "yum install libc" (from the netlabs-rel repository)
+  - libcx 0.6.3
+    - http://rpm.netlabs.org/release/00/zip/libcx-0_6_4-1_oc00.zip (zip format)
+       or "yum install libcx" (from the netlabs-rel repository)
+  - gcc492.dll:
+    - ftp://ftp.netlabs.org/pub/gcc/gcc4core-1_3_1.wpi (formato WarpIn)
+      or "yum install libgcc1 libgcc-fwd" (from the netlabs-rel repository)
+
+For rendering PDFs, Lucide's plugin requires the following:
+
+    - poppler 0.59.0:
+    - "yum install poppler" (from the netlabs-rel repository)
+    
+For rendering DjVu files, Lucide's plugin requires the following:
+
+    - djvulibre 3.5.27:
+    - "yum install djvulibre" (from the netlabs-rel repository)
+    
+For rendering multiple bitmap format files (GBM), Lucide's plugin 
+requires the following:
+
+    - GBMDLL 1.76:
+    - "yum install GBMDLL" (from the netlabs-rel repository)
+    - Installed by default on ArcaOS 5.0.3 and higher
+
+For rendering JPEGs, Lucide's plugin requires the following:
+
+    - libjpeg 8d:
+    - "yum install libjpeg" (from the netlabs-rel repository)
+    - Only needed if you install the JPG plugin GBM provides JPG support
+    - You should not install  JPG and GBM at the same time. (GBM is recommended)
 
 Opzionale: per inserire testo unicode dagli appunti in formato compatibile
 Openoffice.org, e' necessario installare il pacchetto UClip (supporto appunti
@@ -113,4 +142,6 @@ http://www.ecomstation.com
 (c) 2006-2007 by Eugene Romanenko, netlabs.org
 (c) 2010-2011 by Dmitriy Kuminov, netlabs.org
     in cooperazione con Serenity Systems International
+(c) 2016-2019 by netlabs.org
+    in co-operation with Arca Noae, LLC
 

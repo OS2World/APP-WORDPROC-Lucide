@@ -55,13 +55,16 @@
 #define IDB_FITWIDTH    29
 #define IDB_FIND        30
 #define IDB_FINDAGAIN   31
-#define IDB_MGLASS		32
+#define IDB_MGLASS	32
+#define IDB_BACK        33
 
-#define IDM_MAINMENU    100
+#define IDM_MAINMENU        100
+#define IDM_DOCPOPUPMENU    200
 
 #define IDA_MAINACCEL       101
 #define IDA_DOCINFOACCEL    102
 #define IDA_FONTSINFOACCEL  103
+#define IDA_ADDHELPACCEL    104
 
 #define CM_NEW_WINDOW   101
 #define CM_OPEN         102
@@ -70,6 +73,9 @@
 #define CM_PRINT        105
 #define CM_PLUGINSLIST  106
 #define CM_EXIT         107
+#define CM_SAVE         108
+#define CM_BACK         109
+#define CM_BACKNAV      110
 
 #define CM_FILEFIRST    151
 #define CM_FILEPREVIOUS 152
@@ -106,7 +112,18 @@
 #define CM_PRESENTATION 503
 
 #define CM_PRODINFO     601
+#define CM_HELP         602
+#define CM_HELPKEYS     603
+#define CM_HELPPDF      604
+#define CM_HELPDJVU     605
+#define CM_HELPJPEG     606
 
+#define ID_HELPTABLE    650
+#define ID_SUBHELPTABLE 651
+#define MAIN_FRAME      652
+#define PRINT_FRAME     653
+#define INDEX_WIN       654
+#define DOC_WIN         655
 // No menuitems for this commands
 #define CM_MINIMIZE         701
 #define CM_TOPRESENTATION   702
@@ -147,6 +164,7 @@
 #define IDD_SETTINGS        1006
 #define IDC_DEFPGLAYOUT     10
 #define IDC_DEFZOOM         11
+#define IDC_NEVERTHUMB      12
 
 #define IDD_GOTOPAGE        1007
 #define IDC_PAGE            10
@@ -178,12 +196,14 @@
 #define IDC_MTOP			32
 #define IDC_MBOTTOM			33
 #define IDC_SELECTED_FORM	34
+#define IDC_REVERSEPRINT        35
 
 #define IDD_PASSWORD        1009
 #define IDC_PASSWORD        10
 
 #define IDD_LCD_FILEDLG     1010
 #define IDC_PREVIEW			5000
+#define IDC_NOTHUMBONCE       5001
 
 
 #endif // __LUCIDE_RES_H
